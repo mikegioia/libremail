@@ -1,0 +1,12 @@
+/**
+ * This will eventually get merged into SASS or at least
+ * broken out into separate files.
+ */
+
+html {
+    font-size: 75%;
+}
+
+body {
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+}
