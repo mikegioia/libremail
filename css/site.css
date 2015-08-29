@@ -10,3 +10,112 @@ html {
 body {
     font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
+
+header {
+    border-bottom: 4px solid #C56BDE; /* ccc*/
+    height: 5rem;
+    width: 100%;
+    background: #f1f1f1;
+}
+
+#logo {
+    height: 5rem;
+    line-height: 5rem;
+    padding-left: 2rem;
+}
+
+#topnav {
+    height: 5rem;
+    padding: 0.75rem;
+    text-align: right;
+}
+
+nav a {
+    color: #333;
+    text-decoration: none;
+}
+
+nav li.active a {
+    color: #ab51c4;
+    font-weight: bold;
+}
+
+nav {
+    bottom: 0;
+    box-sizing: border-box;
+    left: 0;
+    padding-top: calc(1.5rem + 4px); /* border above */
+    padding-left: 2rem;
+    position: fixed;
+    top: 5rem;
+    width: 20rem;
+}
+
+nav #mailboxes {
+    list-style-type: none;
+    margin-bottom: 0;
+    margin-top: 1rem;
+    padding-left: 1.25rem;
+}
+
+nav #mailboxes li {
+    margin-bottom: 0.25rem;
+}
+
+nav #folders {
+    list-style-type: none;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+nav #folders li {
+    margin-bottom: 0.25rem;
+    padding-left: 1.25rem;
+    position: relative;
+}
+
+nav #folders li:before {
+    content: '\f0da';
+    font-family: FontAwesome;
+    left: -0.25rem;
+    position: absolute;
+    top: 0.1rem;
+    width: 1.25rem;
+}
+
+section#main {
+    bottom: 0;
+    left: 20rem;
+    padding-top: 4px; /* border above */
+    position: fixed;
+    right: 0;
+    top: 5rem;
+}
+
+.button,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+    font-size: 2rem;
+}
+
+.icon.button {
+    height: 3.5rem;
+    line-height: 3.4rem;
+    padding: 0 1rem;
+}
+
+.button.button-primary {
+    font-size: 1.75rem;
+    background-color: #ab51c4;
+    border-color: #ab51c4;
+    height: 3.5rem;
+    line-height: 3.4rem;
+    padding: 0 1.25rem;
+}
+
+.button.button-primary:hover {
+    background-color: #9238ab;
+    border-color: #9238ab;
+}

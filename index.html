@@ -7,23 +7,77 @@
     <meta name="author" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="css/normalize.css">
-    <link rel="stylesheet" href="css/skeleton.css">
-    <link rel="stylesheet" href="css/site.css">
-    <link rel="icon" type="image/png" href="favicon.ico">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="css/normalize.css" rel="stylesheet">
+    <link href="css/skeleton.css" rel="stylesheet">
+    <link href="css/site.css" rel="stylesheet">
+    <link href="favicon.ico" rel="icon" type="image/png">
 </head>
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="one-half column" style="margin-top: 25%">
-                <h4>Basic Page</h4>
-                <p>
-                    This index.html page is a placeholder with the CSS, font and favicon.
-                    It's just waiting for you to add some content! If you need some help
-                    hit up the <a href="http://www.getskeleton.com">Skeleton documentation</a>.
-                </p>
-            </div>
+    <header class="row">
+        <h4 id="logo" class="one-half column">LibreMail</h4>
+        <div id="topnav" class="one-half column">
+            <a class="icon button" href="#">
+                <i class="fa fa-gear"></i>
+            </a>
         </div>
-    </div>
+    </header>
+    <nav>
+        <a class="button button-primary">Compose</a>
+        <ul id="mailboxes">
+            <li class="active">
+                <a href="#">Inbox</a>
+            </li>
+            <li>
+                <a href="#">Starred</a>
+            </li>
+            <li>
+                <a href="#">Sent</a>
+            </li>
+            <li>
+                <a href="#">Drafts</a>
+            </li>
+            <li>
+                <a href="#">All Mail</a>
+            </li>
+        </ul>
+        <ul id="folders">
+            <li>
+                <a href="#">Accounts</a>
+            </li>
+            <li>
+                <a href="#">Employment</a>
+            </li>
+            <li>
+                <a href="#">Family</a>
+            </li>
+            <li>
+                <a href="#">Friends</a>
+            </li>
+            <li>
+                <a href="#">Misc</a>
+            </li>
+            <li>
+                <a href="#">Orders</a>
+            </li>
+            <li>
+                <a href="#">Personal</a>
+            </li>
+            <li>
+                <a href="#">Projects</a>
+            </li>
+            <li>
+                <a href="#">School</a>
+            </li>
+            <li>
+                <a href="#">TeachBoost</a>
+            </li>
+        </ul>
+    </nav>
+    <section id="main" class="container">
+        <div class="row">
+            Mail
+        </div>
+    </section>
 </body>
 </html>
