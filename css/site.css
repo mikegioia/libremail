@@ -119,3 +119,20 @@ input[type="button"] {
     background-color: #9238ab;
     border-color: #9238ab;
 }
+
+.button span.normal {
+    font-size: 1.5rem;
+    position: relative;
+    text-transform: none;
+    top: -0.2rem;
+}
+
+section #msg-actions {
+    border-bottom: 1px solid #ddd;
+    margin-right: 2rem;
+    padding-top: calc(1.25rem + 4px); /* border above */
+}
+
+section #msg-actions a.button:not(:last-child) {
+    margin-right: 0.75rem;
+}

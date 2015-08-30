@@ -74,10 +74,32 @@
             </li>
         </ul>
     </nav>
-    <section id="main" class="container">
-        <div class="row">
-            Mail
-        </div>
+    <section id="main">
+        <section id="msg-actions">
+        <!--
+            Since we don't have :has() yet in CSS4, we need to leave this area
+            for absolutely positioned menu elements that are duplicated for each
+            message below. This is because the only way to contextualize the menu
+            if messages are "checked", is to get a sibling of any :checked element.
+            This means we have to duplicate the menu for each message >_<
+        -->
+            <div class="default">
+                <a href="#" class="icon button">
+                    <i class="fa fa-square-o"></i>
+                    <i class="fa fa-caret-down"></i>
+                </a>
+                <a href="#" class="icon button">
+                    <i class="fa fa-refresh"></i>
+                </a>
+                <a href="#" class="icon button">
+                    <span class="normal">More</span>
+                    <i class="fa fa-caret-down"></i>
+                </a>
+            </div>
+        </section>
+        <section id="msg-list">
+
+        </section>
     </section>
 </body>
 </html>
