@@ -272,3 +272,14 @@ section #msg-list ul {
     margin-top: 0.25rem;
     padding: 0.66rem 1rem;
 }
+
+.dropdown li .left-icon {
+    color: #444;
+    display: inline-block;
+    float: left;
+    line-height: 2.5rem;
+    position: relative;
+    text-align: center;
+    top: 0.5rem;
+    width: 3.5rem;
+}
