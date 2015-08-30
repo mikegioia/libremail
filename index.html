@@ -17,9 +17,19 @@
     <header class="row">
         <h4 id="logo" class="one-half column">LibreMail</h4>
         <div id="topnav" class="one-half column">
-            <a class="icon button" href="#">
-                <i class="fa fa-gear"></i>
-            </a>
+            <div class="dropdown u-pull-right">
+                <a class="icon button" href="#">
+                    <i class="fa fa-gear"></i>
+                </a>
+                <ul class="right-menu size-medium">
+                    <li>
+                        <a href="#settings">Settings &amp; Preferences</a>
+                    </li>
+                    <li>
+                        <a href="#">Configure Email</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </header>
     <nav>
@@ -75,31 +85,95 @@
         </ul>
     </nav>
     <section id="main">
-        <section id="msg-actions">
-        <!--
-            Since we don't have :has() yet in CSS4, we need to leave this area
-            for absolutely positioned menu elements that are duplicated for each
-            message below. This is because the only way to contextualize the menu
-            if messages are "checked", is to get a sibling of any :checked element.
-            This means we have to duplicate the menu for each message >_<
-        -->
-            <div class="default">
-                <a href="#" class="icon button">
-                    <i class="fa fa-square-o"></i>
-                    <i class="fa fa-caret-down"></i>
-                </a>
-                <a href="#" class="icon button">
-                    <i class="fa fa-refresh"></i>
-                </a>
-                <a href="#" class="icon button">
-                    <span class="normal">More</span>
-                    <i class="fa fa-caret-down"></i>
-                </a>
-            </div>
-        </section>
-        <section id="msg-list">
+        <form action="" method="post">
 
-        </section>
+            <section id="msg-actions">
+            <!--
+                Since we don't have :has() yet in CSS4, we need to leave this area
+                for absolutely positioned menu elements that are duplicated for each
+                message below. This is because the only way to contextualize the menu
+                if messages are "checked", is to get a sibling of any :checked element.
+                This means we have to duplicate the menu for each message >_<
+            -->
+                <div class="default">
+                    <div class="dropdown inline-blocked">
+                        <a href="#" class="icon button">
+                            <i class="fa fa-square-o"></i>
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                        <ul>
+                            <li>
+                                <input type="submit" name="select_all" value="All" />
+                            </li>
+                            <li>
+                                <input type="submit" name="select_none" value="None" />
+                            </li>
+                            <li>
+                                <input type="submit" name="select_read" value="Read" />
+                            </li>
+                            <li>
+                                <input type="submit" name="select_unread" value="Unread" />
+                            </li>
+                            <li>
+                                <input type="submit" name="select_starred" value="Starred" />
+                            </li>
+                            <li>
+                                <input type="submit" name="select_unstarred" value="Unstarred" />
+                            </li>
+                        </ul>
+                    </div>
+                    <a href="#" class="icon button">
+                        <i class="fa fa-refresh"></i>
+                    </a>
+                    <div class="dropdown inline-blocked">
+                        <a href="#" class="icon button">
+                            <span class="normal">More</span>
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                        <ul>
+                            <li>
+                                <input type="submit" name="mark_all_read" value="Mark all as read" />
+                            </li>
+                            <li class="notice">
+                                <em>
+                                    Select messages to see more actions
+                                </em>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            <section id="msg-list">
+                <h5>
+                    <i class="fa fa-caret-down arrow"></i>
+                    <span>Starred</span>
+                </h5>
+                <ul>
+                    <li>
+                        <div class="check">
+
+                        </div>
+                        <div class="star">
+
+                        </div>
+                        <div class="names">
+
+                        </div>
+                        <div class="subject">
+
+                        </div>
+                        <div class="date">
+
+                        </div>
+                    </li>
+                </ul>
+                <h5>
+                    <i class="fa fa-caret-down arrow"></i>
+                    <span>Everything else</span>
+                </h5>
+            </section>
+
+        </form>
     </section>
 </body>
 </html>

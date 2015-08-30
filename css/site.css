@@ -5,10 +5,14 @@
 
 html {
     font-size: 75%;
+    height: 100%;
+    width: 100%;
 }
 
 body {
     font-family: "Open Sans", Helvetica, Arial, sans-serif;
+    height: 100%;
+    width: 100%;
 }
 
 header {
@@ -44,7 +48,7 @@ nav {
     bottom: 0;
     box-sizing: border-box;
     left: 0;
-    padding-top: calc(1.5rem + 4px); /* border above */
+    padding-top: 1.75rem;
     padding-left: 2rem;
     position: fixed;
     top: 5rem;
@@ -86,7 +90,6 @@ nav #folders li:before {
 section#main {
     bottom: 0;
     left: 20rem;
-    padding-top: 4px; /* border above */
     position: fixed;
     right: 0;
     top: 5rem;
@@ -98,6 +101,7 @@ input[type="submit"],
 input[type="reset"],
 input[type="button"] {
     font-size: 2rem;
+    text-transform: none;
 }
 
 .icon.button {
@@ -123,16 +127,148 @@ input[type="button"] {
 .button span.normal {
     font-size: 1.5rem;
     position: relative;
-    text-transform: none;
     top: -0.2rem;
 }
 
 section #msg-actions {
     border-bottom: 1px solid #ddd;
+    height: 4.5rem;
     margin-right: 2rem;
-    padding-top: calc(1.25rem + 4px); /* border above */
+    padding-top: 1.75rem;
 }
 
 section #msg-actions a.button:not(:last-child) {
     margin-right: 0.75rem;
+}
+
+section #msg-list {
+    bottom: 0;
+    overflow-y: auto;
+    position: absolute;
+    top: 6.25rem;
+    width: 100%;
+}
+
+section #msg-list h5 {
+    font-size: 1.75rem;
+    margin: 0.5rem 0;
+}
+
+section #msg-list h5 .arrow {
+    font-size: 1.5rem;
+    position: relative;
+    top: -0.15rem;
+}
+
+section #msg-list h5 span {
+    margin-left: 0.5rem;
+}
+
+section #msg-list ul {
+    list-style-type: none;
+    margin-bottom: 1rem;
+}
+
+/* Helpers */
+.inline-blocked {
+    display: inline-block;
+}
+
+.blocked {
+    display: block;
+}
+
+.inlined {
+    display: inline;
+}
+
+/* Dropdowns */
+.dropdown {
+    position: relative;
+}
+
+.dropdown > a {
+    background-color: #fff;
+    position: relative;
+}
+
+.dropdown ul {
+    background-color: #fff;
+    border: 1px solid #bbb;
+    border-radius: 4px
+    color: #333;
+    display: none;
+    list-style-type: none;
+    min-width: 16rem;
+    padding: 0.25rem 0;
+    position: absolute;
+    top: calc(3.5rem - 1px);
+    z-index: 10;
+}
+
+.dropdown ul.right-menu {
+    right: 0;
+}
+
+.dropdown ul.size-medium {
+    width: 22rem;
+}
+
+.dropdown ul.size-large {
+    width: 25rem;
+}
+
+.dropdown > a:focus {
+    border-bottom: none;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    z-index: 11;
+}
+
+.dropdown > a:focus ~ ul,
+.dropdown ul:hover {
+    display: block;
+}
+
+.dropdown > a:focus ~ ul {
+    border-color: #888;
+}
+
+.dropdown li {
+    margin: 0;
+    padding: 0;
+}
+
+.dropdown li a,
+.dropdown li input[type="submit"] {
+    background: #fff;
+    border: none;
+    color: #333;
+    display: block;
+    font-size: 1.5rem;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    text-decoration: none;
+}
+
+.dropdown li input[type="submit"] {
+    font-weight: normal;
+    height: 2.5rem;
+    letter-spacing: normal;
+    line-height: 1.5rem;
+    width: 100%;
+}
+
+.dropdown li a:hover,
+.dropdown li input[type="submit"]:hover {
+    background-color: #eee;
+}
+
+.dropdown li.notice {
+    border-top: 1px solid #ddd;
+    color: #999;
+    line-height: 2rem;
+    margin-top: 0.25rem;
+    padding: 0.66rem 1rem;
 }
