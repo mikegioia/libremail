@@ -6,8 +6,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600" rel="stylesheet" type="text/css">
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <!--<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600" rel="stylesheet" type="text/css">-->
+    <!--<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">-->
+    <link href="css/font-awesome.min.css" rel="stylesheet">
     <link href="css/normalize.css" rel="stylesheet">
     <link href="css/skeleton.css" rel="stylesheet">
     <link href="css/site.css" rel="stylesheet">
@@ -36,55 +37,57 @@
     </header>
     <nav>
         <a id="compose" class="button button-primary">Compose</a>
-        <ul id="mailboxes">
-            <li class="active">
-                <a href="#">Inbox</a>
-            </li>
-            <li>
-                <a href="#">Starred</a>
-            </li>
-            <li>
-                <a href="#">Sent</a>
-            </li>
-            <li>
-                <a href="#">Drafts</a>
-            </li>
-            <li>
-                <a href="#">All Mail</a>
-            </li>
-        </ul>
-        <ul id="folders">
-            <li>
-                <a href="#">Accounts</a>
-            </li>
-            <li>
-                <a href="#">Employment</a>
-            </li>
-            <li>
-                <a href="#">Family</a>
-            </li>
-            <li>
-                <a href="#">Friends</a>
-            </li>
-            <li>
-                <a href="#">Misc</a>
-            </li>
-            <li>
-                <a href="#">Orders</a>
-            </li>
-            <li>
-                <a href="#">Personal</a>
-            </li>
-            <li>
-                <a href="#">Projects</a>
-            </li>
-            <li>
-                <a href="#">School</a>
-            </li>
-            <li>
-                <a href="#">TeachBoost</a>
-            </li>
-        </ul>
+        <div id="nav-wrapper">
+            <ul id="mailboxes">
+                <li class="active">
+                    <a href="#">Inbox</a>
+                </li>
+                <li>
+                    <a href="#">Starred</a>
+                </li>
+                <li>
+                    <a href="#">Sent</a>
+                </li>
+                <li>
+                    <a href="#">Drafts</a>
+                </li>
+                <li>
+                    <a href="#">All Mail</a>
+                </li>
+            </ul>
+            <ul id="folders">
+                <li>
+                    <a href="#">Accounts</a>
+                </li>
+                <li>
+                    <a href="#">Employment</a>
+                </li>
+                <li>
+                    <a href="#">Family</a>
+                </li>
+                <li>
+                    <a href="#">Friends</a>
+                </li>
+                <li>
+                    <a href="#">Misc</a>
+                </li>
+                <li>
+                    <a href="#">Orders</a>
+                </li>
+                <li>
+                    <a href="#">Personal</a>
+                </li>
+                <li>
+                    <a href="#">Projects</a>
+                </li>
+                <li>
+                    <a href="#">School</a>
+                </li>
+                <li>
+                    <a href="#">TeachBoost</a>
+                </li>
+            </ul>
+        </div>
     </nav>
     <section id="main">
         <form action="" method="post">
@@ -97,7 +100,7 @@
                 if messages are "checked", is to get a sibling of any :checked element.
                 This means we have to duplicate the menu for each message >_<
             -->
-                <div class="default">
+                <div class="default menu">
                     <div class="dropdown inline-blocked">
                         <a href="#" class="icon button">
                             <i class="fa fa-square-o"></i>
@@ -146,56 +149,109 @@
                 </div>
             </section>
             <section id="msg-list">
+                <input type="checkbox" id="mailbox-starred-checkbox" class="mailbox-checkbox" />
                 <h5>
-                    <i class="fa fa-caret-down arrow"></i>
+                    <label for="mailbox-starred-checkbox">
+                        <i class="fa fa-caret-down arrow"></i>
+                        <i class="fa fa-caret-right arrow"></i>
+                    </label>
                     <span>Starred</span>
                 </h5>
-                <!--
-                    These are iterated out in 3 parts: the checkbox, the checkbox labe,
-                    then the message row. This is because any behavior tied to the :checked
-                    state of the checkbox(es) needs to be an immediate sibling of the
-                    checked checkbox. In this app, this is used to show an advanced message
-                    list menu if any checkboxes are checked.
-                -->
-                <input type="checkbox" name="message[]" value="1" id="msg-checkbox-1" class="msg-checkbox" />
-                <label for="msg-checkbox-1" class="msg-label"></label>
-                <div class="msg-contents" id="msg-contents-1">
-                    <div class="star">
-                        <i class="fa fa-star"></i>
+                <div id="mailbox-starred" class="mailbox">
+                    <input type="checkbox" name="message[]" value="1" id="msg-checkbox-1" class="msg-checkbox" />
+                    <label for="msg-checkbox-1" class="msg-label"></label>
+                    <div class="msg-contents" id="msg-contents-1">
+                        <div class="star">
+                            <i class="fa fa-star"></i>
+                        </div>
+                        <div class="names">
+                            Thomas Ramfjord
+                        </div>
+                        <a href="#" class="subject">
+                            <span>Michael, please add me to your LinkedIn network</span>&nbsp;Hi Michael, I'd like to connect with you on LinkedIn. Thomas Ramfjord Software Engineer at Quantcast 
+                        </a>
+                        <div class="date">
+                            2:50pm
+                        </div>
                     </div>
-                    <div class="names">
-                        Thomas Ramfjord
-                    </div>
-                    <a href="#" class="subject">
-                        <span>Michael, please add me to your LinkedIn network</span>&nbsp;Hi Michael, I'd like to connect with you on LinkedIn. Thomas Ramfjord Software Engineer at Quantcast 
-                    </a>
-                    <div class="date">
-                        2:50pm
-                    </div>
-                </div>
-                <div class="u-cf"></div>
+                    <div class="u-cf"></div>
 
-                <input type="checkbox" name="message[]" value="2" id="msg-checkbox-2" class="msg-checkbox" />
-                <label for="msg-checkbox-1" class="msg-label"></label>
-                <div class="msg-contents" id="msg-contents-1">
-                    <div class="star">
-                        <i class="fa fa-star"></i>
+                    <input type="checkbox" name="message[]" value="2" id="msg-checkbox-2" class="msg-checkbox" />
+                    <label for="msg-checkbox-2" class="msg-label"></label>
+                    <div class="msg-contents" id="msg-contents-2">
+                        <div class="star">
+                            <i class="fa fa-star"></i>
+                        </div>
+                        <div class="names">
+                            Mike, Jason, Andy (7)
+                        </div>
+                        <a href="#" class="subject">
+                            <mark>TeachBoost</mark>
+                            <span>Design Gym workshop</span>&nbsp;What I was thinking was mainly along the lines of the one day design thinking bootcamp, centered around the business challenge of finding specific use cases of TB as a platfom and rapidly prototyping it and testing the 
+                        </a>
+                        <div class="date">
+                            Aug 27
+                        </div>
                     </div>
-                    <div class="names">
-                        Mike, Jason, Andy (7)
-                    </div>
-                    <a href="#" class="subject">
-                        <mark>TeachBoost</mark>
-                        <span>Design Gym workshop</span>&nbsp;What I was thinking was mainly along the lines of the one day design thinking bootcamp, centered around the business challenge of finding specific use cases of TB as a platfom and rapidly prototyping it and testing the 
-                    </a>
-                    <div class="date">
-                        Aug 27
-                    </div>
-                </div>
-                <div class="u-cf"></div>
+                    <div class="u-cf"></div>
 
+                    <input type="checkbox" name="message[]" value="3" id="msg-checkbox-3" class="msg-checkbox" />
+                    <label for="msg-checkbox-3" class="msg-label"></label>
+                    <div class="msg-contents" id="msg-contents-3">
+                        <div class="star">
+                            <i class="fa fa-star"></i>
+                        </div>
+                        <div class="names">
+                            Mike, Ashley
+                        </div>
+                        <a href="#" class="subject">
+                            <mark>Personal</mark>
+                            <span>Dinner reservation</span>&nbsp;What time did you say again? I can get out of work by like 7 and I can meet you wherever you are. Lemme know.
+                        </a>
+                        <div class="date">
+                            Aug 25
+                        </div>
+                    </div>
+                    <div class="u-cf"></div>
+
+                    <!-- Contextual menu for selected messages -->
+                    <div id="actions-menu" class="actions">
+                        <div class="dropdown inline-blocked">
+                            <a href="#" class="icon button">
+                                <i class="fa fa-square-o"></i>
+                                <i class="fa fa-caret-down"></i>
+                            </a>
+                            <ul>
+                                <li>
+                                    <input type="submit" name="select_all" value="All" />
+                                </li>
+                                <li>
+                                    <input type="submit" name="select_none" value="None" />
+                                </li>
+                                <li>
+                                    <input type="submit" name="select_read" value="Read" />
+                                </li>
+                                <li>
+                                    <input type="submit" name="select_unread" value="Unread" />
+                                </li>
+                                <li>
+                                    <input type="submit" name="select_starred" value="Starred" />
+                                </li>
+                                <li>
+                                    <input type="submit" name="select_unstarred" value="Unstarred" />
+                                </li>
+                            </ul>
+                        </div>
+                        CONTEXTUAL MENU!
+                    </div>
+                </div><!-- /starred mailbox -->
+
+                <input type="checkbox" id="mailbox-everything-checkbox" class="mailbox-checkbox" />
                 <h5>
-                    <i class="fa fa-caret-down arrow"></i>
+                    <label for="mailbox-everything-checkbox">
+                        <i class="fa fa-caret-down arrow"></i>
+                        <i class="fa fa-caret-right arrow"></i>
+                    </label>
                     <span>Everything else</span>
                 </h5>
             </section>
