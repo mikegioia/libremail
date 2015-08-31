@@ -150,25 +150,34 @@
                     <i class="fa fa-caret-down arrow"></i>
                     <span>Starred</span>
                 </h5>
-                <ul>
-                    <li>
-                        <div class="check">
-
-                        </div>
+                <div id="msg-list-wrap">
+                <!--
+                    These are iterated out in 3 parts: the checkbox, the checkbox labe,
+                    then the message row. This is because any behavior tied to the :checked
+                    state of the checkbox(es) needs to be an immediate sibling of the
+                    checked checkbox. In this app, this is used to show an advanced message
+                    list menu if any checkboxes are checked.
+                -->
+                    <input type="checkbox" name="message[]" value="1" id="msg-checkbox-1" class="msg-checkbox" />
+                    <label for="msg-checkbox-1" class="msg-label"></label>
+                    <div class="msg-contents" id="msg-contents-1">
                         <div class="star">
-
+                            <i class="fa fa-star"></i>
                         </div>
                         <div class="names">
-
+                            Thomas Ramfjord
                         </div>
                         <div class="subject">
-
+                            <span>Michael, please add me to your LinkedIn network</span> Hi Michael, I'd like to connect with you on LinkedIn. Thomas Ramfjord Software Engineer at Quantcast 
                         </div>
                         <div class="date">
-
+                            2:50pm
                         </div>
-                    </li>
-                </ul>
+                    </div>
+                </div>
+
+                <!-- Clear all our floated elements -->
+                <div class="u-cf"></div>
                 <h5>
                     <i class="fa fa-caret-down arrow"></i>
                     <span>Everything else</span>

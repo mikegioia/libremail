@@ -293,3 +293,78 @@ section #msg-list ul {
     top: 0.5rem;
     width: 3.5rem;
 }
+
+/* Messages */
+input[type="checkbox"].msg-checkbox {
+    display: none;
+}
+
+.msg-label {
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #e1e1e1;
+    display: block;
+    height: 2.6rem;
+    float: left;
+    width: 2rem;
+}
+
+.msg-label:after {
+    background: #f9f9f9;
+    border: 1px solid #bbb;
+    border-radius: 2px;
+    color: #999;
+    content: ' ';
+    display: block;
+    height: 1.2rem;
+    left: 0.6rem;
+    position: relative;
+    top: 0.6rem;
+    width: 1.2rem;
+}
+
+.msg-contents {
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #e1e1e1;
+    display: border-box;
+    float: left;
+    height: 2.6rem;
+    line-height: 2.66rem;
+    overflow: hidden;
+    width: calc(100% - 5rem);
+}
+
+.msg-contents .star {
+    color: goldenrod;
+    float: left;
+    text-align: center;
+    width: 3.25rem;
+}
+
+.msg-contents .names {
+    font-size: 1.3rem;
+    float: left;
+    width: 18rem;
+}
+
+.msg-contents .subject {
+    color: #888;
+    float: left;
+    font-size: 1.3rem;
+    width: calc(100% - 33.25rem );
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.msg-contents .subject span {
+    color: #333;
+}
+
+.msg-contents .date {
+    box-sizing: border-box;
+    float: right;
+    font-size: 1.3rem;
+    padding-right: 0.6rem;
+    text-align: right;
+    width: 12rem;
+}
