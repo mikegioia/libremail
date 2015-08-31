@@ -164,6 +164,10 @@ section #msg-list h5 {
     margin: 0.5rem 0;
 }
 
+section #msg-list h5 ~ h5 {
+    margin-top: 1.5rem;
+}
+
 section #msg-list h5 .arrow {
     font-size: 1.5rem;
     position: relative;
@@ -302,10 +306,16 @@ input[type="checkbox"].msg-checkbox {
 .msg-label {
     background-color: #f1f1f1;
     border-bottom: 1px solid #e1e1e1;
+    border-top: 1px solid #e1e1e1;
     display: block;
-    height: 2.6rem;
+    height: 3rem;
     float: left;
-    width: 2rem;
+    margin: 0;
+    width: 2.5rem;
+}
+
+.msg-label ~ .msg-label {
+    border-top: none;
 }
 
 .msg-label:after {
@@ -316,55 +326,75 @@ input[type="checkbox"].msg-checkbox {
     content: ' ';
     display: block;
     height: 1.2rem;
-    left: 0.6rem;
+    left: 0.8rem;
     position: relative;
-    top: 0.6rem;
+    top: 0.85rem;
     width: 1.2rem;
 }
 
 .msg-contents {
     background-color: #f1f1f1;
     border-bottom: 1px solid #e1e1e1;
-    display: border-box;
+    border-top: 1px solid #e1e1e1;
     float: left;
-    height: 2.6rem;
-    line-height: 2.66rem;
+    height: 3rem;
+    line-height: 3rem;
     overflow: hidden;
-    width: calc(100% - 5rem);
+    width: calc(100% - 4.5rem);
+}
+
+.msg-contents ~ .msg-contents {
+    border-top: none;
 }
 
 .msg-contents .star {
     color: goldenrod;
     float: left;
+    padding-right: 0.25rem;
     text-align: center;
-    width: 3.25rem;
+    width: 3rem;
 }
 
 .msg-contents .names {
     font-size: 1.3rem;
     float: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     width: 18rem;
 }
 
 .msg-contents .subject {
     color: #888;
+    display: block;
     float: left;
     font-size: 1.3rem;
-    width: calc(100% - 33.25rem );
     overflow: hidden;
-    white-space: nowrap;
+    text-decoration: none;
     text-overflow: ellipsis;
+    white-space: nowrap;
+    width: calc(100% - 33.75rem );
 }
 
 .msg-contents .subject span {
     color: #333;
 }
 
+.msg-contents .subject mark {
+    /* Temporary */
+    background-color: #F2B2A8;
+    color: #8A1C0A;
+
+    border-radius: 1px;
+    font-size: 1rem;
+    padding: 0.1rem 0.4rem;
+}
+
 .msg-contents .date {
     box-sizing: border-box;
     float: right;
     font-size: 1.3rem;
-    padding-right: 0.6rem;
+    padding-right: 0.8rem;
     text-align: right;
     width: 12rem;
 }

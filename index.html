@@ -150,7 +150,6 @@
                     <i class="fa fa-caret-down arrow"></i>
                     <span>Starred</span>
                 </h5>
-                <div id="msg-list-wrap">
                 <!--
                     These are iterated out in 3 parts: the checkbox, the checkbox labe,
                     then the message row. This is because any behavior tied to the :checked
@@ -158,26 +157,43 @@
                     checked checkbox. In this app, this is used to show an advanced message
                     list menu if any checkboxes are checked.
                 -->
-                    <input type="checkbox" name="message[]" value="1" id="msg-checkbox-1" class="msg-checkbox" />
-                    <label for="msg-checkbox-1" class="msg-label"></label>
-                    <div class="msg-contents" id="msg-contents-1">
-                        <div class="star">
-                            <i class="fa fa-star"></i>
-                        </div>
-                        <div class="names">
-                            Thomas Ramfjord
-                        </div>
-                        <div class="subject">
-                            <span>Michael, please add me to your LinkedIn network</span> Hi Michael, I'd like to connect with you on LinkedIn. Thomas Ramfjord Software Engineer at Quantcast 
-                        </div>
-                        <div class="date">
-                            2:50pm
-                        </div>
+                <input type="checkbox" name="message[]" value="1" id="msg-checkbox-1" class="msg-checkbox" />
+                <label for="msg-checkbox-1" class="msg-label"></label>
+                <div class="msg-contents" id="msg-contents-1">
+                    <div class="star">
+                        <i class="fa fa-star"></i>
+                    </div>
+                    <div class="names">
+                        Thomas Ramfjord
+                    </div>
+                    <a href="#" class="subject">
+                        <span>Michael, please add me to your LinkedIn network</span>&nbsp;Hi Michael, I'd like to connect with you on LinkedIn. Thomas Ramfjord Software Engineer at Quantcast 
+                    </a>
+                    <div class="date">
+                        2:50pm
                     </div>
                 </div>
-
-                <!-- Clear all our floated elements -->
                 <div class="u-cf"></div>
+
+                <input type="checkbox" name="message[]" value="2" id="msg-checkbox-2" class="msg-checkbox" />
+                <label for="msg-checkbox-1" class="msg-label"></label>
+                <div class="msg-contents" id="msg-contents-1">
+                    <div class="star">
+                        <i class="fa fa-star"></i>
+                    </div>
+                    <div class="names">
+                        Mike, Jason, Andy (7)
+                    </div>
+                    <a href="#" class="subject">
+                        <mark>TeachBoost</mark>
+                        <span>Design Gym workshop</span>&nbsp;What I was thinking was mainly along the lines of the one day design thinking bootcamp, centered around the business challenge of finding specific use cases of TB as a platfom and rapidly prototyping it and testing the 
+                    </a>
+                    <div class="date">
+                        Aug 27
+                    </div>
+                </div>
+                <div class="u-cf"></div>
+
                 <h5>
                     <i class="fa fa-caret-down arrow"></i>
                     <span>Everything else</span>
