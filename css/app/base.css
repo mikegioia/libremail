@@ -18,6 +18,10 @@ section#main {
     top: 5rem;
 }
 
+a:hover {
+    color: #007db6;
+}
+
 /* Helpers */
 .blocked {
     display: block;

@@ -31,7 +31,13 @@ header {
 
 nav a {
     color: #333;
+    font-size: 1.4rem;
     text-decoration: none;
+}
+
+nav a.mailbox {
+    display: block;
+    margin-right: 2rem;
 }
 
 nav li.active a {
@@ -50,24 +56,40 @@ nav {
     width: 20rem;
 }
 
+nav li {
+    line-height: 1;
+    padding-bottom: 0.4rem;
+    padding-top: 0.25rem;
+}
+
+nav li:hover {
+    background: #f1f1f1;
+}
+
+nav li:not(.active):hover a {
+    color: #000;
+}
+
 nav #nav-wrapper {
     bottom: 0;
     left: 0;
     overflow-y: auto;
-    padding-left: 2rem;
+    padding-left: 1.25rem;
     position: fixed;
     top: 12.25rem;
-    width: 17rem;
+    width: 16.5rem;
 }
 
 nav #mailboxes {
     list-style-type: none;
     margin-bottom: 0;
-    padding-left: 1.25rem;
+    padding: 0;
 }
 
 nav #mailboxes li {
     margin-bottom: 0rem;
+    padding-left: 2rem;
+    padding-right: 0.5rem;
 }
 
 nav #folders {
@@ -78,22 +100,28 @@ nav #folders {
 
 nav #folders li {
     margin-bottom: 0rem;
-    padding-left: 1.25rem;
+    padding-left: 2rem;
     position: relative;
 }
 
-nav #folders li:before {
+nav #folders li.w-sub:before {
     content: '\f0da';
+    cursor: pointer;
     font-family: FontAwesome;
     font-size: 1.3rem;
-    left: -0.25rem;
+    left: 0.75rem;
     position: absolute;
-    top: 0.2rem;
+    top: 0.5rem;
     width: 1.25rem;
 }
 
 nav #folders a.color {
-    
+    float: right;
+    height: 1.2rem;
+    position: absolute;
+    right: 0.5rem;
+    top: 0.45rem;
+    width: 1.2rem;
 }
 
 /**
@@ -115,6 +143,7 @@ section #msg-actions a.button {
 .menu {
     z-index: 20;
 }
+
 .menu .control {
     margin-right: 0.75rem;
 }
