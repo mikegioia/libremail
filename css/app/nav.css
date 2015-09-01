@@ -20,7 +20,7 @@ header {
 
 #topnav {
     height: 5rem;
-    padding: 0.75rem;
+    padding: 0.75rem 1rem 0.75rem 0;
     text-align: right;
 }
 
@@ -132,7 +132,7 @@ nav #folders a.color {
 section #msg-actions {
     border-bottom: 1px solid #ddd;
     height: 4.5rem;
-    margin-right: 2rem;
+    margin-right: 1rem;
     padding-top: 1.75rem;
 }
 

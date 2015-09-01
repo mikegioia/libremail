@@ -27,6 +27,7 @@
 }
 
 .dropdown ul.right-menu {
+    border-radius: 4px 0 4px 4px;
     right: 0;
 }
 
