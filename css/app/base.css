@@ -1,0 +1,38 @@
+html {
+    font-size: 75%;
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+    height: 100%;
+    width: 100%;
+}
+
+section#main {
+    bottom: 0;
+    left: 20rem;
+    position: fixed;
+    right: 0;
+    top: 5rem;
+}
+
+/* Helpers */
+.blocked {
+    display: block;
+}
+
+.inline-blocked {
+    display: inline-block;
+}
+
+.inlined {
+    display: inline;
+}
+
+.no-select {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}

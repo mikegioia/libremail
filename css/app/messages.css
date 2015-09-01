@@ -1,0 +1,203 @@
+/**
+ * Messages
+ *
+ * z-index range: 1-5
+ */
+
+/**
+ * Message Lists
+ * The surrounding structure for housing lists of messages.
+ */
+section #msg-list {
+    bottom: 0;
+    overflow-y: auto;
+    position: absolute;
+    top: 6.25rem;
+    width: 100%;
+}
+
+section #msg-list h5 {
+    font-size: 1.75rem;
+    margin: 0.5rem 0;
+}
+
+section #msg-list h5 ~ h5 {
+    margin-top: 1.5rem;
+}
+
+section #msg-list .mailbox-checkbox {
+    display: none;
+}
+
+section #msg-list h5 label {
+    display: inline;
+}
+
+section #msg-list h5 .fa-caret-right,
+section #msg-list h5 .fa-caret-down {
+    display: inline-block;
+    cursor: pointer;
+    font-size: 1.5rem;
+    position: relative;
+    top: -0.15rem;
+    width: 1rem;
+}
+
+section #msg-list h5 .fa-caret-right {
+    display: none;
+    left: 0.2rem;
+}
+
+section #msg-list h5 span {
+    margin-left: 0.5rem;
+}
+
+section #msg-list .mailbox-checkbox:checked + h5 + .mailbox {
+    display: none;
+}
+
+section #msg-list .mailbox-checkbox:checked + h5 label .fa-caret-right {
+    display: inline-block;
+}
+
+section #msg-list .mailbox-checkbox:checked + h5 label .fa-caret-down {
+    display: none;
+}
+
+/**
+ * Messages
+ */
+input[type="checkbox"].msg-checkbox {
+    display: none;
+}
+
+.msg-checkbox:checked ~ #actions-menu {
+    display: block;
+}
+
+.msg-label {
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #e1e1e1;
+    border-top: 1px solid #e1e1e1;
+    display: block;
+    height: 3rem;
+    float: left;
+    margin: 0;
+    position: relative;
+    width: 2.5rem;
+    z-index: 1;
+}
+
+.msg-label ~ .msg-label {
+    margin-top: -1px;
+}
+
+.msg-label:after {
+    background: #f9f9f9;
+    border: 1px solid #bbb;
+    border-radius: 2px;
+    color: #999;
+    content: ' ';
+    display: block;
+    height: 1.2rem;
+    left: 0.8rem;
+    position: relative;
+    top: 0.85rem;
+    width: 1.2rem;
+}
+
+.msg-checkbox:checked + .msg-label {
+    background-color: #ffda6d;
+    border-color: #d6a70e;
+    z-index: 2;
+}
+
+.msg-checkbox:checked + .msg-label:after {
+    border-color: #888;
+    color: #888;
+    content: '\f00c';
+    font-family: FontAwesome;
+    font-size: 1.2rem;
+    line-height: 1.34rem;
+}
+
+.msg-checkbox:checked + .msg-label + .msg-contents {
+    background-color: #ffda6d;
+    border-color: #d6a70e;
+    z-index: 2;
+}
+
+.msg-contents {
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #e1e1e1;
+    border-top: 1px solid #e1e1e1;
+    float: left;
+    height: 3rem;
+    line-height: 3rem;
+    overflow: hidden;
+    position: relative;
+    width: calc(100% - 4.5rem);
+}
+
+.msg-contents ~ .msg-contents {
+    margin-top: -1px;
+}
+
+.msg-contents .star {
+    color: #d6a70e;
+    float: left;
+    line-height: 3.25rem;
+    padding-right: 0.25rem;
+    text-align: center;
+    width: 3rem;
+}
+
+.msg-contents .names {
+    font-size: 1.3rem;
+    float: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 18rem;
+}
+
+.msg-contents .subject {
+    color: #888;
+    display: block;
+    float: left;
+    font-size: 1.3rem;
+    overflow: hidden;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: calc(100% - 29.75rem );
+}
+
+.msg-checkbox:checked + .msg-label + .msg-contents .subject {
+    color: #555;
+}
+
+.msg-contents .subject span {
+    color: #333;
+}
+
+.msg-contents .subject mark {
+    /* Temporary */
+    background-color: #F2B2A8;
+    color: #8A1C0A;
+
+    border-radius: 1px;
+    font-size: 1rem;
+    padding: 0.1rem 0.4rem;
+    position: relative;
+    top: -0.1rem;
+}
+
+.msg-contents .date {
+    box-sizing: border-box;
+    float: right;
+    font-size: 1.3rem;
+    padding-right: 0.8rem;
+    text-align: right;
+    width: 8rem;
+}

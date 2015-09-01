@@ -34,7 +34,7 @@
             </div>
         </div>
     </header>
-    <nav>
+    <nav class="no-select">
         <a id="compose" class="button button-primary">Compose</a>
         <div id="nav-wrapper">
             <ul id="mailboxes">
@@ -57,6 +57,7 @@
             <ul id="folders">
                 <li>
                     <a href="#">Accounts</a>
+                    <a class="color" href="#" style="background-color: ;"></a>
                 </li>
                 <li>
                     <a href="#">Employment</a>
@@ -91,16 +92,9 @@
     <section id="main">
         <form action="" method="post">
 
-            <section id="msg-actions">
-            <!--
-                Since we don't have :has() yet in CSS4, we need to leave this area
-                for absolutely positioned menu elements that are duplicated for each
-                message below. This is because the only way to contextualize the menu
-                if messages are "checked", is to get a sibling of any :checked element.
-                This means we have to duplicate the menu for each message >_<
-            -->
+            <section id="msg-actions" class="no-select">
                 <div class="default menu">
-                    <div class="dropdown inline-blocked">
+                    <div class="dropdown inline-blocked control">
                         <a href="#" class="icon button">
                             <i class="fa fa-square-o"></i>
                             <i class="fa fa-caret-down"></i>
@@ -126,10 +120,10 @@
                             </li>
                         </ul>
                     </div>
-                    <a href="#" class="icon button">
+                    <a href="#" class="icon button control">
                         <i class="fa fa-refresh"></i>
                     </a>
-                    <div class="dropdown inline-blocked">
+                    <div class="dropdown inline-blocked control">
                         <a href="#" class="icon button">
                             <span class="normal">More</span>
                             <i class="fa fa-caret-down"></i>
@@ -147,7 +141,7 @@
                     </div>
                 </div>
             </section>
-            <section id="msg-list">
+            <section id="msg-list" class="no-select">
                 <input type="checkbox" id="mailbox-starred-checkbox" class="mailbox-checkbox" />
                 <h5>
                     <label for="mailbox-starred-checkbox">
@@ -214,10 +208,10 @@
                     <div class="u-cf"></div>
 
                     <!-- Contextual menu for selected messages -->
-                    <div id="actions-menu" class="actions">
-                        <div class="dropdown inline-blocked">
+                    <div id="actions-menu" class="actions menu">
+                        <div class="dropdown inline-blocked control">
                             <a href="#" class="icon button">
-                                <i class="fa fa-square-o"></i>
+                                <i class="fa fa-minus-square-o"></i>
                                 <i class="fa fa-caret-down"></i>
                             </a>
                             <ul>
@@ -241,7 +235,23 @@
                                 </li>
                             </ul>
                         </div>
-                        CONTEXTUAL MENU!
+                        <a href="#" class="icon button control">
+                            <i class="fa fa-archive"></i>
+                        </a>
+                        <a href="#" class="icon button control">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                        <a href="#" class="icon button control">
+                            <span class="normal">Mark as read</span>
+                        </a>
+                        <a href="#" class="icon button control">
+                            <i class="fa fa-folder"></i>
+                            <i class="fa fa-plus"></i>
+                        </a>
+                        <a href="#" class="icon button control">
+                            <i class="fa fa-tag"></i>
+                            <i class="fa fa-plus"></i>
+                        </a>
                     </div>
                 </div><!-- /starred mailbox -->
 

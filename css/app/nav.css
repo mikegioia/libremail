@@ -1,0 +1,127 @@
+/**
+ * Navigation and Header
+ *
+ * z-index range: 20
+ */
+
+header {
+    border-bottom: 4px solid #C56BDE; /* ccc*/
+    height: 5rem;
+    width: 100%;
+    background: #f1f1f1;
+}
+
+#logo {
+    height: 5rem;
+    line-height: 5rem;
+    margin-bottom: 0;
+    padding-left: 2rem;
+}
+
+#topnav {
+    height: 5rem;
+    padding: 0.75rem;
+    text-align: right;
+}
+
+#compose {
+    line-height: 3.5rem;
+    text-transform: uppercase;
+}
+
+nav a {
+    color: #333;
+    text-decoration: none;
+}
+
+nav li.active a {
+    color: #ab51c4;
+    font-weight: bold;
+}
+
+nav {
+    bottom: 0;
+    box-sizing: border-box;
+    left: 0;
+    padding-top: 1.75rem;
+    padding-left: 2rem;
+    position: fixed;
+    top: 5rem;
+    width: 20rem;
+}
+
+nav #nav-wrapper {
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+    padding-left: 2rem;
+    position: fixed;
+    top: 12.25rem;
+    width: 17rem;
+}
+
+nav #mailboxes {
+    list-style-type: none;
+    margin-bottom: 0;
+    padding-left: 1.25rem;
+}
+
+nav #mailboxes li {
+    margin-bottom: 0rem;
+}
+
+nav #folders {
+    list-style-type: none;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+nav #folders li {
+    margin-bottom: 0rem;
+    padding-left: 1.25rem;
+    position: relative;
+}
+
+nav #folders li:before {
+    content: '\f0da';
+    font-family: FontAwesome;
+    font-size: 1.3rem;
+    left: -0.25rem;
+    position: absolute;
+    top: 0.2rem;
+    width: 1.25rem;
+}
+
+nav #folders a.color {
+    
+}
+
+/**
+ * Actions Menu
+ * This is the menu above the mailboxes that allows for interactivity
+ * with the messages when they're selected.
+ */
+section #msg-actions {
+    border-bottom: 1px solid #ddd;
+    height: 4.5rem;
+    margin-right: 2rem;
+    padding-top: 1.75rem;
+}
+
+section #msg-actions a.button {
+    margin-bottom: 0;
+}
+
+.menu {
+    z-index: 20;
+}
+.menu .control {
+    margin-right: 0.75rem;
+}
+
+#actions-menu {
+    background: #fff;
+    display: none;
+    position: fixed;
+    top: calc(6.75rem);
+}

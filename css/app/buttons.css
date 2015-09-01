@@ -1,0 +1,47 @@
+.button,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+    font-size: 2rem;
+    text-transform: none;
+}
+
+.icon.button {
+    height: 3.5rem;
+    line-height: 3.4rem;
+    padding: 0 1rem;
+}
+
+.icon.button .fa-caret-down {
+    font-size: 1.5rem;
+    position: relative;
+    top: -0.15rem;
+}
+
+.icon.button .fa-plus {
+    font-size: 1rem;
+    position: relative;
+    top: -0.25rem;
+}
+
+.button.button-primary {
+    font-size: 1.75rem;
+    background-color: #ab51c4;
+    border-color: #ab51c4;
+    height: 3.5rem;
+    line-height: 3.4rem;
+    padding: 0 1.25rem;
+}
+
+.button.button-primary:hover {
+    background-color: #9238ab;
+    border-color: #9238ab;
+}
+
+.button span.normal {
+    font-size: 1.5rem;
+    letter-spacing: normal;
+    position: relative;
+    top: -0.2rem;
+}
