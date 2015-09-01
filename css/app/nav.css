@@ -36,8 +36,18 @@ nav a {
 }
 
 nav a.mailbox {
+    border-radius: 2px;
+    box-sizing: border-box;
     display: block;
+    height: 2.1rem;
     margin-right: 2rem;
+    padding: 0.25rem 0 0.4rem;
+    width: 100%;
+}
+
+nav a.mailbox:hover,
+nav a.mailbox:hover + .folder-label {
+    background: #f1f1f1;
 }
 
 nav li.active a {
@@ -58,12 +68,6 @@ nav {
 
 nav li {
     line-height: 1;
-    padding-bottom: 0.4rem;
-    padding-top: 0.25rem;
-}
-
-nav li:hover {
-    background: #f1f1f1;
 }
 
 nav li:not(.active):hover a {
@@ -89,30 +93,25 @@ nav #mailboxes {
 nav #mailboxes li {
     margin-bottom: 0rem;
     padding-left: 2rem;
-    padding-right: 0.5rem;
+    position: relative;
 }
 
-nav #folders {
+nav #folders,
+nav ul.sub {
     list-style-type: none;
-    margin-bottom: 0;
-    margin-top: 0;
+    margin: 0;
+}
+
+nav ul.sub {
+    display: none;
+    margin-left: -0.5rem;
+    margin-top: 0
 }
 
 nav #folders li {
     margin-bottom: 0rem;
     padding-left: 2rem;
     position: relative;
-}
-
-nav #folders li.w-sub:before {
-    content: '\f0da';
-    cursor: pointer;
-    font-family: FontAwesome;
-    font-size: 1.3rem;
-    left: 0.75rem;
-    position: absolute;
-    top: 0.5rem;
-    width: 1.25rem;
 }
 
 nav #folders a.color {
@@ -122,6 +121,51 @@ nav #folders a.color {
     right: 0.5rem;
     top: 0.45rem;
     width: 1.2rem;
+}
+
+nav .folder-checkbox,
+nav .folder-label i {
+    display: none;
+}
+
+nav .folder-label {
+    display: block;
+    font-size: 1.3rem;
+    height: 2.1rem;
+    left: 0;
+    padding-left: 0.75rem;
+    position: absolute;
+    top: 0;
+    width: 1.25rem;
+}
+
+nav li.w-sub > .folder-label {
+    cursor: pointer;
+}
+
+nav .folder-label .fa-caret-down {
+    left: -0.15rem;
+    top: 0.33rem;
+    position: relative;
+}
+
+nav li.w-sub > .folder-label .fa-caret-right {
+    display: inline-block;
+    left: 0;
+    top: 0.33rem;
+    position: relative;
+}
+
+nav li.w-sub > .folder-checkbox:checked ~ .folder-label .fa-caret-right {
+    display: none;
+}
+
+nav li.w-sub > .folder-checkbox:checked ~ .folder-label .fa-caret-down {
+    display: inline-block;
+}
+
+nav li.w-sub > .folder-checkbox:checked ~ ul.sub {
+    display: block;
 }
 
 /**
