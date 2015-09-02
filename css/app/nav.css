@@ -206,3 +206,121 @@ section #msg-actions a.button {
     position: fixed;
     top: calc(6.75rem);
 }
+
+.folder-selector {
+    background-color: #fff;
+    border-left: 1px solid #bbb;
+    box-shadow: 0px 0px 15px #bbb;
+    bottom: 0;
+    right: calc(-44% + -20px);
+    position: fixed;
+    top: calc(5rem + 4px);
+    transition: right 250ms cubic-bezier(0.165, 0.84, 0.44, 1);
+    width: 44%;
+    z-index: 20;
+}
+
+.folder-selector:target {
+    right: 0;
+}
+
+.folder-selector h4 {
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #ddd;
+    box-sizing: border-box;
+    font-size: 2.25rem;
+    height: 4.5rem;
+    line-height: 3.5rem;
+    padding: 0.5rem 1rem;
+    width: 100%;
+}
+
+.folder-selector h4 .close {
+    color: #aaa;
+    float: right;
+    font-weight: normal;
+}
+
+.folder-selector .autocomplete {
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ddd;
+    box-sizing: border-box;
+    height: 4.5rem;
+    line-height: 4.4rem;
+    padding: 0rem 1rem;
+    position: absolute;
+    top: calc(4.5rem + 1px);
+    width: 100%;
+}
+
+.folder-selector .autocomplete input[type="search"] {
+    margin: 0;
+    width: 100%;
+}
+
+.folder-selector .list {
+    bottom: 4.5rem;
+    border-bottom: 1px solid #ddd;
+    box-sizing: border-box;
+    left: 0;
+    overflow-y: auto;
+    position: absolute;
+    right: 0;
+    top: calc(9rem + 2px);
+}
+
+.folder-selector .list .move-to-checkbox {
+    display: none;
+}
+
+.folder-selector .list label {
+    border-bottom: 1px solid #eee;
+    border-top: 1px solid #eee;
+    cursor: pointer;
+    display: block;
+    font-weight: normal;
+    line-height: 3rem;
+    margin: -1px 0 0;
+    padding: 0 1rem;
+    position: relative;
+    transition: padding 200ms cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.folder-selector .list .move-to-checkbox:checked + label {
+    background-color: #007db6;
+    border-color: #006591;
+    color: #fff;
+    padding-left: 3.25rem;
+}
+
+.folder-selector .list .move-to-checkbox + label:after {
+    color: #fff;
+    content: '\f00c';
+    font-family: FontAwesome;
+    position: absolute;
+    left: -1rem;
+    opacity: 0;
+    top: 0;
+    transition: left 200ms cubic-bezier(0.165, 0.84, 0.44, 1);;
+    width: 2rem;
+}
+
+.folder-selector .list .move-to-checkbox:checked + label:after {
+    left: 1rem;
+    opacity: 1;
+}
+
+.folder-selector .actions {
+    background-color: #f7f7f7;
+    bottom: 0;
+    box-sizing: border-box;
+    height: 4.5rem;
+    padding: 0.5rem 1rem;
+    position: absolute;
+    width: 100%;
+}
+
+.folder-selector .actions button {
+    font-size: 1.5rem;
+    letter-spacing: normal;
+}

@@ -319,7 +319,7 @@
                         <a href="#" class="icon button control">
                             <span class="normal">Mark as read</span>
                         </a>
-                        <a href="#" class="icon button control" data-tooltip="Move to">
+                        <a href="#move-messages" class="icon button control" data-tooltip="Move to">
                             <i class="fa fa-folder-o"></i>
                             <i class="fa fa-plus"></i>
                         </a>
@@ -327,6 +327,88 @@
                             <i class="fa fa-tag"></i>
                             <i class="fa fa-plus"></i>
                         </a>
+                    </div><!-- /actions menu -->
+                    <!-- Folder sidebar -->
+                    <div class="folder-selector" id="move-messages">
+                        <h4 class="u-cf">
+                            <span>Move Messages</span>
+                            <a href="#" class="close">
+                                <i class="fa fa-close"></i>
+                            </a>
+                        </h4>
+                        <div class="autocomplete">
+                            <input type="search" list="folder-list" value="" name="move_to[]" autocomplete="Search..." />
+                        </div>
+                        <div class="list">
+                            <input type="checkbox" value="Accounts" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-1" />
+                            <label for="moveto-checkbox-1">Accounts</label>
+                            <input type="checkbox" value="Accounts/Apps" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-2" />
+                            <label for="moveto-checkbox-2">Accounts/Apps</label>
+                            <input type="checkbox" value="Accounts/Banking" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-3" />
+                            <label for="moveto-checkbox-3">Accounts/Banking</label>
+                            <input type="checkbox" value="Accounts/Server" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-4" />
+                            <label for="moveto-checkbox-4">Accounts/Server</label>
+                            <input type="checkbox" value="Accounts/Utilities" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-5" />
+                            <label for="moveto-checkbox-5">Accounts/Utilities</label>
+                            <input type="checkbox" value="Employment" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-6" />
+                            <label for="moveto-checkbox-6">Employment</label>
+                            <input type="checkbox" value="Employment/Closed" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-7" />
+                            <label for="moveto-checkbox-7">Employment/Closed</label>
+                            <input type="checkbox" value="Employment/Closed/Epicenter Arts" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-8" />
+                            <label for="moveto-checkbox-8">Employment/Closed/Epicenter Arts</label>
+                            <input type="checkbox" value="Employment/Closed/LocoJuju" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-9" />
+                            <label for="moveto-checkbox-9">Employment/Closed/LocoJuju</label>
+                            <input type="checkbox" value="Employment/Closed/Mr Youth" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-10" />
+                            <label for="moveto-checkbox-10">Employment/Closed/Mr Youth</label>
+                            <input type="checkbox" value="Employment/Closed/PwC" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-11" />
+                            <label for="moveto-checkbox-11">Employment/Closed/PwC</label>
+                            <input type="checkbox" value="Employment/Closed/SnapGoods" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-12" />
+                            <label for="moveto-checkbox-12">Employment/Closed/SnapGoods</label>
+                            <input type="checkbox" value="Employment/Closed/TraitDesign" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-13" />
+                            <label for="moveto-checkbox-13">Employment/Closed/TraitDesign</label>
+                            <input type="checkbox" value="Employment/GreenDesk" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-14" />
+                            <label for="moveto-checkbox-14">Employment/GreenDesk</label>
+                            <input type="checkbox" value="Employment/ImagineK12" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-15" />
+                            <label for="moveto-checkbox-15">Employment/ImagineK12</label>
+                            <input type="checkbox" value="Family" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-16" />
+                            <label for="moveto-checkbox-16">Family</label>
+                            <input type="checkbox" value="Family/Liz" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-17" />
+                            <label for="moveto-checkbox-17">Family/Liz</label>
+                            <input type="checkbox" value="Family/The GPG" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-18" />
+                            <label for="moveto-checkbox-18">Family/The GPG</label>
+                            <input type="checkbox" value="Friends" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-19" />
+                            <label for="moveto-checkbox-19">Friends</label>
+                            <input type="checkbox" value="Friends/Apokalips" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-20" />
+                            <label for="moveto-checkbox-20">Friends/Apokalips</label>
+                            <input type="checkbox" value="Friends/Band" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-21" />
+                            <label for="moveto-checkbox-21">Friends/Band</label>
+                            <input type="checkbox" value="Friends/CSB" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-22" />
+                            <label for="moveto-checkbox-22">Friends/CSB</label>
+                            <input type="checkbox" value="Friends/Delco" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-23" />
+                            <label for="moveto-checkbox-23">Friends/Delco</label>
+                            <input type="checkbox" value="Friends/Delta Sig" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-24" />
+                            <label for="moveto-checkbox-24">Friends/Delta Sig</label>
+                            <input type="checkbox" value="Friends/Facebook" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-25" />
+                            <label for="moveto-checkbox-25">Friends/Facebook</label>
+                            <input type="checkbox" value="Friends/MtG" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-26" />
+                            <label for="moveto-checkbox-26">Friends/MtG</label>
+                            <input type="checkbox" value="Friends/NYC" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-27" />
+                            <label for="moveto-checkbox-27">Friends/NYC</label>
+                            <input type="checkbox" value="Friends/Orlando" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-28" />
+                            <label for="moveto-checkbox-28">Friends/Orlando</label>
+                            <input type="checkbox" value="Friends/Palo Alto" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-29" />
+                            <label for="moveto-checkbox-29">Friends/Palo Alto</label>
+                            <input type="checkbox" value="Friends/Shave Club" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-30" />
+                            <label for="moveto-checkbox-30">Friends/Shave Club</label>
+                            <input type="checkbox" value="Friends/Soccer" name="move_to[]" class="move-to-checkbox" id="moveto-checkbox-31" />
+                            <label for="moveto-checkbox-31">Friends/Soccer</label>
+                        </div>
+                        <div class="actions">
+                            <button type="submit" class="icon button button-primary">
+                                <i class="fa fa-folder-open-o"></i>&nbsp;
+                                Move to Selected Folders
+                            </button>
+                        </div>
                     </div>
                 </div><!-- /starred mailbox -->
 
@@ -342,5 +424,40 @@
             </section>
         </form>
     </section>
+
+    <!-- Datalist for folders -->
+    <datalist id="folder-list">
+        <option value="Accounts">Accounts</option>
+        <option value="Apps">Accounts/Apps</option>
+        <option value="Banking">Accounts/Banking</option>
+        <option value="Server">Accounts/Server</option>
+        <option value="Utilities">Accounts/Utilities</option>
+        <option value="Employment">Employment</option>
+        <option value="Closed">Employment/Closed</option>
+        <option value="Epicenter Arts">Employment/Closed/Epicenter Arts</option>
+        <option value="LocoJuju">Employment/Closed/LocoJuju</option>
+        <option value="Mr Youth">Employment/Closed/Mr Youth</option>
+        <option value="PwC">Employment/Closed/PwC</option>
+        <option value="SnapGoods">Employment/Closed/SnapGoods</option>
+        <option value="TraitDesign">Employment/Closed/TraitDesign</option>
+        <option value="GreenDesk">Employment/GreenDesk</option>
+        <option value="ImagineK12">Employment/ImagineK12</option>
+        <option value="Family">Family</option>
+        <option value="Liz">Family/Liz</option>
+        <option value="The GPG">Family/The GPG</option>
+        <option value="Friends">Friends</option>
+        <option value="Apokalips">Friends/Apokalips</option>
+        <option value="Band">Friends/Band</option>
+        <option value="CSB">Friends/CSB</option>
+        <option value="Delco">Friends/Delco</option>
+        <option value="Delta Sig">Friends/Delta Sig</option>
+        <option value="Facebook">Friends/Facebook</option>
+        <option value="MtG">Friends/MtG</option>
+        <option value="NYC">Friends/NYC</option>
+        <option value="Orlando">Friends/Orlando</option>
+        <option value="Palo Alto">Friends/Palo Alto</option>
+        <option value="Shave Club">Friends/Shave Club</option>
+        <option value="Soccer">Friends/Soccer</option>
+    </datalist>
 </body>
 </html>
