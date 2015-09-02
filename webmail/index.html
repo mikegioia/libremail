@@ -326,7 +326,7 @@
                             <i class="fa fa-folder-o"></i>
                             <i class="fa fa-plus"></i>
                         </a>
-                        <a href="#" class="icon button control" data-tooltip="Labels">
+                        <a href="#apply-labels" class="icon button control" data-tooltip="Labels">
                             <i class="fa fa-tag"></i>
                             <i class="fa fa-plus"></i>
                         </a>
@@ -412,7 +412,89 @@
                                 Move to Selected Folders
                             </button>
                         </div>
-                    </div>
+                    </div><!-- /move messages selector -->
+                    <!-- Folder sidebar -->
+                    <div class="folder-selector" id="apply-labels">
+                        <h4 class="u-cf">
+                            <span>Apply Labels</span>
+                            <a href="#" class="close">
+                                <i class="fa fa-close"></i>
+                            </a>
+                        </h4>
+                        <div class="autocomplete">
+                            <input type="search" list="folder-list" value="" name="apply_labels[]" autocomplete="Search..." />
+                        </div>
+                        <div class="list">
+                            <input type="checkbox" value="Accounts" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-1" />
+                            <label for="label-checkbox-1">Accounts</label>
+                            <input type="checkbox" value="Accounts/Apps" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-2" />
+                            <label for="label-checkbox-2">Accounts/Apps</label>
+                            <input type="checkbox" value="Accounts/Banking" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-3" />
+                            <label for="label-checkbox-3">Accounts/Banking</label>
+                            <input type="checkbox" value="Accounts/Server" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-4" />
+                            <label for="label-checkbox-4">Accounts/Server</label>
+                            <input type="checkbox" value="Accounts/Utilities" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-5" />
+                            <label for="label-checkbox-5">Accounts/Utilities</label>
+                            <input type="checkbox" value="Employment" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-6" />
+                            <label for="label-checkbox-6">Employment</label>
+                            <input type="checkbox" value="Employment/Closed" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-7" />
+                            <label for="label-checkbox-7">Employment/Closed</label>
+                            <input type="checkbox" value="Employment/Closed/Epicenter Arts" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-8" />
+                            <label for="label-checkbox-8">Employment/Closed/Epicenter Arts</label>
+                            <input type="checkbox" value="Employment/Closed/LocoJuju" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-9" />
+                            <label for="label-checkbox-9">Employment/Closed/LocoJuju</label>
+                            <input type="checkbox" value="Employment/Closed/Mr Youth" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-10" />
+                            <label for="label-checkbox-10">Employment/Closed/Mr Youth</label>
+                            <input type="checkbox" value="Employment/Closed/PwC" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-11" />
+                            <label for="label-checkbox-11">Employment/Closed/PwC</label>
+                            <input type="checkbox" value="Employment/Closed/SnapGoods" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-12" />
+                            <label for="label-checkbox-12">Employment/Closed/SnapGoods</label>
+                            <input type="checkbox" value="Employment/Closed/TraitDesign" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-13" />
+                            <label for="label-checkbox-13">Employment/Closed/TraitDesign</label>
+                            <input type="checkbox" value="Employment/GreenDesk" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-14" />
+                            <label for="label-checkbox-14">Employment/GreenDesk</label>
+                            <input type="checkbox" value="Employment/ImagineK12" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-15" />
+                            <label for="label-checkbox-15">Employment/ImagineK12</label>
+                            <input type="checkbox" value="Family" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-16" />
+                            <label for="label-checkbox-16">Family</label>
+                            <input type="checkbox" value="Family/Liz" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-17" />
+                            <label for="label-checkbox-17">Family/Liz</label>
+                            <input type="checkbox" value="Family/The GPG" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-18" />
+                            <label for="label-checkbox-18">Family/The GPG</label>
+                            <input type="checkbox" value="Friends" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-19" />
+                            <label for="label-checkbox-19">Friends</label>
+                            <input type="checkbox" value="Friends/Apokalips" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-20" />
+                            <label for="label-checkbox-20">Friends/Apokalips</label>
+                            <input type="checkbox" value="Friends/Band" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-21" />
+                            <label for="label-checkbox-21">Friends/Band</label>
+                            <input type="checkbox" value="Friends/CSB" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-22" />
+                            <label for="label-checkbox-22">Friends/CSB</label>
+                            <input type="checkbox" value="Friends/Delco" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-23" />
+                            <label for="label-checkbox-23">Friends/Delco</label>
+                            <input type="checkbox" value="Friends/Delta Sig" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-24" />
+                            <label for="label-checkbox-24">Friends/Delta Sig</label>
+                            <input type="checkbox" value="Friends/Facebook" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-25" />
+                            <label for="label-checkbox-25">Friends/Facebook</label>
+                            <input type="checkbox" value="Friends/MtG" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-26" />
+                            <label for="label-checkbox-26">Friends/MtG</label>
+                            <input type="checkbox" value="Friends/NYC" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-27" />
+                            <label for="label-checkbox-27">Friends/NYC</label>
+                            <input type="checkbox" value="Friends/Orlando" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-28" />
+                            <label for="label-checkbox-28">Friends/Orlando</label>
+                            <input type="checkbox" value="Friends/Palo Alto" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-29" />
+                            <label for="label-checkbox-29">Friends/Palo Alto</label>
+                            <input type="checkbox" value="Friends/Shave Club" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-30" />
+                            <label for="label-checkbox-30">Friends/Shave Club</label>
+                            <input type="checkbox" value="Friends/Soccer" name="apply_labels[]" class="move-to-checkbox" id="label-checkbox-31" />
+                            <label for="label-checkbox-31">Friends/Soccer</label>
+                        </div>
+                        <div class="actions">
+                            <button type="submit" class="icon button button-primary">
+                                <i class="fa fa-tag"></i>&nbsp;
+                                Apply Labels to Messages
+                            </button>
+                        </div>
+                    </div><!-- /apply labels selector -->
                 </div><!-- /starred mailbox -->
 
                 <input type="checkbox" id="mailbox-everything-checkbox" class="mailbox-checkbox" />
