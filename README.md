@@ -1,5 +1,7 @@
 # LibreMail
 
+> *THIS IS UNDER ACTIVE DEVELOPMENT AND IN NO WAY READY FOR PUBLIC USE*
+
 This project encompasses three parts:
 
 1. JavaScript-less HTML Email Client
