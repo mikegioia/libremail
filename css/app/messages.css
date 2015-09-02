@@ -146,7 +146,7 @@ input[type="checkbox"].msg-checkbox {
 .msg-contents .star {
     color: #d6a70e;
     float: left;
-    line-height: 3.25rem;
+    line-height: 3rem;
     padding-right: 0.25rem;
     text-align: center;
     width: 3rem;

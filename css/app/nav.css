@@ -41,7 +41,10 @@ nav a.mailbox {
     display: block;
     height: 2.1rem;
     margin-right: 2rem;
-    padding: 0.25rem 0 0.4rem;
+    overflow: hidden;
+    padding: 0.25rem 1.6rem 0.4rem 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     width: 100%;
 }
 
@@ -70,8 +73,8 @@ nav li {
     line-height: 1;
 }
 
-nav li:not(.active):hover a {
-    color: #000;
+nav li:not(.active):hover > a {
+    color: #333;
 }
 
 nav #nav-wrapper {
@@ -178,6 +181,11 @@ section #msg-actions {
     height: 4.5rem;
     margin-right: 1rem;
     padding-top: 1.75rem;
+}
+
+section #msg-actions .control {
+    box-sizing: border-box;
+    height: 3.5rem;
 }
 
 section #msg-actions a.button {
