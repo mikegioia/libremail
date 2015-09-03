@@ -278,26 +278,23 @@ section #msg-actions a.button {
     font-weight: normal;
 }
 
-.folder-selector .autocomplete {
-    background-color: #f7f7f7;
+.folder-selector input[type="search"] {
+    border: none;
     border-bottom: 1px solid #ddd;
+    border-radius: 0;
     box-sizing: border-box;
+    display: block;
     height: 4.5rem;
-    line-height: 4.4rem;
-    padding: 0rem 1rem;
+    line-height: 4.5rem;
+    margin: 0;
+    padding: 0 1rem;
     position: absolute;
     top: calc(4.5rem + 1px);
     width: 100%;
 }
 
-.folder-selector .autocomplete input[type="search"] {
-    margin: 0;
-    width: 100%;
-}
-
 .folder-selector .list {
     bottom: 4.5rem;
-    border-bottom: 1px solid #ddd;
     box-sizing: border-box;
     left: 0;
     overflow-y: auto;
@@ -328,6 +325,7 @@ section #msg-actions a.button {
     border-color: #006591;
     color: #fff;
     padding-left: 3.25rem;
+    z-index: 1;
 }
 
 .folder-selector .list .move-to-checkbox + label:after {
@@ -349,6 +347,7 @@ section #msg-actions a.button {
 
 .folder-selector .actions {
     background-color: #f7f7f7;
+    border-top: 1px solid #ddd;
     bottom: 0;
     box-sizing: border-box;
     height: 4.5rem;
@@ -360,4 +359,18 @@ section #msg-actions a.button {
 .folder-selector .actions button {
     font-size: 1.5rem;
     letter-spacing: normal;
+}
+
+.folder-selector .actions .hint {
+    display: none;
+    margin-left: 1rem;
+}
+
+.folder-selector input[type="search"]:invalid + .list + .actions {
+    background: #ffda6d;
+    border-color: #d6a70e;
+}
+
+.folder-selector input[type="search"]:invalid + .list + .actions .hint {
+    display: inline-block;
 }
