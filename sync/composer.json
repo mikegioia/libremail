@@ -2,6 +2,8 @@
     "require": {
         "php": ">=5.4.0",
         "ext-imap": "*",
-        "php-imap/php-imap": "^2.0"
+        "php-imap/php-imap": "^2.0",
+        "pimple/pimple": "~3.0",
+        "voku/simple-mysqli": "dev-master"
     }
 }
