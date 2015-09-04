@@ -18,7 +18,8 @@ section#main {
     top: 5rem;
 }
 
-a:hover {
+a:hover,
+a:focus {
     color: #007db6;
 }
 

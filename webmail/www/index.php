@@ -8,4 +8,12 @@ require( __DIR__ .'/../vendor/autoload.php' );
 // Set up route callbacks and trigger routing
 $router = new \App\Router();
 
+$router->get( '/', function () {
+    echo "Hello world";
+});
+
+$router->match( 'GET', '/about', function () {
+    echo 'about';
+});
+
 $router->run();

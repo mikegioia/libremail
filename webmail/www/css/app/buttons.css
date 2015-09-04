@@ -34,7 +34,16 @@ input[type="button"] {
     padding: 0 1.25rem;
 }
 
-.button.button-primary:hover {
+button.button-primary:hover,
+button.button-primary:focus,
+.button.button-primary:hover,
+.button.button-primary:focus,
+input[type="reset"].button-primary:hover,
+input[type="reset"].button-primary:focus,
+input[type="submit"].button-primary:hover,
+input[type="submit"].button-primary:focus,
+input[type="button"].button-primary:hover,
+input[type="button"].button-primary:focus {
     background-color: #9238ab;
     border-color: #9238ab;
 }

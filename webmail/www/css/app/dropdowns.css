@@ -39,6 +39,10 @@
     width: 25rem;
 }
 
+.dropdown ul:focus {
+    background-color: red;
+}
+
 .dropdown > a:focus {
     border-bottom: none;
     border-bottom-right-radius: 0;
@@ -46,12 +50,12 @@
     z-index: 11;
 }
 
-.dropdown > a:focus ~ ul,
+.dropdown > a:focus + ul,
 .dropdown ul:hover {
     display: block;
 }
 
-.dropdown > a:focus ~ ul {
+.dropdown > a:focus + ul {
     border-color: #888;
 }
 
@@ -64,6 +68,7 @@
 .dropdown li input[type="submit"] {
     background: #fff;
     border: none;
+    border-radius: 0;
     color: #333;
     display: block;
     font-size: 1.5rem;
