@@ -3,7 +3,9 @@
 namespace App;
 
 use Monolog\Logger
-  , Monolog\Handler\StreamHandler;
+  , Monolog\Handler\StreamHandler
+  , Monolog\Formatter\LineFormatter
+  , Monolog\Handler\RotatingFileHandler;
 
 class Log
 {
@@ -35,12 +37,31 @@ class Log
             ? $levels[ $config[ 'level' ] ]
             : Logger::WARNING;
 
-        $this->logger = new Logger( $config[ 'name' ] );
-        $this->logger->pushHandler(
-            new StreamHandler(
+        // Create and configure a new logger
+        $log = new Logger( $config[ 'name' ] );
+
+        if ( $stdout === TRUE ) {
+            $handler = new StreamHandler( $this->path, $this->level );
+        }
+        else {
+            $handler = new RotatingFileHandler(
                 $this->path,
-                $this->level
-            ));
+                $maxFiles = 0,
+                $this->level,
+                $bubble = TRUE );
+        }
+
+        // Allow line breaks and stack traces, and don't show
+        // empty context arrays
+        $formatter = new LineFormatter();
+        $formatter->includeStacktraces();
+        $formatter->allowInlineLineBreaks();
+        $formatter->ignoreEmptyContextAndExtra();
+        $handler->setFormatter( $formatter );
+        $log->pushHandler( $handler );
+
+        // Store the log internally
+        $this->logger = $log;
     }
 
     function getLogger()

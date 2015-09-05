@@ -10,6 +10,7 @@
         "php-imap/php-imap": "^2.0",
         "pimple/pimple": "~3.0",
         "voku/simple-mysqli": "dev-master",
-        "monolog/monolog": "^1.17"
+        "monolog/monolog": "^1.17",
+        "league/climate": "^3.2"
     }
 }

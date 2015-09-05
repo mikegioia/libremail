@@ -11,7 +11,8 @@
 use App\Log as Log
   , voku\db\DB as DB
   , App\Console as Console
-  , Pimple\Container as Container;
+  , Pimple\Container as Container
+  , League\CLImate\CLImate as CLI;
 
 require( __DIR__ . '/vendor/autoload.php' );
 
@@ -45,7 +46,15 @@ $container[ 'log' ] = function ( $c ) {
     return $log->getLogger();
 };
 
+// Console/CLI service
+$container[ 'cli' ] = function ( $c ) {
+    return new CLI();
+};
+
 $container[ 'log' ]->addError( 'Bar' );
+
+$container[ 'cli' ]->out('This prints to the terminal.');
+$container[ 'cli' ]->whisper('ssshhhhhh.');
 
 // Run initialization checks, like if the databaes exists or if there
 // are email accounts saved. This may prompt the user to add an account
