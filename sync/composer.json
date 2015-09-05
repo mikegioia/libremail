@@ -1,9 +1,15 @@
 {
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
     "require": {
         "php": ">=5.4.0",
         "ext-imap": "*",
         "php-imap/php-imap": "^2.0",
         "pimple/pimple": "~3.0",
-        "voku/simple-mysqli": "dev-master"
+        "voku/simple-mysqli": "dev-master",
+        "monolog/monolog": "^1.17"
     }
 }
