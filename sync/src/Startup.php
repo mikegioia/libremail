@@ -27,7 +27,7 @@ class Startup
         // throw an error if it's not found.
         $di[ 'db' ]->isReady();
 
-        $this->checkIfAccountsExist();
+        $this->checkIfAccountsExist( $di[ 'db' ], $di[ 'cli' ] );
     }
 
     /**
@@ -35,8 +35,34 @@ class Startup
      * if we're in interactive mode, then prompt the user to add
      * one. Otherwise log and exit.
      */
-    private function checkIfAccountsExist()
+    private function checkIfAccountsExist( $db, $cli )
     {
+        $accounts = $db->select(
+            'accounts', [
+                'is_active =' => 1
+            ]);
 
+        if ( ! $accounts ) {
+            if ( $this->interactive ) {
+                $cli->info( "No active email accounts exist in the database." );
+                $input = $cli->confirm( "Do you want to add one now?" );
+
+                if ( $input->confirmed() ) {
+                    // First prompt to choose a type of account
+                    $cli->br();
+                    $input = $cli->radio(
+                        'Please choose from the supported email providers:',
+                        [ 'GMail', 'Outlook' ] );
+                    $response = $input->prompt();
+                    var_dump( $response );
+                }
+            }
+            else {
+                throw new NoAccountsException(
+                    "No active email accounts exist in the database." );
+            }
+        }
     }
 }
+
+class NoAccountsException extends \Exception {}
