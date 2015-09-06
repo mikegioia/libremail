@@ -9,25 +9,30 @@ namespace App;
 
 class Startup
 {
+    private $db;
+    private $cli;
+    private $log;
     private $dbName;
-    private $interactive;
 
-    function __construct( $config, $console )
+    function __construct( $di )
     {
-        $this->dbName = $config[ 'sql' ][ 'database' ];
-        $this->interactive = ( $console->interactive === TRUE );
+        $this->db = $di[ 'db' ];
+        $this->cli = $di[ 'cli' ];
+        $this->log = $di[ 'log' ];
+        $this->console = $di[ 'console' ];
+        $this->dbName = $di[ 'config' ][ 'sql' ][ 'database' ];
     }
 
-    function run( $di )
+    function run()
     {
         // Try writing to the log
-        $di[ 'log' ]->debug( "Starting sync engine" );
+        $this->log->debug( "Starting sync engine" );
 
         // Check if database exists. This will try accessing it and
         // throw an error if it's not found.
-        $di[ 'db' ]->isReady();
+        $this->db->isReady();
 
-        $this->checkIfAccountsExist( $di[ 'db' ], $di[ 'cli' ] );
+        $this->checkIfAccountsExist();
     }
 
     /**
@@ -35,27 +40,16 @@ class Startup
      * if we're in interactive mode, then prompt the user to add
      * one. Otherwise log and exit.
      */
-    private function checkIfAccountsExist( $db, $cli )
+    private function checkIfAccountsExist()
     {
-        $accounts = $db->select(
+        $accounts = $this->db->select(
             'accounts', [
                 'is_active =' => 1
             ]);
 
         if ( ! $accounts ) {
-            if ( $this->interactive ) {
-                $cli->info( "No active email accounts exist in the database." );
-                $input = $cli->confirm( "Do you want to add one now?" );
-
-                if ( $input->confirmed() ) {
-                    // First prompt to choose a type of account
-                    $cli->br();
-                    $input = $cli->radio(
-                        'Please choose from the supported email providers:',
-                        [ 'GMail', 'Outlook' ] );
-                    $response = $input->prompt();
-                    var_dump( $response );
-                }
+            if ( $this->console->interactive ) {
+                $this->console->promptAccountInfo();
             }
             else {
                 throw new NoAccountsException(

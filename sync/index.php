@@ -61,8 +61,8 @@ $di[ 'log' ] = function ( $c ) {
 // are email accounts saved. This may prompt the user to add an account
 // if we're running in interactive mode.
 try {
-    $startup = new \App\Startup( $di[ 'config' ], $di[ 'console' ] );
-    $startup->run( $di );
+    $startup = new \App\Startup( $di );
+    $startup->run();
 }
 catch ( \Exception $e ) {
     if ( $di[ 'console' ]->interactive === TRUE ) {
