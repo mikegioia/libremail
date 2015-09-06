@@ -19,8 +19,8 @@ class Log
     function __construct( $config, $stdout = FALSE )
     {
         $this->parseConfig( $config, $stdout );
-        $this->checkLogPath();
-        $this->createLog();
+        // $this->checkLogPath();
+        $this->createLog( $config, $stdout );
     }
 
     function getLogger()
@@ -63,7 +63,7 @@ class Log
         }
     }
 
-    private function createLog()
+    private function createLog( $config, $stdout )
     {
         // Create and configure a new logger
         $log = new Logger( $config[ 'name' ] );

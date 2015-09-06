@@ -23,31 +23,35 @@ $local = parse_ini_file( __DIR__ .'/config/local.ini', TRUE );
 $config = array_replace_recursive( $default, $local );
 
 // Set up dependency container and register all services
-$container = new Container();
+$di = new Container();
 
 // Store the configuration as a service
-$container[ 'config' ] = $config;
+$di[ 'config' ] = $config;
 
 // Console/CLI service
-$container[ 'console' ] = function ( $c ) {
+$di[ 'console' ] = function ( $c ) {
     return new Console();
 };
-$container[ 'cli' ] = function ( $c ) {
+$di[ 'cli' ] = function ( $c ) {
     return $c[ 'console' ]->getCLI();
 };
 
 // MySQLi service, this uses Voku's library
-$container[ 'db' ] = function ( $c ) {
+$di[ 'db' ] = function ( $c ) {
     $dbConfig = $c[ 'config' ][ 'sql' ];
     return DB::getInstance(
         $dbConfig[ 'hostname' ],
         $dbConfig[ 'username' ],
         $dbConfig[ 'password' ],
-        $dbConfig[ 'database' ] );
+        $dbConfig[ 'database' ],
+        $dbConfig[ 'port' ],
+        $dbConfig[ 'charset' ],
+        $exitOnError = FALSE,
+        $echoOnError = FALSE );
 };
 
 // Logging service
-$container[ 'log' ] = function ( $c ) {
+$di[ 'log' ] = function ( $c ) {
     $stdout = ( $c[ 'console' ]->interactive === TRUE );
     $log = new Log( $c[ 'config' ][ 'log' ], $stdout );
     return $log->getLogger();
@@ -57,17 +61,21 @@ $container[ 'log' ] = function ( $c ) {
 // are email accounts saved. This may prompt the user to add an account
 // if we're running in interactive mode.
 try {
-    // Try writing to the log
-    $container[ 'log' ]->debug( "Starting sync engine" );
-    // Check if the database connection is open and that the db exists
-    
+    $startup = new \App\Startup( $di[ 'config' ], $di[ 'console' ] );
+    $startup->run( $di );
 }
 catch ( \Exception $e ) {
-    $container[ 'cli' ]->bold()->backgroundRed()->white( $e->getMessage() );
-    $container[ 'cli' ]->br();
+    if ( $di[ 'console' ]->interactive === TRUE ) {
+        $di[ 'cli' ]->bold()->backgroundRed()->white( $e->getMessage() );
+        $di[ 'cli' ]->br();
 
-    if ( $config[ 'app' ][ 'stacktrace' ] ) {
-        $container[ 'cli' ]->comment( $e->getTraceAsString() );
-        $container[ 'cli' ]->br();
+        if ( $config[ 'app' ][ 'stacktrace' ] ) {
+            $di[ 'cli' ]->comment( $e->getTraceAsString() );
+            $di[ 'cli' ]->br();
+        }
+    }
+    else {
+        $di[ 'log' ]->addError(
+            $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
     }
 }
