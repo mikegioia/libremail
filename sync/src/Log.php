@@ -18,6 +18,18 @@ class Log
 
     function __construct( $config, $stdout = FALSE )
     {
+        $this->parseConfig( $config, $stdout );
+        $this->checkLogPath();
+        $this->createLog();
+    }
+
+    function getLogger()
+    {
+        return $this->logger;
+    }
+
+    private function parseConfig( $config, $stdout )
+    {
         // Set up lookup table for log levels
         $levels = [
             0 => Logger::EMERGENCY, // system is unusable
@@ -36,7 +48,23 @@ class Log
         $this->level = ( isset( $levels[ $config[ 'level' ] ] ) )
             ? $levels[ $config[ 'level' ] ]
             : Logger::WARNING;
+    }
 
+    /**
+     * Checks if the log path is writeable by the user.
+     * @return boolean
+     */
+    private function checkLogPath()
+    {
+        if ( ! is_writeable( $this->path ) ) {
+            throw new LogPathNotWriteableException(
+                "The log path is not writeable by the current user: ".
+                get_current_user() );
+        }
+    }
+
+    private function createLog()
+    {
         // Create and configure a new logger
         $log = new Logger( $config[ 'name' ] );
 
@@ -63,9 +91,6 @@ class Log
         // Store the log internally
         $this->logger = $log;
     }
-
-    function getLogger()
-    {
-        return $this->logger;
-    }
 }
+
+class LogPathNotWriteableException extends \Exception {}
