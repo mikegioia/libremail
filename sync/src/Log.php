@@ -19,7 +19,7 @@ class Log
     function __construct( $config, $stdout = FALSE )
     {
         $this->parseConfig( $config, $stdout );
-        // $this->checkLogPath();
+        $this->checkLogPath( $stdout );
         $this->createLog( $config, $stdout );
     }
 
@@ -54,9 +54,17 @@ class Log
      * Checks if the log path is writeable by the user.
      * @return boolean
      */
-    private function checkLogPath()
+    private function checkLogPath( $stdout )
     {
-        if ( ! is_writeable( $this->path ) ) {
+        if ( $stdout ) {
+            return TRUE;
+        }
+
+        $logPath = ( substr( $this->path, 0, 1 ) !== "/" )
+            ? __DIR__
+            : $this->path;
+
+        if ( ! is_writeable( $logPath ) ) {
             throw new LogPathNotWriteableException(
                 "The log path is not writeable by the current user: ".
                 get_current_user() );

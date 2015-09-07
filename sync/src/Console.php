@@ -48,12 +48,6 @@ class Console
                 'defaultValue' => TRUE,
                 'noValue' => TRUE
             ],
-            'verbose' => [
-                'prefix' => 'v',
-                'longPrefix' => 'verbose',
-                'description' => 'Verbose output',
-                'noValue' => TRUE
-            ],
             'help' => [
                 'prefix' => 'h',
                 'longPrefix' => 'help',
@@ -106,6 +100,10 @@ class Console
         $newAccount[ 'type' ] = $this->promptAccountType();
         $newAccount[ 'email' ] = $this->promptEmail();
         $newAccount[ 'password' ] = $this->promptPassword();
+
+        // Test connection before adding
+        $this->testConnection( $newAccount );
+
     }
 
     /**
@@ -138,6 +136,24 @@ class Console
     }
 
     private function promptEmail()
+    {
+        $input = $this->cli->input( 'Email address:' );
+        return $input->prompt();
+    }
+
+    private function promptPassword()
+    {
+        $input = $this->cli->password( 'Password:' );
+        return $input->prompt();
+    }
+
+    /**
+     * Attempts to connect to the mail server using the new account
+     * settings from the prompt.
+     * @return boolean
+     * @throws EmailConnectionException
+     */
+    private function testConnection( $newAccount )
     {
 
     }
