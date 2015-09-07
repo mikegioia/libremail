@@ -55,6 +55,14 @@ $di[ 'log' ] = function ( $c ) {
     return $log->getLogger();
 };
 
+// Statically set the services in the base model
+\App\Model::setDb( $di[ 'db' ] );
+\App\Model::setCLI( $di[ 'cli' ] );
+\App\Model::setLog( $di[ 'log' ] );
+
+// Parse the CLI
+$di[ 'console' ]->init();
+
 // Run initialization checks, like if the database exists or if there
 // are email accounts saved. This may prompt the user to add an account
 // if we're running in interactive mode.

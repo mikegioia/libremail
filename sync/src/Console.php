@@ -15,7 +15,9 @@ class Console
 
     // Command line arguments
     public $help;
+    public $create;
     public $verbose;
+    public $updatedb;
     public $background;
     public $interactive;
 
@@ -26,21 +28,16 @@ class Console
         $this->cli = new CLI();
         $this->cli->description( "LibreMail IMAP to SQL sync engine" );
         $this->setupArgs();
+    }
+
+    function init()
+    {
         $this->processArgs();
     }
 
     function getCLI()
     {
         return $this->cli;
-    }
-
-    /**
-     * Log depends on command line args so this needs to be set
-     * after the dependency is loaded.
-     */
-    function setLog( $log )
-    {
-        $this->log = $log;
     }
 
     /**
@@ -56,6 +53,18 @@ class Console
                 'description' => 'Run as a background service',
                 'noValue' => TRUE
             ],
+            'create' => [
+                'prefix' => 'c',
+                'longPrefix' => 'create',
+                'description' => 'Create a new IMAP account',
+                'noValue' => TRUE
+            ],
+            'help' => [
+                'prefix' => 'h',
+                'longPrefix' => 'help',
+                'description' => 'Prints a usage statement',
+                'noValue' => TRUE
+            ],
             'interactive' => [
                 'prefix' => 'i',
                 'longPrefix' => 'interactive',
@@ -63,10 +72,10 @@ class Console
                 'defaultValue' => TRUE,
                 'noValue' => TRUE
             ],
-            'help' => [
-                'prefix' => 'h',
-                'longPrefix' => 'help',
-                'description' => 'Prints a usage statement',
+            'updatedb' => [
+                'prefix' => 'u',
+                'longPrefix' => 'updatedb',
+                'description' => 'Run the database migration scripts to update the schema',
                 'noValue' => TRUE
             ]
         ]);
@@ -79,13 +88,31 @@ class Console
     {
         $this->cli->arguments->parse();
         $this->help = $this->cli->arguments->get( 'help' );
+        $this->create = $this->cli->arguments->get( 'create' );
         $this->verbose = $this->cli->arguments->get( 'verbose' );
+        $this->updatedb = $this->cli->arguments->get( 'updatedb' );
         $this->background = $this->cli->arguments->get( 'background' );
         $this->interactive = $this->cli->arguments->get( 'interactive' );
 
         // If help is set, show the usage and exit
         if ( $this->help === TRUE ) {
             $this->cli->usage();
+            exit( 0 );
+        }
+
+        // If create is set, skip right to the account creation
+        if ( $this->create === TRUE ) {
+            $this->interactive = TRUE;
+            $this->cli->info( "Creating a new IMAP account" );
+            $this->promptAccountInfo();
+            exit( 0 );
+        }
+
+        // If updatedb is set, just run the migration script
+        if ( $this->updatedb === TRUE ) {
+            $this->interactive = TRUE;
+            $migrate = new \App\Models\Migration();
+            $migrate->run();
             exit( 0 );
         }
 
@@ -111,6 +138,7 @@ class Console
             return;
         }
 
+        $this->cli->br();
         $this->promptAccountInfo();
     }
 
@@ -141,7 +169,7 @@ class Console
     private function promptAccountType()
     {
         $validTypes = [ 'GMail', 'Outlook' ];
-        $this->cli->br();
+        //$this->cli->br();
         $input = $this->cli->radio(
             'Please choose from the supported email providers:',
             $validTypes );
