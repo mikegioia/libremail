@@ -17,7 +17,7 @@ require( __DIR__ . '/vendor/autoload.php' );
 
 // Process command line arguments
 
-// Load configuration files
+// Load configuration files and parse the CLI arguments
 $default = parse_ini_file( __DIR__ .'/config/default.ini', TRUE );
 $local = parse_ini_file( __DIR__ .'/config/local.ini', TRUE );
 $config = array_replace_recursive( $default, $local );
@@ -29,9 +29,7 @@ $di = new Container();
 $di[ 'config' ] = $config;
 
 // Console/CLI service
-$di[ 'console' ] = function ( $c ) {
-    return new Console();
-};
+$di[ 'console' ] = new Console( $config );
 $di[ 'cli' ] = function ( $c ) {
     return $c[ 'console' ]->getCLI();
 };
@@ -75,7 +73,12 @@ catch ( \Exception $e ) {
         }
     }
     else {
-        $di[ 'log' ]->addError(
-            $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
+        if ( $config[ 'app' ][ 'stacktrace' ] ) {
+            $di[ 'log' ]->addError(
+                $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
+        }
+        else {
+            $di[ 'log' ]->addError( $e->getMessage() );
+        }
     }
 }

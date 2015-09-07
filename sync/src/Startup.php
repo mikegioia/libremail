@@ -13,6 +13,7 @@ class Startup
     private $cli;
     private $log;
     private $dbName;
+    private $console;
 
     function __construct( $di )
     {
@@ -49,7 +50,7 @@ class Startup
 
         if ( ! $accounts ) {
             if ( $this->console->interactive ) {
-                $this->console->promptAccountInfo();
+                $this->console->createNewAccount();
             }
             else {
                 throw new NoAccountsException(

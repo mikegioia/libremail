@@ -9,14 +9,20 @@ class Console
     // CLImate instance
     private $cli;
 
+    // Dependencies
+    private $log;
+    private $config;
+
     // Command line arguments
     public $help;
     public $verbose;
     public $background;
     public $interactive;
 
-    function __construct()
+    function __construct( $config )
     {
+        $this->config = $config;
+
         $this->cli = new CLI();
         $this->cli->description( "LibreMail IMAP to SQL sync engine" );
         $this->setupArgs();
@@ -26,6 +32,15 @@ class Console
     function getCLI()
     {
         return $this->cli;
+    }
+
+    /**
+     * Log depends on command line args so this needs to be set
+     * after the dependency is loaded.
+     */
+    function setLog( $log )
+    {
+        $this->log = $log;
     }
 
     /**
@@ -81,9 +96,9 @@ class Console
     }
 
     /**
-     * Asks the user for account information to set up a new account
+     * Asks the user for account information to set up a new account.
      */
-    function promptAccountInfo()
+    function createNewAccount()
     {
         if ( ! $this->interactive ) {
             return;
@@ -96,6 +111,15 @@ class Console
             return;
         }
 
+        $this->promptAccountInfo();
+    }
+
+    /**
+     * Get the new account info from the user via CLI prompts. If
+     * successful this will create a new record in the SQL database.
+     */
+    private function promptAccountInfo()
+    {
         $newAccount = [];
         $newAccount[ 'type' ] = $this->promptAccountType();
         $newAccount[ 'email' ] = $this->promptEmail();
@@ -104,6 +128,9 @@ class Console
         // Test connection before adding
         $this->testConnection( $newAccount );
 
+        // Connection settings worked, save to SQL
+        // @TODO
+        print_r( $newAccount );
     }
 
     /**
@@ -150,11 +177,40 @@ class Console
     /**
      * Attempts to connect to the mail server using the new account
      * settings from the prompt.
-     * @return boolean
+     * @param array $account Account credentials
      * @throws EmailConnectionException
      */
-    private function testConnection( $newAccount )
+    private function testConnection( $account )
     {
+        $sync = new \App\Sync();
+        $sync->setConfig( $this->config );
 
+        try {
+            $sync->connect(
+                $account[ 'type' ],
+                $account[ 'email' ],
+                $account[ 'password' ] );
+        }
+        catch ( \Exception $e ) {
+            $this->cli->error(
+                sprintf(
+                    "Unable to connect as '%s' to %s IMAP server: %s.",
+                    $account[ 'email' ],
+                    $account[ 'type' ],
+                    $e->getMessage()
+                ));
+            $this->cli->comment(
+                "There was a problem connecting using the account info ".
+                "you provided." );
+            $input = $this->cli->confirm( "Do you want to try again?" );
+
+            if ( $input->confirmed() ) {
+                $this->promptAccountInfo();
+            }
+            else {
+                $this->cli->comment( "Account setup canceled." );
+                exit( 0 );
+            }
+        }
     }
 }
