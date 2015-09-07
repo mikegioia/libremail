@@ -15,7 +15,9 @@ use App\Log as Log
 
 require( __DIR__ . '/vendor/autoload.php' );
 
-// Process command line arguments
+// Set up paths
+define( 'BASEPATH', __DIR__ );
+define( 'DBSCRIPTS', __DIR__ .'/db/*.sql' );
 
 // Load configuration files and parse the CLI arguments
 $default = parse_ini_file( __DIR__ .'/config/default.ini', TRUE );
