@@ -11,6 +11,7 @@
         "pimple/pimple": "~3.0",
         "voku/simple-mysqli": "dev-master",
         "monolog/monolog": "^1.17",
-        "league/climate": "^3.2"
+        "league/climate": "^3.2",
+        "particle/validator": "^1.0"
     }
 }

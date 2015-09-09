@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e25585dee738338579f9f577d9d3b470",
+    "hash": "d9dc35fa1e3a06b30886c30151128b01",
     "packages": [
         {
             "name": "league/climate",
@@ -132,6 +132,55 @@
                 "psr-3"
             ],
             "time": "2015-08-31 09:17:37"
+        },
+        {
+            "name": "particle/validator",
+            "version": "v1.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/particle-php/Validator.git",
+                "reference": "0c130530f8df02f4fe293902cbb0d54672f86500"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/particle-php/Validator/zipball/0c130530f8df02f4fe293902cbb0d54672f86500",
+                "reference": "0c130530f8df02f4fe293902cbb0d54672f86500",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0",
+                "squizlabs/php_codesniffer": "2.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Particle\\Validator\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD"
+            ],
+            "authors": [
+                {
+                    "name": "Berry Langerak",
+                    "email": "berry@berryllium.nl",
+                    "role": "developer"
+                },
+                {
+                    "name": "Rick van der Staaij"
+                }
+            ],
+            "description": "Flexible and highly usable validation library with no dependencies.",
+            "homepage": "http://github.com/particle-php/validator",
+            "keywords": [
+                "validation",
+                "validator"
+            ],
+            "time": "2015-06-30 12:10:20"
         },
         {
             "name": "php-imap/php-imap",
@@ -442,7 +491,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple-mysqli/zipball/cbb2ddddd4c4ea224b09e894c4986d01c3073979",
+                "url": "https://api.github.com/repos/voku/simple-mysqli/zipball/823e28c678997d3c55e9ace12dccbdcb66664b7d",
                 "reference": "cbb2ddddd4c4ea224b09e894c4986d01c3073979",
                 "shasum": ""
             },

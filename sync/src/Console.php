@@ -149,7 +149,7 @@ class Console
     private function promptAccountInfo()
     {
         $newAccount = [];
-        $newAccount[ 'type' ] = $this->promptAccountType();
+        $newAccount[ 'service' ] = $this->promptAccountType();
         $newAccount[ 'email' ] = $this->promptEmail();
         $newAccount[ 'password' ] = $this->promptPassword();
 
@@ -157,25 +157,38 @@ class Console
         $this->testConnection( $newAccount );
 
         // Connection settings worked, save to SQL
-        // @TODO
-        print_r( $newAccount );
+        try {
+            \App\Models\Account::create( $newAccount );
+        }
+        catch ( \Exception $e ) {
+            $this->cli->boldRedBackgroundBlack( $e->getMessage() );
+            $input = $this->cli->confirm( "Do you want to try again?" );
+
+            if ( $input->confirmed() ) {
+                return $this->promptAccountInfo();
+            }
+
+            $this->cli->comment( "Account setup canceled." );
+            return;
+        }
+
+        $this->cli->info( "Your account has been saved!" );
     }
 
     /**
-     * Prompts the user to select an account type. Returns the type
+     * Prompts the user to select an account type. Returns the service
      * on success or an empty string on error.
      * @return string
      */
     private function promptAccountType()
     {
-        $validTypes = [ 'GMail', 'Outlook' ];
-        //$this->cli->br();
+        $validServices = $this->config[ 'email' ][ 'services' ];
         $input = $this->cli->radio(
             'Please choose from the supported email providers:',
-            $validTypes );
-        $type = $input->prompt();
+            $validServices );
+        $service = $input->prompt();
 
-        if ( ! in_array( $type, $validTypes ) ) {
+        if ( ! in_array( $service, $validServices ) ) {
             $this->cli->comment( "You didn't select an account type!" );
             $input = $this->cli->confirm( "Do you want to try again?" );
 
@@ -187,7 +200,7 @@ class Console
             exit( 0 );
         }
 
-        return $type;
+        return $service;
     }
 
     private function promptEmail()
@@ -215,7 +228,7 @@ class Console
 
         try {
             $sync->connect(
-                $account[ 'type' ],
+                $account[ 'service' ],
                 $account[ 'email' ],
                 $account[ 'password' ] );
         }
@@ -224,7 +237,7 @@ class Console
                 sprintf(
                     "Unable to connect as '%s' to %s IMAP server: %s.",
                     $account[ 'email' ],
-                    $account[ 'type' ],
+                    $account[ 'service' ],
                     $e->getMessage()
                 ));
             $this->cli->comment(

@@ -13,15 +13,18 @@ use App\Log as Log
   , App\Console as Console
   , Pimple\Container as Container;
 
-require( __DIR__ . '/vendor/autoload.php' );
-
 // Set up paths
 define( 'BASEPATH', __DIR__ );
-define( 'DBSCRIPTS', __DIR__ .'/db/*.sql' );
+define( 'DATE_DATABASE', 'Y-m-d H:i:s' );
+define( 'DBSCRIPTS', BASEPATH .'/db/*.sql' );
+date_default_timezone_set( 'UTC' );
+
+// Load the vendor libraries
+require( BASEPATH . '/vendor/autoload.php' );
 
 // Load configuration files and parse the CLI arguments
-$default = parse_ini_file( __DIR__ .'/config/default.ini', TRUE );
-$local = parse_ini_file( __DIR__ .'/config/local.ini', TRUE );
+$default = parse_ini_file( BASEPATH .'/config/default.ini', TRUE );
+$local = parse_ini_file( BASEPATH .'/config/local.ini', TRUE );
 $config = array_replace_recursive( $default, $local );
 
 // Set up dependency container and register all services
@@ -61,6 +64,7 @@ $di[ 'log' ] = function ( $c ) {
 \App\Model::setDb( $di[ 'db' ] );
 \App\Model::setCLI( $di[ 'cli' ] );
 \App\Model::setLog( $di[ 'log' ] );
+\App\Model::setConfig( $di[ 'config' ] );
 
 // Parse the CLI
 $di[ 'console' ]->init();
@@ -74,7 +78,7 @@ try {
 }
 catch ( \Exception $e ) {
     if ( $di[ 'console' ]->interactive === TRUE ) {
-        $di[ 'cli' ]->bold()->backgroundRed()->white( $e->getMessage() );
+        $di[ 'cli' ]->boldRedBackgroundBlack( $e->getMessage() );
         $di[ 'cli' ]->br();
 
         if ( $config[ 'app' ][ 'stacktrace' ] ) {
