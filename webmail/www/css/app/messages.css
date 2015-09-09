@@ -69,6 +69,12 @@ section #msg-list .mailbox-checkbox:checked + h5 label .fa-caret-down {
     display: none;
 }
 
+section #msg-list footer {
+    color: #777;
+    font-weight: 600;
+    padding: 1rem 1rem 0 0;
+}
+
 /**
  * Messages
  */

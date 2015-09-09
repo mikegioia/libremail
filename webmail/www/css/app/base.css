@@ -24,6 +24,10 @@ a:focus {
 }
 
 /* Helpers */
+.align-right {
+    text-align: right;
+}
+
 .blocked {
     display: block;
 }
@@ -40,4 +44,12 @@ a:focus {
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
+}
+
+.size-sm {
+    font-size: 1rem;
+}
+
+.size-md {
+    font-size: 1.2rem;
 }
