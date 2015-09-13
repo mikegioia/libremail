@@ -6,8 +6,10 @@
 
 namespace App;
 
-use PhpImap\Mailbox as Mailbox,
-  , App\Exceptions\MissingIMAPConfig as MissingIMAPConfigException;
+use PhpImap\Mailbox as Mailbox
+  , App\Models\Account as AccountModel
+  , App\Exceptions\MissingIMAPConfig as MissingIMAPConfigException
+  , App\Exceptions\AttachmentsPathNotWriteable as AttachmentsPathNotWriteableException;
 
 class Sync
 {
@@ -37,6 +39,18 @@ class Sync
         $this->config = $config;
     }
 
+    function run()
+    {
+        $accountModel = new AccountModel;
+
+        foreach ( $accountModel->getActive() as $account ) {
+            $this->connect(
+                $account->service,
+                $account->email,
+                $account->password );
+        }
+    }
+
     /**
      * Connects to an IMAP mailbox using the supplied credentials.
      * @param string $type Account type, like "GMail"
@@ -54,10 +68,10 @@ class Sync
         }
 
         $imapPath = $this->config[ 'email' ][ $type ][ 'path' ];
-        $attachmentsDir = $this->config[ 'email' ][ 'attachments_dir' ];
+        $attachmentsDir = $this->config[ 'email' ][ 'attachments' ][ 'path' ];
 
         // Check the attachment directory is writeable
-        // @todo
+        $this->checkAttachmentsPath();
 
         $this->mailbox = new Mailbox(
             "{". $imapPath ."}". $folder,
@@ -65,5 +79,22 @@ class Sync
             $password,
             $attachmentsDir );
         $this->mailbox->checkMailbox();
+    }
+
+    /**
+     * Checks if the attachments path is writeable by the user.
+     * @throws AttachmentsPathNotWriteableException
+     * @return boolean
+     */
+    private function checkAttachmentsPath()
+    {
+        $configPath = $this->config[ 'email' ][ 'attachments' ][ 'path' ];
+        $attachmentPath = ( substr( $configPath, 0, 1 ) !== "/" )
+            ? __DIR__
+            : $configPath;
+
+        if ( ! is_writeable( $attachmentPath ) ) {
+            throw new AttachmentsPathNotWriteableException;
+        }
     }
 }

@@ -70,6 +70,6 @@ class Account extends \App\Model
         return $this->db()->select(
             'accounts', [
                 'is_active =' => 1
-            ])->get();
+            ])->fetchAllObject();
     }
 }

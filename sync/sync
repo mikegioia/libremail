@@ -77,15 +77,16 @@ $di[ 'console' ]->init();
 try {
     $startup = new \App\Startup( $di );
     $startup->run();
+    $sync = new \App\Sync( $di );
+    $sync->run();
 }
 catch ( \Exception $e ) {
     if ( $di[ 'console' ]->interactive === TRUE ) {
         $di[ 'cli' ]->boldRedBackgroundBlack( $e->getMessage() );
-        $di[ 'cli' ]->br();
+        $di[ 'cli' ]->dim( "[Err#". $e->getCode() ."]" );
 
         if ( $config[ 'app' ][ 'stacktrace' ] ) {
-            $di[ 'cli' ]->comment( $e->getTraceAsString() );
-            $di[ 'cli' ]->br();
+            $di[ 'cli' ]->br()->comment( $e->getTraceAsString() )->br();
         }
     }
     else {
