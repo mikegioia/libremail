@@ -5,7 +5,8 @@ namespace App;
 use Monolog\Logger
   , Monolog\Handler\StreamHandler
   , Monolog\Formatter\LineFormatter
-  , Monolog\Handler\RotatingFileHandler;
+  , Monolog\Handler\RotatingFileHandler
+  , App\Exceptions\LogPathNotWriteable as LogPathNotWriteableException;
 
 class Log
 {
@@ -52,6 +53,7 @@ class Log
 
     /**
      * Checks if the log path is writeable by the user.
+     * @throws LogPathNotWriteableException
      * @return boolean
      */
     private function checkLogPath( $stdout )
@@ -65,9 +67,7 @@ class Log
             : $this->path;
 
         if ( ! is_writeable( $logPath ) ) {
-            throw new LogPathNotWriteableException(
-                "The log path is not writeable by the current user: ".
-                get_current_user() );
+            throw new LogPathNotWriteableException;
         }
     }
 
@@ -89,7 +89,7 @@ class Log
 
         // Allow line breaks and stack traces, and don't show
         // empty context arrays
-        $formatter = new LineFormatter();
+        $formatter = new LineFormatter;
         $formatter->includeStacktraces();
         $formatter->allowInlineLineBreaks();
         $formatter->ignoreEmptyContextAndExtra();
@@ -100,5 +100,3 @@ class Log
         $this->logger = $log;
     }
 }
-
-class LogPathNotWriteableException extends \Exception {}

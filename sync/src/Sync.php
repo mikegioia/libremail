@@ -6,7 +6,8 @@
 
 namespace App;
 
-use PhpImap\Mailbox as Mailbox;
+use PhpImap\Mailbox as Mailbox,
+  , App\Exceptions\MissingIMAPConfig as MissingIMAPConfigException;
 
 class Sync
 {
@@ -42,21 +43,21 @@ class Sync
      * @param string $email
      * @param string $password
      * @param string $folder Optional, like "INBOX"
-     * @throws Exception
+     * @throws MissingIMAPConfigException
      */
     function connect( $type, $email, $password, $folder = "" )
     {
         $type = strtolower( $type );
 
         if ( ! isset( $this->config[ 'email' ][ $type ] ) ) {
-            throw new \Exception( "IMAP config not found for ". $type );
+            throw new MissingIMAPConfigException( $type );
         }
 
         $imapPath = $this->config[ 'email' ][ $type ][ 'path' ];
         $attachmentsDir = $this->config[ 'email' ][ 'attachments_dir' ];
 
         // Check the attachment directory is writeable
-        
+        // @todo
 
         $this->mailbox = new Mailbox(
             "{". $imapPath ."}". $folder,

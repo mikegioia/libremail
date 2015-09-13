@@ -2,11 +2,13 @@
 
 namespace App;
 
+use \App\Models\Account as AccountModel
+  , \App\Exceptions\NoAccounts as NoAccountsException;
+
 /**
  * Runs at the start of the application and performs various
  * initializing and testing before the app can run.
  */
-
 class Startup
 {
     private $db;
@@ -40,24 +42,20 @@ class Startup
      * Check if any accounts exist in the database. If not, and
      * if we're in interactive mode, then prompt the user to add
      * one. Otherwise log and exit.
+     * @throws NoAccountsException
      */
     private function checkIfAccountsExist()
     {
-        $accounts = $this->db->select(
-            'accounts', [
-                'is_active =' => 1
-            ]);
+        $accountModel = new AccountModel;
+        $accounts = $accountModel->getActive();
 
         if ( ! $accounts ) {
             if ( $this->console->interactive ) {
                 $this->console->createNewAccount();
             }
             else {
-                throw new NoAccountsException(
-                    "No active email accounts exist in the database." );
+                throw new NoAccountsException;
             }
         }
     }
 }
-
-class NoAccountsException extends \Exception {}

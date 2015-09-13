@@ -25,7 +25,7 @@ class Console
     {
         $this->config = $config;
 
-        $this->cli = new CLI();
+        $this->cli = new CLI;
         $this->cli->description( "LibreMail IMAP to SQL sync engine" );
         $this->setupArgs();
     }
@@ -111,7 +111,7 @@ class Console
         // If updatedb is set, just run the migration script
         if ( $this->updatedb === TRUE ) {
             $this->interactive = TRUE;
-            $migrate = new \App\Models\Migration();
+            $migrate = new \App\Models\Migration;
             $migrate->run();
             exit( 0 );
         }
@@ -219,11 +219,10 @@ class Console
      * Attempts to connect to the mail server using the new account
      * settings from the prompt.
      * @param array $account Account credentials
-     * @throws EmailConnectionException
      */
     private function testConnection( $account )
     {
-        $sync = new \App\Sync();
+        $sync = new \App\Sync;
         $sync->setConfig( $this->config );
 
         try {

@@ -16,6 +16,7 @@ use App\Log as Log
 
 // Set up paths
 define( 'BASEPATH', __DIR__ );
+define( 'ACCOUNT', 'account' );
 define( 'DATE_DATABASE', 'Y-m-d H:i:s' );
 define( 'DBSCRIPTS', BASEPATH .'/db/*.sql' );
 date_default_timezone_set( 'UTC' );
