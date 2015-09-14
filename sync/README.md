@@ -61,9 +61,11 @@ the minimum level you want to capture when logs are written to disk. This
 happens when the app is running in the background.
 
 * `name`
+
   String, any name for the application. Defaults to `libremail`.
 
 * `path`
+
   Relative or absolute path for saving log files. This needs a filename at the
   end which will be used as a stem for creating timestamped log files. Default
   value is `logs/sync.log`.
@@ -110,6 +112,15 @@ Before you can start syncing, run the SQL database scripts:
     $> ./sync --update
 
 This will create all the SQL tables and run any other database operations.
+
+### 4. Install Composer Dependencies
+
+Download the vendor packages via composer:
+
+    $> composer install
+
+This will create a `vendor` directory with all of the project's PHP
+dependencies.
 
 ## Run the Sync
 

@@ -14,7 +14,7 @@ use App\Log as Log
   , App\Console as Console
   , Pimple\Container as Container;
 
-// Set up paths and constnats
+// Set up paths and constants
 define( 'FOLDER', 'folder' );
 define( 'BASEPATH', __DIR__ );
 define( 'ACCOUNT', 'account' );
