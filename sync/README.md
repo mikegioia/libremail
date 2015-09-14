@@ -28,19 +28,19 @@ file. Here's an explanation of the options you can overwrite:
 
 * `stacktrace`
 
-  Defaults to `true` but set to `false` if you want to suppress stack traces from
-showing in the logs or the CLI.
+  Defaults to `true` but set to `false` if you want to suppress stack traces
+  from showing in the logs or the CLI.
 
 * `sync[wait_seconds]`
 
-  Integer, defaults to `10`. This is the number of seconds to wait before retrying
-a failed action while syncing.
+  Integer, defaults to `10`. This is the number of seconds to wait before
+  retrying a failed action while syncing.
 
 #### [log]
 
-`level[cli]`
+* `level[cli]`
 
-Integer, defaults to `7`. Enter a number between `0` and `7` corresponding to
+  Integer, defaults to `7`. Enter a number between `0` and `7` corresponding to
 the minimum level you want to capture when logs are written to the CLI. This
 happens when the app is run in `interactive mode`. These are the following log
 levels:
@@ -54,43 +54,51 @@ levels:
     6: Info -- informational messages
     7: Debug -- noisy, debug-level messages
 
-`level[file]`
-Integer, defaults to `5`. Enter a number between `0` and `7` corresponding to
+* `level[file]`
+
+  Integer, defaults to `5`. Enter a number between `0` and `7` corresponding to
 the minimum level you want to capture when logs are written to disk. This
 happens when the app is running in the background.
 
-`name`
-String, any name for the application. Defaults to `libremail`.
+* `name`
+  String, any name for the application. Defaults to `libremail`.
 
-`path`
-Relative or absolute path for saving log files. This needs a filename at the end
-which will be used as a stem for creating timestamped log files. Default value
-is `logs/sync.log`.
+* `path`
+  Relative or absolute path for saving log files. This needs a filename at the
+  end which will be used as a stem for creating timestamped log files. Default
+  value is `logs/sync.log`.
 
 #### [sql]
 
-`database`
-Name of the database, defaults to `libremail`.
+* `database`
 
-`hostname`
-Hostname for MySQL connection, defaults to `localhost`.
+  Name of the database, defaults to `libremail`.
 
-`port`
-Port for MySQL connection, defaults to `3306`.
+* `hostname`
 
-`username`
-Username for MySQL connection, defaults to `root`.
+  Hostname for MySQL connection, defaults to `localhost`.
 
-`password`
-Password for MySQL connection, defaults to `root`.
+* `port`
 
-`charset`
-Character set for MySQL connection, defaults to `utf8`.
+  Port for MySQL connection, defaults to `3306`.
+
+* `username`
+
+  Username for MySQL connection, defaults to `root`.
+
+* `password`
+
+  Password for MySQL connection, defaults to `root`.
+
+* `charset`
+
+  Character set for MySQL connection, defaults to `utf8`.
 
 #### [email]
 
-`attachments[path]`
-Relative or absolute path for saving email attachments. Defaults to a local
+* `attachments[path]`
+
+  Relative or absolute path for saving email attachments. Defaults to a local
 directory named `attachments`.
 
 ### 3. Running SQL Migration Scripts
