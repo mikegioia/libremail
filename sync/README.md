@@ -26,14 +26,14 @@ file. Here's an explanation of the options you can overwrite:
 
 #### [app]
 
-`stacktrace`
+* `stacktrace`
 
-Defaults to `true` but set to `false` if you want to suppress stack traces from
+  Defaults to `true` but set to `false` if you want to suppress stack traces from
 showing in the logs or the CLI.
 
-`sync[wait_seconds]`
+* `sync[wait_seconds]`
 
-Integer, defaults to `10`. This is the number of seconds to wait before retrying
+  Integer, defaults to `10`. This is the number of seconds to wait before retrying
 a failed action while syncing.
 
 #### [log]
