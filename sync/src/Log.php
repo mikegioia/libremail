@@ -3,6 +3,8 @@
 namespace App;
 
 use Monolog\Logger
+  , App\Log\CLIHandler
+  , League\CLImate\CLImate
   , Monolog\Handler\StreamHandler
   , Monolog\Formatter\LineFormatter
   , Monolog\Handler\RotatingFileHandler
@@ -10,18 +12,21 @@ use Monolog\Logger
 
 class Log
 {
+    // Console writer dependency for interactive mode
+    private $cli;
     // Path to where log files live
-    private $path = NULL;
+    private $path;
     // Minimum level for logging messges
     private $level;
     // The Monolog handler
     private $logger;
 
-    function __construct( $config, $stdout = FALSE )
+    function __construct( CLImate $cli, array $config, $interactive = FALSE )
     {
-        $this->parseConfig( $config, $stdout );
-        $this->checkLogPath( $stdout );
-        $this->createLog( $config, $stdout );
+        $this->cli = $cli;
+        $this->parseConfig( $config, $interactive );
+        $this->checkLogPath( $interactive );
+        $this->createLog( $config, $interactive );
     }
 
     function getLogger()
@@ -29,7 +34,7 @@ class Log
         return $this->logger;
     }
 
-    private function parseConfig( $config, $stdout )
+    private function parseConfig( array $config, $interactive )
     {
         // Set up lookup table for log levels
         $levels = [
@@ -43,11 +48,14 @@ class Log
             7 => Logger::DEBUG //debug-level messages
         ];
 
-        $this->path = ( $stdout === TRUE )
-            ? "php://stdout"
+        $this->path = ( $interactive === TRUE )
+            ? NULL
             : $config[ 'path' ];
-        $this->level = ( isset( $levels[ $config[ 'level' ] ] ) )
-            ? $levels[ $config[ 'level' ] ]
+        $level = ( $interactive === TRUE )
+            ? $config[ 'level' ][ 'cli' ]
+            : $config[ 'level' ][ 'file' ];
+        $this->level = ( isset( $levels[ $level ] ) )
+            ? $levels[ $level ]
             : Logger::WARNING;
     }
 
@@ -56,9 +64,9 @@ class Log
      * @throws LogPathNotWriteableException
      * @return boolean
      */
-    private function checkLogPath( $stdout )
+    private function checkLogPath( $interactive )
     {
-        if ( $stdout ) {
+        if ( $interactive ) {
             return TRUE;
         }
 
@@ -71,13 +79,13 @@ class Log
         }
     }
 
-    private function createLog( $config, $stdout )
+    private function createLog( array $config, $interactive )
     {
         // Create and configure a new logger
         $log = new Logger( $config[ 'name' ] );
 
-        if ( $stdout === TRUE ) {
-            $handler = new StreamHandler( $this->path, $this->level );
+        if ( $interactive === TRUE ) {
+            $handler = new CLIHandler( $this->cli, $this->level );
         }
         else {
             $handler = new RotatingFileHandler(

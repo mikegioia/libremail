@@ -14,9 +14,11 @@ use App\Log as Log
   , App\Console as Console
   , Pimple\Container as Container;
 
-// Set up paths
+// Set up paths and constnats
+define( 'FOLDER', 'folder' );
 define( 'BASEPATH', __DIR__ );
 define( 'ACCOUNT', 'account' );
+define( 'DATE_LOG', 'j-M-y H:i:s' );
 define( 'DATE_DATABASE', 'Y-m-d H:i:s' );
 define( 'DBSCRIPTS', BASEPATH .'/db/*.sql' );
 date_default_timezone_set( 'UTC' );
@@ -57,8 +59,8 @@ $di[ 'db' ] = function ( $c ) {
 
 // Logging service
 $di[ 'log' ] = function ( $c ) {
-    $stdout = ( $c[ 'console' ]->interactive === TRUE );
-    $log = new Log( $c[ 'config' ][ 'log' ], $stdout );
+    $interactive = ( $c[ 'console' ]->interactive === TRUE );
+    $log = new Log( $c[ 'cli' ], $c[ 'config' ][ 'log' ], $interactive );
     return $log->getLogger();
 };
 

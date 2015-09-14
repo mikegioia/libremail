@@ -2,6 +2,11 @@
 
 namespace App;
 
+use voku\db\DB
+  , Monolog\Logger
+  , League\CLImate\CLImate
+  , Particle\Validator\Validator;
+
 class Model
 {
     static protected $db;
@@ -9,26 +14,37 @@ class Model
     static protected $log;
     static protected $config;
 
+    function __construct( $data = NULL )
+    {
+        if ( ! $data ) {
+            return;
+        }
+
+        foreach ( $data as $key => $value ) {
+            $this->$key = $value;
+        }
+    }
+
     /**
      * Sets the internal database connection statically for all
      * models to use.
      */
-    static function setDb( $db )
+    static function setDb( DB $db )
     {
         static::$db = $db;
     }
 
-    static function setCLI( $cli )
+    static function setCLI( CLImate $cli )
     {
         static::$cli = $cli;
     }
 
-    static function setLog( $log )
+    static function setLog( Logger $log )
     {
         static::$log = $log;
     }
 
-    static function setConfig( $config )
+    static function setConfig( array $config )
     {
         static::$config = $config;
     }
@@ -73,7 +89,7 @@ class Model
         return $lookup;
     }
 
-    function getErrorString( $validator, $message )
+    function getErrorString( Validator $validator, $message )
     {
         $return = [];
         $messages = $validator->getMessages();
@@ -88,5 +104,21 @@ class Model
                 $message,
                 implode( "\n", $return )
             ));
+    }
+
+    /**
+     * Turns stdClass SQL objects into model objects.
+     * @param array $objects
+     * @return array
+     */
+    function populate( $objects, $modelClass )
+    {
+        $modelObjects = [];
+
+        foreach ( $objects as $object ) {
+            $modelObjects[] = new $modelClass( $object );
+        }
+
+        return $modelObjects;
     }
 }

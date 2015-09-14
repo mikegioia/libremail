@@ -2,7 +2,8 @@
 
 namespace App;
 
-use \App\Models\Account as AccountModel
+use Pimple\Container
+  , \App\Models\Account as AccountModel
   , \App\Exceptions\NoAccounts as NoAccountsException;
 
 /**
@@ -17,7 +18,7 @@ class Startup
     private $dbName;
     private $console;
 
-    function __construct( $di )
+    function __construct( Container $di )
     {
         $this->db = $di[ 'db' ];
         $this->cli = $di[ 'cli' ];

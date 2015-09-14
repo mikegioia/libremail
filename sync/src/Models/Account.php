@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Particle\Validator\Validator as Validator
+use Particle\Validator\Validator
   , App\Exceptions\Validation as ValidationException
   , App\Exceptions\AccountExists as AccountExistsException
   , App\Exceptions\DatabaseInsert as DatabaseInsertException;
@@ -67,9 +67,11 @@ class Account extends \App\Model
 
     function getActive()
     {
-        return $this->db()->select(
+        $accounts = $this->db()->select(
             'accounts', [
                 'is_active =' => 1
             ])->fetchAllObject();
+
+        return $this->populate( $accounts, "\App\Models\Account" );
     }
 }

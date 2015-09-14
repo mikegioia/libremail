@@ -12,6 +12,9 @@ namespace App\Models;
 
 class Migration extends \App\Model
 {
+    public $name;
+    public $created_at;
+
     /**
      * Read each file in the script folder and check to see
      * if it's been run before. If so, skip it. If not, run
@@ -23,21 +26,34 @@ class Migration extends \App\Model
         $this->cli()->info( "Running SQL migration scripts" );
 
         foreach ( glob( DBSCRIPTS ) as $filename ) {
-            $query = file_get_contents( $filename );
-            $script = basename( $filename );
+            $script = basename( $filename, ".sql" );
+            $queries = explode( "\n\n", file_get_contents( $filename ) );
 
             if ( $this->isRunAlready( $script ) ) {
-                $this->cli()->dim( "[skip] $script" );
+                $this->cli()->dim( "[skip] {$script}.sql" );
                 continue;
             }
 
-            $this->cli()->inline( "[....] Running $script" );
-            $this->db()->query( $query );
+            $this->cli()->inline( "[....] Running {$script}.sql" );
+
+            foreach ( $queries as $query ) {
+                if ( ! $this->db()->query( $query ) ) {
+                    $this->cli()
+                        ->inline( "\r[" )
+                        ->redInline( "fail" )
+                        ->inline( "] Running {$script}.sql" )
+                        ->br()
+                        ->br()
+                        ->error( $this->db()->lastError() );
+                    return;
+                }
+            }
+
             $this->markRun( $script );
             $this->cli()
                 ->inline( "\r[" )
                 ->greenInline( " ok " )
-                ->inline( "] Running $script" )
+                ->inline( "] Running {$script}.sql" )
                 ->br();
         }
     }
@@ -60,10 +76,12 @@ class Migration extends \App\Model
      */
     private function markRun( $script )
     {
+        $createdAt = new \DateTime;
+
         return $this->db()->insert(
             'migrations', [
                 'name' => $script,
-                'created_at' => time()
+                'created_at' => $createdAt->format( DATE_DATABASE )
             ]);
     }
 }

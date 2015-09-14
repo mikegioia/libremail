@@ -21,13 +21,14 @@ class Console
     public $background;
     public $interactive;
 
-    function __construct( $config )
+    function __construct( array $config )
     {
         $this->config = $config;
 
         $this->cli = new CLI;
         $this->cli->description( "LibreMail IMAP to SQL sync engine" );
         $this->setupArgs();
+        $this->parseArgs();
     }
 
     function init()
@@ -82,9 +83,9 @@ class Console
     }
 
     /**
-     * Reads input values and saves to class variables.
+     * Store CLI arguments into class variables.
      */
-    private function processArgs()
+    private function parseArgs()
     {
         $this->cli->arguments->parse();
         $this->help = $this->cli->arguments->get( 'help' );
@@ -93,7 +94,13 @@ class Console
         $this->updatedb = $this->cli->arguments->get( 'updatedb' );
         $this->background = $this->cli->arguments->get( 'background' );
         $this->interactive = $this->cli->arguments->get( 'interactive' );
+    }
 
+    /**
+     * Reads input values and saves to class variables.
+     */
+    private function processArgs()
+    {
         // If help is set, show the usage and exit
         if ( $this->help === TRUE ) {
             $this->cli->usage();
@@ -119,6 +126,11 @@ class Console
         // If background is set, turn off interactive
         if ( $this->background === TRUE ) {
             $this->interactive = FALSE;
+        }
+
+        // If we're in interactive mode, sent the sync message
+        if ( $this->interactive === TRUE ) {
+            $this->cli->info( "Starting IMAP sync in interactive mode" );
         }
     }
 
