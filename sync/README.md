@@ -45,14 +45,14 @@ the minimum level you want to capture when logs are written to the CLI. This
 happens when the app is run in `interactive mode`. These are the following log
 levels:
 
-    0: Emergency -- system is unusable
-    1: Alert -- action must be taken immediately
-    2: Critical -- severe error
-    3: Error -- standard error
-    4: Warning -- something unusual happened
-    5: Notice -- normal but significant condition
-    6: Info -- informational messages
-    7: Debug -- noisy, debug-level messages
+        0: Emergency -- system is unusable
+        1: Alert -- action must be taken immediately
+        2: Critical -- severe error
+        3: Error -- standard error
+        4: Warning -- something unusual happened
+        5: Notice -- normal but significant condition
+        6: Info -- informational messages
+        7: Debug -- noisy, debug-level messages
 
 * `level[file]`
 
