@@ -21,7 +21,7 @@ be something other than `libremail`, feel free to use anything.
 Configuration options are saved in `config/default.ini`. **Do not modify this
 file or anything in it**. All of your modifications should go into
 `config/local.ini` and should be in the
-[https://en.wikipedia.org/wiki/INI_file](INI file format), just like the default
+[INI file format](https://en.wikipedia.org/wiki/INI_file), just like the default
 file. Here's an explanation of the options you can overwrite:
 
 #### [app]
