@@ -72,7 +72,9 @@ happens when the app is running in the background.
 
 * `database`
 
-  Name of the database, defaults to `libremail`.
+  Name of the database, defaults to `libremail`. If you've changed the name of
+  the database in the `CREATE DATABASE` command at the top, then change this
+  config setting too.
 
 * `hostname`
 
@@ -109,5 +111,45 @@ Before you can start syncing, run the SQL database scripts:
 
 This will create all the SQL tables and run any other database operations.
 
-#### 4. Run the Sync
+## Run the Sync
 
+Before you begin, you can run `./sync --help` to see a list of what options you
+have. Below is an explanation of the options you can specify when running this
+script:
+
+* `--update | -u`
+
+  Updates the database by running the migration scripts in `db/`. These scripts
+  will only run once so you can run this as many times as you'd like.
+
+* `--interactive | -i`
+
+  **Defaults to enabled**. This runs the application interactively, or in a mode
+  designed for the CLI (command line interface). Messages are printed to the
+  screen and you could be prompted to enter data for certain actions (like
+  creating a new account).
+
+* `--background | -b`
+
+  Defaults disabled. This runs the application in the background as a daemon.
+  Use this if you'd like to run the syncing engine from an init script, a cron,
+  a systemd service, managed via a hypervisor, or any other method of
+  watchdogging or monitoring a PHP script.
+
+* `--help | -h`
+
+  Print the help message.
+
+To get started, run:
+
+    $> ./sync
+
+And follow the onscreen instructions!
+
+## Using an Init Script or Supervisor
+
+If you'd like to run this sync script in the background all the time, then it
+is recommended to use some sort of supervisor or watchdog program to monitor if
+the script fails for any reason.
+
+@todo -- Include example SysV Init script and SystemD unit file
