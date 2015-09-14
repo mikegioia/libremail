@@ -11,7 +11,7 @@ use it with the two clients bundled with this tool.
 To get started, make sure you have MariaDB or MySQL running and issue the
 following command:
 
-    > CREATE DATABASE `libremail`;
+    MariaDB [(none)]> CREATE DATABASE `libremail`;
 
 The database name is a configuration option, so if you'd like to change this to
 be something other than `libremail`, feel free to use anything.
