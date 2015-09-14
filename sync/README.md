@@ -27,16 +27,19 @@ file. Here's an explanation of the options you can overwrite:
 #### [app]
 
 `stacktrace`
+
 Defaults to `true` but set to `false` if you want to suppress stack traces from
 showing in the logs or the CLI.
 
 `sync[wait_seconds]`
+
 Integer, defaults to `10`. This is the number of seconds to wait before retrying
 a failed action while syncing.
 
 #### [log]
 
 `level[cli]`
+
 Integer, defaults to `7`. Enter a number between `0` and `7` corresponding to
 the minimum level you want to capture when logs are written to the CLI. This
 happens when the app is run in `interactive mode`. These are the following log
