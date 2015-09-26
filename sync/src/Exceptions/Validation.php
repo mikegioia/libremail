@@ -8,6 +8,6 @@ class Validation extends \Exception
 
     function __construct( $message )
     {
-        $this->message = $message
+        $this->message = $message;
     }
 }

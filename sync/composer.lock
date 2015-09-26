@@ -4,8 +4,56 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d9dc35fa1e3a06b30886c30151128b01",
+    "hash": "9bd2faccbcabbe64d52f0b788c837263",
     "packages": [
+        {
+            "name": "ilya/belt",
+            "version": "2.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ilya-dev/belt.git",
+                "reference": "e6229b855eaa9291c667f804975f29e563dc777c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ilya-dev/belt/zipball/e6229b855eaa9291c667f804975f29e563dc777c",
+                "reference": "e6229b855eaa9291c667f804975f29e563dc777c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpspec/phpspec": "~2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Belt\\": "src/Belt/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ilya S",
+                    "email": "public.ilya.s@gmail.com"
+                }
+            ],
+            "description": "A handful of tools for PHP devs",
+            "keywords": [
+                "arrays",
+                "collections",
+                "functions",
+                "objects",
+                "php",
+                "tools",
+                "utilities"
+            ],
+            "time": "2014-05-21 08:48:47"
+        },
         {
             "name": "league/climate",
             "version": "3.2.0",

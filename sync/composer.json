@@ -12,6 +12,7 @@
         "voku/simple-mysqli": "dev-master",
         "monolog/monolog": "^1.17",
         "league/climate": "^3.2",
-        "particle/validator": "^1.0"
+        "particle/validator": "^1.0",
+        "ilya/belt": "~2"
     }
 }

@@ -66,7 +66,8 @@ class Log
                 break;
         }
 
-        $this->getLogger()->$logMethod( $message );
+        $this->getLogger()->$logMethod(
+            "$message on line $lineNo of $filename" );
     }
 
     private function parseConfig( array $config, $interactive )

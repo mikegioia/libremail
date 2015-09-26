@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Particle\Validator\Validator
+  , App\Traits\Model as ModelTrait
   , App\Exceptions\Validation as ValidationException
   , App\Exceptions\DatabaseInsert as DatabaseInsertException;
 
@@ -14,6 +15,8 @@ class Folder extends \App\Model
     public $is_deleted;
     public $created_at;
 
+    use ModelTrait;
+
     function getData()
     {
         return [
@@ -23,6 +26,16 @@ class Folder extends \App\Model
             'is_deleted' => $this->is_deleted,
             'created_at' => $this->created_at
         ];
+    }
+
+    function getName()
+    {
+        return $this->name;
+    }
+
+    function getAccountId()
+    {
+        return (int) $this->account_id;
     }
 
     /**

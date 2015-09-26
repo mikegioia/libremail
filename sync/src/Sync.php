@@ -11,7 +11,6 @@ use PhpImap\Mailbox
   , Pimple\Container
   , League\CLImate\CLImate
   , App\Models\Folder as FolderModel
-  , App\Sync\Messages as MessagesSync
   , App\Models\Account as AccountModel
   , App\Models\Messages as MessagesModel
   , App\Exceptions\FolderSync as FolderSyncException
@@ -30,6 +29,7 @@ class Sync
     private $maxRetries = 5;
     private $retriesFolders;
     private $retriesMessages;
+    private $messageBatchSize = 50;
 
     /**
      * Constructor can optionally take a dependency container or
@@ -188,13 +188,18 @@ class Sync
     private function checkAttachmentsPath()
     {
         $configPath = $this->config[ 'email' ][ 'attachments' ][ 'path' ];
-        $attachmentsPath = ( substr( $configPath, 0, 1 ) !== "/" )
-            ? __DIR__
+        $attachmentsDir = ( substr( $configPath, 0, 1 ) !== "/" )
+            ? BASEPATH
             : $configPath;
 
-        if ( ! is_writeable( $attachmentsPath ) ) {
+        if ( ! is_writeable( $attachmentsDir ) ) {
             throw new AttachmentsPathNotWriteableException;
         }
+
+        $attachmentsPath = ( substr( $configPath, 0, 1 ) !== "/" )
+            ? BASEPATH ."/". $configPath
+            : $configPath;
+        @mkdir( $attachmentsPath, 0755, TRUE );
 
         return $attachmentsPath;
     }
@@ -231,13 +236,14 @@ class Sync
 
             // Add each folder to SQL, mark old folders as deleted
             foreach ( $folderList as $folder ) {
+                $folder = new FolderModel([
+                    'name' => $folder,
+                    'account_id' => $account->getId()
+                ]);
+                $folder->save();
+                $folders[ $folder->getId() ] = $folder;
+
                 if ( $this->interactive ) {
-                    $folder = new FolderModel([
-                        'name' => $folder,
-                        'account_id' => $account->id
-                    ]);
-                    $folder->save();
-                    $folders[ $folder->id ] = $folder;
                     $progress->current( ( $i++ / $count ) * 100 );
                 }
             }
@@ -296,8 +302,6 @@ class Sync
             throw new MessagesSyncException( $folder );
         }
 
-        $i = 1;
-        $progress = NULL;
         $this->log->debug(
             "Syncing messages in {$folder->name} for {$account->email}" );
 
@@ -309,7 +313,6 @@ class Sync
         //     to SQL database
         //  4. Mark deleted in SQL anything in 2 and not 1
         try {
-            $messagesSync = new MessagesSync( $account );
             $messagesModel = new MessagesModel;
             // Connect to the folder's mailbox, this is sent to the
             // messages sync library to perform operations on
@@ -317,15 +320,13 @@ class Sync
                 $account->service,
                 $account->email,
                 $account->password,
-                'INBOX' );
-            $newIds = $messagesSync->getMessageIds(
-                $this->mailbox,
-                $folder );
-            $savedIds = $messagesModel->getIdsByFolder(
-                $account->id,
-                $folder->id );
-            $messagesSync->saveMessages( $newIds, $savedIds, $folder );
-            $messagesSync->markDeleted( $newIds, $savedIds, $folder );
+                $folder->name );
+            $newIds = $this->mailbox->searchMailBox( 'ALL' );
+            $savedIds = $messagesModel->getSyncedIdsByFolder(
+                $account->getId(),
+                $folder->getId() );
+            $this->downloadMessages( $newIds, $savedIds, $folder );
+            $this->markDeleted( $newIds, $savedIds, $folder );
         }
         catch ( \Exception $e ) {
             $this->log->error( $e->getMessage() );
@@ -339,5 +340,60 @@ class Sync
 
             return $this->syncFolderMessages( $account, $folder );
         }
+    }
+
+    /**
+     * This is the engine that downloads and saves messages for a
+     * given mailbox and folder. Given a list of current message IDs
+     * retrieved from IMAP, and a list of the IDs we have in the
+     * database, copy all the new messages down and mark the removed
+     * ones as such in the database.
+     * @param array $newIds
+     * @param array $savedIds
+     * @param FolderModel $folder
+     */
+    private function downloadMessages( $newIds, $savedIds, FolderModel $folder )
+    {
+        // First get the list of messages to download by taking
+        // a diff of the arrays. Download all these messages.
+        $i = 1;
+        $progress = NULL;
+        $total = count( $newIds );
+        $toDownload = array_diff( $newIds, $savedIds );
+        $count = count( $toDownload );
+        $this->log->debug( "Downloading messages in {$folder->name}" );
+        $this->log->debug( "$total messages, $count new" );
+
+        if ( ! $count ) {
+            $this->log->debug( "No new messages, skipping {$folder->name}" );
+            return;
+        }
+
+        if ( $this->interactive ) {
+            $this->cli->whisper(
+                "Syncing $count of $total messages in {$folder->name}:" );
+            $progress = $this->cli->progress()->total( 100 );
+        }
+
+        // Pull the meta info for a batch of messages at a time.
+        // Save those messages in the batch and then do it again.
+
+        foreach ( $toDownload as $messageId ) {
+            //$message = new MessageModel([
+            //    'unique_id' => $messageId,
+            //    'folder_id' => $folder->getId(),
+            //    'account_id' => $account->getId()
+            //]);
+            //$message->save();
+
+            if ( $this->interactive ) {
+                $progress->current( ( $i++ / $count ) * 100 );
+            }
+        }
+    }
+
+    private function markDeleted( $newIds, $savedIds, FolderModel $folder )
+    {
+        $this->log->debug( "Marking any deletions in {$folder->name}" );
     }
 }
