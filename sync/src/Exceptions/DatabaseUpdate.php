@@ -4,7 +4,7 @@ namespace App\Exceptions;
 
 class DatabaseUpdate extends \Exception
 {
-    public $code = 2003;
+    public $code = EXC_DB_UPDATE;
     public $message = "There was a problem updating this %s.";
 
     function __construct( $type )

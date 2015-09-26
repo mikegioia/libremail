@@ -184,16 +184,16 @@
         },
         {
             "name": "php-imap/php-imap",
-            "version": "2.0.2",
+            "version": "2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barbushin/php-imap.git",
-                "reference": "47a3852a2a90290d94395496b475bdb65c9942d6"
+                "reference": "cc1a49a3f68090db182183c59ffbc09055d59f5b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barbushin/php-imap/zipball/47a3852a2a90290d94395496b475bdb65c9942d6",
-                "reference": "47a3852a2a90290d94395496b475bdb65c9942d6",
+                "url": "https://api.github.com/repos/barbushin/php-imap/zipball/cc1a49a3f68090db182183c59ffbc09055d59f5b",
+                "reference": "cc1a49a3f68090db182183c59ffbc09055d59f5b",
                 "shasum": ""
             },
             "require": {
@@ -223,20 +223,20 @@
                 "mail",
                 "php"
             ],
-            "time": "2015-07-09 10:24:39"
+            "time": "2015-09-16 07:40:39"
         },
         {
             "name": "pimple/pimple",
-            "version": "v3.0.1",
+            "version": "v3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silexphp/Pimple.git",
-                "reference": "3313af5935dbc560fab845b76a1ca351b47855af"
+                "reference": "a30f7d6e57565a2e1a316e1baf2a483f788b258a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/3313af5935dbc560fab845b76a1ca351b47855af",
-                "reference": "3313af5935dbc560fab845b76a1ca351b47855af",
+                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/a30f7d6e57565a2e1a316e1baf2a483f788b258a",
+                "reference": "a30f7d6e57565a2e1a316e1baf2a483f788b258a",
                 "shasum": ""
             },
             "require": {
@@ -263,13 +263,13 @@
                     "email": "fabien@symfony.com"
                 }
             ],
-            "description": "Pimple is a simple Dependency Injection Container for PHP 5.3",
+            "description": "Pimple, a simple Dependency Injection Container",
             "homepage": "http://pimple.sensiolabs.org",
             "keywords": [
                 "container",
                 "dependency injection"
             ],
-            "time": "2015-07-30 09:57:46"
+            "time": "2015-09-11 15:10:35"
         },
         {
             "name": "psr/log",
@@ -359,16 +359,16 @@
         },
         {
             "name": "voku/portable-utf8",
-            "version": "1.6.10",
+            "version": "1.6.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/portable-utf8.git",
-                "reference": "4fd228599839ca0c8b32ea937a9b57d03c74d541"
+                "reference": "7a3b4995d51a53b6e01d62357ffa794e5dffe7a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/portable-utf8/zipball/4fd228599839ca0c8b32ea937a9b57d03c74d541",
-                "reference": "4fd228599839ca0c8b32ea937a9b57d03c74d541",
+                "url": "https://api.github.com/repos/voku/portable-utf8/zipball/7a3b4995d51a53b6e01d62357ffa794e5dffe7a3",
+                "reference": "7a3b4995d51a53b6e01d62357ffa794e5dffe7a3",
                 "shasum": ""
             },
             "require": {
@@ -425,7 +425,7 @@
                 "utf-8",
                 "utf8"
             ],
-            "time": "2015-09-05 02:12:28"
+            "time": "2015-09-21 16:48:54"
         },
         {
             "name": "voku/simple-cache",
@@ -487,12 +487,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple-mysqli.git",
-                "reference": "cbb2ddddd4c4ea224b09e894c4986d01c3073979"
+                "reference": "72be86719edf95258ee7c50cebe04e5a37759e82"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple-mysqli/zipball/823e28c678997d3c55e9ace12dccbdcb66664b7d",
-                "reference": "cbb2ddddd4c4ea224b09e894c4986d01c3073979",
+                "url": "https://api.github.com/repos/voku/simple-mysqli/zipball/72be86719edf95258ee7c50cebe04e5a37759e82",
+                "reference": "72be86719edf95258ee7c50cebe04e5a37759e82",
                 "shasum": ""
             },
             "require": {
@@ -528,7 +528,8 @@
                 },
                 {
                     "name": "Lars Moelleken",
-                    "homepage": "http://www.moelleken.org/",
+                    "email": "lars@moelleken.org",
+                    "homepage": "https://github.com/voku",
                     "role": "Developer"
                 }
             ],
@@ -540,7 +541,7 @@
                 "php",
                 "simple db"
             ],
-            "time": "2015-08-26 18:43:17"
+            "time": "2015-09-24 12:53:35"
         }
     ],
     "packages-dev": [],

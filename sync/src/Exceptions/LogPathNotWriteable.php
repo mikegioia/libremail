@@ -4,7 +4,7 @@ namespace App\Exceptions;
 
 class LogPathNotWriteable extends \Exception
 {
-    public $code = 1001;
+    public $code = EXC_LOG_PATH;
     public $message = "The log path is not writeable by the current user: %s.";
 
     function __construct()

@@ -20,6 +20,19 @@ class Model
             return;
         }
 
+        $this->setData( $data );
+    }
+
+    /**
+     * Implemented in model.
+     */
+    function getData()
+    {
+        return [];
+    }
+
+    function setData( $data )
+    {
         foreach ( $data as $key => $value ) {
             $this->$key = $value;
         }
@@ -104,21 +117,5 @@ class Model
                 $message,
                 implode( "\n", $return )
             ));
-    }
-
-    /**
-     * Turns stdClass SQL objects into model objects.
-     * @param array $objects
-     * @return array
-     */
-    function populate( $objects, $modelClass )
-    {
-        $modelObjects = [];
-
-        foreach ( $objects as $object ) {
-            $modelObjects[] = new $modelClass( $object );
-        }
-
-        return $modelObjects;
     }
 }

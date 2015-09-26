@@ -2,7 +2,8 @@
 
 namespace App;
 
-use League\CLImate\CLImate as CLI;
+use League\CLImate\CLImate as CLI
+  , App\Models\Account as AccountModel;
 
 class Console
 {
@@ -170,7 +171,8 @@ class Console
 
         // Connection settings worked, save to SQL
         try {
-            \App\Models\Account::create( $newAccount );
+            $accountModel = new AccountModel( $newAccount );
+            $accountModel->save();
         }
         catch ( \Exception $e ) {
             $this->cli->boldRedBackgroundBlack( $e->getMessage() );

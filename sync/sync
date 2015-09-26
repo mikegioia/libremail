@@ -9,10 +9,10 @@
  * a list of saved IMAP credentials and runs through a flow of tasks.
  */
 
-use App\Log as Log
-  , voku\db\DB as DB
-  , App\Console as Console
-  , Pimple\Container as Container;
+use App\DB
+  , App\Log
+  , App\Console
+  , Pimple\Container;
 
 // Set up paths and constants
 define( 'FOLDER', 'folder' );
@@ -27,9 +27,12 @@ date_default_timezone_set( 'UTC' );
 require( BASEPATH . '/vendor/autoload.php' );
 
 // Load configuration files and parse the CLI arguments
+$constants = parse_ini_file( BASEPATH .'/config/constants.ini', FALSE );
 $default = parse_ini_file( BASEPATH .'/config/default.ini', TRUE );
 $local = parse_ini_file( BASEPATH .'/config/local.ini', TRUE );
 $config = array_replace_recursive( $default, $local );
+\App\Constants::process( $constants );
+unset( $constants );
 
 // Set up dependency container and register all services
 $di = new Container();

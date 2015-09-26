@@ -4,7 +4,7 @@ namespace App\Exceptions;
 
 class AttachmentsPathNotWriteable extends \Exception
 {
-    public $code = 1002;
+    public $code = EXC_ATTACH_PATH;
     public $message = "The attachments path is not writeable by the current user: %s.";
 
     function __construct()

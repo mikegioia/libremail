@@ -34,8 +34,10 @@ class CLIHandler extends AbstractProcessingHandler
                 $this->cli->whisper()->inline( $message );
                 break;
             case Logger::NOTICE:
+                $this->cli->lightMagenta()->inline( $message );
+                break;
             case Logger::WARNING:
-                $this->cli->comment()->inline( $message );
+                $this->cli->lightYellow()->inline( $message );
                 break;
             case Logger::ERROR:
             case Logger::CRITICAL:

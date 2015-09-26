@@ -27,11 +27,46 @@ class Log
         $this->parseConfig( $config, $interactive );
         $this->checkLogPath( $interactive );
         $this->createLog( $config, $interactive );
+
+        // Set the error and exception handler here
+        @set_error_handler([ $this, 'errorHandler' ]);
+        @set_exception_handler([ $this, 'exceptionHandler' ]);
     }
 
     function getLogger()
     {
         return $this->logger;
+    }
+
+    function exceptionHandler( $exception )
+    {
+        $this->getLogger()->critical( $exception->getMessage() );
+    }
+
+    function errorHandler( $severity, $message, $filename, $lineNo )
+    {
+        if ( ! ( error_reporting() & $severity ) ) {
+            return;
+        }
+
+        switch ( $severity ) {
+            case E_USER_ERROR:
+            case E_USER_WARNING:
+            case E_WARNING:
+                $logMethod = 'warning';
+                break;
+            case E_USER_NOTICE:
+            case E_NOTICE:
+            case @E_STRICT:
+                $logMethod = 'notice';
+                break;
+            case @E_RECOVERABLE_ERROR:
+            default:
+                $logMethod = 'error';
+                break;
+        }
+
+        $this->getLogger()->$logMethod( $message );
     }
 
     private function parseConfig( array $config, $interactive )

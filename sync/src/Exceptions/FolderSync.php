@@ -4,6 +4,6 @@ namespace App\Exceptions;
 
 class FolderSync extends \Exception
 {
-    public $code = 3003;
+    public $code = EXC_FOLDER_SYNC;
     public $message = "Failed to sync IMAP folders.";
 }

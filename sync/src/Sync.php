@@ -11,8 +11,11 @@ use PhpImap\Mailbox
   , Pimple\Container
   , League\CLImate\CLImate
   , App\Models\Folder as FolderModel
+  , App\Sync\Messages as MessagesSync
   , App\Models\Account as AccountModel
+  , App\Models\Messages as MessagesModel
   , App\Exceptions\FolderSync as FolderSyncException
+  , App\Exceptions\MessagesSync as MessagesSyncException
   , App\Exceptions\MissingIMAPConfig as MissingIMAPConfigException
   , App\Exceptions\AttachmentsPathNotWriteable as AttachmentsPathNotWriteableException;
 
@@ -130,11 +133,7 @@ class Sync
             // Fetch folders and sync them to database
             $this->retriesFolders[ $account->email ] = 1;
             $folders = $this->syncFolders( $account );
-            // Process the messages in each folder
-            foreach ( $folders as $folder ) {
-                $this->retriesMessages[ $account->email ] = 1;
-                $this->syncMessages( $account, $folder );
-            }
+            $this->syncMessages( $account, $folders );
         }
         catch ( \Exception $e ) {
             $this->log->error( $e->getMessage() );
@@ -217,12 +216,13 @@ class Sync
         }
 
         $i = 1;
+        $folders = [];
         $progress = NULL;
         $this->log->debug( "Syncing IMAP folders for {$account->email}" );
 
         try {
-            $folders = $this->mailbox->getListingFolders();
-            $count = count( $folders );
+            $folderList = $this->mailbox->getListingFolders();
+            $count = count( $folderList );
 
             if ( $this->interactive ) {
                 $this->cli->whisper( "Syncing $count folders:" );
@@ -230,12 +230,14 @@ class Sync
             }
 
             // Add each folder to SQL, mark old folders as deleted
-            foreach ( $folders as $folder ) {
+            foreach ( $folderList as $folder ) {
                 if ( $this->interactive ) {
-                    FolderModel::create([
+                    $folder = new FolderModel([
                         'name' => $folder,
                         'account_id' => $account->id
                     ]);
+                    $folder->save();
+                    $folders[ $folder->id ] = $folder;
                     $progress->current( ( $i++ / $count ) * 100 );
                 }
             }
@@ -256,26 +258,48 @@ class Sync
     }
 
     /**
+     * Syncs all of the messages for an account. This is set up
+     * to try each folder some amount of times before moving on
+     * to the next folder.
+     * @param AccountModel $account
+     * @param array FolderModel $folders
+     */
+    private function syncMessages( AccountModel $account, $folders )
+    {
+        foreach ( $folders as $folder ) {
+            $this->retriesMessages[ $account->email ] = 1;
+
+            try {
+                $this->syncFolderMessages( $account, $folder );
+            }
+            catch ( MessagesSyncException $e ) {
+                $this->log->error( $e->getMessage() );
+            }
+        }
+    }
+
+    /**
      * Syncs all of the messages for a given IMAP folder.
      * @param AccountModel $account
-     * @param string $folder
-     * @throws MessageSyncException
+     * @param FolderModel $folder
+     * @throws MessagesSyncException
      * @return bool
      */
-    private function syncMessages( AccountModel $account, $folder )
+    private function syncFolderMessages( AccountModel $account, FolderModel $folder )
     {
         if ( $this->retriesMessages[ $account->email ] > $this->maxRetries ) {
             $this->log->notice(
                 "The account '{$account->email}' has exceeded the max ".
-                "amount of retries after message sync failure ".
-                "({$this->maxRetries})." );
-            throw new MessageSyncException( $folder );
+                "amount of retries ({$this->maxRetries}) after trying ".
+                "to sync the folder '{$folder->name}'. Skipping to the ".
+                "next folder." );
+            throw new MessagesSyncException( $folder );
         }
 
         $i = 1;
         $progress = NULL;
         $this->log->debug(
-            "Syncing messages in $folder for {$account->email}" );
+            "Syncing messages in {$folder->name} for {$account->email}" );
 
         // Syncing a folder of messages is done using the following
         // algorithm:
@@ -284,21 +308,36 @@ class Sync
         //  3. For anything in 1 and not 2, download messages and save
         //     to SQL database
         //  4. Mark deleted in SQL anything in 2 and not 1
-        //  5. Update relationship table with links between messages
-        //     and this folder.
         try {
-
+            $messagesSync = new MessagesSync( $account );
+            $messagesModel = new MessagesModel;
+            // Connect to the folder's mailbox, this is sent to the
+            // messages sync library to perform operations on
+            $this->connect(
+                $account->service,
+                $account->email,
+                $account->password,
+                'INBOX' );
+            $newIds = $messagesSync->getMessageIds(
+                $this->mailbox,
+                $folder );
+            $savedIds = $messagesModel->getIdsByFolder(
+                $account->id,
+                $folder->id );
+            $messagesSync->saveMessages( $newIds, $savedIds, $folder );
+            $messagesSync->markDeleted( $newIds, $savedIds, $folder );
         }
         catch ( \Exception $e ) {
             $this->log->error( $e->getMessage() );
+            $retryCount = $this->retriesMessages[ $account->email ];
             $waitSeconds = $this->config[ 'app' ][ 'sync' ][ 'wait_seconds' ];
             $this->log->info(
-                "Re-trying message sync ({$this->retriesMessages[ $account->email ]}/".
-                "{$this->maxRetries}) in $waitSeconds seconds..." );
+                "Re-trying message sync ($retryCount/{$this->maxRetries}) ".
+                "for folder '{$folder->name}' in $waitSeconds seconds..." );
             sleep( $waitSeconds );
             $this->retriesMessages[ $account->email ]++;
 
-            return $this->syncMessages( $account, $folder );
+            return $this->syncFolderMessages( $account, $folder );
         }
     }
 }
