@@ -74,6 +74,10 @@ class Log
                 break;
         }
 
+        if ( $this->isSuppressed( $message ) ) {
+            return;
+        }
+
         $e = new \Exception( "$message on line $lineNo of $filename" );
 
         if ( $this->stackTrace ) {
@@ -108,7 +112,7 @@ class Log
         $this->level = ( isset( $levels[ $level ] ) )
             ? $levels[ $level ]
             : Logger::WARNING;
-        $this->stackTrace = $config->stacktrace;
+        $this->stackTrace = $config[ 'stacktrace' ];
     }
 
     /**
@@ -158,5 +162,26 @@ class Log
 
         // Store the log internally
         $this->logger = $log;
+    }
+
+    /**
+     * There are certain notices that are raised during the mail
+     * header parsing that need to be suppressed.
+     * @param string $message Message to check against
+     * @return boolean
+     */
+    private function isSuppressed( $message )
+    {
+        $suppressList = [
+            'Unknown: Unexpected characters at end of address'
+        ];
+
+        foreach ( $suppressList as $string ) {
+            if ( strpos( $message, $string ) === 0 ) {
+                return TRUE;
+            }
+        }
+
+        return FALSE;
     }
 }

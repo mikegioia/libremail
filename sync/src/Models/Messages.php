@@ -180,6 +180,7 @@ class Messages extends \App\Model
 
         if ( $exists ) {
             $this->id = $exists->id;
+            unset( $data[ 'id' ] );
             unset( $data[ 'created_at' ] );
             $updated = $this->db()->update(
                 'messages',
@@ -188,18 +189,23 @@ class Messages extends \App\Model
                 ]);
 
             if ( ! $updated ) {
-                throw new DatabaseUpdateException( MESSAGE );
+                throw new DatabaseUpdateException(
+                    MESSAGE,
+                    $this->db()->getErrors() );
             }
 
             return;
         }
 
         $createdAt = new \DateTime;
+        unset( $data[ 'id' ] );
         $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
         $newMessageId = $this->db()->insert( 'messages', $data );
 
         if ( ! $newMessageId ) {
-            throw new DatabaseInsertException( MESSAGE );
+            throw new DatabaseInsertException(
+                MESSAGE,
+                $this->db()->getErrors() );
         }
 
         $this->id = $newMessageId;
@@ -256,6 +262,40 @@ class Messages extends \App\Model
             'reply_to' => $this->formatAddress( $replyTo ),
             'attachments' => $this->formatAttachments( $attachments )
         ]);
+    }
+
+    /**
+     * Takes in an array of message unique IDs and marks them all as
+     * deleted in the database.
+     * @param array $uniqueIds
+     */
+    function markDeleted( $uniqueIds, $accountId, $folderId )
+    {
+        if ( ! is_array( $uniqueIds ) || ! count( $uniqueIds ) ) {
+            return;
+        }
+
+        if ( ! Belt::isNumber( $accountId )
+            || ! Belt::isNumber( $folderId ) )
+        {
+            throw new ValidationException(
+                "Account ID and Folder ID need to be integers." );
+        }
+
+        $updated = $this->db()->update(
+            'messages', [
+                'deleted' => 1
+            ], [
+                'folder_id =' => $folderId,
+                'account_id =' => $accountId,
+                'unique_id IN' => $uniqueIds
+            ]);
+
+        if ( ! $updated ) {
+            throw new DatabaseUpdateException(
+                MESSAGE,
+                $this->db()->getErrors() );
+        }
     }
 
     private function formatAddress( $addresses )

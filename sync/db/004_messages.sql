@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `messages` (
-  `id` int(10) unsigned NOT NULL,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `account_id` int(10) unsigned NOT NULL,
   `folder_id` int(10) unsigned NOT NULL,
   `unique_id` int(10) unsigned DEFAULT NULL,

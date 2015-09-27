@@ -282,8 +282,6 @@ class Sync
             catch ( MessagesSyncException $e ) {
                 $this->log->error( $e->getMessage() );
             }
-
-            exit( 'done first folder' );
         }
     }
 
@@ -405,6 +403,7 @@ class Sync
                 // If the message hasn't been synced yet, then pull the entire
                 // contents and save those to the database.
                 if ( ! $message->isSynced() ) {
+                    $message->synced = 1;
                     $mailData = $this->mailbox->getMail(
                         $message->getUniqueId(),
                         FALSE );
@@ -427,11 +426,38 @@ class Sync
                 }
             }
         }
-        exit;
     }
 
+    /**
+     * For any messages we have saved that didn't come back from the
+     * mailbox, mark them as deleted in the database.
+     * @param array $newIds
+     * @param array $savedIds
+     * @param FolderModel $folder
+     */
     private function markDeleted( $newIds, $savedIds, FolderModel $folder )
     {
-        $this->log->debug( "Marking any deletions in {$folder->name}" );
+        $toDelete = array_diff( $savedIds, $newIds );
+        $count = count( $toDelete );
+
+        if ( ! $count ) {
+            $this->log->debug( "No messages to delete in {$folder->name}" );
+            return;
+        }
+
+        $this->log->debug( "Marking $count deletion(s) in {$folder->name}" );
+
+        try {
+            $messagesModel = new MessagesModel;
+            $messagesModel->markDeleted(
+                $toDelete,
+                $folder->getAccountId(),
+                $folder->getId() );
+        }
+        catch ( ValidationException $e ) {
+            $this->log->notice(
+                "Failed validation for marking deleted messages: ".
+                $e->getMessage() );
+        }
     }
 }

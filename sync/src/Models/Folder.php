@@ -74,6 +74,7 @@ class Folder extends \App\Model
         if ( $exists ) {
             $this->is_deleted = 0;
             $this->id = $exists->id;
+            unset( $data[ 'id' ] );
             unset( $data[ 'created_at' ] );
             $updated = $this->db()->update(
                 'folders', [
@@ -91,6 +92,7 @@ class Folder extends \App\Model
         }
 
         $createdAt = new \DateTime;
+        unset( $data[ 'id' ] );
         $data[ 'is_deleted' ] = 0;
         $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
         $newFolderId = $this->db()->insert( 'folders', $data );

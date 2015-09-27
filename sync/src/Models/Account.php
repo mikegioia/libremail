@@ -77,6 +77,7 @@ class Account extends \App\Model
             }
 
             $this->id = $exists->id;
+            unset( $data[ 'id' ] );
             unset( $data[ 'created_at' ] );
             $updated = $this->db()->update(
                 'accounts',
@@ -92,6 +93,7 @@ class Account extends \App\Model
         }
 
         $createdAt = new \DateTime;
+        unset( $data[ 'id' ] );
         $data[ 'is_active' ] = 1;
         $data[ 'service' ] = strtolower( $data[ 'service' ] );
         $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
