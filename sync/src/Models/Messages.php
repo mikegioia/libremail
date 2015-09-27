@@ -6,12 +6,14 @@ use Belt\Belt
   , Particle\Validator\Validator
   , App\Traits\Model as ModelTrait
   , App\Exceptions\Validation as ValidationException
+  , App\Exceptions\DatabaseUpdate as DatabaseUpdateException
   , App\Exceptions\DatabaseInsert as DatabaseInsertException;
 
 class Messages extends \App\Model
 {
     public $id;
     public $to;
+    public $cc;
     public $from;
     public $date;
     public $size;
@@ -20,9 +22,10 @@ class Messages extends \App\Model
     public $synced;
     public $recent;
     public $flagged;
-    public $subject;
     public $deleted;
+    public $subject;
     public $answered;
+    public $reply_to;
     public $date_str;
     public $unique_id;
     public $folder_id;
@@ -32,9 +35,11 @@ class Messages extends \App\Model
     public $message_no;
     public $text_plain;
     public $references;
-    public $is_deleted;
     public $created_at;
     public $in_reply_to;
+    public $attachments;
+
+    private $unserializedAttachments;
 
     use ModelTrait;
 
@@ -43,6 +48,7 @@ class Messages extends \App\Model
         return [
             'id' => $this->id,
             'to' => $this->to,
+            'cc' => $this->cc,
             'from' => $this->from,
             'date' => $this->date,
             'size' => $this->size,
@@ -54,6 +60,7 @@ class Messages extends \App\Model
             'deleted' => $this->deleted,
             'subject' => $this->subject,
             'answered' => $this->answered,
+            'reply_to' => $this->reply_to,
             'date_str' => $this->date_str,
             'unique_id' => $this->unique_id,
             'folder_id' => $this->folder_id,
@@ -64,7 +71,8 @@ class Messages extends \App\Model
             'text_plain' => $this->text_plain,
             'references' => $this->references,
             'created_at' => $this->created_at,
-            'in_reply_to' => $this->in_reply_to
+            'in_reply_to' => $this->in_reply_to,
+            'attachments' => $this->attachments
         ];
     }
 
@@ -91,6 +99,16 @@ class Messages extends \App\Model
     function isDeleted()
     {
         return \Fn\intEq( $this->deleted, 1 );
+    }
+
+    function getAttachments()
+    {
+        if ( ! is_null( $this->unserializedAttachments ) ) {
+            return $this->unserializedAttachments;
+        }
+
+        $this->unserializedAttachments = @unserialize( $this->attachments );
+        return $this->unserializedAttachments;
     }
 
     function getSyncedIdsByFolder( $accountId, $folderId )
@@ -142,14 +160,6 @@ class Messages extends \App\Model
         $val->optional( 'deleted', 'Deleted' )->callback([ $this, 'isValidFlag' ]);
         $val->optional( 'answered', 'Answered' )->callback([ $this, 'isValidFlag' ]);
         $this->setData( $data );
-
-        // Date field is based off string date.
-        if ( $this->date_str ) {
-            $this->date_str = $this->cleanseDate( $this->date_str );
-            $date = new \DateTime( $this->date_str );
-            $this->date = $date->format( DATE_DATABASE );
-        }
-
         $data = $this->getData();
 
         if ( ! $val->validate( $data ) ) {
@@ -168,16 +178,13 @@ class Messages extends \App\Model
                 'account_id' => $this->account_id
             ])->fetchObject();
 
-        exit( 'Save method not implemented yet' );
-
         if ( $exists ) {
             $this->id = $exists->id;
+            unset( $data[ 'created_at' ] );
             $updated = $this->db()->update(
-                'folders', [
-                    'is_deleted' => 0
-                ], [
-                    'name' => $this->name,
-                    'account_id' => $this->account_id
+                'messages',
+                $data, [
+                    'id' => $this->id
                 ]);
 
             if ( ! $updated ) {
@@ -189,13 +196,13 @@ class Messages extends \App\Model
 
         $createdAt = new \DateTime;
         $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
-        $newMessage = $this->db()->insert( 'messages', $data );
+        $newMessageId = $this->db()->insert( 'messages', $data );
 
-        if ( ! $newMessage ) {
+        if ( ! $newMessageId ) {
             throw new DatabaseInsertException( MESSAGE );
         }
 
-        $this->setData( $newMessage );
+        $this->id = $newMessageId;
     }
 
     /**
@@ -231,17 +238,57 @@ class Messages extends \App\Model
      */
     function setMailData( $mail )
     {
+        // cc and replyTo fields come in as arrays with the address
+        // as the index and the name as the value. Create the proper
+        // comma separated strings for these fields.
+        $cc = \Fn\get( $mail, 'cc', [] );
+        $replyTo = \Fn\get( $mail, 'replyTo', [] );
 
+        // Attachments need to be serialized. They come in as an array
+        // of objects with name, path, and id fields.
+        $attachments = \Fn\get( $mail, 'attachments' );
+
+        $this->setData([
+            'date' => \Fn\get( $mail, 'date' ),
+            'cc' => $this->formatAddress( $cc ),
+            'text_html' => \Fn\get( $mail, 'textHtml' ),
+            'text_plain' => \Fn\get( $mail, 'textPlain' ),
+            'reply_to' => $this->formatAddress( $replyTo ),
+            'attachments' => $this->formatAttachments( $attachments )
+        ]);
     }
 
-    private function cleanseDate( $dateStr )
+    private function formatAddress( $addresses )
     {
-        $parenPosition = strpos( $dateStr, "(" );
-
-        if ( $parenPosition !== FALSE ) {
-            $dateStr = substr( $dateStr, 0, $parenPosition );
+        if ( ! is_array( $addresses ) ) {
+            return NULL;
         }
 
-        return $dateStr;
+        $formatted = [];
+
+        foreach ( $addresses as $email => $name ) {
+            $formatted[] = "$name <$email>";
+        }
+
+        return implode( ", ", $formatted );
+    }
+
+    private function formatAttachments( $attachments )
+    {
+        if ( ! is_array( $attachments ) ) {
+            return NULL;
+        }
+
+        $formatted = [];
+
+        foreach ( $attachments as $attachment ) {
+            $formatted[] = [
+                'id' => $attachment->id,
+                'name' => $attachment->name,
+                'filepath' => $attachment->filePath
+            ];
+        }
+
+        return @serialize( $formatted );
     }
 }

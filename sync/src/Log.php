@@ -20,6 +20,8 @@ class Log
     private $level;
     // The Monolog handler
     private $logger;
+    // Whether to write the stack traces
+    private $stackTrace;
 
     function __construct( CLImate $cli, array $config, $interactive = FALSE )
     {
@@ -40,7 +42,13 @@ class Log
 
     function exceptionHandler( $exception )
     {
-        $this->getLogger()->critical( $exception->getMessage() );
+        if ( $this->stackTrace ) {
+            $this->getLogger()->critical(
+                $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
+        }
+        else {
+            $this->getLogger()->critical( $exception->getMessage() );
+        }
     }
 
     function errorHandler( $severity, $message, $filename, $lineNo )
@@ -66,8 +74,15 @@ class Log
                 break;
         }
 
-        $this->getLogger()->$logMethod(
-            "$message on line $lineNo of $filename" );
+        $e = new \Exception( "$message on line $lineNo of $filename" );
+
+        if ( $this->stackTrace ) {
+            $this->getLogger()->$logMethod(
+                $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
+        }
+        else {
+            $this->getLogger()->$logMethod( $e->getMessage() );
+        }
     }
 
     private function parseConfig( array $config, $interactive )
@@ -93,6 +108,7 @@ class Log
         $this->level = ( isset( $levels[ $level ] ) )
             ? $levels[ $level ]
             : Logger::WARNING;
+        $this->stackTrace = $config->stacktrace;
     }
 
     /**

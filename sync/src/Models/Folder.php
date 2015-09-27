@@ -5,6 +5,7 @@ namespace App\Models;
 use Particle\Validator\Validator
   , App\Traits\Model as ModelTrait
   , App\Exceptions\Validation as ValidationException
+  , App\Exceptions\DatabaseUpdate as DatabaseUpdateException
   , App\Exceptions\DatabaseInsert as DatabaseInsertException;
 
 class Folder extends \App\Model
@@ -73,6 +74,7 @@ class Folder extends \App\Model
         if ( $exists ) {
             $this->is_deleted = 0;
             $this->id = $exists->id;
+            unset( $data[ 'created_at' ] );
             $updated = $this->db()->update(
                 'folders', [
                     'is_deleted' => 0
@@ -91,12 +93,12 @@ class Folder extends \App\Model
         $createdAt = new \DateTime;
         $data[ 'is_deleted' ] = 0;
         $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
-        $newFolder = $this->db()->insert( 'folders', $data );
+        $newFolderId = $this->db()->insert( 'folders', $data );
 
-        if ( ! $newFolder ) {
+        if ( ! $newFolderId ) {
             throw new DatabaseInsertException( FOLDER );
         }
 
-        $this->setData( $newFolder );
+        $this->id = $newFolderId;
     }
 }

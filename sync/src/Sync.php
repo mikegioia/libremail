@@ -282,6 +282,8 @@ class Sync
             catch ( MessagesSyncException $e ) {
                 $this->log->error( $e->getMessage() );
             }
+
+            exit( 'done first folder' );
         }
     }
 

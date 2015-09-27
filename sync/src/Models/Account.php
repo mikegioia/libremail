@@ -77,6 +77,7 @@ class Account extends \App\Model
             }
 
             $this->id = $exists->id;
+            unset( $data[ 'created_at' ] );
             $updated = $this->db()->update(
                 'accounts',
                 $data, [
@@ -94,13 +95,13 @@ class Account extends \App\Model
         $data[ 'is_active' ] = 1;
         $data[ 'service' ] = strtolower( $data[ 'service' ] );
         $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
-        $newAccount = $this->db()->insert( 'accounts', $data );
+        $newAccountId = $this->db()->insert( 'accounts', $data );
 
-        if ( ! $newAccount ) {
+        if ( ! $newAccountId ) {
             throw new DatabaseInsertException( ACCOUNT );
         }
 
-        $this->setData( $newAccount );
+        $this->id = $newAccountId;
     }
 
     function getActive()
