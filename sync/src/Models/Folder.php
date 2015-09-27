@@ -71,6 +71,7 @@ class Folder extends \App\Model
 
         // If it exists, unset is_deleted
         if ( $exists ) {
+            $this->is_deleted = 0;
             $this->id = $exists->id;
             $updated = $this->db()->update(
                 'folders', [
@@ -96,6 +97,6 @@ class Folder extends \App\Model
             throw new DatabaseInsertException( FOLDER );
         }
 
-        $this->id = $newFolder->id;
+        $this->setData( $newFolder );
     }
 }

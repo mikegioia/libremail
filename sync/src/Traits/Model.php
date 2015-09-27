@@ -39,4 +39,9 @@ trait Model
 
         return $modelObjects;
     }
+
+    function isValidFlag( $flag )
+    {
+        return in_array( (int) $flag, [ 0, 1 ] );
+    }
 }

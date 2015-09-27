@@ -76,21 +76,31 @@ class Account extends \App\Model
                 throw new AccountExistsException( $data[ 'email' ] );
             }
 
-            $this->id = $exists;
+            $this->id = $exists->id;
+            $updated = $this->db()->update(
+                'accounts',
+                $data, [
+                    'id' => $exists->id
+                ]);
+
+            if ( ! $updated ) {
+                throw new DatabaseUpdateException( FOLDER );
+            }
+
             return;
         }
 
         $createdAt = new \DateTime;
-        $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
-        $data[ 'service' ] = strtolower( $data[ 'service' ] );
         $data[ 'is_active' ] = 1;
+        $data[ 'service' ] = strtolower( $data[ 'service' ] );
+        $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
         $newAccount = $this->db()->insert( 'accounts', $data );
 
         if ( ! $newAccount ) {
             throw new DatabaseInsertException( ACCOUNT );
         }
 
-        $this->id = $newAccount->id;
+        $this->setData( $newAccount );
     }
 
     function getActive()

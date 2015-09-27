@@ -13,6 +13,7 @@ use PhpImap\Mailbox
   , App\Models\Folder as FolderModel
   , App\Models\Account as AccountModel
   , App\Models\Messages as MessagesModel
+  , App\Exceptions\Validation as ValidationException
   , App\Exceptions\FolderSync as FolderSyncException
   , App\Exceptions\MessagesSync as MessagesSyncException
   , App\Exceptions\MissingIMAPConfig as MissingIMAPConfigException
@@ -235,9 +236,9 @@ class Sync
             }
 
             // Add each folder to SQL, mark old folders as deleted
-            foreach ( $folderList as $folder ) {
+            foreach ( $folderList as $folderName ) {
                 $folder = new FolderModel([
-                    'name' => $folder,
+                    'name' => $folderName,
                     'account_id' => $account->getId()
                 ]);
                 $folder->save();
@@ -376,20 +377,55 @@ class Sync
         }
 
         // Pull the meta info for a batch of messages at a time.
-        // Save those messages in the batch and then do it again.
+        for ( $j = 0; $j <= $count; $j += $this->messageBatchSize ) {
+            $mailIds = array_slice( $toDownload, $j, $this->messageBatchSize );
+            $mailMeta = $this->mailbox->getMailsInfo( $mailIds );
 
-        foreach ( $toDownload as $messageId ) {
-            //$message = new MessageModel([
-            //    'unique_id' => $messageId,
-            //    'folder_id' => $folder->getId(),
-            //    'account_id' => $account->getId()
-            //]);
-            //$message->save();
+            foreach ( $mailMeta as $meta ) {
+                $message = new MessagesModel([
+                    'folder_id' => $folder->getId(),
+                    'account_id' => $folder->getAccountId(),
+                ]);
+                $message->setMailMeta( $meta );
 
-            if ( $this->interactive ) {
-                $progress->current( ( $i++ / $count ) * 100 );
+                // Save the meta info that comes back from the server
+                // regardless if the record exists.
+                try {
+                    $message->save();
+                }
+                catch ( ValidationException $e ) {
+                    $this->log->notice(
+                        "Failed validation for message meta ".
+                        "{$message->getUniqueId()}: {$e->getMessage()}" );
+                    goto endOfLoop;
+                }
+
+                // If the message hasn't been synced yet, then pull the entire
+                // contents and save those to the database.
+                if ( ! $message->isSynced() ) {
+                    $mailData = $this->mailbox->getMail(
+                        $message->getUniqueId(),
+                        FALSE );
+                    $message->setMailData( $mailData );
+
+                    try {
+                        $message->save();
+                    }
+                    catch ( ValidationException $e ) {
+                        $this->log->notice(
+                            "Failed validation for message data ".
+                            "{$message->getUniqueId()}: {$e->getMessage()}" );
+                    }
+                }
+
+                endOfLoop: {
+                    if ( $this->interactive ) {
+                        $progress->current( ( $i++ / $count ) * 100 );
+                    }
+                }
             }
         }
+        exit;
     }
 
     private function markDeleted( $newIds, $savedIds, FolderModel $folder )

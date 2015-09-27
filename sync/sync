@@ -11,15 +11,15 @@
 
 use App\DB
   , App\Log
+  , App\Sync
+  , App\Model
   , App\Console
+  , App\Startup
+  , App\Constants
   , Pimple\Container;
 
 // Set up paths and constants
-define( 'FOLDER', 'folder' );
 define( 'BASEPATH', __DIR__ );
-define( 'ACCOUNT', 'account' );
-define( 'DATE_LOG', 'j-M-y H:i:s' );
-define( 'DATE_DATABASE', 'Y-m-d H:i:s' );
 define( 'DBSCRIPTS', BASEPATH .'/db/*.sql' );
 date_default_timezone_set( 'UTC' );
 
@@ -31,7 +31,7 @@ $constants = parse_ini_file( BASEPATH .'/config/constants.ini', FALSE );
 $default = parse_ini_file( BASEPATH .'/config/default.ini', TRUE );
 $local = parse_ini_file( BASEPATH .'/config/local.ini', TRUE );
 $config = array_replace_recursive( $default, $local );
-\App\Constants::process( $constants );
+Constants::process( $constants );
 unset( $constants );
 
 // Set up dependency container and register all services
@@ -68,10 +68,10 @@ $di[ 'log' ] = function ( $c ) {
 };
 
 // Statically set the services in the base model
-\App\Model::setDb( $di[ 'db' ] );
-\App\Model::setCLI( $di[ 'cli' ] );
-\App\Model::setLog( $di[ 'log' ] );
-\App\Model::setConfig( $di[ 'config' ] );
+Model::setDb( $di[ 'db' ] );
+Model::setCLI( $di[ 'cli' ] );
+Model::setLog( $di[ 'log' ] );
+Model::setConfig( $di[ 'config' ] );
 
 // Parse the CLI
 $di[ 'console' ]->init();
@@ -80,9 +80,9 @@ $di[ 'console' ]->init();
 // are email accounts saved. This may prompt the user to add an account
 // if we're running in interactive mode.
 try {
-    $startup = new \App\Startup( $di );
+    $startup = new Startup( $di );
     $startup->run();
-    $sync = new \App\Sync( $di );
+    $sync = new Sync( $di );
     $sync->run();
 }
 catch ( \Exception $e ) {
