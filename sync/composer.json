@@ -7,10 +7,16 @@
             "src/Functions.php"
         ]
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/mikegioia/php-imap"
+        }
+    ],
     "require": {
         "php": ">=5.4.0",
         "ext-imap": "*",
-        "php-imap/php-imap": "^2.0",
+        "mikegioia/php-imap": "dev-master",
         "pimple/pimple": "~3.0",
         "voku/simple-mysqli": "dev-master",
         "monolog/monolog": "^1.17",

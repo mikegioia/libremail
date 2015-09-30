@@ -64,10 +64,14 @@ class Migration extends \App\Model
      */
     private function isRunAlready( $script )
     {
-        return $this->db()->select(
+        $result = $this->db()->select(
             'migrations', [
                 'name' => $script
-            ])->fetchObject();
+            ]);
+
+        return ( $result )
+            ? $result->fetchObject()
+            : FALSE;
     }
 
     /**
