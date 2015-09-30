@@ -111,7 +111,13 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mikegioia/php-imap.git",
-                "reference": "143aea3936c0ce53fe5a5aab7f25d46da1028acf"
+                "reference": "2cb284676152977fce95b791a1f889f4e97a585b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mikegioia/php-imap/zipball/2cb284676152977fce95b791a1f889f4e97a585b",
+                "reference": "2cb284676152977fce95b791a1f889f4e97a585b",
+                "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
@@ -144,7 +150,10 @@
                 "PHP",
                 "mail"
             ],
-            "time": "2015-09-30 14:34:18"
+            "support": {
+                "source": "https://github.com/mikegioia/php-imap/tree/master"
+            },
+            "time": "2015-09-30 15:01:05"
         },
         {
             "name": "monolog/monolog",
