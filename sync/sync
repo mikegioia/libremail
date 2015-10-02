@@ -19,9 +19,10 @@ use App\DB
   , Pimple\Container;
 
 // Set up paths and constants
+set_time_limit( 0 );
 define( 'BASEPATH', __DIR__ );
-define( 'DBSCRIPTS', BASEPATH .'/db/*.sql' );
 date_default_timezone_set( 'UTC' );
+define( 'DBSCRIPTS', BASEPATH .'/db/*.sql' );
 
 // Load the vendor libraries
 require( BASEPATH . '/vendor/autoload.php' );

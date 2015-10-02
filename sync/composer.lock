@@ -4,7 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9bd2faccbcabbe64d52f0b788c837263",
+    "hash": "6ddc68c36cf65b2254b35652039d6a32",
+    "content-hash": "bb57b7be99132a12467f5b5ae223fb1b",
     "packages": [
         {
             "name": "ilya/belt",
@@ -104,6 +105,56 @@
                 "terminal"
             ],
             "time": "2015-08-13 16:50:51"
+        },
+        {
+            "name": "mikegioia/php-imap",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mikegioia/php-imap.git",
+                "reference": "c7f3d46f3a08fc799b0a6b0ede937f5923ca9388"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mikegioia/php-imap/zipball/c7f3d46f3a08fc799b0a6b0ede937f5923ca9388",
+                "reference": "c7f3d46f3a08fc799b0a6b0ede937f5923ca9388",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PhpImap\\": "src/PhpImap/"
+                }
+            },
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Sergey Barbushin",
+                    "homepage": "http://linkedin.com/in/barbushin",
+                    "email": "barbushin@gmail.com"
+                },
+                {
+                    "name": "Mike Gioia",
+                    "homepage": "http://mikegioia.com",
+                    "email": "mikegioia@gmail.com"
+                }
+            ],
+            "description": "PHP class to access mailbox by POP3/IMAP/NNTP using IMAP extension",
+            "homepage": "https://github.com/mikegioia/php-imap",
+            "keywords": [
+                "IMAP",
+                "PHP",
+                "mail"
+            ],
+            "support": {
+                "source": "https://github.com/mikegioia/php-imap/tree/master"
+            },
+            "time": "2015-10-02 14:41:23"
         },
         {
             "name": "monolog/monolog",
@@ -229,49 +280,6 @@
                 "validator"
             ],
             "time": "2015-06-30 12:10:20"
-        },
-        {
-            "name": "php-imap/php-imap",
-            "version": "2.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/barbushin/php-imap.git",
-                "reference": "cc1a49a3f68090db182183c59ffbc09055d59f5b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/barbushin/php-imap/zipball/cc1a49a3f68090db182183c59ffbc09055d59f5b",
-                "reference": "cc1a49a3f68090db182183c59ffbc09055d59f5b",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "PhpImap": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD 3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Sergey Barbushin",
-                    "email": "barbushin@gmail.com",
-                    "homepage": "http://linkedin.com/in/barbushin"
-                }
-            ],
-            "description": "PHP class to access mailbox by POP3/IMAP/NNTP using IMAP extension",
-            "homepage": "https://github.com/barbushin/php-imap",
-            "keywords": [
-                "imap",
-                "mail",
-                "php"
-            ],
-            "time": "2015-09-16 07:40:39"
         },
         {
             "name": "pimple/pimple",
@@ -596,6 +604,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "mikegioia/php-imap": 20,
         "voku/simple-mysqli": 20
     },
     "prefer-stable": false,

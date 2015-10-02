@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use Belt\Belt
+  , PhpImap\Mail
   , Particle\Validator\Validator
   , App\Traits\Model as ModelTrait
   , App\Exceptions\Validation as ValidationException
   , App\Exceptions\DatabaseUpdate as DatabaseUpdateException
   , App\Exceptions\DatabaseInsert as DatabaseInsertException;
 
-class Messages extends \App\Model
+class Message extends \App\Model
 {
     public $id;
     public $to;
@@ -111,6 +112,13 @@ class Messages extends \App\Model
         return $this->unserializedAttachments;
     }
 
+    /**
+     * Returns a list of integer unique_ids given an account ID
+     * and a folder ID to search.
+     * @param int $accountId
+     * @param int $folderId
+     * @return array
+     */
     function getSyncedIdsByFolder( $accountId, $folderId )
     {
         if ( ! Belt::isNumber( $accountId )
@@ -120,16 +128,26 @@ class Messages extends \App\Model
                 "Account ID and Folder ID need to be integers." );
         }
 
+        $ids = [];
         $messages = $this->db()->select(
             'messages', [
                 'synced =' => 1,
+                'deleted =' => 0,
                 'folder_id =' => $folderId,
                 'account_id =' => $accountId,
             ], [
                 'unique_id'
             ])->fetchAllObject();
 
-        return $this->populate( $messages );
+        if ( ! $messages ) {
+            return $ids;
+        }
+
+        foreach ( $messages as $message ) {
+            $ids[] = $message->unique_id;
+        }
+
+        return $ids;
     }
 
     /**
@@ -242,7 +260,7 @@ class Messages extends \App\Model
      * message object.
      * @param array $mail
      */
-    function setMailData( $mail )
+    function setMailData( Mail $mail )
     {
         // cc and replyTo fields come in as arrays with the address
         // as the index and the name as the value. Create the proper
@@ -250,17 +268,13 @@ class Messages extends \App\Model
         $cc = \Fn\get( $mail, 'cc', [] );
         $replyTo = \Fn\get( $mail, 'replyTo', [] );
 
-        // Attachments need to be serialized. They come in as an array
-        // of objects with name, path, and id fields.
-        $attachments = \Fn\get( $mail, 'attachments' );
-
         $this->setData([
-            'date' => \Fn\get( $mail, 'date' ),
+            'date' => $mail->date,
+            'text_html' => $mail->textHtml,
+            'text_plain' => $mail->textPlain,
             'cc' => $this->formatAddress( $cc ),
-            'text_html' => \Fn\get( $mail, 'textHtml' ),
-            'text_plain' => \Fn\get( $mail, 'textPlain' ),
             'reply_to' => $this->formatAddress( $replyTo ),
-            'attachments' => $this->formatAttachments( $attachments )
+            'attachments' => $this->formatAttachments( $mail->getAttachments() )
         ]);
     }
 
@@ -298,6 +312,10 @@ class Messages extends \App\Model
         }
     }
 
+    /**
+     * Takes in an array of addresses and formats them in a list.
+     * @return string
+     */
     private function formatAddress( $addresses )
     {
         if ( ! is_array( $addresses ) ) {
@@ -313,6 +331,12 @@ class Messages extends \App\Model
         return implode( ", ", $formatted );
     }
 
+    /**
+     * Attachments need to be serialized. They come in as an array
+     * of objects with name, path, and id fields.
+     * @param Attachment array $attachments
+     * @return string
+     */
     private function formatAttachments( $attachments )
     {
         if ( ! is_array( $attachments ) ) {
@@ -322,11 +346,7 @@ class Messages extends \App\Model
         $formatted = [];
 
         foreach ( $attachments as $attachment ) {
-            $formatted[] = [
-                'id' => $attachment->id,
-                'name' => $attachment->name,
-                'filepath' => $attachment->filePath
-            ];
+            $formatted[] = (array) $attachment;
         }
 
         return @serialize( $formatted );

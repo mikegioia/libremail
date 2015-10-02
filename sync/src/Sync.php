@@ -6,13 +6,13 @@
 
 namespace App;
 
-use PhpImap\Mailbox
-  , Monolog\Logger
+use Monolog\Logger
+  , PhpImap\Mailbox
   , Pimple\Container
   , League\CLImate\CLImate
   , App\Models\Folder as FolderModel
   , App\Models\Account as AccountModel
-  , App\Models\Messages as MessagesModel
+  , App\Models\Message as MessageModel
   , App\Exceptions\Validation as ValidationException
   , App\Exceptions\FolderSync as FolderSyncException
   , App\Exceptions\MessagesSync as MessagesSyncException
@@ -33,8 +33,8 @@ class Sync
     private $messageBatchSize = 50;
 
     /**
-     * Constructor can optionally take a dependency container or
-     * have the dependencies loaded individually. The di method is
+     * Constructor can either take a dependency container or have
+     * the dependencies loaded individually. The di method is
      * used when the sync app is run from a bootstrap file and the
      * ad hoc method is when this class is used separately within
      * other classes like Console.
@@ -83,7 +83,7 @@ class Sync
      *  1. Get the folders
      *  2. Save all message IDs for each folder
      *  3. For each folder, add/remove messages based off IDs
-     *  4. Set up threading for messages based off UIDs
+     *  4. Save attachments
      * @param AccountModel $account Optional account to run
      */
     function run( AccountModel $account = NULL )
@@ -314,7 +314,7 @@ class Sync
         //     to SQL database
         //  4. Mark deleted in SQL anything in 2 and not 1
         try {
-            $messagesModel = new MessagesModel;
+            $messageModel = new MessageModel;
             // Connect to the folder's mailbox, this is sent to the
             // messages sync library to perform operations on
             $this->connect(
@@ -323,7 +323,7 @@ class Sync
                 $account->password,
                 $folder->name );
             $newIds = $this->mailbox->searchMailBox( 'ALL' );
-            $savedIds = $messagesModel->getSyncedIdsByFolder(
+            $savedIds = $messageModel->getSyncedIdsByFolder(
                 $account->getId(),
                 $folder->getId() );
             $this->downloadMessages( $newIds, $savedIds, $folder );
@@ -382,7 +382,7 @@ class Sync
             $mailMeta = $this->mailbox->getMailsInfo( $mailIds );
 
             foreach ( $mailMeta as $meta ) {
-                $message = new MessagesModel([
+                $message = new MessageModel([
                     'folder_id' => $folder->getId(),
                     'account_id' => $folder->getAccountId(),
                 ]);
@@ -448,8 +448,8 @@ class Sync
         $this->log->debug( "Marking $count deletion(s) in {$folder->name}" );
 
         try {
-            $messagesModel = new MessagesModel;
-            $messagesModel->markDeleted(
+            $messageModel = new MessageModel;
+            $messageModel->markDeleted(
                 $toDelete,
                 $folder->getAccountId(),
                 $folder->getId() );
