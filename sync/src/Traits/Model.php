@@ -2,19 +2,23 @@
 
 namespace App\Traits;
 
+use Belt\Belt
+  , App\Exceptions\NotFound as NotFoundException
+  , App\Exceptions\Validation as ValidationException;
+
 trait Model
 {
-    function getClass()
+    public function getClass()
     {
         return get_class();
     }
 
-    function getId()
+    public function getId()
     {
         return (int) $this->id;
     }
 
-    function getCreatedAt()
+    public function getCreatedAt()
     {
         return $this->created_at;
     }
@@ -24,13 +28,13 @@ trait Model
      * @param array $objects
      * @return array
      */
-    function populate( $objects, $modelClass = NULL )
+    public function populate( $objects, $modelClass = NULL )
     {
         $modelObjects = [];
         $modelClass = ( $modelClass ) ?: $this->getClass();
 
         if ( ! is_array( $objects ) ) {
-            return new $modelClass( $object );
+            return new $modelClass( $objects );
         }
 
         foreach ( $objects as $object ) {
@@ -40,8 +44,32 @@ trait Model
         return $modelObjects;
     }
 
-    function isValidFlag( $flag )
+    public function isValidFlag( $flag )
     {
         return in_array( (int) $flag, [ 0, 1 ] );
+    }
+
+    public function requireInt( $number, $name )
+    {
+        if ( ! Belt::isNumber( $number ) ) {
+            throw new ValidationException(
+                "$name needs to be an integer." );
+        }
+    }
+
+    public function requireString( $string, $name )
+    {
+        if ( ! Belt::isString( $string ) ) {
+            throw new ValidationException(
+                "$name needs to be a string." );
+        }
+    }
+
+    public function handleNotFound( $result, $type, $fail )
+    {
+        if ( ! $result && $fail === TRUE )
+        {
+            throw new NotFoundException( $type );
+        }
     }
 }

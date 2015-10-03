@@ -18,7 +18,7 @@ class Startup
     private $dbName;
     private $console;
 
-    function __construct( Container $di )
+    public function __construct( Container $di )
     {
         $this->db = $di[ 'db' ];
         $this->cli = $di[ 'cli' ];
@@ -27,7 +27,7 @@ class Startup
         $this->dbName = $di[ 'config' ][ 'sql' ][ 'database' ];
     }
 
-    function run()
+    public function run()
     {
         // Try writing to the log
         $this->log->debug( "Starting sync engine" );

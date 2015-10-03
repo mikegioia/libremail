@@ -18,7 +18,7 @@ class Folder extends \App\Model
 
     use ModelTrait;
 
-    function getData()
+    public function getData()
     {
         return [
             'id' => $this->id,
@@ -29,12 +29,12 @@ class Folder extends \App\Model
         ];
     }
 
-    function getName()
+    public function getName()
     {
         return $this->name;
     }
 
-    function getAccountId()
+    public function getAccountId()
     {
         return (int) $this->account_id;
     }
@@ -47,7 +47,7 @@ class Folder extends \App\Model
      * @throws DatabaseUpdateException
      * @throws DatabaseInsertException
      */
-    function save( $data = [] )
+    public function save( $data = [] )
     {
         $val = new Validator;
         $val->required( 'name', 'Name' )->lengthBetween( 0, 255 );
@@ -102,5 +102,31 @@ class Folder extends \App\Model
         }
 
         $this->id = $newFolderId;
+    }
+
+    /**
+     * Finds a folder by account and name.
+     * @param int $accountId
+     * @param string $name
+     * @param bool $failOnNotFound If set, throw an Exception when
+     *   the folder isn't found
+     * @return bool | FolderModel
+     */
+    public function getByName( $accountId, $name, $failOnNotFound = FALSE )
+    {
+        $this->requireInt( $accountId, "Account ID" );
+        $this->requireString( $name, "Folder name" );
+
+        $folder = $this->db()->select(
+            'folders', [
+                'name' => $name,
+                'account_id' => $accountId
+            ])->fetchObject();
+
+        $this->handleNotFound( $folder, FOLDER, $failOnNotFound );
+
+        return ( $folder )
+            ? $this->populate( $folder )
+            : FALSE;
     }
 }

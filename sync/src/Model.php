@@ -14,7 +14,7 @@ class Model
     static protected $log;
     static protected $config;
 
-    function __construct( $data = NULL )
+    public function __construct( $data = NULL )
     {
         if ( ! $data ) {
             return;
@@ -26,12 +26,12 @@ class Model
     /**
      * Implemented in model.
      */
-    function getData()
+    public function getData()
     {
         return [];
     }
 
-    function setData( $data )
+    public function setData( $data )
     {
         foreach ( $data as $key => $value ) {
             $this->$key = $value;
@@ -62,17 +62,17 @@ class Model
         static::$config = $config;
     }
 
-    function db()
+    public function db()
     {
         return static::$db;
     }
 
-    function cli()
+    public function cli()
     {
         return static::$cli;
     }
 
-    function log()
+    public function log()
     {
         return static::$log;
     }
@@ -83,7 +83,7 @@ class Model
      * @param string $key Optional key to lookup
      * @return mixed | array
      */
-    function config( $key = '' )
+    public function config( $key = '' )
     {
         if ( ! $key ) {
             return static::$config;
@@ -102,7 +102,7 @@ class Model
         return $lookup;
     }
 
-    function getErrorString( Validator $validator, $message )
+    public function getErrorString( Validator $validator, $message )
     {
         $return = [];
         $messages = $validator->getMessages();

@@ -91,12 +91,12 @@ catch ( \Exception $e ) {
         $di[ 'cli' ]->boldRedBackgroundBlack( $e->getMessage() );
         $di[ 'cli' ]->dim( "[Err#". $e->getCode() ."]" );
 
-        if ( $config[ 'app' ][ 'stacktrace' ] ) {
+        if ( $config[ 'log' ][ 'stacktrace' ] ) {
             $di[ 'cli' ]->br()->comment( $e->getTraceAsString() )->br();
         }
     }
     else {
-        if ( $config[ 'app' ][ 'stacktrace' ] ) {
+        if ( $config[ 'log' ][ 'stacktrace' ] ) {
             $di[ 'log' ]->addError(
                 $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
         }

@@ -7,7 +7,7 @@ class LogPathNotWriteable extends \Exception
     public $code = EXC_LOG_PATH;
     public $message = "The log path is not writeable by the current user: %s.";
 
-    function __construct()
+    public function __construct()
     {
         $this->message = sprintf( $this->message, get_current_user() );
     }

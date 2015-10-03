@@ -17,12 +17,13 @@ class Console
     // Command line arguments
     public $help;
     public $create;
+    public $folder;
     public $verbose;
     public $updatedb;
     public $background;
     public $interactive;
 
-    function __construct( array $config )
+    public function __construct( array $config )
     {
         $this->config = $config;
 
@@ -32,12 +33,12 @@ class Console
         $this->parseArgs();
     }
 
-    function init()
+    public function init()
     {
         $this->processArgs();
     }
 
-    function getCLI()
+    public function getCLI()
     {
         return $this->cli;
     }
@@ -60,6 +61,11 @@ class Console
                 'longPrefix' => 'create',
                 'description' => 'Create a new IMAP account',
                 'noValue' => TRUE
+            ],
+            'folder' => [
+                'prefix' => 'f',
+                'longPrefix' => 'folder',
+                'description' => 'Sync the selected folder'
             ],
             'help' => [
                 'prefix' => 'h',
@@ -91,6 +97,7 @@ class Console
         $this->cli->arguments->parse();
         $this->help = $this->cli->arguments->get( 'help' );
         $this->create = $this->cli->arguments->get( 'create' );
+        $this->folder = $this->cli->arguments->get( 'folder' );
         $this->verbose = $this->cli->arguments->get( 'verbose' );
         $this->updatedb = $this->cli->arguments->get( 'updatedb' );
         $this->background = $this->cli->arguments->get( 'background' );
@@ -138,7 +145,7 @@ class Console
     /**
      * Asks the user for account information to set up a new account.
      */
-    function createNewAccount()
+    public function createNewAccount()
     {
         if ( ! $this->interactive ) {
             return;

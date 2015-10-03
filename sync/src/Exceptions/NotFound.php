@@ -2,10 +2,10 @@
 
 namespace App\Exceptions;
 
-class MissingIMAPConfig extends \Exception
+class NotFound extends \Exception
 {
-    public $code = EXC_MISSING_IMAP;
-    public $message = "IMAP config not found for %s.";
+    public $code = EXC_DB_NOTFOUND;
+    public $message = "The requested %s could not be found.";
 
     public function __construct( $type )
     {

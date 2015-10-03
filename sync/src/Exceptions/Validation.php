@@ -6,7 +6,7 @@ class Validation extends \Exception
 {
     public $code = 2001;
 
-    function __construct( $message )
+    public function __construct( $message )
     {
         $this->message = $message;
     }

@@ -7,7 +7,7 @@ class AttachmentsPathNotWriteable extends \Exception
     public $code = EXC_ATTACH_PATH;
     public $message = "The attachments path is not writeable by the current user: %s.";
 
-    function __construct()
+    public function __construct()
     {
         $this->message = sprintf( $this->message, get_current_user() );
     }

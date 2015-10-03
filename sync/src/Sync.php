@@ -13,6 +13,9 @@ use Monolog\Logger
   , App\Models\Folder as FolderModel
   , App\Models\Account as AccountModel
   , App\Models\Message as MessageModel
+  , App\Models\Migration as MigrationModel
+  , App\Exceptions\Error as ErrorException
+  , App\Exceptions\Fatal as FatalException
   , App\Exceptions\Validation as ValidationException
   , App\Exceptions\FolderSync as FolderSyncException
   , App\Exceptions\MessagesSync as MessagesSyncException
@@ -24,6 +27,7 @@ class Sync
     private $cli;
     private $log;
     private $config;
+    private $folder;
     private $mailbox;
     private $retries;
     private $interactive;
@@ -40,7 +44,7 @@ class Sync
      * other classes like Console.
      * @param array $di Service container
      */
-    function __construct( Container $di = NULL )
+    public function __construct( Container $di = NULL )
     {
         $this->retries = [];
         $this->retriesFolders = [];
@@ -50,6 +54,7 @@ class Sync
             $this->cli = $di[ 'cli' ];
             $this->log = $di[ 'log' ];
             $this->config = $di[ 'config' ];
+            $this->folder = $di[ 'console' ]->folder;
             $this->interactive = $di[ 'console' ]->interactive;
         }
     }
@@ -57,7 +62,7 @@ class Sync
     /**
      * @param CLImate $cli
      */
-    function setCLI( CLImate $cli )
+    public function setCLI( CLImate $cli )
     {
         $this->cli = $cli;
     }
@@ -65,7 +70,7 @@ class Sync
     /**
      * @param Logger $log
      */
-    function setLog( Logger $log )
+    public function setLog( Logger $log )
     {
         $this->log = $log;
     }
@@ -73,7 +78,7 @@ class Sync
     /**
      * @param array $config
      */
-    function setConfig( array $config )
+    public function setConfig( array $config )
     {
         $this->config = $config;
     }
@@ -86,7 +91,7 @@ class Sync
      *  4. Save attachments
      * @param AccountModel $account Optional account to run
      */
-    function run( AccountModel $account = NULL )
+    public function run( AccountModel $account = NULL )
     {
         if ( $account ) {
             $accounts = [ $account ];
@@ -94,6 +99,18 @@ class Sync
         else {
             $accountModel = new AccountModel;
             $accounts = $accountModel->getActive();
+        }
+
+        // Try to set max allowed packet size in SQL
+        $migration = new MigrationModel;
+
+        if ( ! $migration->setMaxAllowedPacket( 16 ) ) {
+            throw new ErrorException(
+                "The max_allowed_packet in MySQL is smaller than what's ".
+                "safe for this sync. I've attempted to change it to 16 MB ".
+                "but you should re-run this script to re-test. Please see ".
+                "the documentation on updating this MySQL setting in your ".
+                "configuration file." );
         }
 
         // Loop through the active accounts and perform the sync
@@ -131,10 +148,31 @@ class Sync
                 $account->service,
                 $account->email,
                 $account->password );
+            // Check if we're only syncing one folder
+            if ( $this->folder ) {
+                try {
+                    $folderModel = new FolderModel;
+                    $folder = $folderModel->getByName(
+                        $account->getId(),
+                        $this->folder,
+                        $failOnNotFound = TRUE );
+                }
+                catch ( \Exception $e ) {
+                    throw new FatalException(
+                        "Syncing that folder failed: ". $e->getMessage() );
+                }
+                $this->syncMessages( $account, [ $folder ] );
+            }
             // Fetch folders and sync them to database
-            $this->retriesFolders[ $account->email ] = 1;
-            $folders = $this->syncFolders( $account );
-            $this->syncMessages( $account, $folders );
+            else {
+                $this->retriesFolders[ $account->email ] = 1;
+                $folders = $this->syncFolders( $account );
+                $this->syncMessages( $account, $folders );
+            }
+        }
+        catch ( FatalException $e ) {
+            $this->log->critical( $e->getMessage() );
+            exit;
         }
         catch ( \Exception $e ) {
             $this->log->error( $e->getMessage() );
@@ -161,7 +199,7 @@ class Sync
      * @param string $folder Optional, like "INBOX"
      * @throws MissingIMAPConfigException
      */
-    function connect( $type, $email, $password, $folder = "" )
+    public function connect( $type, $email, $password, $folder = "" )
     {
         $type = strtolower( $type );
 
@@ -330,7 +368,7 @@ class Sync
             $this->markDeleted( $newIds, $savedIds, $folder );
         }
         catch ( \Exception $e ) {
-            $this->log->error( $e->getMessage() );
+            $this->log->error( substr( $e->getMessage(), 0, 500 ) );
             $retryCount = $this->retriesMessages[ $account->email ];
             $waitSeconds = $this->config[ 'app' ][ 'sync' ][ 'wait_seconds' ];
             $this->log->info(

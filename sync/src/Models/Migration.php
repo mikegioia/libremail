@@ -21,7 +21,7 @@ class Migration extends \App\Model
      * the script and log it in the migrations table.
      * @param string $scriptDir Path to script files
      */
-    function run()
+    public function run()
     {
         $this->cli()->info( "Running SQL migration scripts" );
 
@@ -56,6 +56,24 @@ class Migration extends \App\Model
                 ->inline( "] Running {$script}.sql" )
                 ->br();
         }
+    }
+
+    public function setMaxAllowedPacket( $mb = 16 )
+    {
+        $size = $this->db()
+            ->query( "SHOW VARIABLES LIKE 'max_allowed_packet'" )
+            ->get();
+        $value = \Fn\get( $size, 'Value' );
+
+        if ( ! $value || $value < ( $mb * 1024 * 1024 ) ) {
+            $this->db()->query(
+                'SET GLOBAL max_allowed_packet = ?', [
+                    $mb * 1024 * 1024
+                ]);
+            return FALSE;
+        }
+
+        return TRUE;
     }
 
     /**

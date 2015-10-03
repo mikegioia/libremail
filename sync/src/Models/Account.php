@@ -22,7 +22,7 @@ class Account extends \App\Model
 
     use ModelTrait;
 
-    function getData()
+    public function getData()
     {
         return [
             'id' => $this->id,
@@ -44,7 +44,7 @@ class Account extends \App\Model
      * @throws AccountExistsException
      * @throws DatabaseInsertException
      */
-    function save( $data = [], $updateIfExists = FALSE )
+    public function save( $data = [], $updateIfExists = FALSE )
     {
         $val = new Validator;
         $val->required( 'email', 'Email' )->lengthBetween( 0, 100 );
@@ -106,7 +106,7 @@ class Account extends \App\Model
         $this->id = $newAccountId;
     }
 
-    function getActive()
+    public function getActive()
     {
         $accounts = $this->db()->select(
             'accounts', [

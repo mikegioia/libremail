@@ -23,7 +23,7 @@ class Log
     // Whether to write the stack traces
     private $stackTrace;
 
-    function __construct( CLImate $cli, array $config, $interactive = FALSE )
+    public function __construct( CLImate $cli, array $config, $interactive = FALSE )
     {
         $this->cli = $cli;
         $this->parseConfig( $config, $interactive );
@@ -35,23 +35,25 @@ class Log
         @set_exception_handler([ $this, 'exceptionHandler' ]);
     }
 
-    function getLogger()
+    public function getLogger()
     {
         return $this->logger;
     }
 
-    function exceptionHandler( $exception )
+    public function exceptionHandler( $exception )
     {
         if ( $this->stackTrace ) {
+            exit('oops');
             $this->getLogger()->critical(
                 $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
         }
         else {
+            exit('in here');
             $this->getLogger()->critical( $exception->getMessage() );
         }
     }
 
-    function errorHandler( $severity, $message, $filename, $lineNo )
+    public function errorHandler( $severity, $message, $filename, $lineNo )
     {
         if ( ! ( error_reporting() & $severity ) ) {
             return;

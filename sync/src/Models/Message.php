@@ -44,7 +44,7 @@ class Message extends \App\Model
 
     use ModelTrait;
 
-    function getData()
+    public function getData()
     {
         return [
             'id' => $this->id,
@@ -77,32 +77,32 @@ class Message extends \App\Model
         ];
     }
 
-    function getFolderId()
+    public function getFolderId()
     {
         return (int) $this->folder_id;
     }
 
-    function getUniqueId()
+    public function getUniqueId()
     {
         return (int) $this->unique_id;
     }
 
-    function getAccountId()
+    public function getAccountId()
     {
         return (int) $this->account_id;
     }
 
-    function isSynced()
+    public function isSynced()
     {
         return \Fn\intEq( $this->synced, 1 );
     }
 
-    function isDeleted()
+    public function isDeleted()
     {
         return \Fn\intEq( $this->deleted, 1 );
     }
 
-    function getAttachments()
+    public function getAttachments()
     {
         if ( ! is_null( $this->unserializedAttachments ) ) {
             return $this->unserializedAttachments;
@@ -119,16 +119,11 @@ class Message extends \App\Model
      * @param int $folderId
      * @return array
      */
-    function getSyncedIdsByFolder( $accountId, $folderId )
+    public function getSyncedIdsByFolder( $accountId, $folderId )
     {
-        if ( ! Belt::isNumber( $accountId )
-            || ! Belt::isNumber( $folderId ) )
-        {
-            throw new ValidationException(
-                "Account ID and Folder ID need to be integers." );
-        }
-
         $ids = [];
+        $this->requireInt( $folderId, "Folder ID" );
+        $this->requireInt( $accountId, "Account ID" );
         $messages = $this->db()->select(
             'messages', [
                 'synced =' => 1,
@@ -157,7 +152,7 @@ class Message extends \App\Model
      * @throws DatabaseUpdateException
      * @throws DatabaseInsertException
      */
-    function save( $data = [] )
+    public function save( $data = [] )
     {
         $val = new Validator;
         $val->required( 'folder_id', 'Folder ID' )->integer();
@@ -235,7 +230,7 @@ class Message extends \App\Model
      * will exist on the record.
      * @param array $meta
      */
-    function setMailMeta( $meta )
+    public function setMailMeta( $meta )
     {
         $this->setData([
             'to' => \Fn\get( $meta, 'to' ),
@@ -260,7 +255,7 @@ class Message extends \App\Model
      * message object.
      * @param array $mail
      */
-    function setMailData( Mail $mail )
+    public function setMailData( Mail $mail )
     {
         // cc and replyTo fields come in as arrays with the address
         // as the index and the name as the value. Create the proper
@@ -283,19 +278,14 @@ class Message extends \App\Model
      * deleted in the database.
      * @param array $uniqueIds
      */
-    function markDeleted( $uniqueIds, $accountId, $folderId )
+    public function markDeleted( $uniqueIds, $accountId, $folderId )
     {
         if ( ! is_array( $uniqueIds ) || ! count( $uniqueIds ) ) {
             return;
         }
 
-        if ( ! Belt::isNumber( $accountId )
-            || ! Belt::isNumber( $folderId ) )
-        {
-            throw new ValidationException(
-                "Account ID and Folder ID need to be integers." );
-        }
-
+        $this->requireInt( $folderId, "Folder ID" );
+        $this->requireInt( $accountId, "Account ID" );
         $updated = $this->db()->update(
             'messages', [
                 'deleted' => 1
