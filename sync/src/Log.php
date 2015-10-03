@@ -128,7 +128,7 @@ class Log
             return TRUE;
         }
 
-        $logPath = ( substr( $this->path, 0, 1 ) !== "/" )
+        $logPath = ( substr( $this->path, 0, 1 ) !== DIRECTORY_SEPARATOR )
             ? __DIR__
             : $this->path;
 

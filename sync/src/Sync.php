@@ -208,7 +208,7 @@ class Sync
         }
 
         // Check the attachment directory is writeable
-        $attachmentsPath = $this->checkAttachmentsPath();
+        $attachmentsPath = $this->checkAttachmentsPath( $email );
         $imapPath = $this->config[ 'email' ][ $type ][ 'path' ];
 
         $this->mailbox = new Mailbox(
@@ -221,13 +221,15 @@ class Sync
 
     /**
      * Checks if the attachments path is writeable by the user.
+     * @param string $email
      * @throws AttachmentsPathNotWriteableException
      * @return boolean
      */
-    private function checkAttachmentsPath()
+    private function checkAttachmentsPath( $email )
     {
+        $slash = DIRECTORY_SEPARATOR;
         $configPath = $this->config[ 'email' ][ 'attachments' ][ 'path' ];
-        $attachmentsDir = ( substr( $configPath, 0, 1 ) !== "/" )
+        $attachmentsDir = ( substr( $configPath, 0, 1 ) !== $slash )
             ? BASEPATH
             : $configPath;
 
@@ -235,9 +237,11 @@ class Sync
             throw new AttachmentsPathNotWriteableException;
         }
 
-        $attachmentsPath = ( substr( $configPath, 0, 1 ) !== "/" )
-            ? BASEPATH ."/". $configPath
+        $attachmentsPath = ( substr( $configPath, 0, 1 ) !== $slash )
+            ? BASEPATH ."$slash$configPath"
             : $configPath;
+        $attachmentsPath .= "$slash$email";
+
         @mkdir( $attachmentsPath, 0755, TRUE );
 
         return $attachmentsPath;
