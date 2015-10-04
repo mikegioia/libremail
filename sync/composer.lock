@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6ddc68c36cf65b2254b35652039d6a32",
-    "content-hash": "bb57b7be99132a12467f5b5ae223fb1b",
+    "hash": "906c958dfa15aa1c85c07570ce6f7767",
+    "content-hash": "15c2fe573f5b9dcde7aa1b720d1008a8",
     "packages": [
         {
             "name": "ilya/belt",
@@ -107,17 +107,72 @@
             "time": "2015-08-13 16:50:51"
         },
         {
+            "name": "mikegioia/pdo",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mikegioia/Slim-PDO.git",
+                "reference": "e9d5c5dbc90fe5cdafa043fb9815d46f5f28a029"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mikegioia/Slim-PDO/zipball/e9d5c5dbc90fe5cdafa043fb9815d46f5f28a029",
+                "reference": "e9d5c5dbc90fe5cdafa043fb9815d46f5f28a029",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Slim\\PDO\\": "src/PDO/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabian de Laender",
+                    "email": "fabian@faapz.nl",
+                    "homepage": "http://faapz.nl",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Mike Gioia",
+                    "homepage": "http://mikegioia.com",
+                    "email": "mikegioia@gmail.com"
+                }
+            ],
+            "description": "PDO database library for Slim Framework",
+            "homepage": "https://github.com/mikegioia/Slim-PDO",
+            "keywords": [
+                "database",
+                "framework",
+                "pdo",
+                "slim"
+            ],
+            "support": {
+                "issues": "https://github.com/mikegioia/Slim-PDO/issues",
+                "docs": "https://github.com/mikegioia/Slim-PDO/blob/master/docs/README.md",
+                "source": "https://github.com/mikegioia/Slim-PDO/tree/master"
+            },
+            "time": "2015-10-04 16:09:56"
+        },
+        {
             "name": "mikegioia/php-imap",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mikegioia/php-imap.git",
-                "reference": "c7f3d46f3a08fc799b0a6b0ede937f5923ca9388"
+                "reference": "e4241f6e1e2b7bd484a8b9ebdb87778a0cc9a2b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikegioia/php-imap/zipball/c7f3d46f3a08fc799b0a6b0ede937f5923ca9388",
-                "reference": "c7f3d46f3a08fc799b0a6b0ede937f5923ca9388",
+                "url": "https://api.github.com/repos/mikegioia/php-imap/zipball/e4241f6e1e2b7bd484a8b9ebdb87778a0cc9a2b5",
+                "reference": "e4241f6e1e2b7bd484a8b9ebdb87778a0cc9a2b5",
                 "shasum": ""
             },
             "require": {
@@ -154,7 +209,7 @@
             "support": {
                 "source": "https://github.com/mikegioia/php-imap/tree/master"
             },
-            "time": "2015-10-02 14:41:23"
+            "time": "2015-10-03 02:27:38"
         },
         {
             "name": "monolog/monolog",
@@ -412,192 +467,6 @@
                 "prompt"
             ],
             "time": "2015-04-30 20:24:49"
-        },
-        {
-            "name": "voku/portable-utf8",
-            "version": "1.6.13",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/voku/portable-utf8.git",
-                "reference": "7a3b4995d51a53b6e01d62357ffa794e5dffe7a3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/voku/portable-utf8/zipball/7a3b4995d51a53b6e01d62357ffa794e5dffe7a3",
-                "reference": "7a3b4995d51a53b6e01d62357ffa794e5dffe7a3",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "4.*",
-                "satooshi/php-coveralls": "0.7.*@dev"
-            },
-            "suggest": {
-                "ext-iconv": "Use iconv for best performance",
-                "ext-intl": "Use Intl for best performance",
-                "ext-mbstring": "Use Mbstring for best performance"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.6.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "voku\\": "src/voku/"
-                },
-                "classmap": [
-                    "src/Normalizer.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "(Apache-2.0 or GPL-2.0)"
-            ],
-            "authors": [
-                {
-                    "name": "Hamid Sarfraz",
-                    "homepage": "http://pageconfig.com/"
-                },
-                {
-                    "name": "Lars Moelleken",
-                    "homepage": "http://www.moelleken.org/"
-                },
-                {
-                    "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
-                }
-            ],
-            "description": "Portable UTF-8 library with polyfill / shim for Iconv, Intl, Mbstring, Normalizrer etc.",
-            "homepage": "https://github.com/voku/portable-utf8",
-            "keywords": [
-                "UTF",
-                "clean",
-                "php",
-                "unicode",
-                "utf-8",
-                "utf8"
-            ],
-            "time": "2015-09-21 16:48:54"
-        },
-        {
-            "name": "voku/simple-cache",
-            "version": "2.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/voku/simple-cache.git",
-                "reference": "2f428beb3037127aa95d22862436b0d341dbdedd"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple-cache/zipball/2f428beb3037127aa95d22862436b0d341dbdedd",
-                "reference": "2f428beb3037127aa95d22862436b0d341dbdedd",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "4.*",
-                "predis/predis": "1.0.*",
-                "satooshi/php-coveralls": "0.7.*@dev"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "voku\\cache\\": "src/voku/cache/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Lars Moelleken",
-                    "homepage": "http://www.moelleken.org/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Simple Cache library",
-            "homepage": "https://github.com/voku/simple-cache",
-            "keywords": [
-                "cache",
-                "caching",
-                "php",
-                "simple cache"
-            ],
-            "time": "2015-08-20 11:46:30"
-        },
-        {
-            "name": "voku/simple-mysqli",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/voku/simple-mysqli.git",
-                "reference": "72be86719edf95258ee7c50cebe04e5a37759e82"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple-mysqli/zipball/72be86719edf95258ee7c50cebe04e5a37759e82",
-                "reference": "72be86719edf95258ee7c50cebe04e5a37759e82",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0",
-                "voku/portable-utf8": "1.*",
-                "voku/simple-cache": "2.*"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "4.*",
-                "satooshi/php-coveralls": "0.7.*@dev"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.8.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "voku\\db\\": "src/voku/db/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jonathan Tavares",
-                    "email": "the.entomb@gmail.com",
-                    "homepage": "https://github.com/entomb",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Lars Moelleken",
-                    "email": "lars@moelleken.org",
-                    "homepage": "https://github.com/voku",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Simple MySQLi library",
-            "homepage": "https://github.com/voku/simple-mysqli",
-            "keywords": [
-                "db",
-                "mysqli",
-                "php",
-                "simple db"
-            ],
-            "time": "2015-09-24 12:53:35"
         }
     ],
     "packages-dev": [],
@@ -605,7 +474,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "mikegioia/php-imap": 20,
-        "voku/simple-mysqli": 20
+        "mikegioia/pdo": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

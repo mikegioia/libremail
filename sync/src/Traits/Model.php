@@ -24,6 +24,26 @@ trait Model
     }
 
     /**
+     * Returns a string containing the PDO error info if there
+     * is any.
+     * @return string
+     */
+    public function getError()
+    {
+        $errorInfo = $this->db()->errorInfo();
+
+        if ( strlen( $errorInfo[ 2 ] ) ) {
+            return sprintf(
+                "[%s -- %s]: %s",
+                $errorInfo[ 0 ],
+                $errorInfo[ 1 ],
+                $errorInfo[ 2 ] );
+        }
+
+        return "";
+    }
+
+    /**
      * Turns stdClass SQL objects into model objects.
      * @param array $objects
      * @return array

@@ -34,6 +34,7 @@ class Sync
     private $maxRetries = 5;
     private $retriesFolders;
     private $retriesMessages;
+    private $gcBatchSize = 50;
     private $messageBatchSize = 50;
 
     /**
@@ -141,6 +142,7 @@ class Sync
         }
 
         $this->log->info( "Starting sync for {$account->email}" );
+        $this->log->debug( "Process ID: ". getmypid() );
 
         try {
             // Open a connection to the mailbox
@@ -336,6 +338,11 @@ class Sync
      */
     private function syncFolderMessages( AccountModel $account, FolderModel $folder )
     {
+        if ( $folder->ignored ) {
+            $this->log->debug( 'Skipping ignored folder' );
+            return;
+        }
+ 
         if ( $this->retriesMessages[ $account->email ] > $this->maxRetries ) {
             $this->log->notice(
                 "The account '{$account->email}' has exceeded the max ".
@@ -347,6 +354,8 @@ class Sync
 
         $this->log->debug(
             "Syncing messages in {$folder->name} for {$account->email}" );
+        $this->log->debug(
+            "Memory usage: ". \Fn\formatBytes( memory_get_usage() ) );
 
         // Syncing a folder of messages is done using the following
         // algorithm:
@@ -404,6 +413,7 @@ class Sync
         $total = count( $newIds );
         $toDownload = array_diff( $newIds, $savedIds );
         $count = count( $toDownload );
+        $remainingCount = $total - $count;
         $this->log->debug( "Downloading messages in {$folder->name}" );
         $this->log->debug( "$total messages, $count new" );
 
@@ -463,10 +473,19 @@ class Sync
 
                 endOfLoop: {
                     if ( $this->interactive ) {
-                        $progress->current( ( $i++ / $count ) * 100 );
+                        $progress->current( ( ( $remainingCount + $i++ ) / $total ) * 100 );
                     }
                 }
             }
+
+            // Try to cleanup any memory
+            $beforeGc = \Fn\formatBytes( memory_get_usage() );
+            usleep( 500000 );
+            clearstatcache();
+            gc_collect_cycles();
+            $this->log->debug(
+                "Memory usage: ". \Fn\formatBytes( memory_get_usage() ) .
+                " (before GC: $beforeGc)" );
         }
     }
 

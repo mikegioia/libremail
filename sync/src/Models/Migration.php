@@ -10,10 +10,14 @@
 
 namespace App\Models;
 
+use App\Traits\Model as ModelTrait;
+
 class Migration extends \App\Model
 {
     public $name;
     public $created_at;
+
+    use ModelTrait;
 
     /**
      * Read each file in the script folder and check to see
@@ -44,7 +48,7 @@ class Migration extends \App\Model
                         ->inline( "] Running {$script}.sql" )
                         ->br()
                         ->br()
-                        ->error( $this->db()->lastError() );
+                        ->error( $this->getError() );
                     return;
                 }
             }
@@ -62,12 +66,13 @@ class Migration extends \App\Model
     {
         $size = $this->db()
             ->query( "SHOW VARIABLES LIKE 'max_allowed_packet'" )
-            ->get();
+            ->fetch();
         $value = \Fn\get( $size, 'Value' );
 
         if ( ! $value || $value < ( $mb * 1024 * 1024 ) ) {
-            $this->db()->query(
-                'SET GLOBAL max_allowed_packet = ?', [
+            $this->db()
+                ->prepare( 'SET GLOBAL max_allowed_packet = ?' )
+                ->execute([
                     $mb * 1024 * 1024
                 ]);
             return FALSE;
@@ -82,14 +87,20 @@ class Migration extends \App\Model
      */
     private function isRunAlready( $script )
     {
-        $result = $this->db()->select(
-            'migrations', [
-                'name' => $script
-            ]);
+        $migrationsExists = $this->db()
+            ->query( "show tables like 'migrations';" )
+            ->fetch();
 
-        return ( $result )
-            ? $result->fetchObject()
-            : FALSE;
+        if ( ! $migrationsExists ) {
+            return FALSE;
+        }
+
+        return $this->db()
+            ->select()
+            ->from( 'migrations' )
+            ->where( 'name', '=', $script )
+            ->execute()
+            ->fetchObject( $this->getClass() );
     }
 
     /**
@@ -100,10 +111,12 @@ class Migration extends \App\Model
     {
         $createdAt = new \DateTime;
 
-        return $this->db()->insert(
-            'migrations', [
-                'name' => $script,
-                'created_at' => $createdAt->format( DATE_DATABASE )
-            ]);
+        return $this->db()
+            ->insert([ 'name', 'created_at' ])
+            ->into( 'migrations' )
+            ->values([
+                $script,
+                $createdAt->format( DATE_DATABASE )
+            ])->execute();
     }
 }

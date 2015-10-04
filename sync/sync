@@ -9,14 +9,14 @@
  * a list of saved IMAP credentials and runs through a flow of tasks.
  */
 
-use App\DB
-  , App\Log
+use App\Log
   , App\Sync
   , App\Model
   , App\Console
   , App\Startup
   , App\Constants
-  , Pimple\Container;
+  , Pimple\Container
+  , Slim\PDO\Database;
 
 // Set up paths and constants
 set_time_limit( 0 );
@@ -50,15 +50,15 @@ $di[ 'cli' ] = function ( $c ) {
 // MySQLi service, this uses Voku's library
 $di[ 'db' ] = function ( $c ) {
     $dbConfig = $c[ 'config' ][ 'sql' ];
-    return DB::getInstance(
+    $dsn = sprintf(
+        "mysql:host=%s;dbname=%s;charset=%s",
         $dbConfig[ 'hostname' ],
-        $dbConfig[ 'username' ],
-        $dbConfig[ 'password' ],
         $dbConfig[ 'database' ],
-        $dbConfig[ 'port' ],
-        $dbConfig[ 'charset' ],
-        $exitOnError = FALSE,
-        $echoOnError = FALSE );
+        $dbConfig[ 'charset' ] );
+    return new Database(
+        $dsn,
+        $dbConfig[ 'username' ],
+        $dbConfig[ 'password' ] );
 };
 
 // Logging service
@@ -81,10 +81,17 @@ $di[ 'console' ]->init();
 // are email accounts saved. This may prompt the user to add an account
 // if we're running in interactive mode.
 try {
+    $sleepMinutes = $di[ 'config' ][ 'app' ][ 'sync' ][ 'sleep_minutes' ];
     $startup = new Startup( $di );
     $startup->run();
-    $sync = new Sync( $di );
-    $sync->run();
+
+    while ( TRUE ) {
+        $sync = new Sync( $di );
+        $sync->run();
+        $di[ 'log' ]->addDebug(
+            "Going to sleep for $sleepMinutes minutes (brb)" );
+        sleep( $sleepMinutes * 60 );
+    }
 }
 catch ( \Exception $e ) {
     if ( $di[ 'console' ]->interactive === TRUE ) {

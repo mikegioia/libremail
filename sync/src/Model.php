@@ -2,8 +2,8 @@
 
 namespace App;
 
-use voku\db\DB
-  , Monolog\Logger
+use Monolog\Logger
+  , Slim\PDO\Database
   , League\CLImate\CLImate
   , Particle\Validator\Validator;
 
@@ -42,7 +42,7 @@ class Model
      * Sets the internal database connection statically for all
      * models to use.
      */
-    static function setDb( DB $db )
+    static function setDb( Database $db )
     {
         static::$db = $db;
     }

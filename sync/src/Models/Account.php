@@ -66,10 +66,12 @@ class Account extends \App\Model
         }
 
         // Check if this email exists
-        $exists = $this->db()->select(
-            'accounts', [
-                'email' => $data[ 'email' ]
-            ])->fetchObject();
+        $exists = $this->db()
+            ->select()
+            ->from( 'accounts' )
+            ->where( 'email', '=', $data[ 'email' ] )
+            ->execute()
+            ->fetchObject();
 
         if ( $exists ) {
             if ( ! $updateIfExists ) {
@@ -79,13 +81,13 @@ class Account extends \App\Model
             $this->id = $exists->id;
             unset( $data[ 'id' ] );
             unset( $data[ 'created_at' ] );
-            $updated = $this->db()->update(
-                'accounts',
-                $data, [
-                    'id' => $exists->id
-                ]);
+            $updated = $this->db()
+                ->update( $data )
+                ->table( 'accounts' )
+                ->where( 'id', '=', $exists->id )
+                ->execute();
 
-            if ( ! $updated ) {
+            if ( $updated === FALSE ) {
                 throw new DatabaseUpdateException( FOLDER );
             }
 
@@ -97,10 +99,17 @@ class Account extends \App\Model
         $data[ 'is_active' ] = 1;
         $data[ 'service' ] = strtolower( $data[ 'service' ] );
         $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
-        $newAccountId = $this->db()->insert( 'accounts', $data );
+
+        $newAccountId = $this->db()
+            ->insert( array_keys( $data ) )
+            ->into( 'accounts' )
+            ->values( array_values( $data ) )
+            ->execute();
 
         if ( ! $newAccountId ) {
-            throw new DatabaseInsertException( ACCOUNT );
+            throw new DatabaseInsertException(
+                ACCOUNT,
+                $this->getError() );
         }
 
         $this->id = $newAccountId;
@@ -108,11 +117,11 @@ class Account extends \App\Model
 
     public function getActive()
     {
-        $accounts = $this->db()->select(
-            'accounts', [
-                'is_active =' => 1
-            ])->fetchAllObject();
-
-        return $this->populate( $accounts );
+        return $this->db()
+            ->select()
+            ->from( 'accounts' )
+            ->where( 'is_active', '=', 1 )
+            ->execute()
+            ->fetchAll( \PDO::FETCH_CLASS, $this->getClass() );
     }
 }

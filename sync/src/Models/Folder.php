@@ -12,8 +12,9 @@ class Folder extends \App\Model
 {
     public $id;
     public $name;
+    public $deleted;
+    public $ignored;
     public $account_id;
-    public $is_deleted;
     public $created_at;
 
     use ModelTrait;
@@ -23,8 +24,9 @@ class Folder extends \App\Model
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'deleted' => $this->deleted,
+            'ignored' => $this->ignored,
             'account_id' => $this->account_id,
-            'is_deleted' => $this->is_deleted,
             'created_at' => $this->created_at
         ];
     }
@@ -64,27 +66,28 @@ class Folder extends \App\Model
         }
 
         // Check if this folder exists
-        $exists = $this->db()->select(
-            'folders', [
-                'name' => $this->name,
-                'account_id' => $this->account_id
-            ])->fetchObject();
+        $exists = $this->db()
+            ->select()
+            ->from( 'folders' )
+            ->where( 'name', '=', $this->name )
+            ->where( 'account_id', '=', $this->account_id )
+            ->execute()
+            ->fetchObject();
 
-        // If it exists, unset is_deleted
+        // If it exists, unset deleted
         if ( $exists ) {
-            $this->is_deleted = 0;
+            $this->deleted = 0;
             $this->id = $exists->id;
-            unset( $data[ 'id' ] );
-            unset( $data[ 'created_at' ] );
-            $updated = $this->db()->update(
-                'folders', [
-                    'is_deleted' => 0
-                ], [
-                    'name' => $this->name,
-                    'account_id' => $this->account_id
-                ]);
+            $this->ignored = $exists->ignored;
+            $updated = $this->db()
+                ->update([
+                    'deleted' => 0
+                ])
+                ->table( 'folders' )
+                ->where( 'id', '=', $this->id )
+                ->execute();
 
-            if ( ! $updated ) {
+            if ( $updated === FALSE ) {
                 throw new DatabaseUpdateException( FOLDER );
             }
 
@@ -93,9 +96,14 @@ class Folder extends \App\Model
 
         $createdAt = new \DateTime;
         unset( $data[ 'id' ] );
-        $data[ 'is_deleted' ] = 0;
+        $data[ 'deleted' ] = 0;
+        $data[ 'ignored' ] = 0;
         $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
-        $newFolderId = $this->db()->insert( 'folders', $data );
+        $newFolderId = $this->db()
+            ->insert( array_keys( $data ) )
+            ->into( 'folders' )
+            ->values( array_values( $data ) )
+            ->execute();
 
         if ( ! $newFolderId ) {
             throw new DatabaseInsertException( FOLDER );
@@ -117,16 +125,16 @@ class Folder extends \App\Model
         $this->requireInt( $accountId, "Account ID" );
         $this->requireString( $name, "Folder name" );
 
-        $folder = $this->db()->select(
-            'folders', [
-                'name' => $name,
-                'account_id' => $accountId
-            ])->fetchObject();
+        $folder = $this->db()
+            ->select()
+            ->from( 'folders' )
+            ->where( 'name', '=', $name )
+            ->where( 'account_id', '=', $accountId )
+            ->execute()
+            ->fetchObject( $this->getClass() );
 
         $this->handleNotFound( $folder, FOLDER, $failOnNotFound );
 
-        return ( $folder )
-            ? $this->populate( $folder )
-            : FALSE;
+        return $folder;
     }
 }

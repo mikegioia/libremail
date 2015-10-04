@@ -43,12 +43,10 @@ class Log
     public function exceptionHandler( $exception )
     {
         if ( $this->stackTrace ) {
-            exit('oops');
             $this->getLogger()->critical(
                 $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
         }
         else {
-            exit('in here');
             $this->getLogger()->critical( $exception->getMessage() );
         }
     }

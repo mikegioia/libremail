@@ -11,6 +11,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/mikegioia/php-imap"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/mikegioia/Slim-PDO"
         }
     ],
     "require": {
@@ -18,10 +22,10 @@
         "ext-imap": "*",
         "mikegioia/php-imap": "dev-master",
         "pimple/pimple": "~3.0",
-        "voku/simple-mysqli": "dev-master",
         "monolog/monolog": "^1.17",
         "league/climate": "^3.2",
         "particle/validator": "^1.0",
-        "ilya/belt": "~2"
+        "ilya/belt": "~2",
+        "mikegioia/pdo": "dev-master"
     }
 }

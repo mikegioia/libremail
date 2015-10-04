@@ -29,13 +29,7 @@ class Startup
 
     public function run()
     {
-        // Try writing to the log
         $this->log->debug( "Starting sync engine" );
-
-        // Check if database exists. This will try accessing it and
-        // throw an error if it's not found.
-        $this->db->isReady();
-
         $this->checkIfAccountsExist();
     }
 

@@ -124,22 +124,22 @@ class Message extends \App\Model
         $ids = [];
         $this->requireInt( $folderId, "Folder ID" );
         $this->requireInt( $accountId, "Account ID" );
-        $messages = $this->db()->select(
-            'messages', [
-                'synced =' => 1,
-                'deleted =' => 0,
-                'folder_id =' => $folderId,
-                'account_id =' => $accountId,
-            ], [
-                'unique_id'
-            ])->fetchAllObject();
+        $messages = $this->db()
+            ->select([ 'unique_id' ])
+            ->from( 'messages' )
+            ->where( 'synced', '=', 1 )
+            ->where( 'deleted', '=', 0 )
+            ->where( 'folder_id', '=', $folderId )
+            ->where( 'account_id', '=', $accountId )
+            ->execute()
+            ->fetchAll();
 
         if ( ! $messages ) {
             return $ids;
         }
 
         foreach ( $messages as $message ) {
-            $ids[] = $message->unique_id;
+            $ids[] = $message[ 'unique_id' ];
         }
 
         return $ids;
@@ -184,27 +184,29 @@ class Message extends \App\Model
         }
 
         // Check if this message exists
-        $exists = $this->db()->select(
-            'messages', [
-                'folder_id' => $this->folder_id,
-                'unique_id' => $this->unique_id,
-                'account_id' => $this->account_id
-            ])->fetchObject();
+        $exists = $this->db()
+            ->select()
+            ->from( 'messages' )
+            ->where( 'folder_id', '=', $this->folder_id )
+            ->where( 'unique_id', '=', $this->unique_id )
+            ->where( 'account_id', '=', $this->account_id )
+            ->execute()
+            ->fetchObject();
 
         if ( $exists ) {
             $this->id = $exists->id;
             unset( $data[ 'id' ] );
             unset( $data[ 'created_at' ] );
-            $updated = $this->db()->update(
-                'messages',
-                $data, [
-                    'id' => $this->id
-                ]);
+            $updated = $this->db()
+                ->update( $data )
+                ->table( 'messages' )
+                ->where( 'id', '=', $this->id )
+                ->execute();
 
-            if ( ! $updated ) {
+            if ( $updated === FALSE ) {
                 throw new DatabaseUpdateException(
                     MESSAGE,
-                    $this->db()->getErrors() );
+                    $this->db()->getError() );
             }
 
             return;
@@ -213,12 +215,16 @@ class Message extends \App\Model
         $createdAt = new \DateTime;
         unset( $data[ 'id' ] );
         $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
-        $newMessageId = $this->db()->insert( 'messages', $data );
+        $newMessageId = $this->db()
+            ->insert( array_keys( $data ) )
+            ->into( 'messages' )
+            ->values( array_values( $data ) )
+            ->execute();
 
         if ( ! $newMessageId ) {
             throw new DatabaseInsertException(
                 MESSAGE,
-                $this->db()->getErrors() );
+                $this->getError() );
         }
 
         $this->id = $newMessageId;
@@ -286,19 +292,18 @@ class Message extends \App\Model
 
         $this->requireInt( $folderId, "Folder ID" );
         $this->requireInt( $accountId, "Account ID" );
-        $updated = $this->db()->update(
-            'messages', [
-                'deleted' => 1
-            ], [
-                'folder_id =' => $folderId,
-                'account_id =' => $accountId,
-                'unique_id IN' => $uniqueIds
-            ]);
+        $updated = $this->db()
+            ->update([ 'deleted' => 1 ])
+            ->table( 'messages' )
+            ->where( 'folder_id', '=', $folderId )
+            ->where( 'account_id', '=', $accountId )
+            ->whereIn( 'unique_id', $uniqueIds )
+            ->execute();
 
         if ( ! $updated ) {
             throw new DatabaseUpdateException(
                 MESSAGE,
-                $this->db()->getErrors() );
+                $this->getError() );
         }
     }
 
