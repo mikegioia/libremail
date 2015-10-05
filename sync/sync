@@ -90,6 +90,7 @@ try {
         $sync->run();
         $di[ 'log' ]->addDebug(
             "Going to sleep for $sleepMinutes minutes (brb)" );
+        $sync = NULL;
         sleep( $sleepMinutes * 60 );
     }
 }

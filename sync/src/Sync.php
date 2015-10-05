@@ -34,7 +34,6 @@ class Sync
     private $maxRetries = 5;
     private $retriesFolders;
     private $retriesMessages;
-    private $gcBatchSize = 50;
     private $messageBatchSize = 50;
 
     /**
@@ -355,7 +354,9 @@ class Sync
         $this->log->debug(
             "Syncing messages in {$folder->name} for {$account->email}" );
         $this->log->debug(
-            "Memory usage: ". \Fn\formatBytes( memory_get_usage() ) );
+            "Memory usage: ". \Fn\formatBytes( memory_get_usage() ) .
+            ", real usage: ". \Fn\formatBytes( memory_get_usage( TRUE ) ) .
+            ", peak usage: ". \Fn\formatBytes( memory_get_peak_usage() ) );
 
         // Syncing a folder of messages is done using the following
         // algorithm:
@@ -475,17 +476,11 @@ class Sync
                     if ( $this->interactive ) {
                         $progress->current( ( ( $remainingCount + $i++ ) / $total ) * 100 );
                     }
+                    // Check if we've exceeded memory threshold and if so
+                    // alert the user and kill thyself.
+                    // @TODO
                 }
             }
-
-            // Try to cleanup any memory
-            $beforeGc = \Fn\formatBytes( memory_get_usage() );
-            usleep( 500000 );
-            clearstatcache();
-            gc_collect_cycles();
-            $this->log->debug(
-                "Memory usage: ". \Fn\formatBytes( memory_get_usage() ) .
-                " (before GC: $beforeGc)" );
         }
     }
 
