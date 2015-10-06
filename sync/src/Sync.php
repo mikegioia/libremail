@@ -105,12 +105,13 @@ class Sync
         $migration = new MigrationModel;
 
         if ( ! $migration->setMaxAllowedPacket( 16 ) ) {
-            throw new ErrorException(
+            $this->log->notice(
                 "The max_allowed_packet in MySQL is smaller than what's ".
                 "safe for this sync. I've attempted to change it to 16 MB ".
                 "but you should re-run this script to re-test. Please see ".
                 "the documentation on updating this MySQL setting in your ".
                 "configuration file." );
+            throw new \Exception( "Halting script" );
         }
 
         // Loop through the active accounts and perform the sync

@@ -65,16 +65,14 @@ class Migration extends \App\Model
     public function setMaxAllowedPacket( $mb = 16 )
     {
         $size = $this->db()
-            ->query( "SHOW VARIABLES LIKE 'max_allowed_packet'" )
+            ->query( "SHOW VARIABLES LIKE 'max_allowed_packet';" )
             ->fetch();
         $value = \Fn\get( $size, 'Value' );
+        $newSize = (int) ( $mb * 1024 * 1024 );
 
-        if ( ! $value || $value < ( $mb * 1024 * 1024 ) ) {
-            $this->db()
-                ->prepare( 'SET GLOBAL max_allowed_packet = ?' )
-                ->execute([
-                    $mb * 1024 * 1024
-                ]);
+        if ( ! $value || $value < $newSize ) {
+            $stmt = $this->db()
+                ->query( "SET GLOBAL max_allowed_packet = $newSize;" );
             return FALSE;
         }
 
