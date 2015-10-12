@@ -415,9 +415,9 @@ class Sync
         $total = count( $newIds );
         $toDownload = array_diff( $newIds, $savedIds );
         $count = count( $toDownload );
-        $remainingCount = $total - $count;
+        $noun = \Fn\plural( 'message', $total );
         $this->log->debug( "Downloading messages in {$folder->name}" );
-        $this->log->debug( "$total messages, $count new" );
+        $this->log->debug( "$total $noun, $count new" );
 
         if ( ! $count ) {
             $this->log->debug( "No new messages, skipping {$folder->name}" );
@@ -425,8 +425,9 @@ class Sync
         }
 
         if ( $this->interactive ) {
+            $noun = \Fn\plural( 'message', $count );
             $this->cli->whisper(
-                "Syncing $count of $total messages in {$folder->name}:" );
+                "Syncing $count new $noun in {$folder->name}:" );
             $progress = $this->cli->progress()->total( 100 );
         }
 
@@ -475,7 +476,7 @@ class Sync
 
                 endOfLoop: {
                     if ( $this->interactive ) {
-                        $progress->current( ( ( $remainingCount + $i++ ) / $total ) * 100 );
+                        $progress->current( ( $i++ / $count ) * 100 );
                     }
                     // Check if we've exceeded memory threshold and if so
                     // alert the user and kill thyself.

@@ -49,3 +49,18 @@ function formatBytes( $bytes, $precision = 2 )
 
     return round( $bytes, $precision ) .' '. $units[ $pow ];
 }
+
+function plural( $word, $count )
+{
+    if ( $count === 1 ) {
+        return $word;
+    }
+    elseif ( substr( $word, -1 ) === 's' ) {
+        return $word;
+    }
+    elseif ( substr( $word, -1 ) === 'y' ) {
+        return substr( $word, 0 -1 ) ."ies";
+    }
+
+    return $word ."s";
+}
