@@ -16,7 +16,7 @@ following command:
 The database name is a configuration option, so if you'd like to change this to
 be something other than `libremail`, feel free to use anything.
 
-#### 1.1 `max_allowed_packet` (MariaDB/MySQL)
+##### 1.1 `max_allowed_packet` (MariaDB/MySQL)
 
 Because of the amount of data that may be written to SQL (long email message text)
 a configuration setting needs to be enabled for MySQL databases allowing a larger
