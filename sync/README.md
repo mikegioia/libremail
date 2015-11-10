@@ -16,6 +16,18 @@ following command:
 The database name is a configuration option, so if you'd like to change this to
 be something other than `libremail`, feel free to use anything.
 
+#### 1.1 `max_allowed_packet` (MariaDB/MySQL)
+
+Because of the amount of data that may be written to SQL (long email message text)
+a configuration setting needs to be enabled for MySQL databases allowing a larger
+packet size to be sent in a query. To do this, add the following line to your SQL
+config file:
+
+    [mysqld]
+    max_allowed_pack = 500M
+    
+You don't have to use 500MB as your packet size, but anything 16MB or higher is advised.
+
 ### 2. Configure the Application
 
 Configuration options are saved in `config/default.ini`. **Do not modify this
