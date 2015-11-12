@@ -26,6 +26,7 @@
         "league/climate": "^3.2",
         "particle/validator": "^1.0",
         "ilya/belt": "~2",
-        "mikegioia/pdo": "dev-master"
+        "mikegioia/pdo": "dev-master",
+        "symfony/process": "^2.7"
     }
 }
