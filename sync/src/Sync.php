@@ -34,6 +34,8 @@ class Sync
     private $maxRetries = 5;
     private $retriesFolders;
     private $retriesMessages;
+    private $gcEnabled = FALSE;
+    private $gcMemEnabled = FALSE;
     private $messageBatchSize = 50;
 
     /**
@@ -57,6 +59,11 @@ class Sync
             $this->folder = $di[ 'console' ]->folder;
             $this->interactive = $di[ 'console' ]->interactive;
         }
+
+        // Enable garbage collection
+        gc_enable();
+        $this->gcEnabled = gc_enabled();
+        $this->gcMemEnabled = function_exists( 'gc_mem_caches' );
     }
 
     /**
@@ -482,8 +489,19 @@ class Sync
                     // alert the user and kill thyself.
                     // @TODO
                 }
+
+                $meta = NULL;
+                $message = NULL;
             }
+
+            // Message batch done. Before we loop to another batch, try
+            // to reclaim memory.
+            unset( $mailIds );
+            unset( $mailMeta );
+            $this->gc();
         }
+
+        $this->gc();
     }
 
     /**
@@ -516,6 +534,17 @@ class Sync
             $this->log->notice(
                 "Failed validation for marking deleted messages: ".
                 $e->getMessage() );
+        }
+    }
+
+    private function gc()
+    {
+        if ( $this->gcEnabled ) {
+            gc_collect_cycles();
+            
+            if ( $this->gcMemEnabled ) {
+                gc_mem_caches();
+            }
         }
     }
 }
