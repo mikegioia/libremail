@@ -112,12 +112,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mikegioia/Slim-PDO.git",
-                "reference": "e9d5c5dbc90fe5cdafa043fb9815d46f5f28a029"
+                "reference": "ca5005176ccd2089b9ed1cca7d2ffa7dba9d785f"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/mikegioia/Slim-PDO/zipball/ca5005176ccd2089b9ed1cca7d2ffa7dba9d785f",
-                "reference": "e9d5c5dbc90fe5cdafa043fb9815d46f5f28a029",
+                "reference": "ca5005176ccd2089b9ed1cca7d2ffa7dba9d785f",
                 "shasum": ""
             },
             "require": {
@@ -159,7 +159,7 @@
                 "docs": "https://github.com/mikegioia/Slim-PDO/blob/master/docs/README.md",
                 "source": "https://github.com/mikegioia/Slim-PDO/tree/master"
             },
-            "time": "2015-10-04 16:09:56"
+            "time": "2015-10-05 11:38:16"
         },
         {
             "name": "mikegioia/php-imap",
@@ -167,12 +167,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mikegioia/php-imap.git",
-                "reference": "e4241f6e1e2b7bd484a8b9ebdb87778a0cc9a2b5"
+                "reference": "f981e56dde28d0482ed4fefd3ce2f503aace5017"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikegioia/php-imap/zipball/e4241f6e1e2b7bd484a8b9ebdb87778a0cc9a2b5",
-                "reference": "e4241f6e1e2b7bd484a8b9ebdb87778a0cc9a2b5",
+                "url": "https://api.github.com/repos/mikegioia/php-imap/zipball/f981e56dde28d0482ed4fefd3ce2f503aace5017",
+                "reference": "f981e56dde28d0482ed4fefd3ce2f503aace5017",
                 "shasum": ""
             },
             "require": {
@@ -209,20 +209,20 @@
             "support": {
                 "source": "https://github.com/mikegioia/php-imap/tree/master"
             },
-            "time": "2015-10-03 02:27:38"
+            "time": "2015-12-03 14:14:29"
         },
         {
             "name": "monolog/monolog",
-            "version": "1.17.1",
+            "version": "1.17.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "0524c87587ab85bc4c2d6f5b41253ccb930a5422"
+                "reference": "bee7f0dc9c3e0b69a6039697533dca1e845c8c24"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/0524c87587ab85bc4c2d6f5b41253ccb930a5422",
-                "reference": "0524c87587ab85bc4c2d6f5b41253ccb930a5422",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/bee7f0dc9c3e0b69a6039697533dca1e845c8c24",
+                "reference": "bee7f0dc9c3e0b69a6039697533dca1e845c8c24",
                 "shasum": ""
             },
             "require": {
@@ -236,10 +236,11 @@
                 "aws/aws-sdk-php": "^2.4.9",
                 "doctrine/couchdb": "~1.0@dev",
                 "graylog2/gelf-php": "~1.0",
+                "jakub-onderka/php-parallel-lint": "0.9",
                 "php-console/php-console": "^3.1.3",
                 "phpunit/phpunit": "~4.5",
                 "phpunit/phpunit-mock-objects": "2.3.0",
-                "raven/raven": "~0.11",
+                "raven/raven": "^0.13",
                 "ruflin/elastica": ">=0.90 <3.0",
                 "swiftmailer/swiftmailer": "~5.3",
                 "videlalvaro/php-amqplib": "~2.4"
@@ -285,20 +286,20 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2015-08-31 09:17:37"
+            "time": "2015-10-14 12:51:02"
         },
         {
             "name": "particle/validator",
-            "version": "v1.0.5",
+            "version": "v1.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/particle-php/Validator.git",
-                "reference": "0c130530f8df02f4fe293902cbb0d54672f86500"
+                "reference": "fa10a1e7958d22167c960532dbf07914f9d9ff54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/particle-php/Validator/zipball/0c130530f8df02f4fe293902cbb0d54672f86500",
-                "reference": "0c130530f8df02f4fe293902cbb0d54672f86500",
+                "url": "https://api.github.com/repos/particle-php/Validator/zipball/fa10a1e7958d22167c960532dbf07914f9d9ff54",
+                "reference": "fa10a1e7958d22167c960532dbf07914f9d9ff54",
                 "shasum": ""
             },
             "require": {
@@ -334,7 +335,7 @@
                 "validation",
                 "validator"
             ],
-            "time": "2015-06-30 12:10:20"
+            "time": "2015-10-30 12:37:55"
         },
         {
             "name": "pimple/pimple",
@@ -470,16 +471,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v2.7.6",
+            "version": "v2.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "4a959dd4e19c2c5d7512689413921e0a74386ec7"
+                "reference": "1b988a88e3551102f3c2d9e1d47a18c3a78d6312"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/4a959dd4e19c2c5d7512689413921e0a74386ec7",
-                "reference": "4a959dd4e19c2c5d7512689413921e0a74386ec7",
+                "url": "https://api.github.com/repos/symfony/process/zipball/1b988a88e3551102f3c2d9e1d47a18c3a78d6312",
+                "reference": "1b988a88e3551102f3c2d9e1d47a18c3a78d6312",
                 "shasum": ""
             },
             "require": {
@@ -488,13 +489,16 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.7-dev"
+                    "dev-master": "2.8-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
                     "Symfony\\Component\\Process\\": ""
-                }
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -512,7 +516,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2015-10-23 14:47:27"
+            "time": "2015-11-30 12:35:10"
         }
     ],
     "packages-dev": [],
