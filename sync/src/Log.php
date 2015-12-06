@@ -44,7 +44,9 @@ class Log
     {
         if ( $this->stackTrace ) {
             $this->getLogger()->critical(
-                $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
+                $exception->getMessage() .
+                PHP_EOL .
+                $exception->getTraceAsString() );
         }
         else {
             $this->getLogger()->critical( $exception->getMessage() );
