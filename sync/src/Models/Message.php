@@ -25,6 +25,7 @@ class Message extends \App\Model
     public $flagged;
     public $deleted;
     public $subject;
+    public $charset;
     public $answered;
     public $reply_to;
     public $date_str;
@@ -60,6 +61,7 @@ class Message extends \App\Model
             'flagged' => $this->flagged,
             'deleted' => $this->deleted,
             'subject' => $this->subject,
+            'charset' => $this->charset,
             'answered' => $this->answered,
             'reply_to' => $this->reply_to,
             'date_str' => $this->date_str,
@@ -67,7 +69,7 @@ class Message extends \App\Model
             'folder_id' => $this->folder_id,
             'text_html' => $this->text_html,
             'account_id' => $this->account_id,
-            'message_id' => $this->account_id,
+            'message_id' => $this->message_id,
             'message_no' => $this->message_no,
             'text_plain' => $this->text_plain,
             'references' => $this->references,
@@ -163,6 +165,7 @@ class Message extends \App\Model
         $val->required( 'message_no', 'Message Number' )->integer();
         $val->optional( 'date', 'Date' )->datetime( DATE_DATABASE );
         $val->optional( 'subject', 'Subject' )->lengthBetween( 0, 250 );
+        $val->optional( 'charset', 'Charset' )->lengthBetween( 0, 100 );
         $val->optional( 'date_str', 'RFC Date' )->lengthBetween( 0, 100 );
         $val->optional( 'seen', 'Seen' )->callback([ $this, 'isValidFlag' ]);
         $val->optional( 'message_id', 'Message ID' )->lengthBetween( 0, 250 );
@@ -237,39 +240,34 @@ class Message extends \App\Model
      */
     public function setMessageData( ImapMessage $message )
     {
-        print_r($message);exit;
-
-        /*
         $this->setData([
-            'to' => \Fn\get( $meta, 'to' ),
-            'from' => \Fn\get( $meta, 'from' ),
-            'size' => \Fn\get( $meta, 'size' ),
-            'seen' => \Fn\get( $meta, 'seen' ),
-            'draft' => \Fn\get( $meta, 'draft' ),
-            'date_str' => \Fn\get( $meta, 'date' ),
-            'unique_id' => \Fn\get( $meta, 'uid' ),
-            'recent' => \Fn\get( $meta, 'recent' ),
-            'flagged' => \Fn\get( $meta, 'flagged' ),
-            'deleted' => \Fn\get( $meta, 'deleted' ),
-            'subject' => \Fn\get( $meta, 'subject' ),
-            'message_no' => \Fn\get( $meta, 'msgno' ),
-            'answered' => \Fn\get( $meta, 'answered' ),
-            'message_id' => \Fn\get( $meta, 'message_id' ),
-        // cc and replyTo fields come in as arrays with the address
-        // as the index and the name as the value. Create the proper
-        // comma separated strings for these fields.
-        $cc = \Fn\get( $message, 'cc', [] );
-        $replyTo = \Fn\get( $message, 'replyTo', [] );
-
-        $this->setData([
+            'size' => $message->size,
             'date' => $message->date,
+            'to' => $message->toString,
+            'unique_id' => $message->uid,
+            'message_id' => $message->id,
+            'from' => $message->fromString,
+            'subject' => $message->subject,
+            'charset' => $message->charset,
+            'seen' => $message->flags->seen,
             'text_html' => $message->textHtml,
+            'draft' => $message->flags->draft,
+            'date_str' => $message->dateString,
             'text_plain' => $message->textPlain,
-            'cc' => $this->formatAddress( $cc ),
-            'reply_to' => $this->formatAddress( $replyTo ),
+            'recent' => $message->flags->recent,
+            'message_no' => $message->messageNum,
+            'references' => $message->references,
+            'in_reply_to' => $message->inReplyTo,
+            'flagged' => $message->flags->flagged,
+            'deleted' => $message->flags->deleted,
+            'answered' => $message->flags->answered,
+            // The cc and inReplyTo fields come in as arrays with the
+            // address as the index and the name as the value. Create
+            // the proper comma separated strings for these fields.
+            'cc' => $this->formatAddress( $message->cc ),
+            'reply_to' => $this->formatAddress( $message->replyTo ),
             'attachments' => $this->formatAttachments( $message->getAttachments() )
         ]);
-        */
     }
 
     /**
@@ -312,8 +310,11 @@ class Message extends \App\Model
 
         $formatted = [];
 
-        foreach ( $addresses as $email => $name ) {
-            $formatted[] = "$name <$email>";
+        foreach ( $addresses as $address ) {
+            $formatted[] = sprintf(
+                "%s <%s>",
+                $address->getName(),
+                $address->getEmail() );
         }
 
         return implode( ", ", $formatted );

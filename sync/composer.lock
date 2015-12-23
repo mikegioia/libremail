@@ -321,12 +321,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "2bdfdddd95ee5547e84c25d02986c586ae3133bd"
+                "reference": "f5d165b4e81743a34c423ba0ba8376edc2d98edb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/2bdfdddd95ee5547e84c25d02986c586ae3133bd",
-                "reference": "2bdfdddd95ee5547e84c25d02986c586ae3133bd",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/f5d165b4e81743a34c423ba0ba8376edc2d98edb",
+                "reference": "f5d165b4e81743a34c423ba0ba8376edc2d98edb",
                 "shasum": ""
             },
             "require": {
@@ -359,10 +359,10 @@
                 "mail"
             ],
             "support": {
-                "source": "https://github.com/ParticleBits/imap/tree/0.1.4",
+                "source": "https://github.com/ParticleBits/imap/tree/master",
                 "issues": "https://github.com/ParticleBits/imap/issues"
             },
-            "time": "2015-12-23 19:02:04"
+            "time": "2015-12-23 22:53:19"
         },
         {
             "name": "particlebits/zend-mail",
