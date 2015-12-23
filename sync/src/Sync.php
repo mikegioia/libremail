@@ -7,7 +7,7 @@
 namespace App;
 
 use Monolog\Logger
-  , PhpImap\Mailbox
+  , Pb\Imap\Mailbox
   , Pimple\Container
   , League\CLImate\CLImate
   , App\Models\Folder as FolderModel
@@ -208,7 +208,7 @@ class Sync
      * @param string $folder Optional, like "INBOX"
      * @throws MissingIMAPConfigException
      */
-    public function connect( $type, $email, $password, $folder = "" )
+    public function connect( $type, $email, $password, $folder = NULL )
     {
         $type = strtolower( $type );
 
@@ -220,12 +220,13 @@ class Sync
         $attachmentsPath = $this->checkAttachmentsPath( $email );
         $imapPath = $this->config[ 'email' ][ $type ][ 'path' ];
 
+        // Add connection settings and attempt the connection
         $this->mailbox = new Mailbox(
-            "{". $imapPath ."}". $folder,
+            $imapPath,
             $email,
             $password,
+            $folder,
             $attachmentsPath );
-        $this->mailbox->checkMailbox();
     }
 
     /**
@@ -278,8 +279,8 @@ class Sync
         $this->log->debug( "Syncing IMAP folders for {$account->email}" );
 
         try {
-            $folderList = $this->mailbox->getListingFolders();
-            $count = count( $folderList );
+            $folderList = $this->mailbox->getFolders();
+            $count = iterator_count( $folderList );
 
             if ( $this->interactive ) {
                 $this->cli->whisper( "Syncing $count folders:" );
@@ -375,14 +376,10 @@ class Sync
         //  4. Mark deleted in SQL anything in 2 and not 1
         try {
             $messageModel = new MessageModel;
-            // Connect to the folder's mailbox, this is sent to the
+            // Select the folder's mailbox, this is sent to the
             // messages sync library to perform operations on
-            $this->connect(
-                $account->service,
-                $account->email,
-                $account->password,
-                $folder->name );
-            $newIds = $this->mailbox->searchMailBox( 'ALL' );
+            $this->mailbox->select( $folder->name );
+            $newIds = $this->mailbox->search( 'ALL' );
             $savedIds = $messageModel->getSyncedIdsByFolder(
                 $account->getId(),
                 $folder->getId() );
@@ -440,15 +437,16 @@ class Sync
 
         // Pull the meta info for a batch of messages at a time.
         for ( $j = 0; $j <= $count; $j += $this->messageBatchSize ) {
-            $mailIds = array_slice( $toDownload, $j, $this->messageBatchSize );
-            $mailMeta = $this->mailbox->getMailsInfo( $mailIds );
+            $messageIds = array_slice( $toDownload, $j, $this->messageBatchSize );
 
-            foreach ( $mailMeta as $meta ) {
+            foreach ( $messageIds as $messageId ) {
+                $imapMessage = $this->mailbox->getMessage( $messageId );
                 $message = new MessageModel([
+                    'synced' => 1,
                     'folder_id' => $folder->getId(),
                     'account_id' => $folder->getAccountId(),
                 ]);
-                $message->setMailMeta( $meta );
+                $message->setMessageData( $imapMessage );
 
                 // Save the meta info that comes back from the server
                 // regardless if the record exists.
@@ -457,47 +455,21 @@ class Sync
                 }
                 catch ( ValidationException $e ) {
                     $this->log->notice(
-                        "Failed validation for message meta ".
+                        "Failed validation for message data ".
                         "{$message->getUniqueId()}: {$e->getMessage()}" );
-                    goto endOfLoop;
                 }
 
-                // If the message hasn't been synced yet, then pull the entire
-                // contents and save those to the database.
-                if ( ! $message->isSynced() ) {
-                    $message->synced = 1;
-                    $mailData = $this->mailbox->getMail(
-                        $message->getUniqueId(),
-                        FALSE );
-                    $message->setMailData( $mailData );
-
-                    try {
-                        $message->save();
-                    }
-                    catch ( ValidationException $e ) {
-                        $this->log->notice(
-                            "Failed validation for message data ".
-                            "{$message->getUniqueId()}: {$e->getMessage()}" );
-                    }
+                if ( $this->interactive ) {
+                    $progress->current( ( $i++ / $count ) * 100 );
                 }
 
-                endOfLoop: {
-                    if ( $this->interactive ) {
-                        $progress->current( ( $i++ / $count ) * 100 );
-                    }
-                    // Check if we've exceeded memory threshold and if so
-                    // alert the user and kill thyself.
-                    // @TODO
-                }
-
-                $meta = NULL;
                 $message = NULL;
+                $imapMessage = NULL;
             }
 
             // Message batch done. Before we loop to another batch, try
             // to reclaim memory.
-            unset( $mailIds );
-            unset( $mailMeta );
+            unset( $messageIds );
             $this->gc();
         }
 

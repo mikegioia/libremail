@@ -10,7 +10,15 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/mikegioia/php-imap"
+            "url": "https://github.com/ParticleBits/imap"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/ParticleBits/zend-mail"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/ParticleBits/zend-mime"
         },
         {
             "type": "vcs",
@@ -19,14 +27,14 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "ext-imap": "*",
-        "mikegioia/php-imap": "dev-master",
+        "particlebits/imap": "@dev",
         "pimple/pimple": "~3.0",
         "monolog/monolog": "^1.17",
         "league/climate": "^3.2",
         "particle/validator": "^1.0",
         "ilya/belt": "~2",
-        "mikegioia/pdo": "dev-master",
+        "mikegioia/pdo": "@dev",
         "symfony/process": "^2.7"
-    }
+    },
+    "minimum-stability": "dev"
 }

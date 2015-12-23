@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Belt\Belt
-  , PhpImap\Mail
   , Particle\Validator\Validator
+  , Pb\Imap\Message as ImapMessage
   , App\Traits\Model as ModelTrait
   , App\Exceptions\Validation as ValidationException
   , App\Exceptions\DatabaseUpdate as DatabaseUpdateException
@@ -231,13 +231,15 @@ class Message extends \App\Model
     }
 
     /**
-     * Saves the meta information for a message as data
-     * on the class object. We can't assume any fields
-     * will exist on the record.
+     * Saves the meta information and content for a message as data
+     * on the class object.
      * @param array $meta
      */
-    public function setMailMeta( $meta )
+    public function setMessageData( ImapMessage $message )
     {
+        print_r($message);exit;
+
+        /*
         $this->setData([
             'to' => \Fn\get( $meta, 'to' ),
             'from' => \Fn\get( $meta, 'from' ),
@@ -252,31 +254,22 @@ class Message extends \App\Model
             'subject' => \Fn\get( $meta, 'subject' ),
             'message_no' => \Fn\get( $meta, 'msgno' ),
             'answered' => \Fn\get( $meta, 'answered' ),
-            'message_id' => \Fn\get( $meta, 'message_id' )
-        ]);
-    }
-
-    /**
-     * Saves the full data from an IMAP message to the
-     * message object.
-     * @param array $mail
-     */
-    public function setMailData( Mail $mail )
-    {
+            'message_id' => \Fn\get( $meta, 'message_id' ),
         // cc and replyTo fields come in as arrays with the address
         // as the index and the name as the value. Create the proper
         // comma separated strings for these fields.
-        $cc = \Fn\get( $mail, 'cc', [] );
-        $replyTo = \Fn\get( $mail, 'replyTo', [] );
+        $cc = \Fn\get( $message, 'cc', [] );
+        $replyTo = \Fn\get( $message, 'replyTo', [] );
 
         $this->setData([
-            'date' => $mail->date,
-            'text_html' => $mail->textHtml,
-            'text_plain' => $mail->textPlain,
+            'date' => $message->date,
+            'text_html' => $message->textHtml,
+            'text_plain' => $message->textPlain,
             'cc' => $this->formatAddress( $cc ),
             'reply_to' => $this->formatAddress( $replyTo ),
-            'attachments' => $this->formatAttachments( $mail->getAttachments() )
+            'attachments' => $this->formatAttachments( $message->getAttachments() )
         ]);
+        */
     }
 
     /**
