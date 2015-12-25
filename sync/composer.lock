@@ -321,12 +321,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "f5d165b4e81743a34c423ba0ba8376edc2d98edb"
+                "reference": "2d1497f622f6ba355121bf42bce24390bf6ae528"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/f5d165b4e81743a34c423ba0ba8376edc2d98edb",
-                "reference": "f5d165b4e81743a34c423ba0ba8376edc2d98edb",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/2d1497f622f6ba355121bf42bce24390bf6ae528",
+                "reference": "2d1497f622f6ba355121bf42bce24390bf6ae528",
                 "shasum": ""
             },
             "require": {
@@ -362,7 +362,7 @@
                 "source": "https://github.com/ParticleBits/imap/tree/master",
                 "issues": "https://github.com/ParticleBits/imap/issues"
             },
-            "time": "2015-12-23 22:53:19"
+            "time": "2015-12-25 04:15:10"
         },
         {
             "name": "particlebits/zend-mail",
@@ -370,12 +370,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/zend-mail.git",
-                "reference": "041d81575ff4ebbd0691ac48b9cd46bf8279af08"
+                "reference": "b7e3dcad7adfb366583873d0918d736b09616545"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/zend-mail/zipball/041d81575ff4ebbd0691ac48b9cd46bf8279af08",
-                "reference": "041d81575ff4ebbd0691ac48b9cd46bf8279af08",
+                "url": "https://api.github.com/repos/ParticleBits/zend-mail/zipball/b7e3dcad7adfb366583873d0918d736b09616545",
+                "reference": "b7e3dcad7adfb366583873d0918d736b09616545",
                 "shasum": ""
             },
             "require": {
@@ -424,7 +424,7 @@
             "support": {
                 "source": "https://github.com/ParticleBits/zend-mail/tree/master"
             },
-            "time": "2015-12-23 17:38:48"
+            "time": "2015-12-24 13:37:50"
         },
         {
             "name": "particlebits/zend-mime",
@@ -432,12 +432,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/zend-mime.git",
-                "reference": "497e69132b7c1c25a74502e2544ceff657683270"
+                "reference": "452f3edd11c9094b993ddbd96ada6594a5615d8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/zend-mime/zipball/497e69132b7c1c25a74502e2544ceff657683270",
-                "reference": "497e69132b7c1c25a74502e2544ceff657683270",
+                "url": "https://api.github.com/repos/ParticleBits/zend-mime/zipball/452f3edd11c9094b993ddbd96ada6594a5615d8f",
+                "reference": "452f3edd11c9094b993ddbd96ada6594a5615d8f",
                 "shasum": ""
             },
             "require": {
@@ -481,7 +481,7 @@
             "support": {
                 "source": "https://github.com/ParticleBits/zend-mime/tree/master"
             },
-            "time": "2015-12-23 17:38:25"
+            "time": "2015-12-25 03:48:12"
         },
         {
             "name": "pimple/pimple",

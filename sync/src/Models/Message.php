@@ -115,7 +115,7 @@ class Message extends \App\Model
     }
 
     /**
-     * Returns a list of integer unique_ids given an account ID
+     * Returns a list of integer message IDs given an account ID
      * and a folder ID to search.
      * @param int $accountId
      * @param int $folderId
@@ -127,7 +127,7 @@ class Message extends \App\Model
         $this->requireInt( $folderId, "Folder ID" );
         $this->requireInt( $accountId, "Account ID" );
         $messages = $this->db()
-            ->select([ 'unique_id' ])
+            ->select([ 'message_no' ])
             ->from( 'messages' )
             ->where( 'synced', '=', 1 )
             ->where( 'deleted', '=', 0 )
@@ -141,7 +141,7 @@ class Message extends \App\Model
         }
 
         foreach ( $messages as $message ) {
-            $ids[] = $message[ 'unique_id' ];
+            $ids[] = $message[ 'message_no' ];
         }
 
         return $ids;
@@ -245,7 +245,6 @@ class Message extends \App\Model
             'date' => $message->date,
             'to' => $message->toString,
             'unique_id' => $message->uid,
-            'message_id' => $message->id,
             'from' => $message->fromString,
             'subject' => $message->subject,
             'charset' => $message->charset,
@@ -254,6 +253,7 @@ class Message extends \App\Model
             'draft' => $message->flags->draft,
             'date_str' => $message->dateString,
             'text_plain' => $message->textPlain,
+            'message_id' => $message->messageId,
             'recent' => $message->flags->recent,
             'message_no' => $message->messageNum,
             'references' => $message->references,

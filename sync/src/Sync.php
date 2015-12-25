@@ -6,7 +6,8 @@
 
 namespace App;
 
-use Monolog\Logger
+use Exception
+  , Monolog\Logger
   , Pb\Imap\Mailbox
   , Pimple\Container
   , League\CLImate\CLImate
@@ -118,7 +119,7 @@ class Sync
                 "but you should re-run this script to re-test. Please see ".
                 "the documentation on updating this MySQL setting in your ".
                 "configuration file." );
-            throw new \Exception( "Halting script" );
+            throw new Exception( "Halting script" );
         }
 
         // Loop through the active accounts and perform the sync
@@ -157,6 +158,7 @@ class Sync
                 $account->service,
                 $account->email,
                 $account->password );
+
             // Check if we're only syncing one folder
             if ( $this->folder ) {
                 try {
@@ -166,10 +168,11 @@ class Sync
                         $this->folder,
                         $failOnNotFound = TRUE );
                 }
-                catch ( \Exception $e ) {
+                catch ( Exception $e ) {
                     throw new FatalException(
                         "Syncing that folder failed: ". $e->getMessage() );
                 }
+
                 $this->syncMessages( $account, [ $folder ] );
             }
             // Fetch folders and sync them to database
@@ -183,7 +186,7 @@ class Sync
             $this->log->critical( $e->getMessage() );
             exit;
         }
-        catch ( \Exception $e ) {
+        catch ( Exception $e ) {
             $this->log->error( $e->getMessage() );
             $waitSeconds = $this->config[ 'app' ][ 'sync' ][ 'wait_seconds' ];
             $this->log->info(
@@ -219,6 +222,12 @@ class Sync
         // Check the attachment directory is writeable
         $attachmentsPath = $this->checkAttachmentsPath( $email );
         $imapPath = $this->config[ 'email' ][ $type ][ 'path' ];
+
+        // If the connection is active, then just select the folder
+        if ( $this->mailbox ) {
+            $this->mailbox->select( $folder );
+            return;
+        }
 
         // Add connection settings and attempt the connection
         $this->mailbox = new Mailbox(
@@ -301,7 +310,7 @@ class Sync
                 }
             }
         }
-        catch ( \Exception $e ) {
+        catch ( Exception $e ) {
             $this->log->error( $e->getMessage() );
             $waitSeconds = $this->config[ 'app' ][ 'sync' ][ 'wait_seconds' ];
             $this->log->info(
@@ -357,7 +366,7 @@ class Sync
                 "amount of retries ({$this->maxRetries}) after trying ".
                 "to sync the folder '{$folder->name}'. Skipping to the ".
                 "next folder." );
-            throw new MessagesSyncException( $folder );
+            throw new MessagesSyncException( $folder->name );
         }
 
         $this->log->debug(
@@ -386,7 +395,7 @@ class Sync
             $this->downloadMessages( $newIds, $savedIds, $folder );
             $this->markDeleted( $newIds, $savedIds, $folder );
         }
-        catch ( \Exception $e ) {
+        catch ( Exception $e ) {
             $this->log->error( substr( $e->getMessage(), 0, 500 ) );
             $retryCount = $this->retriesMessages[ $account->email ];
             $waitSeconds = $this->config[ 'app' ][ 'sync' ][ 'wait_seconds' ];
