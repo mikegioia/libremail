@@ -21,6 +21,7 @@ use Exception
   , App\Exceptions\FolderSync as FolderSyncException
   , App\Exceptions\MessagesSync as MessagesSyncException
   , App\Exceptions\MissingIMAPConfig as MissingIMAPConfigException
+  , Pb\Imap\Exceptions\MessageSizeLimit as MessageSizeLimitException
   , App\Exceptions\AttachmentsPathNotWriteable as AttachmentsPathNotWriteableException;
 
 class Sync
@@ -37,7 +38,6 @@ class Sync
     private $retriesMessages;
     private $gcEnabled = FALSE;
     private $gcMemEnabled = FALSE;
-    private $messageBatchSize = 50;
 
     /**
      * Constructor can either take a dependency container or have
@@ -388,7 +388,7 @@ class Sync
             // Select the folder's mailbox, this is sent to the
             // messages sync library to perform operations on
             $this->mailbox->select( $folder->name );
-            $newIds = $this->mailbox->search( 'ALL' );
+            $newIds = $this->mailbox->getUniqueIds();
             $savedIds = $messageModel->getSyncedIdsByFolder(
                 $account->getId(),
                 $folder->getId() );
@@ -444,45 +444,63 @@ class Sync
             $progress = $this->cli->progress()->total( 100 );
         }
 
-        // Pull the meta info for a batch of messages at a time.
-        for ( $j = 0; $j <= $count; $j += $this->messageBatchSize ) {
-            $messageIds = array_slice( $toDownload, $j, $this->messageBatchSize );
+        foreach ( $toDownload as $messageId => $uniqueId ) {
+            $this->downloadMessage( $messageId, $uniqueId, $folder );
 
-            foreach ( $messageIds as $messageId ) {
-                $imapMessage = $this->mailbox->getMessage( $messageId );
-                $message = new MessageModel([
-                    'synced' => 1,
-                    'folder_id' => $folder->getId(),
-                    'account_id' => $folder->getAccountId(),
-                ]);
-                $message->setMessageData( $imapMessage );
-
-                // Save the meta info that comes back from the server
-                // regardless if the record exists.
-                try {
-                    $message->save();
-                }
-                catch ( ValidationException $e ) {
-                    $this->log->notice(
-                        "Failed validation for message data ".
-                        "{$message->getUniqueId()}: {$e->getMessage()}" );
-                }
-
-                if ( $this->interactive ) {
-                    $progress->current( ( $i++ / $count ) * 100 );
-                }
-
-                $message = NULL;
-                $imapMessage = NULL;
+            if ( $this->interactive ) {
+                $progress->current( ( $i++ / $count ) * 100 );
             }
 
-            // Message batch done. Before we loop to another batch, try
-            // to reclaim memory.
-            unset( $messageIds );
+            $message = NULL;
+            $imapMessage = NULL;
+
+            // After each download, try to reclaim memory.
             $this->gc();
         }
 
         $this->gc();
+    }
+
+    /**
+     * Download a specified message by message ID.
+     * @param integer $messageId
+     * @param integer $uniqueId
+     * @param FolderModel $folder
+     */
+    private function downloadMessage( $messageId, $uniqueId, FolderModel $folder )
+    {
+        try {
+            $imapMessage = $this->mailbox->getMessage( $messageId );
+            $message = new MessageModel([
+                'synced' => 1,
+                'folder_id' => $folder->getId(),
+                'account_id' => $folder->getAccountId(),
+            ]);
+            $message->setMessageData( $imapMessage );
+        }
+        catch ( MessageSizeLimitException $e ) {
+            $this->log->notice(
+                "Size exceeded during download of message $messageId: ".
+                $e->getMessage() );
+            return;
+        }
+        catch ( Exception $e ) {
+            $this->log->warning(
+                "Failed download for message {$messageId}: ".
+                $e->getMessage() );
+            return;
+        }
+
+        // Save the meta info that comes back from the server
+        // regardless if the record exists.
+        try {
+            $message->save();
+        }
+        catch ( ValidationException $e ) {
+            $this->log->notice(
+                "Failed validation for message $messageId: ".
+                $e->getMessage() );
+        }
     }
 
     /**
