@@ -68,6 +68,9 @@ $di[ 'log' ] = function ( $c ) {
     return $log->getLogger();
 };
 
+// Set the memory limit from the config
+ini_set( 'memory_limit', $di[ 'config' ][ 'app' ][ 'memory' ] );
+
 // Statically set the services in the base model
 Model::setDb( $di[ 'db' ] );
 Model::setCLI( $di[ 'cli' ] );

@@ -321,12 +321,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "497492fadc719720b3627e0e0863edab0c6b7a38"
+                "reference": "577134402610d0961dcd95db7a71ae611787e5c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/497492fadc719720b3627e0e0863edab0c6b7a38",
-                "reference": "497492fadc719720b3627e0e0863edab0c6b7a38",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/577134402610d0961dcd95db7a71ae611787e5c5",
+                "reference": "577134402610d0961dcd95db7a71ae611787e5c5",
                 "shasum": ""
             },
             "require": {
@@ -359,10 +359,10 @@
                 "mail"
             ],
             "support": {
-                "source": "https://github.com/ParticleBits/imap/tree/0.5.3",
+                "source": "https://github.com/ParticleBits/imap/tree/0.5.4",
                 "issues": "https://github.com/ParticleBits/imap/issues"
             },
-            "time": "2015-12-27 15:08:58"
+            "time": "2015-12-30 03:12:32"
         },
         {
             "name": "particlebits/zend-mail",
@@ -629,12 +629,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "62c254438b5040bc2217156e1570cf2206e8540c"
+                "reference": "126dde8f8f8f7eb305f994636858d3555651eaad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/62c254438b5040bc2217156e1570cf2206e8540c",
-                "reference": "62c254438b5040bc2217156e1570cf2206e8540c",
+                "url": "https://api.github.com/repos/symfony/process/zipball/126dde8f8f8f7eb305f994636858d3555651eaad",
+                "reference": "126dde8f8f8f7eb305f994636858d3555651eaad",
                 "shasum": ""
             },
             "require": {
@@ -670,7 +670,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2015-12-23 11:03:46"
+            "time": "2015-12-28 13:12:56"
         },
         {
             "name": "zendframework/zend-crypt",
