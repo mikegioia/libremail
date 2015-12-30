@@ -359,7 +359,7 @@ class Sync
             $this->log->debug( 'Skipping ignored folder' );
             return;
         }
- 
+
         if ( $this->retriesMessages[ $account->email ] > $this->maxRetries ) {
             $this->log->notice(
                 "The account '{$account->email}' has exceeded the max ".
@@ -540,7 +540,7 @@ class Sync
     {
         if ( $this->gcEnabled ) {
             gc_collect_cycles();
-            
+
             if ( $this->gcMemEnabled ) {
                 gc_mem_caches();
             }
