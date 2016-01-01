@@ -2,9 +2,12 @@
 
 namespace App;
 
-use Exception
+use App\Sync
+  , Exception
+  , App\Diagnostics
   , League\CLImate\CLImate as CLI
-  , App\Models\Account as AccountModel;
+  , App\Models\Account as AccountModel
+  , App\Models\Migration as MigrationModel;
 
 class Console
 {
@@ -22,6 +25,7 @@ class Console
     public $verbose;
     public $updatedb;
     public $background;
+    public $diagnostic;
     public $interactive;
 
     public function __construct( array $config )
@@ -63,6 +67,12 @@ class Console
                 'description' => 'Create a new IMAP account',
                 'noValue' => TRUE
             ],
+            'diagnostic' => [
+                'prefix' => 'd',
+                'longPrefix' => 'diagnostic',
+                'description' => 'Runs a series of diagnostic tests',
+                'noValue' => TRUE
+            ],
             'folder' => [
                 'prefix' => 'f',
                 'longPrefix' => 'folder',
@@ -102,7 +112,18 @@ class Console
         $this->verbose = $this->cli->arguments->get( 'verbose' );
         $this->updatedb = $this->cli->arguments->get( 'updatedb' );
         $this->background = $this->cli->arguments->get( 'background' );
+        $this->diagnostic = $this->cli->arguments->get( 'diagnostic' );
         $this->interactive = $this->cli->arguments->get( 'interactive' );
+
+        // If background is set, turn off interactive
+        if ( $this->background === TRUE ) {
+            $this->interactive = FALSE;
+        }
+
+        // If create or update DB is set turn interactive on
+        if ( $this->create === TRUE || $this->updatedb === TRUE ) {
+            $this->interactive = TRUE;
+        }
     }
 
     /**
@@ -116,9 +137,15 @@ class Console
             exit( 0 );
         }
 
+        // If diagnostic is set, just run the tests and exit
+        if ( $this->diagnostic === TRUE ) {
+            $diagnostics = new Diagnostics;
+            $diagnostics->run();
+            exit( 0 );
+        }
+
         // If create is set, skip right to the account creation
         if ( $this->create === TRUE ) {
-            $this->interactive = TRUE;
             $this->cli->info( "Creating a new IMAP account" );
             $this->promptAccountInfo();
             exit( 0 );
@@ -126,15 +153,9 @@ class Console
 
         // If updatedb is set, just run the migration script
         if ( $this->updatedb === TRUE ) {
-            $this->interactive = TRUE;
-            $migrate = new \App\Models\Migration;
+            $migrate = new MigrationModel;
             $migrate->run();
             exit( 0 );
-        }
-
-        // If background is set, turn off interactive
-        if ( $this->background === TRUE ) {
-            $this->interactive = FALSE;
         }
 
         // If we're in interactive mode, sent the sync message
@@ -257,7 +278,7 @@ class Console
      */
     private function testConnection( $account )
     {
-        $sync = new \App\Sync;
+        $sync = new Sync;
         $sync->setConfig( $this->config );
 
         try {

@@ -154,6 +154,7 @@ class Sync
 
         try {
             // Open a connection to the mailbox
+            $this->disconnect();
             $this->connect(
                 $account->imap_host,
                 $account->imap_port,
@@ -200,6 +201,7 @@ class Sync
         }
 
         $this->log->info( "Sync complete for {$account->email}" );
+        $this->disconnect();
 
         return TRUE;
     }
@@ -234,13 +236,22 @@ class Sync
         $this->mailbox->getImapStream();
     }
 
+    public function disconnect()
+    {
+        if ( $this->mailbox ) {
+            $this->mailbox->disconnect();
+        }
+
+        $this->mailbox = NULL;
+    }
+
     /**
      * Checks if the attachments path is writeable by the user.
      * @param string $email
      * @throws AttachmentsPathNotWriteableException
      * @return boolean
      */
-    private function checkAttachmentsPath( $email )
+    public function checkAttachmentsPath( $email, $createEmailDir = TRUE )
     {
         $slash = DIRECTORY_SEPARATOR;
         $configPath = $this->config[ 'email' ][ 'attachments' ][ 'path' ];
@@ -250,6 +261,10 @@ class Sync
 
         if ( ! is_writeable( $attachmentsDir ) ) {
             throw new AttachmentsPathNotWriteableException;
+        }
+
+        if ( ! $createEmailDir ) {
+            return TRUE;
         }
 
         $attachmentsPath = ( substr( $configPath, 0, 1 ) !== $slash )
@@ -518,7 +533,9 @@ class Sync
             return;
         }
 
-        $this->log->info( "Marking $count deletion(s) in {$folder->name}" );
+        $this->log->info(
+            "Marking $count deletion". ( $count == 1 ? '' : 's' ) .
+            " in {$folder->name}" );
 
         try {
             $messageModel = new MessageModel;
