@@ -12,7 +12,6 @@
 use App\Log
   , App\Sync
   , App\Model
-  , Exception
   , App\Console
   , App\Startup
   , App\Constants
@@ -98,7 +97,7 @@ try {
         sleep( $sleepMinutes * 60 );
     }
 }
-catch ( Exception $e ) {
+catch ( \Exception $e ) {
     if ( $di[ 'console' ]->interactive === TRUE ) {
         $di[ 'cli' ]->boldRedBackgroundBlack( $e->getMessage() );
         $di[ 'cli' ]->dim( "[Err#". $e->getCode() ."]" );
