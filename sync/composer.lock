@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "31d9c0a464f729609096d52c755579ec",
-    "content-hash": "f100dc25eb9e5346f673cfcd5fbc1e1d",
+    "hash": "ab6e770cec5c7044352fb6a01cb1bfff",
+    "content-hash": "e7eb36557362b4889d7156aef5050773",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -84,16 +84,16 @@
         },
         {
             "name": "league/climate",
-            "version": "3.2.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/climate.git",
-                "reference": "834cb907c89eb31e2171b68ee25c0ed26c8f34f4"
+                "reference": "e590077d1f47c19aa712434d894e9f72c6cde6c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/climate/zipball/834cb907c89eb31e2171b68ee25c0ed26c8f34f4",
-                "reference": "834cb907c89eb31e2171b68ee25c0ed26c8f34f4",
+                "url": "https://api.github.com/repos/thephpleague/climate/zipball/e590077d1f47c19aa712434d894e9f72c6cde6c7",
+                "reference": "e590077d1f47c19aa712434d894e9f72c6cde6c7",
                 "shasum": ""
             },
             "require": {
@@ -131,7 +131,7 @@
                 "php",
                 "terminal"
             ],
-            "time": "2015-08-13 16:50:51"
+            "time": "2015-11-11 02:52:08"
         },
         {
             "name": "mikegioia/pdo",
@@ -321,12 +321,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "6079facd1bcc883db5f56c53a4846899fba66643"
+                "reference": "433c1142d48620088bb22024670b6e666b4fd603"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/6079facd1bcc883db5f56c53a4846899fba66643",
-                "reference": "6079facd1bcc883db5f56c53a4846899fba66643",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/433c1142d48620088bb22024670b6e666b4fd603",
+                "reference": "433c1142d48620088bb22024670b6e666b4fd603",
                 "shasum": ""
             },
             "require": {
@@ -359,10 +359,10 @@
                 "mail"
             ],
             "support": {
-                "source": "https://github.com/ParticleBits/imap/tree/1.0.0",
+                "source": "https://github.com/ParticleBits/imap/tree/1.0.2",
                 "issues": "https://github.com/ParticleBits/imap/issues"
             },
-            "time": "2015-12-30 18:32:13"
+            "time": "2016-01-01 01:47:53"
         },
         {
             "name": "particlebits/zend-mail",
@@ -370,12 +370,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/zend-mail.git",
-                "reference": "cae8191d1ff86ef10ff30174e06dc8575909de94"
+                "reference": "93f3c3effa1ea517e6be06ba805a085a0abc5c39"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/zend-mail/zipball/cae8191d1ff86ef10ff30174e06dc8575909de94",
-                "reference": "cae8191d1ff86ef10ff30174e06dc8575909de94",
+                "url": "https://api.github.com/repos/ParticleBits/zend-mail/zipball/93f3c3effa1ea517e6be06ba805a085a0abc5c39",
+                "reference": "93f3c3effa1ea517e6be06ba805a085a0abc5c39",
                 "shasum": ""
             },
             "require": {
@@ -424,7 +424,7 @@
             "support": {
                 "source": "https://github.com/ParticleBits/zend-mail/tree/master"
             },
-            "time": "2015-12-27 13:39:03"
+            "time": "2015-12-31 16:55:45"
         },
         {
             "name": "particlebits/zend-mime",
@@ -629,12 +629,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "75b35e027f5951e33bd55c13f70e2ae713be1450"
+                "reference": "9c367f0c64639b2065ffdf4d917ba581bdc30200"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/75b35e027f5951e33bd55c13f70e2ae713be1450",
-                "reference": "75b35e027f5951e33bd55c13f70e2ae713be1450",
+                "url": "https://api.github.com/repos/symfony/process/zipball/9c367f0c64639b2065ffdf4d917ba581bdc30200",
+                "reference": "9c367f0c64639b2065ffdf4d917ba581bdc30200",
                 "shasum": ""
             },
             "require": {
@@ -670,7 +670,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2015-12-30 18:23:12"
+            "time": "2015-12-31 10:59:32"
         },
         {
             "name": "zendframework/zend-crypt",
@@ -1003,6 +1003,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "particlebits/imap": 20,
+        "league/climate": 20,
         "mikegioia/pdo": 20
     },
     "prefer-stable": false,

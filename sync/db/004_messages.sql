@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `unique_id` int(10) unsigned DEFAULT NULL,
   `date_str` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   `charset` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `subject` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `subject` varchar(270) COLLATE utf8_unicode_ci DEFAULT NULL,
   `message_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
   `in_reply_to` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
   `size` int(10) unsigned DEFAULT NULL,

@@ -150,12 +150,13 @@ class Sync
         }
 
         $this->log->info( "Starting sync for {$account->email}" );
-        $this->log->debug( "Process ID: ". getmypid() );
+        $this->log->info( "Process ID: ". getmypid() );
 
         try {
             // Open a connection to the mailbox
             $this->connect(
-                $account->service,
+                $account->imap_host,
+                $account->imap_port,
                 $account->email,
                 $account->password );
 
@@ -205,23 +206,17 @@ class Sync
 
     /**
      * Connects to an IMAP mailbox using the supplied credentials.
-     * @param string $type Account type, like "GMail"
+     * @param string $host IMAP hostname, like 'imap.host.com'
+     * @param string $port IMAP port, usually 993 (not used)
      * @param string $email
      * @param string $password
      * @param string $folder Optional, like "INBOX"
      * @throws MissingIMAPConfigException
      */
-    public function connect( $type, $email, $password, $folder = NULL )
+    public function connect( $host, $port, $email, $password, $folder = NULL )
     {
-        $type = strtolower( $type );
-
-        if ( ! isset( $this->config[ 'email' ][ $type ] ) ) {
-            throw new MissingIMAPConfigException( $type );
-        }
-
         // Check the attachment directory is writeable
         $attachmentsPath = $this->checkAttachmentsPath( $email );
-        $imapPath = $this->config[ 'email' ][ $type ][ 'path' ];
 
         // If the connection is active, then just select the folder
         if ( $this->mailbox ) {
@@ -231,11 +226,12 @@ class Sync
 
         // Add connection settings and attempt the connection
         $this->mailbox = new Mailbox(
-            $imapPath,
+            $host,
             $email,
             $password,
             $folder,
             $attachmentsPath );
+        $this->mailbox->getImapStream();
     }
 
     /**
@@ -334,6 +330,8 @@ class Sync
      */
     private function syncMessages( AccountModel $account, $folders )
     {
+        $this->log->info( "Syncing messages in each folder" );
+
         foreach ( $folders as $folder ) {
             $this->retriesMessages[ $account->email ] = 1;
 
@@ -520,7 +518,7 @@ class Sync
             return;
         }
 
-        $this->log->debug( "Marking $count deletion(s) in {$folder->name}" );
+        $this->log->info( "Marking $count deletion(s) in {$folder->name}" );
 
         try {
             $messageModel = new MessageModel;

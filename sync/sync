@@ -12,6 +12,7 @@
 use App\Log
   , App\Sync
   , App\Model
+  , Exception
   , App\Console
   , App\Startup
   , App\Constants
@@ -91,13 +92,13 @@ try {
     while ( TRUE ) {
         $sync = new Sync( $di );
         $sync->run();
-        $di[ 'log' ]->addDebug(
+        $di[ 'log' ]->addInfo(
             "Going to sleep for $sleepMinutes minutes (brb)" );
         $sync = NULL;
         sleep( $sleepMinutes * 60 );
     }
 }
-catch ( \Exception $e ) {
+catch ( Exception $e ) {
     if ( $di[ 'console' ]->interactive === TRUE ) {
         $di[ 'cli' ]->boldRedBackgroundBlack( $e->getMessage() );
         $di[ 'cli' ]->dim( "[Err#". $e->getCode() ."]" );

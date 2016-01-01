@@ -29,7 +29,7 @@ class Account extends \App\Model
             'email' => $this->email,
             'service' => $this->service,
             'password' => $this->password,
-            'is_active' => $this->is_active, 
+            'is_active' => $this->is_active,
             'imap_host' => $this->imap_host,
             'imap_port' => $this->imap_port,
             'imap_flags' => $this->imap_flags,
@@ -49,7 +49,11 @@ class Account extends \App\Model
         $val = new Validator;
         $val->required( 'email', 'Email' )->lengthBetween( 0, 100 );
         $val->required( 'service', 'Service type' )
-            ->inArray( $this->config( 'email.services' ) );
+            ->inArray(
+                array_map(
+                    'strtolower',
+                    $this->config( 'email.services' )
+                ));
         $val->required( 'password', 'Password' )->lengthBetween( 0, 100 );
         $val->optional( 'imap_host', 'IMAP host' )->lengthBetween( 0, 50 );
         $val->optional( 'imap_port', 'IMAP port' )->lengthBetween( 0, 5 );

@@ -164,7 +164,7 @@ class Message extends \App\Model
         $val->required( 'size', 'Size' )->integer();
         $val->required( 'message_no', 'Message Number' )->integer();
         $val->optional( 'date', 'Date' )->datetime( DATE_DATABASE );
-        $val->optional( 'subject', 'Subject' )->lengthBetween( 0, 250 );
+        $val->optional( 'subject', 'Subject' )->lengthBetween( 0, 270 );
         $val->optional( 'charset', 'Charset' )->lengthBetween( 0, 100 );
         $val->optional( 'date_str', 'RFC Date' )->lengthBetween( 0, 100 );
         $val->optional( 'seen', 'Seen' )->callback([ $this, 'isValidFlag' ]);

@@ -30,7 +30,7 @@
         "particlebits/imap": "@dev",
         "pimple/pimple": "~3.0",
         "monolog/monolog": "^1.17",
-        "league/climate": "^3.2",
+        "league/climate": "dev-master",
         "particle/validator": "^1.0",
         "ilya/belt": "~2",
         "mikegioia/pdo": "@dev",

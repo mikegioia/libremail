@@ -2,7 +2,8 @@
 
 namespace App;
 
-use League\CLImate\CLImate as CLI
+use Exception
+  , League\CLImate\CLImate as CLI
   , App\Models\Account as AccountModel;
 
 class Console
@@ -169,19 +170,21 @@ class Console
     private function promptAccountInfo()
     {
         $newAccount = [];
-        $newAccount[ 'service' ] = $this->promptAccountType();
+        list(
+            $newAccount[ 'service' ],
+            $newAccount[ 'imap_host' ],
+            $newAccount[ 'imap_port' ] ) = $this->promptAccountType();
         $newAccount[ 'email' ] = $this->promptEmail();
         $newAccount[ 'password' ] = $this->promptPassword();
 
-        // Test connection before adding
-        $this->testConnection( $newAccount );
-
         // Connection settings worked, save to SQL
         try {
+            // Test connection before adding
+            $this->testConnection( $newAccount );
             $accountModel = new AccountModel( $newAccount );
             $accountModel->save();
         }
-        catch ( \Exception $e ) {
+        catch ( Exception $e ) {
             $this->cli->boldRedBackgroundBlack( $e->getMessage() );
             $input = $this->cli->confirm( "Do you want to try again?" );
 
@@ -221,7 +224,18 @@ class Console
             exit( 0 );
         }
 
-        return $service;
+        $service = strtolower( $service );
+        $port = $this->config[ 'email' ][ $service ][ 'port' ];
+
+        // If the service was 'other' we need to ask them for the host.
+        if ( $service === 'other' ) {
+            $host = $this->cli->input( 'Host address (like imap.host.com):' )->prompt();
+        }
+        else {
+            $host = $this->config[ 'email' ][ $service ][ 'host' ];
+        }
+
+        return [ $service, $host, $port ];
     }
 
     private function promptEmail()
@@ -248,16 +262,18 @@ class Console
 
         try {
             $sync->connect(
-                $account[ 'service' ],
+                $account[ 'imap_host' ],
+                $account[ 'imap_port' ],
                 $account[ 'email' ],
                 $account[ 'password' ] );
         }
-        catch ( \Exception $e ) {
+        catch ( Exception $e ) {
             $this->cli->error(
                 sprintf(
-                    "Unable to connect as '%s' to %s IMAP server: %s.",
+                    "Unable to connect as '%s' to %s:%s IMAP server: %s.",
                     $account[ 'email' ],
-                    $account[ 'service' ],
+                    $account[ 'imap_host' ],
+                    $account[ 'imap_port' ],
                     $e->getMessage()
                 ));
             $this->cli->comment(

@@ -2,7 +2,8 @@
 
 namespace App;
 
-use Monolog\Logger
+use Exception
+  , Monolog\Logger
   , App\Log\CLIHandler
   , League\CLImate\CLImate
   , Monolog\Handler\StreamHandler
@@ -80,7 +81,7 @@ class Log
             return;
         }
 
-        $e = new \Exception( "$message on line $lineNo of $filename" );
+        $e = new Exception( "$message on line $lineNo of $filename" );
 
         if ( $this->stackTrace ) {
             $this->getLogger()->$logMethod(
