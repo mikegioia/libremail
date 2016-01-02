@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
    this email is replying to. This value comes from the mail header.
 - `size` Integer denoting the size in bytes of the message.
 - `message_no` The positional message number returned from the mail server.
-   *This value can change* if messages are moved within a folder and is only
+   **This value can change** if messages are moved within a folder and is only
    used when fetching a message or other information from the IMAP server.
 - `to` String containing the entire `To` mail header value. This is usually of
    the form "Full name <fullname@example.org>".
@@ -148,8 +148,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
 - `references` Optional string containing the entire `References` mail header.
    References are any other `message_id`s that may be included in any way
    within the message.
-- `attachments` *`@TODO` JSON encode this field or move to another table*
-
+- `attachments` **`@TODO` JSON encode this field or move to another table**
    Serialized array of the attachment information. This is an array of objects
    containing the name, filename, path on disk, mime-type, and the original
    file name and name fields (which may be empty).
