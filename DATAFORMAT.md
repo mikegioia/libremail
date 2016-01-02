@@ -60,6 +60,17 @@ CREATE TABLE IF NOT EXISTS `folders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 ```
 
+- `id` Unique integer identifying the folder
+- `account_id` Foreign key referencing the account from the `accounts` table.
+- `name` Full global name of the folder as saved on the IMAP server. For
+   example, this would be 'Accounts/Listserv/Libremail' instead of 'Libremail'.
+- `deleted` Boolean flag denoting if the folder was deleted on the IMAP server.
+   Deleted folders should not be synced.
+- `ignored` Boolean flag denoting if the folder should be ignored from sycning
+   locally. Any folder with this flag set to 1 should not have its messages
+   downloaded.
+- `created_at` Timestamp denoting when the account was added to the database.
+
 ## Messages
 
 ```SQL
