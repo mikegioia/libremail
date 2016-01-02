@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
 - `references` Optional string containing the entire `References` mail header.
    References are any other `message_id`s that may be included in any way
    within the message.
-- `attachments` **`@TODO` JSON encode this field or move to another table**
+- `attachments` **@TODO JSON encode this field or move to another table**
    Serialized array of the attachment information. This is an array of objects
    containing the name, filename, path on disk, mime-type, and the original
    file name and name fields (which may be empty).
