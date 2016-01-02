@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 ```
 
-- `id` Unique integer identifying the account
+- `id` Unique integer identifying the account.
 - `service` Optional string referencing the IMAP service. For example, this
    could say 'gmail', 'outlook', 'yahoo', etc.
 - `email` String containing the email address for the IMAP account
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `folders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 ```
 
-- `id` Unique integer identifying the folder
+- `id` Unique integer identifying the folder.
 - `account_id` Foreign key referencing the account from the `accounts` table.
 - `name` Full global name of the folder as saved on the IMAP server. For
    example, this would be 'Accounts/Listserv/Libremail' instead of 'Libremail'.
@@ -111,3 +111,58 @@ CREATE TABLE IF NOT EXISTS `messages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 ```
+
+- `id` Unique integer identifying the message.
+- `account_id` Foreign key referencing the account from the `accounts` table.
+- `folder_id` Foreign key referencing the folder from the `folders` table.
+- `unique_id` Unique IMAP mail ID as given from the mail server. The unique ID
+   differs from the `message_no` in that it is an unchanging ID issued from the
+   mail server. This unique ID (or uid) is used in determining which messages
+   are new or marked for deletion in the syncing process.
+- `date_str` The date string as stored in the mail header. This can take
+   many different formats and sometimes not even be a valid date string. It
+   should be stored here regardless. The `date` field is a cleansed version of
+   this (see below).
+- `charset` The character set as stored in the mail header. This is to be
+   used when decoding the plain text if the plain text part is encoded in a
+   non UTF-8 format.
+- `subject` The subject of the message.
+- `message_id` The message ID as stored in the mail header. This usually
+   takes a form of `<591d...4140a@example.org>` and is returned from the
+   mail server.
+- `in_reply_to` Optional string containing the `message_id` of the message that
+   this email is replying to. This value comes from the mail header.
+- `size` Integer denoting the size in bytes of the message.
+- `message_no` The positional message number returned from the mail server.
+   *This value can change* if messages are moved within a folder and is only
+   used when fetching a message or other information from the IMAP server.
+- `to` String containing the entire `To` mail header value. This is usually of
+   the form "Full name <fullname@example.org>".
+- `from` String containing the entire `From` mail header value.
+- `cc` String containing the entire `Cc` mail header value.
+- `reply_to` String containing the entire `Reply-To` or `Return-Path` mail
+   header value.
+- `text_plain` The full string text of the `text/plain` part of the message.
+   This can sometimes contain concatenated plain text mail parts.
+- `text_html` The full string text of the `text/html` part of the message.
+- `references` Optional string containing the entire `References` mail header.
+   References are any other `message_id`s that may be included in any way
+   within the message.
+- `attachments` *`@TODO` JSON encode this field or move to another table*
+
+   Serialized array of the attachment information. This is an array of objects
+   containing the name, filename, path on disk, mime-type, and the original
+   file name and name fields (which may be empty).
+- `seen` Boolean value, 1 if the `\Seen` flag exists on the message.
+- `draft` Boolean value, 1 if the `\Draft` flag exists on the message.
+- `recent` Boolean value, 1 if the `\Recent` flag exists on the message.
+- `flagged` Boolean value, 1 if the `\Flagged` flag exists on the message.
+- `deleted` Boolean value denoting if the message was deleted on the server.
+- `answered` Boolean value, 1 if the `\Answered` flag exists on the message.
+- `synced` Boolean value denoting if the message has been synced with the IMAP
+   server. This is a placeholder for now but if the syncing process was multi-
+   stage and only the headers were saved in this table, then this value would
+   remain 0 until the text, html, attachments, and other mail parts were synced.
+- `date` Date-time field representing the processed `date_str` from the message.
+   This field is in the format `YYYY-MM-DD HH-MM-SS`.
+- `created_at` Timestamp denoting when the message was added to the database.
