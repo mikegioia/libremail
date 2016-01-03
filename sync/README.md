@@ -197,7 +197,7 @@ the script fails for any reason.
 All bugs and requests are tracked in the Github Issues for this repository. See
 the [Issues Page](https://github.com/mikegioia/libremail/issues) for a listing
 of the open and closed tickets. **Please search the closed issues before
-reporting anything* to see if it has been resolved :)
+reporting anything** to see if it has been resolved :)
 
 This is an open source project that is worked on in spare time, so there is no
 guarantee that anything that you report will be looked at or fixed! However I
