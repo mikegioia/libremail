@@ -55,8 +55,8 @@ class Sync
 
         if ( $di ) {
             $this->cli = $di[ 'cli' ];
-            $this->log = $di[ 'log' ];
             $this->config = $di[ 'config' ];
+            $this->log = $di[ 'log' ]->getLogger();
             $this->folder = $di[ 'console' ]->folder;
             $this->interactive = $di[ 'console' ]->interactive;
         }
@@ -109,6 +109,11 @@ class Sync
             $accounts = $accountModel->getActive();
         }
 
+        if ( ! $accounts ) {
+        	$this->log->notice( "No accounts to run, exiting." );
+        	return FALSE;
+        }
+
         // Try to set max allowed packet size in SQL
         $migration = new MigrationModel;
 
@@ -129,6 +134,8 @@ class Sync
             $this->retries[ $account->email ] = 1;
             $this->runAccount( $account );
         }
+
+        return TRUE;
     }
 
     /**

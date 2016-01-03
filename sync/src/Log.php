@@ -30,7 +30,10 @@ class Log
         $this->parseConfig( $config, $interactive );
         $this->checkLogPath( $interactive );
         $this->createLog( $config, $interactive );
+    }
 
+    public function init()
+    {
         // Set the error and exception handler here
         @set_error_handler([ $this, 'errorHandler' ]);
         @set_exception_handler([ $this, 'exceptionHandler' ]);

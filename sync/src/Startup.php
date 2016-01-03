@@ -22,8 +22,8 @@ class Startup
     {
         $this->db = $di[ 'db' ];
         $this->cli = $di[ 'cli' ];
-        $this->log = $di[ 'log' ];
         $this->console = $di[ 'console' ];
+        $this->log = $di[ 'log' ]->getLogger();
         $this->dbName = $di[ 'config' ][ 'sql' ][ 'database' ];
     }
 

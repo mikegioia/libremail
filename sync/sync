@@ -55,27 +55,39 @@ $di[ 'db' ] = function ( $c ) {
         $dbConfig[ 'hostname' ],
         $dbConfig[ 'database' ],
         $dbConfig[ 'charset' ] );
-    return new Database(
-        $dsn,
-        $dbConfig[ 'username' ],
-        $dbConfig[ 'password' ] );
+
+    try {
+        return new Database(
+            $dsn,
+            $dbConfig[ 'username' ],
+            $dbConfig[ 'password' ] );
+    }
+    catch ( \PDOException $e ) {
+        $c[ 'log' ]->getLogger()->addError(
+            "There was a problem connecting to the database. ".
+            "Are you sure it exists? Here are the details: ".
+            $e->getMessage() );
+        exit( 0 );
+    }
 };
 
 // Logging service
 $di[ 'log' ] = function ( $c ) {
     $interactive = ( $c[ 'console' ]->interactive === TRUE );
-    $log = new Log( $c[ 'cli' ], $c[ 'config' ][ 'log' ], $interactive );
-    return $log->getLogger();
+    return new Log( $c[ 'cli' ], $c[ 'config' ][ 'log' ], $interactive );
 };
 
 // Set the memory limit from the config
 ini_set( 'memory_limit', $di[ 'config' ][ 'app' ][ 'memory' ] );
 
+// Initialize the error and exception handlers
+$di[ 'log' ]->init();
+
 // Statically set the services in the base model
 Model::setDb( $di[ 'db' ] );
 Model::setCLI( $di[ 'cli' ] );
-Model::setLog( $di[ 'log' ] );
 Model::setConfig( $di[ 'config' ] );
+Model::setLog( $di[ 'log' ]->getLogger() );
 
 // Parse the CLI
 $di[ 'console' ]->init();
@@ -90,8 +102,12 @@ try {
 
     while ( TRUE ) {
         $sync = new Sync( $di );
-        $sync->run();
-        $di[ 'log' ]->addInfo(
+        
+        if ( ! $sync->run() ) {
+            exit( 0 );
+        }
+
+        $di[ 'log' ]->getLogger()->addInfo(
             "Going to sleep for $sleepMinutes minutes (brb)" );
         $sync = NULL;
         sleep( $sleepMinutes * 60 );
@@ -108,11 +124,11 @@ catch ( \Exception $e ) {
     }
     else {
         if ( $config[ 'log' ][ 'stacktrace' ] ) {
-            $di[ 'log' ]->addError(
+            $di[ 'log' ]->getLogger()->addError(
                 $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
         }
         else {
-            $di[ 'log' ]->addError( $e->getMessage() );
+            $di[ 'log' ]->getLogger()->addError( $e->getMessage() );
         }
     }
 }

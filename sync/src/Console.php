@@ -170,14 +170,14 @@ class Console
     public function createNewAccount()
     {
         if ( ! $this->interactive ) {
-            return;
+            return NULL;
         }
 
         $this->cli->info( "No active email accounts exist in the database." );
         $input = $this->cli->confirm( "Do you want to add one now?" );
 
         if ( ! $input->confirmed() ) {
-            return;
+            return FALSE;
         }
 
         $this->cli->br();

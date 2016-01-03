@@ -335,9 +335,9 @@ class Message extends \App\Model
         $formatted = [];
 
         foreach ( $attachments as $attachment ) {
-            $formatted[] = (array) $attachment;
+            $formatted[] = $attachment->toArray();
         }
 
-        return @serialize( $formatted );
+        return json_encode( $formatted, JSON_UNESCAPED_SLASHES );
     }
 }
