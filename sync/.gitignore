@@ -1,4 +1,7 @@
-attachments
-vendor
-logs
-test.php
+# Ignore everything
+/*
+
+# But not these files
+!/.gitignore
+!/index.html
+!/images/
