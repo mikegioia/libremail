@@ -8,9 +8,13 @@ use it with the two clients bundled with this tool.
 
 ---
 
-- [Installation](https://github.com/mikegioia/libremail#installation)
-- [Run the IMAP Sync](https://github.com/kylestetz/CLNDR#run-the-sync)
-- [Using an Init Script or Supervisor](https://github.com/kylestetz/CLNDR#using-an-init-script-or-supervisor)
+- [Installation](https://github.com/mikegioia/libremail/tree/master/sync#installation)
+- [Run the IMAP Sync](https://github.com/mikegioia/libremail/tree/master/sync#run-the-sync)
+    1. [Create Database](https://github.com/mikegioia/libremail/tree/master/sync#1-create-database)
+    2. [Configure the Application](https://github.com/mikegioia/libremail/tree/master/sync#2-configure-the-application)
+    3. [Running SQL Migration Scripts](https://github.com/mikegioia/libremail/tree/master/sync#3-running-sql-migration-scripts)
+    4. [Install Composer Dependencies](https://github.com/mikegioia/libremail/tree/master/sync#4-install-composer-dependencies)
+- [Using an Init Script or Supervisor](https://github.com/mikegioia/libremail/tree/master/sync#using-an-init-script-or-supervisor)
 
 ## Installation
 
