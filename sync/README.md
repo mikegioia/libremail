@@ -6,6 +6,12 @@ use it with the two clients bundled with this tool.
 
 ![Sync Screenshot](http://mikegioia.github.io/libremail/images/sync_screenshot.png)
 
+---
+
+- [Installation](https://github.com/mikegioia/libremail#installation)
+- [Run the IMAP Sync](https://github.com/kylestetz/CLNDR#run-the-sync)
+- [Using an Init Script or Supervisor](https://github.com/kylestetz/CLNDR#using-an-init-script-or-supervisor)
+
 ## Installation
 
 ### 1. Create Database
