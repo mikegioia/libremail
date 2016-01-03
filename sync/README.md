@@ -8,6 +8,8 @@ use it with the two clients bundled with this tool.
 
 ---
 
+## Contents
+
 - [Installation](https://github.com/mikegioia/libremail/tree/master/sync#installation)
 - [Run the IMAP Sync](https://github.com/mikegioia/libremail/tree/master/sync#run-the-sync)
     1. [Create Database](https://github.com/mikegioia/libremail/tree/master/sync#1-create-database)
@@ -15,6 +17,7 @@ use it with the two clients bundled with this tool.
     3. [Running SQL Migration Scripts](https://github.com/mikegioia/libremail/tree/master/sync#3-running-sql-migration-scripts)
     4. [Install Composer Dependencies](https://github.com/mikegioia/libremail/tree/master/sync#4-install-composer-dependencies)
 - [Using an Init Script or Supervisor](https://github.com/mikegioia/libremail/tree/master/sync#using-an-init-script-or-supervisor)
+- [Submitting Bugs](https://github.com/mikegioia/libremail/tree/master/sync#submitting-bugs)
 
 ## Installation
 
@@ -188,3 +191,16 @@ is recommended to use some sort of supervisor or watchdog program to monitor if
 the script fails for any reason.
 
 @todo -- Include example SysV Init script and SystemD unit file
+
+## Submitting Bugs
+
+All bugs and requests are tracked in the Github Issues for this repository. See
+the [Issues Page](https://github.com/mikegioia/libremail/issues) for a listing
+of the open and closed tickets. **Please search the closed issues before
+reporting anything* to see if it has been resolved :)
+
+This is an open source project that is worked on in spare time, so there is no
+guarantee that anything that you report will be looked at or fixed! However I
+will make a personal effort to resolve everything in a timely manner, and odds
+are good that I'll check it out quickly as I'm personally using this project to
+manage my own email.
