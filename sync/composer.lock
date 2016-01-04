@@ -321,12 +321,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "c58273e9f923da5f91673696eb90a4169d63012b"
+                "reference": "765fed300ca364894cb2dac774583f4702cb5281"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/c58273e9f923da5f91673696eb90a4169d63012b",
-                "reference": "c58273e9f923da5f91673696eb90a4169d63012b",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/765fed300ca364894cb2dac774583f4702cb5281",
+                "reference": "765fed300ca364894cb2dac774583f4702cb5281",
                 "shasum": ""
             },
             "require": {
@@ -359,10 +359,10 @@
                 "mail"
             ],
             "support": {
-                "source": "https://github.com/ParticleBits/imap/tree/1.0.7",
+                "source": "https://github.com/ParticleBits/imap/tree/1.0.9",
                 "issues": "https://github.com/ParticleBits/imap/issues"
             },
-            "time": "2016-01-03 10:24:55"
+            "time": "2016-01-04 03:03:53"
         },
         {
             "name": "particlebits/zend-mail",
@@ -633,7 +633,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/9c367f0c64639b2065ffdf4d917ba581bdc30200",
+                "url": "https://api.github.com/repos/symfony/process/zipball/fcf372616d0e6a4491cec690153ea43aa4d04a6e",
                 "reference": "9c367f0c64639b2065ffdf4d917ba581bdc30200",
                 "shasum": ""
             },
