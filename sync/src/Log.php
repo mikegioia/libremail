@@ -111,7 +111,7 @@ class Log
 
         $this->path = ( $interactive === TRUE )
             ? NULL
-            : $config[ 'path' ];
+            : $this->preparePath( $config[ 'path' ] );
         $level = ( $interactive === TRUE )
             ? $config[ 'level' ][ 'cli' ]
             : $config[ 'level' ][ 'file' ];
@@ -132,13 +132,27 @@ class Log
             return TRUE;
         }
 
-        $logPath = ( substr( $this->path, 0, 1 ) !== DIRECTORY_SEPARATOR )
-            ? __DIR__
-            : $this->path;
+        $logPath = ( substr( $this->path, 0, 1 ) === DIRECTORY_SEPARATOR )
+            ? dirname( $this->path )
+            : BASEPATH;
 
         if ( ! is_writeable( $logPath ) ) {
             throw new LogPathNotWriteableException;
         }
+    }
+
+    /**
+     * Returns an absolute URL from a possible relative one.
+     * @param string $path
+     * @return string
+     */
+    private function preparePath( $path )
+    {
+        if ( substr( $path, 0, 1 ) === DIRECTORY_SEPARATOR ) {
+            return $path;
+        }
+
+        return BASEPATH . DIRECTORY_SEPARATOR . $path;
     }
 
     private function createLog( array $config, $interactive )

@@ -629,12 +629,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "9c367f0c64639b2065ffdf4d917ba581bdc30200"
+                "reference": "fcf372616d0e6a4491cec690153ea43aa4d04a6e"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/process/zipball/fcf372616d0e6a4491cec690153ea43aa4d04a6e",
-                "reference": "9c367f0c64639b2065ffdf4d917ba581bdc30200",
+                "reference": "fcf372616d0e6a4491cec690153ea43aa4d04a6e",
                 "shasum": ""
             },
             "require": {
@@ -670,7 +670,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2015-12-31 10:59:32"
+            "time": "2016-01-03 15:33:41"
         },
         {
             "name": "zendframework/zend-crypt",

@@ -16,7 +16,11 @@ use App\Log
   , App\Startup
   , App\Constants
   , Pimple\Container
-  , Slim\PDO\Database;
+  , Slim\PDO\Database
+  , App\Exceptions\Terminate as TerminateException;
+
+// Used for signal catching
+declare( ticks = 1 );
 
 // Set up paths and constants
 set_time_limit( 0 );
@@ -83,6 +87,16 @@ ini_set( 'memory_limit', $di[ 'config' ][ 'app' ][ 'memory' ] );
 // Initialize the error and exception handlers
 $di[ 'log' ]->init();
 
+// Set up the signal handler to shutdown
+pcntl_signal( SIGTERM, function ( $signo ) use ( $di ) {
+    if ( $di[ 'sync' ] ) {
+        $di[ 'sync' ]->halt();
+    }
+    else {
+        throw new TerminateException;
+    }
+});
+
 // Statically set the services in the base model
 Model::setDb( $di[ 'db' ] );
 Model::setCLI( $di[ 'cli' ] );
@@ -101,17 +115,21 @@ try {
     $startup->run();
 
     while ( TRUE ) {
-        $sync = new Sync( $di );
-        
-        if ( ! $sync->run() ) {
+        $di[ 'sync' ] = new Sync( $di );
+
+        if ( ! $di[ 'sync' ]->run() ) {
             exit( 0 );
         }
 
         $di[ 'log' ]->getLogger()->addInfo(
             "Going to sleep for $sleepMinutes minutes (brb)" );
-        $sync = NULL;
+        $di[ 'sync' ] = NULL;
         sleep( $sleepMinutes * 60 );
     }
+}
+catch ( TerminateException $e ) {
+    $di[ 'log' ]->getLogger()->addInfo( $e->getMessage() );
+    exit( 0 );
 }
 catch ( \Exception $e ) {
     if ( $di[ 'console' ]->interactive === TRUE ) {

@@ -17,6 +17,7 @@ use Exception
   , App\Models\Migration as MigrationModel
   , App\Exceptions\Error as ErrorException
   , App\Exceptions\Fatal as FatalException
+  , App\Exceptions\Terminate as TerminateException
   , App\Exceptions\Validation as ValidationException
   , App\Exceptions\FolderSync as FolderSyncException
   , App\Exceptions\MessagesSync as MessagesSyncException
@@ -28,6 +29,7 @@ class Sync
 {
     private $cli;
     private $log;
+    private $halt;
     private $config;
     private $folder;
     private $mailbox;
@@ -49,6 +51,7 @@ class Sync
      */
     public function __construct( Container $di = NULL )
     {
+        $this->halt = FALSE;
         $this->retries = [];
         $this->retriesFolders = [];
         $this->retriesMessages = [];
@@ -193,7 +196,11 @@ class Sync
         }
         catch ( FatalException $e ) {
             $this->log->critical( $e->getMessage() );
-            exit;
+            exit( 1 );
+        }
+        catch ( TerminateException $e ) {
+            throw $e;
+            return TRUE;
         }
         catch ( Exception $e ) {
             $this->log->error( $e->getMessage() );
@@ -250,6 +257,15 @@ class Sync
         }
 
         $this->mailbox = NULL;
+    }
+
+    /**
+     * Turns the halt flag on. Message sync operations check for this
+     * and throw a TerminateException if true.
+     */
+    public function halt()
+    {
+        $this->halt = TRUE;
     }
 
     /**
@@ -326,7 +342,12 @@ class Sync
                 if ( $this->interactive ) {
                     $progress->current( ( $i++ / $count ) * 100 );
                 }
+
+                $this->checkForHalt();
             }
+        }
+        catch ( TerminateException $e ) {
+            throw $e;
         }
         catch ( Exception $e ) {
             $this->log->error( $e->getMessage() );
@@ -336,6 +357,7 @@ class Sync
                 "{$this->maxRetries}) in $waitSeconds seconds..." );
             sleep( $waitSeconds );
             $this->retriesFolders[ $account->email ]++;
+            $this->checkForHalt();
 
             return $this->syncFolders( $account );
         }
@@ -363,6 +385,8 @@ class Sync
             catch ( MessagesSyncException $e ) {
                 $this->log->error( $e->getMessage() );
             }
+
+            $this->checkForHalt();
         }
     }
 
@@ -414,6 +438,10 @@ class Sync
                 $folder->getId() );
             $this->downloadMessages( $newIds, $savedIds, $folder );
             $this->markDeleted( $newIds, $savedIds, $folder );
+            $this->checkForHalt();
+        }
+        catch ( TerminateException $e ) {
+            throw $e;
         }
         catch ( Exception $e ) {
             $this->log->error( substr( $e->getMessage(), 0, 500 ) );
@@ -424,6 +452,7 @@ class Sync
                 "for folder '{$folder->name}' in $waitSeconds seconds..." );
             sleep( $waitSeconds );
             $this->retriesMessages[ $account->email ]++;
+            $this->checkForHalt();
 
             return $this->syncFolderMessages( $account, $folder );
         }
@@ -450,7 +479,14 @@ class Sync
         $count = count( $toDownload );
         $noun = \Fn\plural( 'message', $total );
         $this->log->debug( "Downloading messages in {$folder->name}" );
-        $this->log->debug( "$total $noun, $count new" );
+
+        if ( $count ) {
+            $this->log->info( "{$folder->name}: found $total $noun, $count new" );
+        }
+        else {
+            $this->log->debug( "Found $total $noun, none are new" );
+        }
+
 
         if ( ! $count ) {
             $this->log->debug( "No new messages, skipping {$folder->name}" );
@@ -476,6 +512,7 @@ class Sync
 
             // After each download, try to reclaim memory.
             $this->gc();
+            $this->checkForHalt();
         }
 
         $this->gc();
@@ -555,6 +592,14 @@ class Sync
             $this->log->notice(
                 "Failed validation for marking deleted messages: ".
                 $e->getMessage() );
+        }
+    }
+
+    private function checkForHalt()
+    {
+        if ( $this->halt === TRUE ) {
+            $this->disconnect();
+            throw new TerminateException;
         }
     }
 
