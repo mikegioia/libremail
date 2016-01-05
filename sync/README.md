@@ -192,7 +192,8 @@ the script fails for any reason.
 
 ### SystemD
 
-Create a file `libremail.service` and place it in `~/.config/systemd/user/`:
+Create a file `libremail.service` and place it in `~/.config/systemd/user/`.
+Make sure to update the paths to the files in PIDFile and ExecStart.
 
 ```
 [Unit]
@@ -202,8 +203,8 @@ After=network.target network-online.target
 
 [Service]
 Type=simple
-PIDFile=/var/run/libremail-sync.pid
-ExecStart=/home/mike/Projects/LibreMail/sync/sync -b
+PIDFile=/path/to/home/.config/libremail/sync.pid
+ExecStart=/path/to/LibreMail/sync/sync -b
 ExecStop=/bin/kill -15 $MAINPID
 Restart=always    
 
