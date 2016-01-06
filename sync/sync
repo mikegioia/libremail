@@ -93,7 +93,9 @@ pcntl_signal( SIGTERM, function ( $signo ) use ( $di ) {
         $di[ 'sync' ]->halt();
     }
     else {
-        throw new TerminateException;
+        $e = new TerminateException;
+        $di[ 'log' ]->getLogger()->addInfo( $e->getMessage() );
+        exit( 0 );
     }
 });
 
