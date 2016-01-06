@@ -30,6 +30,7 @@ class Startup
     public function run()
     {
         $this->log->debug( "Starting sync engine" );
+        $this->log->info( "Process ID: ". getmypid() );
         $this->checkIfAccountsExist();
     }
 

@@ -160,7 +160,6 @@ class Sync
         }
 
         $this->log->info( "Starting sync for {$account->email}" );
-        $this->log->info( "Process ID: ". getmypid() );
 
         try {
             // Open a connection to the mailbox
