@@ -14,8 +14,9 @@ use it with the two clients bundled with this tool.
 - [Run the IMAP Sync](https://github.com/mikegioia/libremail/tree/master/sync#run-the-sync)
     1. [Create Database](https://github.com/mikegioia/libremail/tree/master/sync#1-create-database)
     2. [Configure the Application](https://github.com/mikegioia/libremail/tree/master/sync#2-configure-the-application)
-    3. [Running SQL Migration Scripts](https://github.com/mikegioia/libremail/tree/master/sync#3-running-sql-migration-scripts)
-    4. [Install Composer Dependencies](https://github.com/mikegioia/libremail/tree/master/sync#4-install-composer-dependencies)
+    3. [Running the Diagnostic Tests](https://github.com/mikegioia/libremail/tree/master/sync#3-running-the-diagnostic-tests)
+    4. [Running SQL Migration Scripts](https://github.com/mikegioia/libremail/tree/master/sync#4-running-sql-migration-scripts)
+    5. [Install Composer Dependencies](https://github.com/mikegioia/libremail/tree/master/sync#5-install-composer-dependencies)
 - [Using an Init Script or Supervisor](https://github.com/mikegioia/libremail/tree/master/sync#using-an-init-script-or-supervisor)
 - [Submitting Bugs](https://github.com/mikegioia/libremail/tree/master/sync#submitting-bugs)
 
@@ -40,7 +41,7 @@ config file:
 
     [mysqld]
     max_allowed_pack = 500M
-    
+
 You don't have to use 500MB as your packet size, but anything 16MB or higher is advised.
 
 ### 2. Configure the Application
@@ -53,15 +54,25 @@ file. Here's an explanation of the options you can overwrite:
 
 #### [app]
 
-* `stacktrace`
+* `memory`
 
-  Defaults to `true` but set to `false` if you want to suppress stack traces
-  from showing in the logs or the CLI.
+  String, defaults to `"128M"`. This is the PHP memory size limit for the
+  sync script. The application will use whatever your default memory limit
+  is for your PHP install, but you can override that here. It's best to
+  leave this at 128 MB as a minimum, otherwise some of your emails may not
+  download. Emails with large (or many) attachments require an excess of
+  memory to parse in PHP, due do how large strings are parsed. 256M is a
+  better, safer limit but I set mine as high as 1GB.
 
 * `sync[wait_seconds]`
 
   Integer, defaults to `10`. This is the number of seconds to wait before
   retrying a failed action while syncing.
+
+* `sync[sleep_minutes]`
+
+  Integer, defaults to `15`. This is the number of minutes the script will
+  sleep after each sync attempt, before running the next.
 
 #### [log]
 
@@ -86,6 +97,11 @@ levels:
   Integer, defaults to `5`. Enter a number between `0` and `7` corresponding to
 the minimum level you want to capture when logs are written to disk. This
 happens when the app is running in the background.
+
+* `stacktrace`
+
+  Defaults to `true` but set to `false` if you want to suppress stack traces
+  from showing in the logs or the CLI.
 
 * `name`
 
@@ -132,15 +148,29 @@ happens when the app is running in the background.
   Relative or absolute path for saving email attachments. Defaults to a local
 directory named `attachments`.
 
-### 3. Running SQL Migration Scripts
+### 3. Running the Diagnostic Tests
+
+You can run a test to see if the application is installed correctly, and that
+all dependencies and pre-requisites are met. To do that, run:
+
+    $> ./sync --diagnostic
+
+You can also use `-d` as a short flag. This will go through and check the
+database connection, that all paths are writeable, and some other tests and see
+if the sync script will run correctly. These tests are run in the background
+before any sync happens, but you can access them this way for more detailed
+information in the case that something is failing.
+
+### 4. Running SQL Migration Scripts
 
 Before you can start syncing, run the SQL database scripts:
 
     $> ./sync --update
 
-This will create all the SQL tables and run any other database operations.
+You can also use `-u` as a short flag. This will create all the SQL tables and
+run any other database operations.
 
-### 4. Install Composer Dependencies
+### 5. Install Composer Dependencies
 
 Download the vendor packages via composer:
 
@@ -155,11 +185,6 @@ Before you begin, you can run `./sync --help` to see a list of what options you
 have. Below is an explanation of the options you can specify when running this
 script:
 
-* `--update | -u`
-
-  Updates the database by running the migration scripts in `db/`. These scripts
-  will only run once so you can run this as many times as you'd like.
-
 * `--interactive | -i`
 
   **Defaults to enabled**. This runs the application interactively, or in a mode
@@ -173,6 +198,25 @@ script:
   Use this if you'd like to run the syncing engine from an init script, a cron,
   a systemd service, managed via a hypervisor, or any other method of
   watchdogging or monitoring a PHP script.
+
+* `--folder <folder> | -f <folder>`
+
+  Runs the sync script for the specified folder only, and then halts. This is
+  useful when running in interactive mode to download one specific folder if
+  you're testing something, or if you want to just have an external script
+  download, say, your Inbox separately from the entire mailbox. The `<folder>`
+  argument is the full name of the IMAP folder: 'INBOX', or 'Accounts/Support'
+  are examples.
+
+* `--update | -u`
+
+  Updates the database by running the migration scripts in `db/`. These scripts
+  will only run once so you can run this as many times as you'd like.
+
+* `--diagnostic | -d`
+
+  Runs through the diagnostic tests and reports any errors. Use this to start
+  debugging any failures.
 
 * `--help | -h`
 
@@ -206,7 +250,7 @@ Type=simple
 PIDFile=/path/to/home/.config/libremail/sync.pid
 ExecStart=/path/to/LibreMail/sync/sync -b
 ExecStop=/bin/kill -15 $MAINPID
-Restart=always    
+Restart=always
 
 [Install]
 WantedBy=default.target
