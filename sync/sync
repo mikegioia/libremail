@@ -51,7 +51,7 @@ $di[ 'cli' ] = function ( $c ) {
     return $c[ 'console' ]->getCLI();
 };
 
-// MySQLi service, this uses Voku's library
+// PDO service, this uses Slim-PDO as a wrapper
 $di[ 'db' ] = function ( $c ) {
     $dbConfig = $c[ 'config' ][ 'sql' ];
     $dsn = sprintf(
@@ -98,6 +98,9 @@ pcntl_signal( SIGTERM, function ( $signo ) use ( $di ) {
         exit( 0 );
     }
 });
+
+// No-op, continue sync if asleep
+pcntl_signal( SIGUSR1, function ( $signo ) use ( $di ) {} );
 
 // Statically set the services in the base model
 Model::setDb( $di[ 'db' ] );
