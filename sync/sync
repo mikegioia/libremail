@@ -100,7 +100,10 @@ pcntl_signal( SIGTERM, function ( $signo ) use ( $di ) {
 });
 
 // No-op, continue sync if asleep
-pcntl_signal( SIGUSR1, function ( $signo ) use ( $di ) {} );
+pcntl_signal( SIGUSR1, function ( $signo ) use ( $di ) {
+    $di[ 'log' ]->getLogger()->addInfo(
+        "SIGUSR1 received, restarting sync" );
+});
 
 // Statically set the services in the base model
 Model::setDb( $di[ 'db' ] );
