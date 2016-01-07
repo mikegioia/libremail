@@ -139,12 +139,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mikegioia/Slim-PDO.git",
-                "reference": "b3a104e975604213c9e72cd9cbc8b426d2db4609"
+                "reference": "d879475e3b9c784b9f711b39deda0e0383be0411"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikegioia/Slim-PDO/zipball/b3a104e975604213c9e72cd9cbc8b426d2db4609",
-                "reference": "b3a104e975604213c9e72cd9cbc8b426d2db4609",
+                "url": "https://api.github.com/repos/mikegioia/Slim-PDO/zipball/d879475e3b9c784b9f711b39deda0e0383be0411",
+                "reference": "d879475e3b9c784b9f711b39deda0e0383be0411",
                 "shasum": ""
             },
             "require": {
@@ -186,7 +186,7 @@
                 "docs": "https://github.com/mikegioia/Slim-PDO/blob/master/docs/README.md",
                 "source": "https://github.com/mikegioia/Slim-PDO/tree/master"
             },
-            "time": "2015-12-06 19:50:24"
+            "time": "2016-01-07 04:00:00"
         },
         {
             "name": "monolog/monolog",
@@ -539,7 +539,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/9e45edca52cc9c954680072c93e621f8b71fab26",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/d8e60a5619fff77f9669da8997697443ef1a1d7e",
                 "reference": "9e45edca52cc9c954680072c93e621f8b71fab26",
                 "shasum": ""
             },
@@ -633,7 +633,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/fcf372616d0e6a4491cec690153ea43aa4d04a6e",
+                "url": "https://api.github.com/repos/symfony/process/zipball/6f1979c3b0f4c22c77a8a8971afaa7dd07f082ac",
                 "reference": "fcf372616d0e6a4491cec690153ea43aa4d04a6e",
                 "shasum": ""
             },

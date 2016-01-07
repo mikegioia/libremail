@@ -116,12 +116,66 @@ class Message extends \App\Model
 
     /**
      * Returns a list of integer unique IDs given an account ID
-     * and a folder ID to search.
+     * and a folder ID to search. This fetches IDs in pages to
+     * not exceed any memory limits on the query response.
      * @param int $accountId
      * @param int $folderId
      * @return array
      */
     public function getSyncedIdsByFolder( $accountId, $folderId )
+    {
+        $ids = [];
+        $limit = 10000;
+        $count = $this->countSyncedIdsByFolder( $accountId, $folderId );
+
+        for ( $offset = 0; $offset < $count; $offset += $limit ) {
+            $ids = array_merge(
+                $ids,
+                $this->getPagedSyncedIdsByFolder(
+                    $accountId,
+                    $folderId,
+                    $offset,
+                    $limit
+                ));
+        }
+
+        return $ids;
+    }
+
+    /**
+     * Returns a count of unique IDs for a folder.
+     * @param int $accountId
+     * @param int $folderId
+     * @return int
+     */
+    public function countSyncedIdsByFolder( $accountId, $folderId )
+    {
+        $this->requireInt( $folderId, "Folder ID" );
+        $this->requireInt( $accountId, "Account ID" );
+        $messages = $this->db()
+            ->select()
+            ->count( 1, 'count' )
+            ->from( 'messages' )
+            ->where( 'synced', '=', 1 )
+            ->where( 'deleted', '=', 0 )
+            ->where( 'folder_id', '=', $folderId )
+            ->where( 'account_id', '=', $accountId )
+            ->execute()
+            ->fetch();
+
+        return ( $messages ) ? $messages[ 'count' ] : 0;
+    }
+
+    /**
+     * This method is called by getSyncedIdsByFolder to return a
+     * page of results.
+     * @param int $accountId
+     * @param int $folderId
+     * @param int $offset
+     * @param int $limit
+     * @return array
+     */
+    private function getPagedSyncedIdsByFolder( $accountId, $folderId, $offset = 0, $limit = 100 )
     {
         $ids = [];
         $this->requireInt( $folderId, "Folder ID" );
@@ -133,6 +187,7 @@ class Message extends \App\Model
             ->where( 'deleted', '=', 0 )
             ->where( 'folder_id', '=', $folderId )
             ->where( 'account_id', '=', $accountId )
+            ->limit( $offset, $limit )
             ->execute()
             ->fetchAll();
 
