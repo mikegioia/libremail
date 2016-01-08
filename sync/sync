@@ -139,6 +139,10 @@ catch ( TerminateException $e ) {
     $di[ 'log' ]->getLogger()->addInfo( $e->getMessage() );
     exit( 0 );
 }
+catch ( \PDOException $e ) {
+    echo $e->getMessage(), "\n", $e->getCode(), "\n", $e->getTraceAsString(), "\n\n";
+    exit( 'caught PDO exception' );
+}
 catch ( \Exception $e ) {
     if ( $di[ 'console' ]->interactive === TRUE ) {
         $di[ 'cli' ]->boldRedBackgroundBlack( $e->getMessage() );

@@ -7,6 +7,7 @@
 namespace App;
 
 use Exception
+  , PDOException
   , Monolog\Logger
   , Pb\Imap\Mailbox
   , Pimple\Container
@@ -179,6 +180,9 @@ class Sync
                         $this->folder,
                         $failOnNotFound = TRUE );
                 }
+                catch ( PDOException $e ) {
+                    throw $e;
+                }
                 catch ( Exception $e ) {
                     throw new FatalException(
                         "Syncing that folder failed: ". $e->getMessage() );
@@ -192,6 +196,9 @@ class Sync
                 $folders = $this->syncFolders( $account );
                 $this->syncMessages( $account, $folders );
             }
+        }
+        catch ( PDOException $e ) {
+            throw $e;
         }
         catch ( FatalException $e ) {
             $this->log->critical( $e->getMessage() );
@@ -345,6 +352,9 @@ class Sync
                 $this->checkForHalt();
             }
         }
+        catch ( PDOException $e ) {
+            throw $e;
+        }
         catch ( TerminateException $e ) {
             throw $e;
         }
@@ -438,6 +448,9 @@ class Sync
             $this->downloadMessages( $newIds, $savedIds, $folder );
             $this->markDeleted( $newIds, $savedIds, $folder );
             $this->checkForHalt();
+        }
+        catch ( PDOException $e ) {
+            throw $e;
         }
         catch ( TerminateException $e ) {
             throw $e;
@@ -533,6 +546,9 @@ class Sync
                 'account_id' => $folder->getAccountId(),
             ]);
             $message->setMessageData( $imapMessage );
+        }
+        catch ( PDOException $e ) {
+            throw $e;
         }
         catch ( MessageSizeLimitException $e ) {
             $this->log->notice(
