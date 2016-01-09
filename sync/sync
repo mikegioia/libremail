@@ -15,8 +15,11 @@ use App\Log
   , App\Console
   , App\Startup
   , App\Constants
+  , App\Diagnostics
   , Pimple\Container
   , Slim\PDO\Database
+  , Exception as Exception
+  , PDOException as PDOException
   , App\Exceptions\Terminate as TerminateException;
 
 // Used for signal catching
@@ -25,7 +28,7 @@ declare( ticks = 1 );
 // Set up paths and constants
 set_time_limit( 0 );
 define( 'BASEPATH', __DIR__ );
-date_default_timezone_set( 'UTC' );
+//date_default_timezone_set( 'UTC' );
 define( 'DBSCRIPTS', BASEPATH .'/db/*.sql' );
 
 // Load the vendor libraries
@@ -51,8 +54,41 @@ $di[ 'cli' ] = function ( $c ) {
     return $c[ 'console' ]->getCLI();
 };
 
-// PDO service, this uses Slim-PDO as a wrapper
-$di[ 'db' ] = function ( $c ) {
+// Logging service
+$di[ 'log' ] = function ( $c ) {
+    $interactive = ( $c[ 'console' ]->interactive === TRUE );
+    return new Log( $c[ 'cli' ], $c[ 'config' ][ 'log' ], $interactive );
+};
+
+// Initialize the error and exception handlers
+$di[ 'log' ]->init();
+
+// Set the memory limit from the config
+ini_set( 'memory_limit', $di[ 'config' ][ 'app' ][ 'memory' ] );
+
+// Set up the signal handler to shutdown
+$HALT = function ( $signo ) use ( $di ) {
+    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ) {
+        $di[ 'sync' ]->halt();
+    }
+    else {
+        throw new TerminateException;
+    }
+};
+
+pcntl_signal( SIGHUP, $HALT );
+pcntl_signal( SIGINT, $HALT );
+pcntl_signal( SIGTERM, $HALT );
+pcntl_signal( SIGQUIT, $HALT );
+
+// No-op, continue sync if asleep
+pcntl_signal( SIGCONT, function ( $signo ) use ( $di ) {
+    $di[ 'log' ]->getLogger()->addInfo(
+        "SIGCONT received, restarting sync" );
+});
+
+// PDO factory, this uses Slim-PDO as a wrapper
+$di[ 'db_factory' ] = $di->factory( function ( $c ) {
     $dbConfig = $c[ 'config' ][ 'sql' ];
     $dsn = sprintf(
         "mysql:host=%s;dbname=%s;charset=%s",
@@ -61,49 +97,22 @@ $di[ 'db' ] = function ( $c ) {
         $dbConfig[ 'charset' ] );
 
     try {
+        echo "trying to return a new db\n";
         return new Database(
             $dsn,
             $dbConfig[ 'username' ],
             $dbConfig[ 'password' ] );
     }
-    catch ( \PDOException $e ) {
-        $c[ 'log' ]->getLogger()->addError(
+    catch ( PDOException $e ) {
+        echo "throwing pdoex from inside factory\n";
+        throw new TerminateException(
             "There was a problem connecting to the database. ".
             "Are you sure it exists? Here are the details: ".
             $e->getMessage() );
-        exit( 0 );
-    }
-};
-
-// Logging service
-$di[ 'log' ] = function ( $c ) {
-    $interactive = ( $c[ 'console' ]->interactive === TRUE );
-    return new Log( $c[ 'cli' ], $c[ 'config' ][ 'log' ], $interactive );
-};
-
-// Set the memory limit from the config
-ini_set( 'memory_limit', $di[ 'config' ][ 'app' ][ 'memory' ] );
-
-// Initialize the error and exception handlers
-$di[ 'log' ]->init();
-
-// Set up the signal handler to shutdown
-pcntl_signal( SIGTERM, function ( $signo ) use ( $di ) {
-    if ( $di[ 'sync' ] ) {
-        $di[ 'sync' ]->halt();
-    }
-    else {
-        $e = new TerminateException;
-        $di[ 'log' ]->getLogger()->addInfo( $e->getMessage() );
-        exit( 0 );
     }
 });
-
-// No-op, continue sync if asleep
-pcntl_signal( SIGUSR1, function ( $signo ) use ( $di ) {
-    $di[ 'log' ]->getLogger()->addInfo(
-        "SIGUSR1 received, restarting sync" );
-});
+// PDO connection
+$di[ 'db' ] = $di[ 'db_factory' ];
 
 // Statically set the services in the base model
 Model::setDb( $di[ 'db' ] );
@@ -118,47 +127,27 @@ $di[ 'console' ]->init();
 // are email accounts saved. This may prompt the user to add an account
 // if we're running in interactive mode.
 try {
-    $sleepMinutes = $di[ 'config' ][ 'app' ][ 'sync' ][ 'sleep_minutes' ];
     $startup = new Startup( $di );
     $startup->run();
 
-    while ( TRUE ) {
+    runSyncLoop: {
         $di[ 'sync' ] = new Sync( $di );
-
-        if ( ! $di[ 'sync' ]->run() ) {
-            exit( 0 );
-        }
-
-        $di[ 'log' ]->getLogger()->addInfo(
-            "Going to sleep for $sleepMinutes minutes (brb)" );
-        $di[ 'sync' ] = NULL;
-        sleep( $sleepMinutes * 60 );
+        $di[ 'sync' ]->loop();
     }
+}
+// If the database connection dropped, kill the database service and
+// try to reconnect. Otherwise terminate.
+catch ( PDOException $e ) {
+    $di[ 'sync' ] = NULL;
+    $di[ 'log' ]->displayError( $e );
+    Diagnostics::checkDatabaseException( $di, $e );
+    sleep( $config[ 'app' ][ 'db' ][ 'sleep_minutes' ] * 60 );
+    goto runSyncLoop;
 }
 catch ( TerminateException $e ) {
     $di[ 'log' ]->getLogger()->addInfo( $e->getMessage() );
     exit( 0 );
 }
-catch ( \PDOException $e ) {
-    echo $e->getMessage(), "\n", $e->getCode(), "\n", $e->getTraceAsString(), "\n\n";
-    exit( 'caught PDO exception' );
-}
-catch ( \Exception $e ) {
-    if ( $di[ 'console' ]->interactive === TRUE ) {
-        $di[ 'cli' ]->boldRedBackgroundBlack( $e->getMessage() );
-        $di[ 'cli' ]->dim( "[Err#". $e->getCode() ."]" );
-
-        if ( $config[ 'log' ][ 'stacktrace' ] ) {
-            $di[ 'cli' ]->br()->comment( $e->getTraceAsString() )->br();
-        }
-    }
-    else {
-        if ( $config[ 'log' ][ 'stacktrace' ] ) {
-            $di[ 'log' ]->getLogger()->addError(
-                $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
-        }
-        else {
-            $di[ 'log' ]->getLogger()->addError( $e->getMessage() );
-        }
-    }
+catch ( Exception $e ) {
+    $di[ 'log' ]->displayError( $e );
 }

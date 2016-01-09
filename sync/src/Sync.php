@@ -6,7 +6,8 @@
 
 namespace App;
 
-use Exception
+use Fn
+  , Exception
   , PDOException
   , Monolog\Logger
   , Pb\Imap\Mailbox
@@ -96,6 +97,27 @@ class Sync
     }
 
     /**
+     * Runs sync forever. This is a while loop that runs a sync
+     * for all accounts, then sleeps for a designated period of
+     * time.
+     */
+    public function loop()
+    {
+        while ( TRUE ) {
+            if ( ! $this->run() ) {
+                throw new TerminateException( "Sync was prevented from running" );
+            }
+
+            $sleepMinutes = $this->config[ 'app' ][ 'sync' ][ 'sleep_minutes' ];
+            $wakeTime = Fn\timeFromNow( $sleepMinutes );
+            $this->log->addInfo(
+                "Going to sleep for $sleepMinutes minutes. Sync will ".
+                "re-run at $wakeTime." );
+            sleep( $sleepMinutes * 60 );
+        }
+    }
+
+    /**
      * For each account:
      *  1. Get the folders
      *  2. Save all message IDs for each folder
@@ -160,6 +182,7 @@ class Sync
             return FALSE;
         }
 
+        $this->checkForHalt();
         $this->log->info( "Starting sync for {$account->email}" );
 
         try {
@@ -206,7 +229,6 @@ class Sync
         }
         catch ( TerminateException $e ) {
             throw $e;
-            return TRUE;
         }
         catch ( Exception $e ) {
             $this->log->error( $e->getMessage() );
@@ -425,9 +447,9 @@ class Sync
         $this->log->debug(
             "Syncing messages in {$folder->name} for {$account->email}" );
         $this->log->debug(
-            "Memory usage: ". \Fn\formatBytes( memory_get_usage() ) .
-            ", real usage: ". \Fn\formatBytes( memory_get_usage( TRUE ) ) .
-            ", peak usage: ". \Fn\formatBytes( memory_get_peak_usage() ) );
+            "Memory usage: ". Fn\formatBytes( memory_get_usage() ) .
+            ", real usage: ". Fn\formatBytes( memory_get_usage( TRUE ) ) .
+            ", peak usage: ". Fn\formatBytes( memory_get_peak_usage() ) );
 
         // Syncing a folder of messages is done using the following
         // algorithm:
@@ -489,7 +511,7 @@ class Sync
         $total = count( $newIds );
         $toDownload = array_diff( $newIds, $savedIds );
         $count = count( $toDownload );
-        $noun = \Fn\plural( 'message', $total );
+        $noun = Fn\plural( 'message', $total );
         $this->log->debug( "Downloading messages in {$folder->name}" );
 
         if ( $count ) {
@@ -506,7 +528,7 @@ class Sync
         }
 
         if ( $this->interactive ) {
-            $noun = \Fn\plural( 'message', $count );
+            $noun = Fn\plural( 'message', $count );
             $this->cli->whisper(
                 "Syncing $count new $noun in {$folder->name}:" );
             $progress = $this->cli->progress()->total( 100 );

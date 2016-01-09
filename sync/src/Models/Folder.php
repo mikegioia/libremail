@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use Particle\Validator\Validator
+use DateTime
+  , Particle\Validator\Validator
   , App\Traits\Model as ModelTrait
   , App\Exceptions\Validation as ValidationException
   , App\Exceptions\DatabaseUpdate as DatabaseUpdateException
@@ -94,7 +95,7 @@ class Folder extends \App\Model
             return;
         }
 
-        $createdAt = new \DateTime;
+        $createdAt = new DateTime;
         unset( $data[ 'id' ] );
         $data[ 'deleted' ] = 0;
         $data[ 'ignored' ] = 0;

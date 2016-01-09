@@ -19,14 +19,20 @@ class Log
     private $path;
     // Minimum level for logging messges
     private $level;
+    // Log configuration
+    private $config;
     // The Monolog handler
     private $logger;
     // Whether to write the stack traces
     private $stackTrace;
+    // If we're running in interative mode
+    private $interactive;
 
     public function __construct( CLImate $cli, array $config, $interactive = FALSE )
     {
         $this->cli = $cli;
+        $this->config = $config;
+        $this->interactive = $interactive;
         $this->parseConfig( $config, $interactive );
         $this->checkLogPath( $interactive );
         $this->createLog( $config, $interactive );
@@ -92,6 +98,32 @@ class Log
         }
         else {
             $this->getLogger()->$logMethod( $e->getMessage() );
+        }
+    }
+
+    /**
+     * Write an error exception to the console or log depending
+     * on the environment.
+     * @param Exception $e
+     */
+    public function displayError( Exception $e )
+    {
+        if ( $this->interactive === TRUE ) {
+            $this->cli->boldRedBackgroundBlack( $e->getMessage() );
+            $this->cli->dim( "[Err#". $e->getCode() ."]" );
+
+            if ( $this->config[ 'stacktrace' ] ) {
+                $this->cli->br()->comment( $e->getTraceAsString() )->br();
+            }
+        }
+        else {
+            if ( $this->config[ 'stacktrace' ] ) {
+                $this->getLogger()->addError(
+                    $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
+            }
+            else {
+                $this->getLogger()->addError( $e->getMessage() );
+            }
         }
     }
 

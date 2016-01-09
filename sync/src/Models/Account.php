@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-use Particle\Validator\Validator
+use PDO
+  , DateTime
+  , Particle\Validator\Validator
   , App\Traits\Model as ModelTrait
   , App\Exceptions\Validation as ValidationException
   , App\Exceptions\AccountExists as AccountExistsException
@@ -98,7 +100,7 @@ class Account extends \App\Model
             return;
         }
 
-        $createdAt = new \DateTime;
+        $createdAt = new DateTime;
         unset( $data[ 'id' ] );
         $data[ 'is_active' ] = 1;
         $data[ 'service' ] = strtolower( $data[ 'service' ] );
@@ -126,6 +128,6 @@ class Account extends \App\Model
             ->from( 'accounts' )
             ->where( 'is_active', '=', 1 )
             ->execute()
-            ->fetchAll( \PDO::FETCH_CLASS, $this->getClass() );
+            ->fetchAll( PDO::FETCH_CLASS, $this->getClass() );
     }
 }

@@ -10,7 +10,9 @@
 
 namespace App\Models;
 
-use App\Traits\Model as ModelTrait;
+use Fn
+  , DateTime
+  , App\Traits\Model as ModelTrait;
 
 class Migration extends \App\Model
 {
@@ -67,7 +69,7 @@ class Migration extends \App\Model
         $size = $this->db()
             ->query( "SHOW VARIABLES LIKE 'max_allowed_packet';" )
             ->fetch();
-        $value = \Fn\get( $size, 'Value' );
+        $value = Fn\get( $size, 'Value' );
         $newSize = (int) ( $mb * 1024 * 1024 );
 
         if ( ! $value || $value < $newSize ) {
@@ -107,7 +109,7 @@ class Migration extends \App\Model
      */
     private function markRun( $script )
     {
-        $createdAt = new \DateTime;
+        $createdAt = new DateTime;
 
         return $this->db()
             ->insert([ 'name', 'created_at' ])

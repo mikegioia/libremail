@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-use Belt\Belt
+use Fn
+  , DateTime
+  , Belt\Belt
   , Particle\Validator\Validator
   , Pb\Imap\Message as ImapMessage
   , App\Traits\Model as ModelTrait
@@ -96,12 +98,12 @@ class Message extends \App\Model
 
     public function isSynced()
     {
-        return \Fn\intEq( $this->synced, 1 );
+        return Fn\intEq( $this->synced, 1 );
     }
 
     public function isDeleted()
     {
-        return \Fn\intEq( $this->deleted, 1 );
+        return Fn\intEq( $this->deleted, 1 );
     }
 
     public function getAttachments()
@@ -270,7 +272,7 @@ class Message extends \App\Model
             return;
         }
 
-        $createdAt = new \DateTime;
+        $createdAt = new DateTime;
         unset( $data[ 'id' ] );
         $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
         $newMessageId = $this->db()

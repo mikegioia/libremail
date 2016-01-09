@@ -12,19 +12,13 @@ use Pimple\Container
  */
 class Startup
 {
-    private $db;
-    private $cli;
     private $log;
-    private $dbName;
     private $console;
 
     public function __construct( Container $di )
     {
-        $this->db = $di[ 'db' ];
-        $this->cli = $di[ 'cli' ];
         $this->console = $di[ 'console' ];
         $this->log = $di[ 'log' ]->getLogger();
-        $this->dbName = $di[ 'config' ][ 'sql' ][ 'database' ];
     }
 
     public function run()

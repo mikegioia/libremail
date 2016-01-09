@@ -2,6 +2,9 @@
 
 namespace Fn;
 
+use DateTime
+  , DateInterval;
+
 /**
  * Looks for a value in an object or array by key
  * and either returns that value or the specified
@@ -63,4 +66,16 @@ function plural( $word, $count )
     }
 
     return $word ."s";
+}
+
+/**
+ * Returns a string like 1:30 PM corresponding to the
+ * number of minutes from now.
+ */
+function timeFromNow( $minutes, $format = 'g:i a' )
+{
+    $time = new DateTime;
+    $time->add( new DateInterval( 'PT'. $minutes .'M' ) );
+
+    return $time->format( $format );
 }
