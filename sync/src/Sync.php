@@ -215,8 +215,10 @@ class Sync
             }
             // Fetch folders and sync them to database
             else {
+                $folderModel = new FolderModel;
                 $this->retriesFolders[ $account->email ] = 1;
-                $folders = $this->syncFolders( $account );
+                $this->syncFolders( $account );
+                $folders = $folderModel->getByAccount( $account->getId() );
                 $this->syncMessages( $account, $folders );
             }
         }
@@ -344,35 +346,16 @@ class Sync
             throw new FolderSyncException;
         }
 
-        $i = 1;
-        $folders = [];
-        $progress = NULL;
         $this->log->debug( "Syncing IMAP folders for {$account->email}" );
 
         try {
+            $folderModel = new FolderModel;
             $folderList = $this->mailbox->getFolders();
+            $savedFolders = $folderModel->getByAccount( $account->getId() );
             $count = iterator_count( $folderList );
-
-            if ( $this->interactive ) {
-                $this->cli->whisper( "Syncing $count folders:" );
-                $progress = $this->cli->progress()->total( 100 );
-            }
-
-            // Add each folder to SQL, mark old folders as deleted
-            foreach ( $folderList as $folderName ) {
-                $folder = new FolderModel([
-                    'name' => $folderName,
-                    'account_id' => $account->getId()
-                ]);
-                $folder->save();
-                $folders[ $folder->getId() ] = $folder;
-
-                if ( $this->interactive ) {
-                    $progress->current( ( $i++ / $count ) * 100 );
-                }
-
-                $this->checkForHalt();
-            }
+            $this->log->debug( "Found $count ". Fn\plural( 'folder', $count ) );
+            $this->addNewFolders( $folderList, $savedFolders, $account );
+            $this->removeOldFolders( $folderList, $savedFolders, $account );
         }
         catch ( PDOException $e ) {
             throw $e;
@@ -389,11 +372,90 @@ class Sync
             sleep( $waitSeconds );
             $this->retriesFolders[ $account->email ]++;
             $this->checkForHalt();
+            $this->syncFolders( $account );
+        }
+    }
 
-            return $this->syncFolders( $account );
+    /**
+     * Adds new folders from IMAP to the database.
+     * @param array $folderList
+     * @param FolderModel array $savedFolders
+     * @param AccountModel $account
+     */
+    private function addNewFolders( $folderList, $savedFolders, AccountModel $account )
+    {
+        $i = 1;
+        $toAdd = [];
+
+        foreach ( $folderList as $folderName ) {
+            if ( ! array_key_exists( (string) $folderName, $savedFolders ) ) {
+                $toAdd[] = $folderName;
+            }
         }
 
-        return $folders;
+        if ( ! ( $count = count( $toAdd ) ) ) {
+            $this->log->debug( "No new folders to save" );
+            return;
+        }
+
+        if ( $this->interactive ) {
+            $this->cli->whisper(
+                "Adding $count new ". Fn\plural( 'folder', $count ) .":" );
+            $progress = $this->cli->progress()->total( $count );
+        }
+        else {
+            $this->log->info(
+                "Adding $count new ". Fn\plural( 'folder', $count ) );
+        }
+
+        foreach ( $toAdd as $folderName ) {
+            $folder = new FolderModel([
+                'name' => $folderName,
+                'account_id' => $account->getId()
+            ]);
+            $folder->save();
+            $folders[ $folder->getId() ] = $folder;
+
+            if ( $this->interactive ) {
+                $progress->current( $i++ );
+            }
+
+            $this->checkForHalt();
+        }
+    }
+
+    /**
+     * Removes purged folders no longer in the mailbox from the database.
+     * @param array $folderList
+     * @param FolderModel array $savedFolders
+     * @param AccountModel $account
+     */
+    private function removeOldFolders( $folderList, $savedFolders, AccountModel $account )
+    {
+        $lookup = [];
+        $toRemove = [];
+
+        foreach ( $folderList as $folderName ) {
+            $lookup[] = $folderName;
+        }
+
+        foreach ( $savedFolders as $savedFolder ) {
+            if ( ! in_array( $savedFolder->getName(), $lookup ) ) {
+                $toRemove[] = $savedFolder;
+            }
+        }
+
+        if ( ! ( $count = count( $toRemove ) ) ) {
+            $this->log->debug( "No folders to remove" );
+            return;
+        }
+
+        $this->log->info( "Removing $count ". Fn\plural( 'folder', $count ) );
+
+        foreach ( $toRemove as $folder ) {
+            $folder->deleted = 0;
+            $folder->save();
+        }
     }
 
     /**

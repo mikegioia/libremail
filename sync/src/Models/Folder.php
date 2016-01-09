@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-use DateTime
+use Fn
+  , PDO
+  , DateTime
   , Particle\Validator\Validator
   , App\Traits\Model as ModelTrait
   , App\Exceptions\Validation as ValidationException
@@ -137,5 +139,35 @@ class Folder extends \App\Model
         $this->handleNotFound( $folder, FOLDER, $failOnNotFound );
 
         return $folder;
+    }
+
+    /**
+     * Returns a list of folders by an account ID. This is useful for
+     * comparing the new folders against the already saved ones.
+     * @param int $accountId
+     * @param bool $indexByName Return array indexed by folder name
+     * @return FolderModel array
+     */
+    public function getByAccount( $accountId, $indexByName = TRUE )
+    {
+        $indexed = [];
+        $this->requireInt( $accountId, "Account ID" );
+        $folders = $this->db()
+            ->select()
+            ->from( 'folders' )
+            ->where( 'deleted', '=', 0 )
+            ->where( 'account_id', '=', $accountId )
+            ->execute()
+            ->fetchAll( PDO::FETCH_CLASS, $this->getClass() );
+
+        if ( ! $indexByName ) {
+            return $folders;
+        }
+
+        foreach ( $folders as $folder ) {
+            $indexed[ $folder->getName() ] = $folder;
+        }
+
+        return $indexed;
     }
 }

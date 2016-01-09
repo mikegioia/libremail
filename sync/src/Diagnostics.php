@@ -15,7 +15,7 @@ class Diagnostics
      */
     public function run()
     {
-        // @TODO
+
     }
 
     /**

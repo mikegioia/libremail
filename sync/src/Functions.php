@@ -30,16 +30,34 @@ function get( $object, $key, $default = NULL )
     return $default;
 }
 
+/**
+ * Safe integer equality test.
+ * @param mixed $int1
+ * @param mixed $int2
+ * @return bool
+ */
 function intEq( $int1, $int2 )
 {
     return (int) $int1 === (int) $int2;
 }
 
+/**
+ * Safe string equality test.
+ * @param mixed $str1
+ * @param mixed $str2
+ * @return bool
+ */
 function strEq( $str1, $str2 )
 {
     return (string) $str1 === (string) $str2;
 }
 
+/**
+ * Formats a count of bytes into a readable size.
+ * @param int $bytes
+ * @param int $precision
+ * @return string
+ */
 function formatBytes( $bytes, $precision = 2 )
 {
     $units = [ 'B', 'KB', 'MB', 'GB', 'TB' ];
@@ -53,6 +71,12 @@ function formatBytes( $bytes, $precision = 2 )
     return round( $bytes, $precision ) .' '. $units[ $pow ];
 }
 
+/**
+ * Pluralizes a word given the count of items.
+ * @param string $word
+ * @param int $count
+ * @return string
+ */
 function plural( $word, $count )
 {
     if ( $count === 1 ) {
@@ -69,8 +93,29 @@ function plural( $word, $count )
 }
 
 /**
+ * Takes in an array and reindexes the array but the value
+ * stored in $key.
+ * @param array $array
+ * @param string $key
+ * @return array
+ */
+function reindex( $array, $key )
+{
+    $new = [];
+
+    foreach ( $array as $item ) {
+        $new[ $item[ $key ] ] = $item;
+    }
+
+    return $new;
+}
+
+/**
  * Returns a string like 1:30 PM corresponding to the
  * number of minutes from now.
+ * @param int $minutes
+ * @param string $format
+ * @return string
  */
 function timeFromNow( $minutes, $format = 'g:i a' )
 {
