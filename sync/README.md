@@ -153,7 +153,7 @@ directory named `attachments`.
 You can run a test to see if the application is installed correctly, and that
 all dependencies and pre-requisites are met. To do that, run:
 
-    $> ./sync --diagnostic
+    $> ./sync --diagnostics
 
 You can also use `-d` as a short flag. This will go through and check the
 database connection, that all paths are writeable, and some other tests and see
@@ -213,7 +213,7 @@ script:
   Updates the database by running the migration scripts in `db/`. These scripts
   will only run once so you can run this as many times as you'd like.
 
-* `--diagnostic | -d`
+* `--diagnostics | -d`
 
   Runs through the diagnostic tests and reports any errors. Use this to start
   debugging any failures.
