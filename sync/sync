@@ -54,6 +54,11 @@ $di[ 'cli' ] = function ( $c ) {
     return $c[ 'console' ]->getCLI();
 };
 
+// Diagnostic test service
+$di[ 'diagnostics' ] = function ( $c ) {
+    return new Diagnostics( $c );
+};
+
 // Logging service
 $di[ 'log' ] = function ( $c ) {
     $interactive = ( $c[ 'console' ]->interactive === TRUE );
@@ -88,8 +93,8 @@ pcntl_signal( SIGCONT, function ( $signo ) use ( $di ) {
 });
 
 // PDO factory, this uses Slim-PDO as a wrapper
-$di[ 'db_factory' ] = $di->factory( function ( $c ) {
-    $dbConfig = $c[ 'config' ][ 'sql' ];
+$di[ 'db_factory' ] = $di->factory( function ( $c, $config = NULL ) {
+    $dbConfig = ( $config ) ?: $c[ 'config' ][ 'sql' ];
     $dsn = sprintf(
         "mysql:host=%s;dbname=%s;charset=%s",
         $dbConfig[ 'hostname' ],
@@ -109,7 +114,13 @@ $di[ 'db_factory' ] = $di->factory( function ( $c ) {
             $e->getMessage() );
     }
 });
-// PDO connection
+
+// Run the diagnostic tests. If specified from the CLI, then
+// output the results to the console and exit.
+$di[ 'diagnostics' ]->run();
+
+// PDO connection. This attempts to connect to the database. If it
+// fails here, the script will halt.
 $di[ 'db' ] = $di[ 'db_factory' ];
 
 // Statically set the services in the base model

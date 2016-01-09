@@ -4,7 +4,6 @@ namespace App;
 
 use App\Sync
   , Exception
-  , App\Diagnostics
   , League\CLImate\CLImate as CLI
   , App\Models\Account as AccountModel
   , App\Models\Migration as MigrationModel;
@@ -25,7 +24,7 @@ class Console
     public $verbose;
     public $updatedb;
     public $background;
-    public $diagnostic;
+    public $diagnostics;
     public $interactive;
 
     public function __construct( array $config )
@@ -67,9 +66,9 @@ class Console
                 'description' => 'Create a new IMAP account',
                 'noValue' => TRUE
             ],
-            'diagnostic' => [
+            'diagnostics' => [
                 'prefix' => 'd',
-                'longPrefix' => 'diagnostic',
+                'longPrefix' => 'diagnostics',
                 'description' => 'Runs a series of diagnostic tests',
                 'noValue' => TRUE
             ],
@@ -112,7 +111,7 @@ class Console
         $this->verbose = $this->cli->arguments->get( 'verbose' );
         $this->updatedb = $this->cli->arguments->get( 'updatedb' );
         $this->background = $this->cli->arguments->get( 'background' );
-        $this->diagnostic = $this->cli->arguments->get( 'diagnostic' );
+        $this->diagnostics = $this->cli->arguments->get( 'diagnostics' );
         $this->interactive = $this->cli->arguments->get( 'interactive' );
 
         // If background is set, turn off interactive
@@ -121,7 +120,10 @@ class Console
         }
 
         // If create or update DB is set turn interactive on
-        if ( $this->create === TRUE || $this->updatedb === TRUE ) {
+        if ( $this->create === TRUE
+            || $this->updatedb === TRUE
+            || $this->diagnostics === TRUE )
+        {
             $this->interactive = TRUE;
         }
     }
@@ -134,13 +136,6 @@ class Console
         // If help is set, show the usage and exit
         if ( $this->help === TRUE ) {
             $this->cli->usage();
-            exit( 0 );
-        }
-
-        // If diagnostic is set, just run the tests and exit
-        if ( $this->diagnostic === TRUE ) {
-            $diagnostics = new Diagnostics;
-            $diagnostics->run();
             exit( 0 );
         }
 

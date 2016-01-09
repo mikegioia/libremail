@@ -313,7 +313,7 @@ class Sync
             : $configPath;
 
         if ( ! is_writeable( $attachmentsDir ) ) {
-            throw new AttachmentsPathNotWriteableException;
+            throw new AttachmentsPathNotWriteableException( $attachmentsDir );
         }
 
         if ( ! $createEmailDir ) {

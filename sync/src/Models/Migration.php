@@ -12,6 +12,7 @@ namespace App\Models;
 
 use Fn
   , DateTime
+  , Slim\PDO\Database
   , App\Traits\Model as ModelTrait;
 
 class Migration extends \App\Model
@@ -66,10 +67,7 @@ class Migration extends \App\Model
 
     public function setMaxAllowedPacket( $mb = 16 )
     {
-        $size = $this->db()
-            ->query( "SHOW VARIABLES LIKE 'max_allowed_packet';" )
-            ->fetch();
-        $value = Fn\get( $size, 'Value' );
+        $value = $this->getMaxAllowedPacket();
         $newSize = (int) ( $mb * 1024 * 1024 );
 
         if ( ! $value || $value < $newSize ) {
@@ -79,6 +77,23 @@ class Migration extends \App\Model
         }
 
         return TRUE;
+    }
+
+    /**
+     * Returns the max_allowed_packet setting. This takes an optional
+     * $db argument to use as the database connection if this query
+     * is run outside of the Model scope.
+     * @param Database $db Optional database connection
+     * @return int
+     */
+    public function getMaxAllowedPacket( Database $db = NULL )
+    {
+        $db = ( $db ) ?: $this->db();
+        $size = $db
+            ->query( "SHOW VARIABLES LIKE 'max_allowed_packet';" )
+            ->fetch();
+
+        return Fn\get( $size, 'Value' );
     }
 
     /**

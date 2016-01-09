@@ -34,8 +34,6 @@ class Log
         $this->config = $config;
         $this->interactive = $interactive;
         $this->parseConfig( $config, $interactive );
-        $this->checkLogPath( $interactive );
-        $this->createLog( $config, $interactive );
     }
 
     public function init()
@@ -43,6 +41,9 @@ class Log
         // Set the error and exception handler here
         @set_error_handler([ $this, 'errorHandler' ]);
         @set_exception_handler([ $this, 'exceptionHandler' ]);
+
+        $this->checkLogPath( $this->interactive, $this->path );
+        $this->createLog( $this->config, $this->interactive );
     }
 
     public function getLogger()
@@ -158,18 +159,18 @@ class Log
      * @throws LogPathNotWriteableException
      * @return boolean
      */
-    private function checkLogPath( $interactive )
+    static public function checkLogPath( $interactive, $path )
     {
         if ( $interactive ) {
             return TRUE;
         }
 
-        $logPath = ( substr( $this->path, 0, 1 ) === DIRECTORY_SEPARATOR )
-            ? dirname( $this->path )
+        $logPath = ( substr( $path, 0, 1 ) === DIRECTORY_SEPARATOR )
+            ? dirname( $path )
             : BASEPATH;
 
         if ( ! is_writeable( $logPath ) ) {
-            throw new LogPathNotWriteableException;
+            throw new LogPathNotWriteableException( $logPath );
         }
     }
 
@@ -178,7 +179,7 @@ class Log
      * @param string $path
      * @return string
      */
-    private function preparePath( $path )
+    static public function preparePath( $path )
     {
         if ( substr( $path, 0, 1 ) === DIRECTORY_SEPARATOR ) {
             return $path;
