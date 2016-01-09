@@ -97,14 +97,12 @@ $di[ 'db_factory' ] = $di->factory( function ( $c ) {
         $dbConfig[ 'charset' ] );
 
     try {
-        echo "trying to return a new db\n";
         return new Database(
             $dsn,
             $dbConfig[ 'username' ],
             $dbConfig[ 'password' ] );
     }
     catch ( PDOException $e ) {
-        echo "throwing pdoex from inside factory\n";
         throw new TerminateException(
             "There was a problem connecting to the database. ".
             "Are you sure it exists? Here are the details: ".
