@@ -14,9 +14,9 @@ use it with the two clients bundled with this tool.
 - [Run the IMAP Sync](https://github.com/mikegioia/libremail/tree/master/sync#run-the-sync)
     1. [Create Database](https://github.com/mikegioia/libremail/tree/master/sync#1-create-database)
     2. [Configure the Application](https://github.com/mikegioia/libremail/tree/master/sync#2-configure-the-application)
-    3. [Running the Diagnostic Tests](https://github.com/mikegioia/libremail/tree/master/sync#3-running-the-diagnostic-tests)
-    4. [Running SQL Migration Scripts](https://github.com/mikegioia/libremail/tree/master/sync#4-running-sql-migration-scripts)
-    5. [Install Composer Dependencies](https://github.com/mikegioia/libremail/tree/master/sync#5-install-composer-dependencies)
+    3. [Install Composer Dependencies](https://github.com/mikegioia/libremail/tree/master/sync#5-install-composer-dependencies)
+    4. [Running the Diagnostic Tests](https://github.com/mikegioia/libremail/tree/master/sync#3-running-the-diagnostic-tests)
+    5. [Running SQL Migration Scripts](https://github.com/mikegioia/libremail/tree/master/sync#4-running-sql-migration-scripts)
 - [Using an Init Script or Supervisor](https://github.com/mikegioia/libremail/tree/master/sync#using-an-init-script-or-supervisor)
 - [Submitting Bugs](https://github.com/mikegioia/libremail/tree/master/sync#submitting-bugs)
 
@@ -148,7 +148,16 @@ happens when the app is running in the background.
   Relative or absolute path for saving email attachments. Defaults to a local
 directory named `attachments`.
 
-### 3. Running the Diagnostic Tests
+### 3. Install Composer Dependencies
+
+Download the vendor packages via composer:
+
+    $> composer install
+
+This will create a `vendor` directory with all of the project's PHP
+dependencies.
+
+### 4. Running the Diagnostic Tests
 
 You can run a test to see if the application is installed correctly, and that
 all dependencies and pre-requisites are met. To do that, run:
@@ -161,7 +170,7 @@ if the sync script will run correctly. These tests are run in the background
 before any sync happens, but you can access them this way for more detailed
 information in the case that something is failing.
 
-### 4. Running SQL Migration Scripts
+### 5. Running SQL Migration Scripts
 
 Before you can start syncing, run the SQL database scripts:
 
@@ -169,15 +178,6 @@ Before you can start syncing, run the SQL database scripts:
 
 You can also use `-u` as a short flag. This will create all the SQL tables and
 run any other database operations.
-
-### 5. Install Composer Dependencies
-
-Download the vendor packages via composer:
-
-    $> composer install
-
-This will create a `vendor` directory with all of the project's PHP
-dependencies.
 
 ## Run the Sync
 
