@@ -165,7 +165,7 @@ information in the case that something is failing.
 
 Before you can start syncing, run the SQL database scripts:
 
-    $> ./sync --update
+    $> ./sync --updatedb
 
 You can also use `-u` as a short flag. This will create all the SQL tables and
 run any other database operations.
@@ -208,7 +208,7 @@ script:
   argument is the full name of the IMAP folder: 'INBOX', or 'Accounts/Support'
   are examples.
 
-* `--update | -u`
+* `--updatedb | -u`
 
   Updates the database by running the migration scripts in `db/`. These scripts
   will only run once so you can run this as many times as you'd like.

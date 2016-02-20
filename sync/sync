@@ -62,7 +62,10 @@ $di[ 'diagnostics' ] = function ( $c ) {
 // Logging service
 $di[ 'log' ] = function ( $c ) {
     $interactive = ( $c[ 'console' ]->interactive === TRUE );
-    return new Log( $c[ 'cli' ], $c[ 'config' ][ 'log' ], $interactive );
+    return new Log(
+        $c[ 'cli' ],
+        $c[ 'config' ][ 'log' ],
+        $interactive );
 };
 
 // Initialize the error and exception handlers
