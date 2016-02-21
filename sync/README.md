@@ -50,7 +50,12 @@ Configuration options are saved in `config/default.ini`. **Do not modify this
 file or anything in it**. All of your modifications should go into
 `config/local.ini` and should be in the
 [INI file format](https://en.wikipedia.org/wiki/INI_file), just like the default
-file. Here's an explanation of the options you can overwrite:
+file. If you would like to make changes to `config/local.ini` but not ever commit
+them, run the following:
+
+    $> git update-index --assume-unchanged config/local.ini
+
+Here's an explanation of the options you can overwrite:
 
 #### [app]
 
