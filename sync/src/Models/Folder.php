@@ -15,6 +15,8 @@ class Folder extends \App\Model
 {
     public $id;
     public $name;
+    public $count;
+    public $synced;
     public $deleted;
     public $ignored;
     public $account_id;
@@ -39,9 +41,28 @@ class Folder extends \App\Model
         return $this->name;
     }
 
+    public function getCount()
+    {
+        return ( $this->count )
+            ? (int) $this->count
+            : 0;
+    }
+
+    public function getSynced()
+    {
+        return ( $this->synced )
+            ? (int) $this->synced
+            : 0;
+    }
+
     public function getAccountId()
     {
         return (int) $this->account_id;
+    }
+
+    public function isIgnored()
+    {
+        return Fn\intEq( $this->ignored, 1 );
     }
 
     /**
@@ -55,8 +76,10 @@ class Folder extends \App\Model
     public function save( $data = [] )
     {
         $val = new Validator;
+        $val->optional( 'count', 'Count' )->integer();
+        $val->optional( 'synced', 'Synced count' )->numeric();
+        $val->required( 'account_id', 'Account ID' )->numeric();
         $val->required( 'name', 'Name' )->lengthBetween( 0, 255 );
-        $val->required( 'account_id', 'Account ID' )->integer();
         $this->setData( $data );
         $data = $this->getData();
 
@@ -84,7 +107,9 @@ class Folder extends \App\Model
             $this->ignored = $exists->ignored;
             $updated = $this->db()
                 ->update([
-                    'deleted' => 0
+                    'deleted' => 0,
+                    'count' => $this->getCount(),
+                    'synced' => $this->getSynced()
                 ])
                 ->table( 'folders' )
                 ->where( 'id', '=', $this->id )
@@ -113,6 +138,22 @@ class Folder extends \App\Model
         }
 
         $this->id = $newFolderId;
+    }
+
+    /**
+     * Stores the meta information about the folder. This includes
+     * the total count of messages on the IMAP server, and the
+     * count of messages confirmed to be synced in our database.
+     * @param integer $count
+     * @param integer $synced
+     * @return boolean
+     */
+    public function saveStats( $count, $synced )
+    {
+        $this->count = $count;
+        $this->synced = $synced;
+
+        return $this->save();
     }
 
     /**

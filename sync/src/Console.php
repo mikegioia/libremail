@@ -19,6 +19,7 @@ class Console
 
     // Command line arguments
     public $help;
+    public $sleep;
     public $create;
     public $folder;
     public $verbose;
@@ -90,6 +91,12 @@ class Console
                 'defaultValue' => TRUE,
                 'noValue' => TRUE
             ],
+            'sleep' => [
+                'prefix' => 's',
+                'longPrefix' => 'sleep',
+                'description' => 'Runs with sync disabled; useful for signal testing',
+                'noValue' => TRUE
+            ],
             'updatedb' => [
                 'prefix' => 'u',
                 'longPrefix' => 'updatedb',
@@ -106,6 +113,7 @@ class Console
     {
         $this->cli->arguments->parse();
         $this->help = $this->cli->arguments->get( 'help' );
+        $this->sleep = $this->cli->arguments->get( 'sleep' );
         $this->create = $this->cli->arguments->get( 'create' );
         $this->folder = $this->cli->arguments->get( 'folder' );
         $this->verbose = $this->cli->arguments->get( 'verbose' );
@@ -120,7 +128,8 @@ class Console
         }
 
         // If create or update DB is set turn interactive on
-        if ( $this->create === TRUE
+        if ( $this->sleep === TRUE
+            || $this->create === TRUE
             || $this->updatedb === TRUE
             || $this->diagnostics === TRUE )
         {

@@ -26,6 +26,13 @@ class Startup
         $this->log->debug( "Starting sync engine" );
         $this->log->info( "Process ID: ". getmypid() );
         $this->checkIfAccountsExist();
+
+        if ( $this->console->sleep === TRUE ) {
+            $this->log->warn(
+                "Sleep mode enabled. I will only respond to signals." );
+            $this->log->warn(
+                "Run 'kill -SIGQUIT ". getmypid() . "' to exit!" );
+        }
     }
 
     /**

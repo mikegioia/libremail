@@ -12,6 +12,7 @@
 use App\Log
   , App\Sync
   , App\Model
+  , App\Stats
   , App\Console
   , App\Startup
   , App\Constants
@@ -59,6 +60,11 @@ $di[ 'diagnostics' ] = function ( $c ) {
     return new Diagnostics( $c );
 };
 
+// Statistics logging and printing service
+$di[ 'stats' ] = function ( $c ) {
+    return new Stats( $c[ 'console' ] );
+};
+
 // Logging service
 $di[ 'log' ] = function ( $c ) {
     $interactive = ( $c[ 'console' ]->interactive === TRUE );
@@ -91,8 +97,20 @@ pcntl_signal( SIGQUIT, $HALT );
 
 // No-op, continue sync if asleep
 pcntl_signal( SIGCONT, function ( $signo ) use ( $di ) {
+    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ) {
+        $di[ 'sync' ]->wake();
+    }
     $di[ 'log' ]->getLogger()->addInfo(
         "SIGCONT received, restarting sync" );
+});
+
+// Return back statistics on the current sync
+pcntl_signal( SIGUSR1, function ( $signo ) use ( $di ) {
+    $di[ 'stats' ]->text();
+});
+// SIGUSR2 returns JSON
+pcntl_signal( SIGUSR2, function ( $signo ) use ( $di ) {
+    $di[ 'stats' ]->json();
 });
 
 // PDO factory, this uses Slim-PDO as a wrapper

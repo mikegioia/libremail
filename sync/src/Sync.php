@@ -7,6 +7,7 @@
 namespace App;
 
 use Fn
+  , DateTime
   , Exception
   , PDOException
   , Monolog\Logger
@@ -32,6 +33,8 @@ class Sync
     private $cli;
     private $log;
     private $halt;
+    private $wake;
+    private $sleep;
     private $config;
     private $folder;
     private $mailbox;
@@ -62,6 +65,7 @@ class Sync
             $this->cli = $di[ 'cli' ];
             $this->config = $di[ 'config' ];
             $this->log = $di[ 'log' ]->getLogger();
+            $this->sleep = $di[ 'console' ]->sleep;
             $this->folder = $di[ 'console' ]->folder;
             $this->interactive = $di[ 'console' ]->interactive;
         }
@@ -103,17 +107,31 @@ class Sync
      */
     public function loop()
     {
+        $wakeUnix = 0;
+        $sleepMinutes = $this->config[ 'app' ][ 'sync' ][ 'sleep_minutes' ];
+
         while ( TRUE ) {
+            $this->checkForHalt();
+
+            if ( $this->wake === TRUE ) {
+                $wakeUnix = 0;
+                $this->wake = FALSE;
+            }
+
+            if ( (new DateTime)->getTimestamp() < $wakeUnix ) {
+                sleep( 60 );
+                continue;
+            }
+
             if ( ! $this->run() ) {
                 throw new TerminateException( "Sync was prevented from running" );
             }
 
-            $sleepMinutes = $this->config[ 'app' ][ 'sync' ][ 'sleep_minutes' ];
             $wakeTime = Fn\timeFromNow( $sleepMinutes );
+            $wakeUnix = Fn\unixFromNow( $sleepMinutes );
             $this->log->addInfo(
                 "Going to sleep for $sleepMinutes minutes. Sync will ".
                 "re-run at $wakeTime." );
-            sleep( $sleepMinutes * 60 );
         }
     }
 
@@ -127,6 +145,10 @@ class Sync
      */
     public function run( AccountModel $account = NULL )
     {
+        if ( $this->sleep ) {
+            return TRUE;
+        }
+
         if ( $account ) {
             $accounts = [ $account ];
         }
@@ -170,9 +192,12 @@ class Sync
      * allowed to fail a certain number of times before the account is
      * considered offline.
      * @param AccountModel $account
+     * @param array $options Valid options include:
+     *   only_update_stats (false) If true, only stats about the
+     *     folders will be logged. Messages won't be downloaded.
      * @return boolean
      */
-    private function runAccount( AccountModel $account )
+    public function runAccount( AccountModel $account, $options = [] )
     {
         if ( $this->retries[ $account->email ] > $this->maxRetries ) {
             $this->log->notice(
@@ -219,6 +244,21 @@ class Sync
                 $this->retriesFolders[ $account->email ] = 1;
                 $this->syncFolders( $account );
                 $folders = $folderModel->getByAccount( $account->getId() );
+                // First pass, just log the message stats
+                $this->syncMessages( $account, $folders, [
+                    'skip_download' => TRUE
+                ]);
+
+                // If the all that's requested is to update the folder stats,
+                // then we can exit here.
+                if ( Fn\get( $options, 'only_update_stats' ) === TRUE ) {
+                    return;
+                }
+
+                // Second pass, download the messages. Yes, we could have stored
+                // an array of folders with 0 messages (to skip) but if we're
+                // going to run again in 15 minutes, why not just do two passes
+                // and download any extra messages while we can?
                 $this->syncMessages( $account, $folders );
             }
         }
@@ -296,6 +336,16 @@ class Sync
     public function halt()
     {
         $this->halt = TRUE;
+
+        // If we're sleeping forever, throw the exception now
+        if ( $this->sleep === TRUE ) {
+            throw new TerminateException;
+        }
+    }
+
+    public function wake()
+    {
+        $this->wake = TRUE;
     }
 
     /**
@@ -464,16 +514,24 @@ class Sync
      * to the next folder.
      * @param AccountModel $account
      * @param array FolderModel $folders
+     * @param array $options Valid options include:
+     *   skip_download (false) If true, only stats about the
+     *     folder will be logged. The messages won't be downloaded.
      */
-    private function syncMessages( AccountModel $account, $folders )
+    private function syncMessages( AccountModel $account, $folders, $options = [] )
     {
-        $this->log->info( "Syncing messages in each folder" );
+        if ( Fn\get( $options, 'skip_download' ) === TRUE ) {
+            $this->log->debug( "Updating folder counts" );
+        }
+        else {
+            $this->log->debug( "Syncing messages in each folder" );
+        }
 
         foreach ( $folders as $folder ) {
             $this->retriesMessages[ $account->email ] = 1;
 
             try {
-                $this->syncFolderMessages( $account, $folder );
+                $this->syncFolderMessages( $account, $folder, $options );
             }
             catch ( MessagesSyncException $e ) {
                 $this->log->error( $e->getMessage() );
@@ -487,12 +545,13 @@ class Sync
      * Syncs all of the messages for a given IMAP folder.
      * @param AccountModel $account
      * @param FolderModel $folder
+     * @param array $options (see syncMessages)
      * @throws MessagesSyncException
      * @return bool
      */
-    private function syncFolderMessages( AccountModel $account, FolderModel $folder )
+    private function syncFolderMessages( AccountModel $account, FolderModel $folder, $options )
     {
-        if ( $folder->ignored ) {
+        if ( $folder->isIgnored() ) {
             $this->log->debug( 'Skipping ignored folder' );
             return;
         }
@@ -529,8 +588,8 @@ class Sync
             $savedIds = $messageModel->getSyncedIdsByFolder(
                 $account->getId(),
                 $folder->getId() );
-            $this->downloadMessages( $newIds, $savedIds, $folder );
-            $this->markDeleted( $newIds, $savedIds, $folder );
+            $this->downloadMessages( $newIds, $savedIds, $folder, $options );
+            $this->markDeleted( $newIds, $savedIds, $folder, $options );
             $this->checkForHalt();
         }
         catch ( PDOException $e ) {
@@ -550,7 +609,7 @@ class Sync
             $this->retriesMessages[ $account->email ]++;
             $this->checkForHalt();
 
-            return $this->syncFolderMessages( $account, $folder );
+            return $this->syncFolderMessages( $account, $folder, $options );
         }
     }
 
@@ -563,8 +622,9 @@ class Sync
      * @param array $newIds
      * @param array $savedIds
      * @param FolderModel $folder
+     * @param array $options (see syncMessages)
      */
-    private function downloadMessages( $newIds, $savedIds, FolderModel $folder )
+    private function downloadMessages( $newIds, $savedIds, FolderModel $folder, $options )
     {
         // First get the list of messages to download by taking
         // a diff of the arrays. Download all these messages.
@@ -573,6 +633,7 @@ class Sync
         $total = count( $newIds );
         $toDownload = array_diff( $newIds, $savedIds );
         $count = count( $toDownload );
+        $syncedCount = $total - $count;
         $noun = Fn\plural( 'message', $total );
         $this->log->debug( "Downloading messages in {$folder->name}" );
 
@@ -583,6 +644,12 @@ class Sync
             $this->log->debug( "Found $total $noun, none are new" );
         }
 
+        // Update folder stats with count
+        $folder->saveStats( $total, $syncedCount );
+
+        if ( Fn\get( $options, 'skip_download' ) === TRUE ) {
+            return;
+        }
 
         if ( ! $count ) {
             $this->log->debug( "No new messages, skipping {$folder->name}" );
@@ -606,11 +673,15 @@ class Sync
             $message = NULL;
             $imapMessage = NULL;
 
+            // Save stats about the folder
+            $folder->saveStats( $total, ++$syncedCount );
+
             // After each download, try to reclaim memory.
             $this->gc();
             $this->checkForHalt();
         }
 
+        $this->stats->logFolderStats( $folder );
         $this->gc();
     }
 

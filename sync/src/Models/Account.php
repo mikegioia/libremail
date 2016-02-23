@@ -39,6 +39,11 @@ class Account extends \App\Model
         ];
     }
 
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
     /**
      * Create a new account record.
      * @param array $data

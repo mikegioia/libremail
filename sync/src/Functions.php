@@ -72,6 +72,15 @@ function formatBytes( $bytes, $precision = 2 )
 }
 
 /**
+ * Converts a decimal to a formatted percent.
+ * @param float $value
+ */
+function percent( $value, $precision = 2 )
+{
+    return round( $value * 100, $precision ) ."%";
+}
+
+/**
  * Pluralizes a word given the count of items.
  * @param string $word
  * @param int $count
@@ -123,4 +132,12 @@ function timeFromNow( $minutes, $format = 'g:i a' )
     $time->add( new DateInterval( 'PT'. $minutes .'M' ) );
 
     return $time->format( $format );
+}
+
+function unixFromNow( $minutes )
+{
+    $time = new DateTime;
+    $time->add( new DateInterval( 'PT'. $minutes .'M' ) );
+
+    return $time->getTimestamp();
 }
