@@ -681,7 +681,6 @@ class Sync
             $this->checkForHalt();
         }
 
-        $this->stats->logFolderStats( $folder );
         $this->gc();
     }
 

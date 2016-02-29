@@ -15,9 +15,9 @@
  * process will gracefully shut itself down at a configured memory
  * limit.
  */
-
 use App\Constants
-  , Symfony\Component\Process\Process;
+  , React\EventLoop\Factory
+  , React\ChildProcess\Process;
 
 // Set up paths and constants
 set_time_limit( 0 );
@@ -35,12 +35,19 @@ $config = array_replace_recursive( $default, $local );
 Constants::process( $constants );
 unset( $constants );
 
-$process = new Process( BASEPATH .'/sync -b' );
-$process->run( function ( $type, $buffer ) {
-    if ( Process::ERR === $type ) {
-        echo $buffer;
-    }
-    else {
-        echo $buffer;
-    }
+
+$loop = React\EventLoop\Factory::create();
+$process = new React\ChildProcess\Process( BASEPATH .'/sync -s' );
+
+$process->on('exit', function($exitCode, $termSignal) {
+    echo "Exit\n";
 });
+
+$loop->addTimer(0.001, function($timer) use ($process) {
+    $process->start($timer->getLoop());
+    $process->stdout->on('data', function($output) {
+        echo $output;
+    });
+});
+
+$loop->run();
