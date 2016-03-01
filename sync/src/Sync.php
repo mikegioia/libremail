@@ -37,6 +37,9 @@ class Sync
     private $sleep;
     private $config;
     private $folder;
+    private $daemon;
+    private $asleep;
+    private $running;
     private $mailbox;
     private $retries;
     private $interactive;
@@ -67,6 +70,7 @@ class Sync
             $this->log = $di[ 'log' ]->getLogger();
             $this->sleep = $di[ 'console' ]->sleep;
             $this->folder = $di[ 'console' ]->folder;
+            $this->daemon = $di[ 'console' ]->daemon;
             $this->interactive = $di[ 'console' ]->interactive;
         }
 
@@ -112,6 +116,7 @@ class Sync
 
         while ( TRUE ) {
             $this->checkForHalt();
+            $this->running = TRUE;
 
             if ( $this->wake === TRUE ) {
                 $wakeUnix = 0;
@@ -119,6 +124,7 @@ class Sync
             }
 
             if ( (new DateTime)->getTimestamp() < $wakeUnix ) {
+                $this->asleep = TRUE;
                 sleep( 60 );
                 continue;
             }
@@ -158,6 +164,13 @@ class Sync
         }
 
         if ( ! $accounts ) {
+            // If we're in daemon mode, just go to sleep. The script
+            // will pick up once the user creates an account and a
+            // SIGCONT is sent to this process.
+            if ( $this->daemon ) {
+                return TRUE;
+            }
+
         	$this->log->notice( "No accounts to run, exiting." );
         	return FALSE;
         }
@@ -327,6 +340,8 @@ class Sync
         }
 
         $this->mailbox = NULL;
+        $this->asleep = FALSE;
+        $this->running = FALSE;
     }
 
     /**
@@ -346,6 +361,16 @@ class Sync
     public function wake()
     {
         $this->wake = TRUE;
+    }
+
+    public function isAsleep()
+    {
+        return $this->asleep === TRUE;
+    }
+
+    public function isRunning()
+    {
+        return $this->running === TRUE;
     }
 
     /**
