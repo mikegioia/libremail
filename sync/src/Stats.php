@@ -3,6 +3,7 @@
 namespace App;
 
 use Fn
+  , App\Daemon
   , App\Console
   , Pimple\Container
   , App\Models\Folder as FolderModel
@@ -16,10 +17,12 @@ use Fn
 class Stats
 {
     private $cli;
+    private $daemon;
 
     public function __construct( Console $console )
     {
         $this->cli = $console->getCli();
+        $this->daemon = $console->daemon;
     }
 
     /**
@@ -94,6 +97,15 @@ class Stats
      */
     public function json()
     {
-        echo json_encode( $this->getStats() );
+        $stats = $this->getStats();
+
+        if ( $this->daemon ) {
+            $stats = [
+                'accounts' => $stats,
+                'type' => Daemon::MESSAGE_STATS
+            ];
+        }
+
+        fwrite( STDOUT, json_encode( $stats ) );
     }
 }

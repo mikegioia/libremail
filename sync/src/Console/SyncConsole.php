@@ -18,6 +18,7 @@ class SyncConsole extends Console
     public $sleep;
     public $create;
     public $folder;
+    public $daemon;
     public $verbose;
     public $updatedb;
     public $background;
@@ -54,6 +55,12 @@ class SyncConsole extends Console
                 'prefix' => 'd',
                 'longPrefix' => 'diagnostics',
                 'description' => 'Runs a series of diagnostic tests',
+                'noValue' => TRUE
+            ],
+            'daemon' => [
+                'prefix' => 'e',
+                'longPrefix' => 'daemon',
+                'description' => 'Runs sync in daemon mode',
                 'noValue' => TRUE
             ],
             'folder' => [
@@ -99,6 +106,7 @@ class SyncConsole extends Console
         $this->sleep = $this->cli->arguments->get( 'sleep' );
         $this->create = $this->cli->arguments->get( 'create' );
         $this->folder = $this->cli->arguments->get( 'folder' );
+        $this->daemon = $this->cli->arguments->get( 'daemon' );
         $this->verbose = $this->cli->arguments->get( 'verbose' );
         $this->updatedb = $this->cli->arguments->get( 'updatedb' );
         $this->background = $this->cli->arguments->get( 'background' );

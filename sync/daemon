@@ -112,6 +112,13 @@ $di[ 'emitter' ]->addListener(
         $di[ 'emitter' ]->dispatch( EV_START_SERVER );
     });
 
+// Triggered to update the stats to all websocket connections
+$di[ 'emitter' ]->addListener(
+    EV_BROADCAST_STATS,
+    function ( Event $event ) use ( $di ) {
+        // @TODO
+    });
+
 // Trigger the events to load the timers
 $di[ 'emitter' ]->dispatch( EV_START_SYNC );
 //$di[ 'emitter' ]->dispatch( EV_START_SERVER );

@@ -3,6 +3,7 @@
 namespace App;
 
 use Exception
+  , App\Events\StatsEvent
   , App\Console\DaemonConsole
   , React\ChildProcess\Process
   , React\EventLoop\LoopInterface
@@ -18,10 +19,20 @@ class Daemon
     private $config;
     private $emitter;
     private $console;
+    // Used for internal message passing
+    private $message;
+    private $isReading;
     // Stored to send signals to
     private $syncProcess;
     // Ratchet websocket server
     private $webServerProcess;
+    // References to true PIDs
+    private $processPids = [];
+
+    const PROC_SYNC = 'sync';
+    const PROC_SERVER = 'server';
+    const MESSAGE_PID = 'pid';
+    const MESSAGE_STATS = 'stats';
 
     public function __construct(
         LoopInterface $loop,
@@ -47,18 +58,21 @@ class Daemon
         if ( $this->syncProcess ) {
             $this->syncProcess->close();
             $this->syncProcess = NULL;
+            $this->processPids[ self::PROC_SYNC ] = NULL;
         }
 
         if ( $this->halt === TRUE ) {
             return;
         }
 
-        $syncProcess = new Process( BASEPATH .'/sync -s' );
+        // @TODO replace -s with -b
+        $syncProcess = new Process( BASEPATH .'/sync -s -e' );
 
         // When the sync process exits, we want to alert the
         // daemon. This is to restart the sync upon crash or
         // to handle the error.
         $syncProcess->on( 'exit', function ( $exitCode, $termSignal ) {
+            $this->processPids[ self::PROC_SYNC ] = NULL;
             $this->emitter->dispatch( EV_SYNC_EXITED );
         });
 
@@ -66,8 +80,21 @@ class Daemon
         $this->loop->addTimer( 0.001, function ( $timer ) use ( $syncProcess ) {
             $syncProcess->start( $timer->getLoop() );
             $syncProcess->stdout->on( 'data', function ( $output ) {
-                echo $output;
+                // If JSON came back, we have a message to parse. Run
+                // it through our message handler. Otherwise forward the
+                // output to STDOUT.
+                $this->processMessage( $output, self::PROC_SYNC );
             });
+        });
+
+        // Every 10 seconds signal the sync process to get statistics.
+        // Only do this if the webserver is running.
+        $this->loop->addPeriodicTimer( 10, function ( $timer ) use ( $syncProcess ) {
+            if ( isset( $this->processPids[ self::PROC_SYNC ] )
+                && $this->webServerProcess )
+            {
+                posix_kill( $this->processPids[ self::PROC_SYNC ], SIGUSR2 );
+            }
         });
 
         $this->syncProcess = $syncProcess;
@@ -82,6 +109,7 @@ class Daemon
         if ( $this->webServerProcess ) {
             $this->webServerProcess->close();
             $this->webServerProcess = NULL;
+            $this->processPids[ self::PROC_SERVER ] = NULL;
         }
 
         if ( $this->halt === TRUE ) {
@@ -94,6 +122,7 @@ class Daemon
         // daemon. This is to restart the server upon crash or
         // to handle the error.
         $webServerProcess->on( 'exit', function ( $exitCode, $termSignal ) {
+            $this->processPids[ self::PROC_SERVER ] = NULL;
             $this->emitter->dispatch( EV_SERVER_EXITED );
         });
 
@@ -105,7 +134,7 @@ class Daemon
         $this->loop->addTimer( 0.001, function ( $timer ) use ( $webServerProcess ) {
             $webServerProcess->start( $timer->getLoop() );
             $webServerProcess->stdout->on( 'data', function ( $output ) {
-                echo $output;
+                $this->processMessage( $output, self::PROC_SERVER );
             });
         });
 
@@ -115,6 +144,7 @@ class Daemon
     public function halt()
     {
         $this->halt = TRUE;
+        $this->processPids = [];
 
         if ( $this->syncProcess ) {
             $this->syncProcess->terminate( SIGQUIT );
@@ -176,5 +206,49 @@ class Daemon
         }
 
         return FALSE;
+    }
+
+    private function processMessage( $message, $process )
+    {
+        if ( substr( $message, 0, 1 ) === "{" ) {
+            $this->message = "";
+            $this->isReading = TRUE;
+        }
+
+        if ( $this->isReading ) {
+            $this->message .= $message;
+
+            if ( substr( $message, -1 ) === "}" ) {
+                $this->isReading = FALSE;
+                $message = @json_decode( $this->message );
+                $this->message = NULL;
+                $this->handleMessage( $message, $process );
+            }
+
+            return;
+        }
+
+        fwrite( STDOUT, $message );
+    }
+
+    /**
+     * Reads in a JSON message from one of the child processes.
+     * The message expects certain fields to be set:
+     *   type: 'pid' or 'stats'
+     * @param stdClass $message
+     * @param string $process
+     */
+    private function handleMessage( $message, $process )
+    {
+        switch ( $message->type ) {
+            case self::MESSAGE_PID:
+                $this->processPids[ $process ] = $message->pid;
+                break;
+            case self::MESSAGE_STATS:
+                $this->emitter->dispatch(
+                    EV_BROADCAST_STATS,
+                    new StatsEvent( $message ) );
+                break;
+        }
     }
 }

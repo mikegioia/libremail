@@ -2,7 +2,8 @@
 
 namespace App;
 
-use Pimple\Container
+use App\Daemon
+  , Pimple\Container
   , \App\Models\Account as AccountModel
   , \App\Exceptions\NoAccounts as NoAccountsException;
 
@@ -25,6 +26,14 @@ class Startup
     {
         $this->log->debug( "Starting sync engine" );
         $this->log->info( "Process ID: ". getmypid() );
+
+        if ( $this->console->daemon ) {
+            fwrite( STDOUT, json_encode([
+                'pid' => getmypid(),
+                'type' => Daemon::MESSAGE_PID
+            ]));
+        }
+
         $this->checkIfAccountsExist();
 
         if ( $this->console->sleep === TRUE ) {
