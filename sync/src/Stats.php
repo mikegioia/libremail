@@ -18,11 +18,28 @@ class Stats
 {
     private $cli;
     private $daemon;
+    private $asleep;
+    private $running;
+    private $startTime;
 
     public function __construct( Console $console )
     {
         $this->cli = $console->getCli();
         $this->daemon = $console->daemon;
+    }
+
+    public function setAsleep( $asleep = TRUE )
+    {
+        $this->asleep = $asleep;
+    }
+
+    public function setRunning( $running = TRUE )
+    {
+        $this->running = $running;
+
+        if ( $running && ! $this->startTime ) {
+            $this->startTime = time();
+        }
     }
 
     /**
@@ -102,7 +119,10 @@ class Stats
         if ( $this->daemon ) {
             $stats = [
                 'accounts' => $stats,
-                'type' => Daemon::MESSAGE_STATS
+                'type' => Daemon::MESSAGE_STATS,
+                'asleep' => (bool) $this->asleep,
+                'running' => (bool) $this->running,
+                'uptime' => time() - $this->startTime
             ];
         }
 

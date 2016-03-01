@@ -66,6 +66,7 @@ class Sync
 
         if ( $di ) {
             $this->cli = $di[ 'cli' ];
+            $this->stats = $di[ 'stats' ];
             $this->config = $di[ 'config' ];
             $this->log = $di[ 'log' ]->getLogger();
             $this->sleep = $di[ 'console' ]->sleep;
@@ -117,6 +118,7 @@ class Sync
         while ( TRUE ) {
             $this->checkForHalt();
             $this->running = TRUE;
+            $this->stats->setRunning();
 
             if ( $this->wake === TRUE ) {
                 $wakeUnix = 0;
@@ -125,6 +127,7 @@ class Sync
 
             if ( (new DateTime)->getTimestamp() < $wakeUnix ) {
                 $this->asleep = TRUE;
+                $this->stats->setAsleep();
                 sleep( 60 );
                 continue;
             }
@@ -342,6 +345,8 @@ class Sync
         $this->mailbox = NULL;
         $this->asleep = FALSE;
         $this->running = FALSE;
+        $this->stats->setAsleep( FALSE );
+        $this->stats->setRunning( FALSE );
     }
 
     /**
@@ -361,16 +366,6 @@ class Sync
     public function wake()
     {
         $this->wake = TRUE;
-    }
-
-    public function isAsleep()
-    {
-        return $this->asleep === TRUE;
-    }
-
-    public function isRunning()
-    {
-        return $this->running === TRUE;
     }
 
     /**
