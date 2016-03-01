@@ -28,7 +28,7 @@ class Log
     // If we're running in interative mode
     private $interactive;
 
-    public function __construct( CLImate $cli, array $config, $interactive = FALSE )
+    public function __construct( CLImate $cli, Array $config, $interactive = FALSE )
     {
         $this->cli = $cli;
         $this->config = $config;

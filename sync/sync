@@ -8,18 +8,17 @@
  * from the CLI or managed via a supervisor. It works by checking
  * a list of saved IMAP credentials and runs through a flow of tasks.
  */
-
 use App\Log
   , App\Sync
   , App\Model
   , App\Stats
-  , App\Console
   , App\Startup
   , App\Constants
   , App\Diagnostics
   , Pimple\Container
   , Slim\PDO\Database
   , Exception as Exception
+  , App\Console\SyncConsole
   , PDOException as PDOException
   , App\Exceptions\Terminate as TerminateException;
 
@@ -50,7 +49,7 @@ $di = new Container();
 $di[ 'config' ] = $config;
 
 // Console/CLI service
-$di[ 'console' ] = new Console( $config );
+$di[ 'console' ] = new SyncConsole( $config );
 $di[ 'cli' ] = function ( $c ) {
     return $c[ 'console' ]->getCLI();
 };
@@ -174,10 +173,12 @@ catch ( PDOException $e ) {
     sleep( $config[ 'app' ][ 'db' ][ 'sleep_minutes' ] * 60 );
     goto runSyncLoop;
 }
+// Gracefully exit if we're terminated
 catch ( TerminateException $e ) {
     $di[ 'log' ]->getLogger()->addInfo( $e->getMessage() );
     exit( 0 );
 }
+// Unhandled exceptions
 catch ( Exception $e ) {
     $di[ 'log' ]->displayError( $e );
 }

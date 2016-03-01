@@ -35,7 +35,10 @@
         "ilya/belt": "~2",
         "mikegioia/pdo": "@dev",
         "react/event-loop": "^0.4.1",
-        "react/child-process": "^0.4.0"
+        "react/child-process": "^0.4.0",
+        "cboden/ratchet": "^0.3.4",
+        "symfony/event-dispatcher": "^3.0",
+        "mkraemer/react-pcntl": "^2.0"
     },
     "minimum-stability": "dev"
 }

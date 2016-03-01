@@ -6,18 +6,19 @@
  *
  * This is the long-running daemon for managing the syncing engine.
  * Call this script to run "forever" and manage the possibly-memory
- * abusive sync script.
- *
- * The reason for this is because PHP doesn't
- * free allocated memory, and while the script may not be consuming
- * all allocated memory, it still keeps it from the system to use.
- * For that reason, this tiny process will run forever and the sync
- * process will gracefully shut itself down at a configured memory
- * limit.
+ * abusive sync and server scripts.
  */
-use App\Constants
+use App\Daemon
+  , App\Constants
+  , Pimple\Container
+  , Exception as Exception
   , React\EventLoop\Factory
-  , React\ChildProcess\Process;
+  , App\Console\DaemonConsole
+  , MKraemer\ReactPCNTL\PCNTL
+  , React\ChildProcess\Process
+  , Symfony\Component\EventDispatcher\Event
+  , App\Exceptions\Terminate as TerminateException
+  , Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 
 // Set up paths and constants
 set_time_limit( 0 );
@@ -35,19 +36,91 @@ $config = array_replace_recursive( $default, $local );
 Constants::process( $constants );
 unset( $constants );
 
+// Set up dependency container and register all services
+$di = new Container();
 
-$loop = React\EventLoop\Factory::create();
-$process = new React\ChildProcess\Process( BASEPATH .'/sync -s' );
+// Console/CLI service
+$di[ 'console' ] = new DaemonConsole;
+$di[ 'cli' ] = function ( $c ) {
+    return $c[ 'console' ]->getCLI();
+};
 
-$process->on('exit', function($exitCode, $termSignal) {
-    echo "Exit\n";
-});
+// Parse the CLI
+$di[ 'console' ]->init();
 
-$loop->addTimer(0.001, function($timer) use ($process) {
-    $process->start($timer->getLoop());
-    $process->stdout->on('data', function($output) {
-        echo $output;
+// Set up the event dispatcher
+$di[ 'emitter' ] = new Emitter;
+
+// React event loop, used for child-process and web socket
+// server (Ratchet).
+$di[ 'loop' ] = Factory::create();
+
+// Set up the signal handler to shutdown
+$HALT = function () use ( $di ) {
+    if ( isset( $di[ 'daemon' ] ) && $di[ 'daemon' ] ) {
+        $di[ 'daemon' ]->halt();
+    }
+    else {
+        throw new TerminateException;
+    }
+};
+
+// Set up process handler bindings for React
+$pcntl = new PCNTL( $di[ 'loop' ] );
+$pcntl->on( SIGHUP, $HALT );
+$pcntl->on( SIGINT, $HALT );
+$pcntl->on( SIGTERM, $HALT );
+$pcntl->on( SIGQUIT, $HALT );
+
+// Daemon manages the sync and websocket processes
+$di[ 'daemon' ] = new Daemon(
+    $di[ 'loop' ],
+    $di[ 'emitter' ],
+    $di[ 'console' ],
+    $config[ 'daemon' ] );
+$di[ 'daemon' ]->init();
+
+// This event is fired to start or restart the sync process.
+$di[ 'emitter' ]->addListener(
+    EV_START_SYNC,
+    function ( Event $event ) use ( $di ) {
+        $di[ 'daemon' ]->startSync();
     });
-});
 
-$loop->run();
+// This event is fired to start or restart the server process.
+$di[ 'emitter' ]->addListener(
+    EV_START_SERVER,
+    function ( Event $event ) use ( $di ) {
+        $di[ 'daemon' ]->startWebServer();
+    });
+
+// Fired when the sync is terminated for any reason. This is
+// where we can restart the script or terminate gracefully.
+// During restart, we want to incorporate some form of
+// exponential back-off. Attempt to restart quickly but slow
+// down over time.
+$di[ 'emitter' ]->addListener(
+    EV_SYNC_EXITED,
+    function ( Event $event ) use ( $di ) {
+        $di[ 'emitter' ]->dispatch( EV_START_SYNC );
+    });
+
+// Fired when the server is terminated for any reason.
+$di[ 'emitter' ]->addListener(
+    EV_SERVER_EXITED,
+    function ( Event $event ) use ( $di ) {
+        $di[ 'emitter' ]->dispatch( EV_START_SERVER );
+    });
+
+// Trigger the events to load the timers
+$di[ 'emitter' ]->dispatch( EV_START_SYNC );
+//$di[ 'emitter' ]->dispatch( EV_START_SERVER );
+
+// Run the loop until we hit a halt signal
+try {
+    $di[ 'loop' ]->run();
+}
+// Gracefully exit if we're terminated
+catch ( TerminateException $e ) {
+    exit( 0 );
+}

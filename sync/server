@@ -1,0 +1,21 @@
+#!/usr/bin/php
+<?php
+
+/**
+ * WebSocket Server
+ *
+ * This is the websocket server for the web front-end to
+ * connect to. This process can be run standalone, manually
+ * or (more commonly) it's invoked via the daemon script.
+ */
+
+/*
+$webServer = new RatchetApp(
+    $this->config[ 'webserver' ][ 'host' ],
+    $this->config[ 'webserver' ][ 'port' ],
+    $this->config[ 'webserver' ][ 'address' ],
+    $this->loop );
+//$webServer->route( '/stats', new StatsServer );
+$webServer->route( '/stats', new \Ratchet\Server\EchoServer, [ '*' ] );
+$webServer->run();
+*/
