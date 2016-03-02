@@ -22,9 +22,6 @@ use App\Log
   , PDOException as PDOException
   , App\Exceptions\Terminate as TerminateException;
 
-// Used for signal catching
-declare( ticks = 1 );
-
 // Set up paths and constants
 set_time_limit( 0 );
 define( 'BASEPATH', __DIR__ );
@@ -105,10 +102,14 @@ pcntl_signal( SIGCONT, function ( $signo ) use ( $di ) {
 
 // Return back statistics on the current sync
 pcntl_signal( SIGUSR1, function ( $signo ) use ( $di ) {
+    $di[ 'log' ]->getLogger()->addInfo(
+        "SIGUSR1 received, printing text stats" );
     $di[ 'stats' ]->text();
 });
 // SIGUSR2 returns JSON
 pcntl_signal( SIGUSR2, function ( $signo ) use ( $di ) {
+    $di[ 'log' ]->getLogger()->addInfo(
+        "SIGUSR1 received, printing JSON stats" );
     $di[ 'stats' ]->json();
 });
 
