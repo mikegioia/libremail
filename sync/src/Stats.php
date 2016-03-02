@@ -114,17 +114,13 @@ class Stats
      */
     public function json()
     {
-        $stats = $this->getStats();
-
-        if ( $this->daemon ) {
-            $stats = [
-                'accounts' => $stats,
-                'type' => Daemon::MESSAGE_STATS,
-                'asleep' => (bool) $this->asleep,
-                'running' => (bool) $this->running,
-                'uptime' => time() - $this->startTime
-            ];
-        }
+        $stats = [
+            'accounts' => $this->getStats(),
+            'type' => Daemon::MESSAGE_STATS,
+            'asleep' => (bool) $this->asleep,
+            'running' => (bool) $this->running,
+            'uptime' => time() - $this->startTime
+        ];
 
         fwrite( STDOUT, json_encode( $stats ) );
     }

@@ -164,7 +164,7 @@ class SyncConsole extends Console
      */
     public function createNewAccount()
     {
-        if ( ! $this->interactive ) {
+        if ( ! $this->interactive || $this->sleep ) {
             return NULL;
         }
 

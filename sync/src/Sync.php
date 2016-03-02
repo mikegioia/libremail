@@ -116,9 +116,10 @@ class Sync
         $sleepMinutes = $this->config[ 'app' ][ 'sync' ][ 'sleep_minutes' ];
 
         while ( TRUE ) {
+            $this->gc();
             $this->checkForHalt();
-            $this->running = TRUE;
-            $this->stats->setRunning();
+            $this->setRunning();
+            $this->setAsleep( FALSE );
 
             if ( $this->wake === TRUE ) {
                 $wakeUnix = 0;
@@ -126,8 +127,7 @@ class Sync
             }
 
             if ( (new DateTime)->getTimestamp() < $wakeUnix ) {
-                $this->asleep = TRUE;
-                $this->stats->setAsleep();
+                $this->setAsleep();
                 sleep( 60 );
                 continue;
             }
@@ -343,10 +343,20 @@ class Sync
         }
 
         $this->mailbox = NULL;
-        $this->asleep = FALSE;
-        $this->running = FALSE;
-        $this->stats->setAsleep( FALSE );
-        $this->stats->setRunning( FALSE );
+        $this->setAsleep( FALSE );
+        $this->setRunning( FALSE );
+    }
+
+    public function setAsleep( $asleep = TRUE )
+    {
+        $this->asleep = $asleep;
+        $this->stats->setAsleep( $asleep );
+    }
+
+    public function setRunning( $running = TRUE )
+    {
+        $this->running = $running;
+        $this->stats->setRunning( $running );
     }
 
     /**
@@ -794,6 +804,8 @@ class Sync
 
     private function gc()
     {
+        pcntl_signal_dispatch();
+
         if ( $this->gcEnabled ) {
             gc_collect_cycles();
 
