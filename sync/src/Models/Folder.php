@@ -95,6 +95,7 @@ class Folder extends \App\Model
         $exists = $this->db()
             ->select()
             ->from( 'folders' )
+            ->where( 'deleted', '=', 0 )
             ->where( 'name', '=', $this->name )
             ->where( 'account_id', '=', $this->account_id )
             ->execute()
@@ -138,6 +139,22 @@ class Folder extends \App\Model
         }
 
         $this->id = $newFolderId;
+    }
+
+    public function delete()
+    {
+        $this->deleted = 1;
+        $updated = $this->db()
+            ->update([
+                'deleted' => 1
+            ])
+            ->table( 'folders' )
+            ->where( 'id', '=', $this->id )
+            ->execute();
+
+        if ( $updated === FALSE ) {
+            throw new DatabaseUpdateException( FOLDER );
+        }
     }
 
     /**

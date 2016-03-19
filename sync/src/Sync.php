@@ -533,8 +533,7 @@ class Sync
         $this->log->info( "Removing $count ". Fn\plural( 'folder', $count ) );
 
         foreach ( $toRemove as $folder ) {
-            $folder->deleted = 0;
-            $folder->save();
+            $folder->delete();
         }
     }
 
