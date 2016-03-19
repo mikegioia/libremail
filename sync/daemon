@@ -8,7 +8,9 @@
  * Call this script to run "forever" and manage the possibly-memory
  * abusive sync and server scripts.
  */
-use App\Daemon
+use App\Log
+  , App\Daemon
+  , App\Command
   , App\Constants
   , Pimple\Container
   , Exception as Exception
@@ -18,6 +20,7 @@ use App\Daemon
   , React\ChildProcess\Process
   , Symfony\Component\EventDispatcher\Event
   , App\Exceptions\Terminate as TerminateException
+  , App\Exceptions\BadCommand as BadCommandException
   , Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 
 // Set up paths and constants
@@ -36,14 +39,31 @@ $config = array_replace_recursive( $default, $local );
 Constants::process( $constants );
 unset( $constants );
 
+// Set the memory limit from the config
+ini_set( 'memory_limit', $config[ 'app' ][ 'memory' ] );
+
 // Set up dependency container and register all services
 $di = new Container();
+
+// Store the configuration as a service
+$di[ 'config' ] = $config;
 
 // Console/CLI service
 $di[ 'console' ] = new DaemonConsole;
 $di[ 'cli' ] = function ( $c ) {
     return $c[ 'console' ]->getCLI();
 };
+
+// Logging service
+$di[ 'log' ] = function ( $c ) {
+    return new Log(
+        $c[ 'cli' ],
+        $c[ 'config' ][ 'daemonlog' ],
+        FALSE );
+};
+
+// Initialize the error and exception handlers
+$di[ 'log' ]->init();
 
 // Parse the CLI
 $di[ 'console' ]->init();
@@ -55,30 +75,34 @@ $di[ 'emitter' ] = new Emitter;
 // server (Ratchet).
 $di[ 'loop' ] = Factory::create();
 
+// Set up the command handler
+$di[ 'command' ] = new Command( $di[ 'emitter' ], $di[ 'log' ] );
+
 // Set up the signal handler to shutdown
+$TERMINATE = function () {
+    throw new TerminateException;
+};
+// Graceful shutdown
 $HALT = function () use ( $di ) {
     if ( isset( $di[ 'daemon' ] ) && $di[ 'daemon' ] ) {
         $di[ 'daemon' ]->halt();
-    }
-    else {
-        throw new TerminateException;
     }
 };
 
 // Set up process handler bindings for React
 $pcntl = new PCNTL( $di[ 'loop' ] );
-$pcntl->on( SIGHUP, $HALT );
-$pcntl->on( SIGINT, $HALT );
-$pcntl->on( SIGTERM, $HALT );
-$pcntl->on( SIGQUIT, $HALT );
+$pcntl->on( SIGHUP, $TERMINATE );
+$pcntl->on( SIGINT, $TERMINATE );
+$pcntl->on( SIGTERM, $TERMINATE );
+$pcntl->on( SIGQUIT, $TERMINATE );
 
 // Daemon manages the sync and websocket processes
 $di[ 'daemon' ] = new Daemon(
     $di[ 'loop' ],
     $di[ 'emitter' ],
     $di[ 'console' ],
+    $di[ 'command' ],
     $config[ 'daemon' ] );
-$di[ 'daemon' ]->init();
 
 // This event is fired to start or restart the sync process.
 $di[ 'emitter' ]->addListener(
@@ -116,18 +140,28 @@ $di[ 'emitter' ]->addListener(
 $di[ 'emitter' ]->addListener(
     EV_BROADCAST_STATS,
     function ( Event $event ) use ( $di ) {
-        // @TODO
+        $di[ 'daemon' ]->broadcastStats( $event->getStats() );
     });
 
 // Trigger the events to load the timers
 $di[ 'emitter' ]->dispatch( EV_START_SYNC );
-//$di[ 'emitter' ]->dispatch( EV_START_SERVER );
+$di[ 'emitter' ]->dispatch( EV_START_SERVER );
 
 // Run the loop until we hit a halt signal
 try {
     $di[ 'loop' ]->run();
 }
+// Ignore these but log them
+catch ( BadCommandException $e ) {
+    $di[ 'log' ]->getLogger()->addNotice( $e->getMessage() );
+}
 // Gracefully exit if we're terminated
 catch ( TerminateException $e ) {
-    exit( 0 );
+    $di[ 'log' ]->getLogger()->addInfo( $e->getMessage() );
+    $HALT();
+}
+// Unhandled exceptions
+catch ( Exception $e ) {
+    $di[ 'log' ]->displayError( $e );
+    $HALT();
 }

@@ -39,6 +39,9 @@ $config = array_replace_recursive( $default, $local );
 Constants::process( $constants );
 unset( $constants );
 
+// Set the memory limit from the config
+ini_set( 'memory_limit', $config[ 'app' ][ 'memory' ] );
+
 // Set up dependency container and register all services
 $di = new Container();
 
@@ -73,9 +76,6 @@ $di[ 'log' ] = function ( $c ) {
 // Initialize the error and exception handlers
 $di[ 'log' ]->init();
 
-// Set the memory limit from the config
-ini_set( 'memory_limit', $di[ 'config' ][ 'app' ][ 'memory' ] );
-
 // Set up the signal handler to shutdown
 $HALT = function ( $signo ) use ( $di ) {
     if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ) {
@@ -102,13 +102,13 @@ pcntl_signal( SIGCONT, function ( $signo ) use ( $di ) {
 
 // Return back statistics on the current sync
 pcntl_signal( SIGUSR1, function ( $signo ) use ( $di ) {
-    $di[ 'log' ]->getLogger()->addInfo(
+    $di[ 'log' ]->getLogger()->addDebug(
         "SIGUSR1 received, printing text stats" );
     $di[ 'stats' ]->text();
 });
 // SIGUSR2 returns JSON
 pcntl_signal( SIGUSR2, function ( $signo ) use ( $di ) {
-    $di[ 'log' ]->getLogger()->addInfo(
+    $di[ 'log' ]->getLogger()->addDebug(
         "SIGUSR2 received, printing JSON stats" );
     $di[ 'stats' ]->json();
 });

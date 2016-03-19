@@ -44,6 +44,19 @@ class Startup
         }
     }
 
+    public function runServer()
+    {
+        $this->log->debug( "Starting socket server" );
+        $this->log->info( "Process ID: ". getmypid() );
+
+        if ( $this->console->daemon ) {
+            fwrite( STDOUT, json_encode([
+                'pid' => getmypid(),
+                'type' => Daemon::MESSAGE_PID
+            ]));
+        }
+    }
+
     /**
      * Check if any accounts exist in the database. If not, and
      * if we're in interactive mode, then prompt the user to add

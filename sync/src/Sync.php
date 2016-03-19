@@ -334,6 +334,7 @@ class Sync
             $folder,
             $attachmentsPath );
         $this->mailbox->getImapStream();
+        $this->setRunning( TRUE );
     }
 
     public function disconnect()
@@ -795,6 +796,8 @@ class Sync
 
     private function checkForHalt()
     {
+        pcntl_signal_dispatch();
+
         if ( $this->halt === TRUE ) {
             $this->disconnect();
             throw new TerminateException;

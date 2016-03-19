@@ -8,14 +8,105 @@
  * connect to. This process can be run standalone, manually
  * or (more commonly) it's invoked via the daemon script.
  */
+use App\Log
+  , App\Daemon
+  , App\Server
+  , App\Startup
+  , App\Constants
+  , Pimple\Container
+  , Exception as Exception
+  , React\EventLoop\Factory
+  , Ratchet\App as RatchetApp
+  , App\Console\ServerConsole
+  , MKraemer\ReactPCNTL\PCNTL
+  , App\Exceptions\Terminate as TerminateException;
 
-/*
-$webServer = new RatchetApp(
-    $this->config[ 'webserver' ][ 'host' ],
-    $this->config[ 'webserver' ][ 'port' ],
-    $this->config[ 'webserver' ][ 'address' ],
-    $this->loop );
-//$webServer->route( '/stats', new StatsServer );
-$webServer->route( '/stats', new \Ratchet\Server\EchoServer, [ '*' ] );
-$webServer->run();
-*/
+// Set up paths and constants
+set_time_limit( 0 );
+define( 'BASEPATH', __DIR__ );
+date_default_timezone_set( 'UTC' );
+
+// Load the vendor libraries
+require( BASEPATH .'/vendor/autoload.php' );
+
+// Load configuration files and parse the CLI arguments
+$constants = parse_ini_file( BASEPATH .'/config/constants.ini', FALSE );
+$default = parse_ini_file( BASEPATH .'/config/default.ini', TRUE );
+$local = parse_ini_file( BASEPATH .'/config/local.ini', TRUE );
+$config = array_replace_recursive( $default, $local );
+Constants::process( $constants );
+unset( $constants );
+
+// Set the memory limit from the config
+ini_set( 'memory_limit', $config[ 'app' ][ 'memory' ] );
+
+// Set up dependency container and register all services
+$di = new Container();
+
+// Store the configuration as a service
+$di[ 'config' ] = $config;
+
+// Console/CLI service
+$di[ 'console' ] = new ServerConsole( $config );
+$di[ 'cli' ] = function ( $c ) {
+    return $c[ 'console' ]->getCLI();
+};
+
+// Logging service
+$di[ 'log' ] = function ( $c ) {
+    $interactive = ( $c[ 'console' ]->interactive === TRUE );
+    return new Log(
+        $c[ 'cli' ],
+        $c[ 'config' ][ 'serverlog' ],
+        $interactive );
+};
+
+// Initialize the error and exception handlers
+$di[ 'log' ]->init();
+
+// Parse the CLI
+$di[ 'console' ]->init();
+
+// React event loop, used for Ratchet.
+$di[ 'loop' ] = Factory::create();
+
+// Set up the signal handler to shutdown
+$HALT = function () use ( $di ) {
+    if ( isset( $di[ 'loop' ] ) && $di[ 'loop' ] ) {
+        $di[ 'loop' ]->stop();
+    }
+    throw new TerminateException;
+};
+
+// Set up process handler bindings for React
+$pcntl = new PCNTL( $di[ 'loop' ] );
+$pcntl->on( SIGHUP, $HALT );
+$pcntl->on( SIGINT, $HALT );
+$pcntl->on( SIGTERM, $HALT );
+$pcntl->on( SIGQUIT, $HALT );
+
+// Create a new socket server handler
+$di[ 'server' ] = new Server( $di[ 'log' ], $di[ 'loop' ] );
+
+// Ratchet web server instance
+$di[ 'ratchet' ] = new RatchetApp(
+    $config[ 'server' ][ 'host' ],
+    $config[ 'server' ][ 'port' ],
+    $config[ 'server' ][ 'address' ],
+    $di[ 'loop' ] );
+
+$di[ 'ratchet' ]->route(
+    $config[ 'server' ][ 'endpoint' ],
+    $di[ 'server' ],
+    $config[ 'server' ][ 'allowed_origins' ]);
+
+// Run the loop until we hit a halt signal
+try {
+    $startup = new Startup( $di );
+    $startup->runServer();
+    $di[ 'ratchet' ]->run();
+}
+// Gracefully exit if we're terminated
+catch ( TerminateException $e ) {
+    exit( 0 );
+}

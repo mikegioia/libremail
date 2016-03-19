@@ -226,6 +226,7 @@ class Log
     private function isSuppressed( $message )
     {
         $suppressList = [
+            'stream_select(): unable to select',
             'Unknown: Unexpected characters at end of address'
         ];
 
