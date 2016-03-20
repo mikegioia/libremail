@@ -30,6 +30,7 @@ class Daemon
     private $webServerProcess;
     // References to true PIDs
     private $processPids = [];
+    private $processRestartInterval = [];
 
     const PROC_SYNC = 'sync';
     const PROC_SERVER = 'server';
@@ -48,18 +49,22 @@ class Daemon
         $this->emitter = $emitter;
         $this->console = $console;
         $this->command = $command;
+        $this->processRestartInterval = [
+            PROC_SYNC => $config[ 'restart_interval' ][ PROC_SYNC ],
+            PROC_SERVER => $config[ 'restart_interval' ][ PROC_SERVER ]
+        ];
     }
 
     public function startSync()
     {
+        if ( $this->halt === TRUE ) {
+            return;
+        }
+
         if ( $this->syncProcess ) {
             $this->syncProcess->close();
             $this->syncProcess = NULL;
-            $this->processPids[ self::PROC_SYNC ] = NULL;
-        }
-
-        if ( $this->halt === TRUE ) {
-            return;
+            $this->processPids[ PROC_SYNC ] = NULL;
         }
 
         $syncProcess = new Process( BASEPATH . EXEC_SYNC );
@@ -68,7 +73,6 @@ class Daemon
         // daemon. This is to restart the sync upon crash or
         // to handle the error.
         $syncProcess->on( 'exit', function ( $exitCode, $termSignal ) {
-            $this->processPids[ self::PROC_SYNC ] = NULL;
             $this->emitter->dispatch( EV_SYNC_EXITED );
         });
 
@@ -79,17 +83,17 @@ class Daemon
                 // If JSON came back, we have a message to parse. Run
                 // it through our message handler. Otherwise forward the
                 // output to STDOUT.
-                $this->processMessage( $output, self::PROC_SYNC );
+                $this->processMessage( $output, PROC_SYNC );
             });
         });
 
         // Every 10 seconds signal the sync process to get statistics.
         // Only do this if the webserver is running.
         $this->loop->addPeriodicTimer( 10, function ( $timer ) use ( $syncProcess ) {
-            if ( isset( $this->processPids[ self::PROC_SYNC ] )
+            if ( isset( $this->processPids[ PROC_SYNC ] )
                 && $this->webServerProcess )
             {
-                posix_kill( $this->processPids[ self::PROC_SYNC ], SIGUSR2 );
+                posix_kill( $this->processPids[ PROC_SYNC ], SIGUSR2 );
             }
         });
 
@@ -105,7 +109,7 @@ class Daemon
         if ( $this->webServerProcess ) {
             $this->webServerProcess->close();
             $this->webServerProcess = NULL;
-            $this->processPids[ self::PROC_SERVER ] = NULL;
+            $this->processPids[ PROC_SERVER ] = NULL;
         }
 
         if ( $this->halt === TRUE ) {
@@ -118,7 +122,6 @@ class Daemon
         // daemon. This is to restart the server upon crash or
         // to handle the error.
         $webServerProcess->on( 'exit', function ( $exitCode, $termSignal ) {
-            $this->processPids[ self::PROC_SERVER ] = NULL;
             $this->emitter->dispatch( EV_SERVER_EXITED );
         });
 
@@ -126,11 +129,37 @@ class Daemon
         $this->loop->addTimer( 0.001, function ( $timer ) use ( $webServerProcess ) {
             $webServerProcess->start( $timer->getLoop() );
             $webServerProcess->stdout->on( 'data', function ( $output ) {
-                $this->processMessage( $output, self::PROC_SERVER );
+                $this->processMessage( $output, PROC_SERVER );
             });
         });
 
         $this->webServerProcess = $webServerProcess;
+    }
+
+    /**
+     * Emits an event to restart a process after an interval
+     * of time has passed, plus some decay value. The decay is
+     * used to not thrash a reconnect if we have networking
+     * problems.
+     * @param string $process
+     */
+    public function restartWithDecay( $process, $event )
+    {
+        $decay = $this->config[ 'decay' ][ $process ];
+        $restartMax = $this->config[ 'restart_max' ][ $process ];
+        $currentInterval = $this->processRestartInterval[ $process ];
+        $nextInterval = ( $decay * $currentInterval < $restartMax )
+            ? $decay * $currentInterval
+            : $restartMax;
+
+        $this->loop->addTimer( $nextInterval, function ( $timer ) {
+            $this->emitter->dispatch( $event );
+        });
+
+        // Update the restart interval for next time. At some point,
+        // this needs to reset back to the starting interval.
+        // @TODO
+        $this->processRestartInterval[ $process ] = $nextInterval;
     }
 
     public function broadcastStats( $stats )
@@ -150,18 +179,12 @@ class Daemon
     {
         $this->halt = TRUE;
 
-        if ( isset( $this->processPids[ self::PROC_SYNC ] ) ) {
-            posix_kill( $this->processPids[ self::PROC_SYNC ], SIGQUIT );
-        }
-        elseif ( $this->syncProcess ) {
-            $this->syncProcess->terminate( SIGQUIT );
+        if ( isset( $this->processPids[ PROC_SYNC ] ) ) {
+            posix_kill( $this->processPids[ PROC_SYNC ], SIGQUIT );
         }
 
-        if ( isset( $this->processPids[ self::PROC_SERVER ] ) ) {
-            posix_kill( $this->processPids[ self::PROC_SERVER ], SIGQUIT );
-        }
-        elseif ( $this->webServerProcess ) {
-            $this->webServerProcess->terminate( SIGQUIT );
+        if ( isset( $this->processPids[ PROC_SERVER ] ) ) {
+            posix_kill( $this->processPids[ PROC_SERVER ], SIGQUIT );
         }
 
         $this->processPids = [];
@@ -224,7 +247,7 @@ class Daemon
      * @param string $message
      * @return boolean
      */
-    function handleCommand( $message )
+    private function handleCommand( $message )
     {
         if ( $this->command->isValid( $message ) ) {
             $this->command->run( $message );

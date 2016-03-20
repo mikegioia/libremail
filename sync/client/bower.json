@@ -1,0 +1,24 @@
+{
+  "name": "LibreMail",
+  "version": "0.0.0",
+  "homepage": "https://github.com/mikegioia/libremail",
+  "authors": [
+    "Mike Gioia <mikegioia@gmail.com>"
+  ],
+  "main": "index.html",
+  "moduleType": [
+    "globals"
+  ],
+  "license": "GPLv3",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "reconnectingWebsocket": "~1.0.0"
+  }
+}

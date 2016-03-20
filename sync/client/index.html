@@ -1,0 +1,13 @@
+<script src="vendor/reconnectingWebsocket/reconnecting-websocket.js"></script>
+<script>
+  var ws = new ReconnectingWebSocket( 'ws://localhost:9898/stats' );
+  ws.onmessage = function ( evt ) {
+    console.log( JSON.parse( evt.data ) );
+  };
+  ws.onopen = function () {
+    console.log( 'Connected' );
+  };
+  ws.onclose = function () {
+    console.log( 'Disconnected' );
+  };
+</script>

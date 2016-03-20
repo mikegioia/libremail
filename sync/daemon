@@ -126,14 +126,16 @@ $di[ 'emitter' ]->addListener(
 $di[ 'emitter' ]->addListener(
     EV_SYNC_EXITED,
     function ( Event $event ) use ( $di ) {
-        $di[ 'emitter' ]->dispatch( EV_START_SYNC );
+        // We want to trigger this after a grace period, and
+        // with an increasing decay.
+        $di[ 'daemon' ]->restartWithDecay( PROC_SYNC, EV_START_SYNC );
     });
 
 // Fired when the server is terminated for any reason.
 $di[ 'emitter' ]->addListener(
     EV_SERVER_EXITED,
     function ( Event $event ) use ( $di ) {
-        $di[ 'emitter' ]->dispatch( EV_START_SERVER );
+        $di[ 'daemon' ]->restartWithDecay( PROC_SERVER, EV_START_SERVER );
     });
 
 // Triggered to update the stats to all websocket connections
