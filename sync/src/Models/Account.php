@@ -4,13 +4,14 @@ namespace App\Models;
 
 use PDO
   , DateTime
+  , App\Model
   , Particle\Validator\Validator
   , App\Traits\Model as ModelTrait
   , App\Exceptions\Validation as ValidationException
   , App\Exceptions\AccountExists as AccountExistsException
   , App\Exceptions\DatabaseInsert as DatabaseInsertException;
 
-class Account extends \App\Model
+class Account extends Model
 {
     public $id;
     public $email;

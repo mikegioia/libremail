@@ -10,10 +10,11 @@
  */
 use App\Log
   , App\Daemon
-  , App\Server
   , App\Startup
   , App\Constants
   , Pimple\Container
+  , App\Server\WebServer
+  , App\Server\StatsServer
   , Exception as Exception
   , React\EventLoop\Factory
   , Ratchet\App as RatchetApp
@@ -86,7 +87,8 @@ $pcntl->on( SIGTERM, $HALT );
 $pcntl->on( SIGQUIT, $HALT );
 
 // Create a new socket server handler
-$di[ 'server' ] = new Server( $di[ 'log' ], $di[ 'loop' ] );
+$di[ 'server.web' ] = new WebServer( $di[ 'log' ] );
+$di[ 'server.stats' ] = new StatsServer( $di[ 'log' ], $di[ 'loop' ] );
 
 // Ratchet web server instance
 $di[ 'ratchet' ] = new RatchetApp(
@@ -94,10 +96,15 @@ $di[ 'ratchet' ] = new RatchetApp(
     $config[ 'server' ][ 'port' ],
     $config[ 'server' ][ 'address' ],
     $di[ 'loop' ] );
-
+// Socket route
 $di[ 'ratchet' ]->route(
-    $config[ 'server' ][ 'endpoint' ],
-    $di[ 'server' ],
+    $config[ 'server' ][ 'endpoint' ][ 'stats' ],
+    $di[ 'server.stats' ],
+    $config[ 'server' ][ 'allowed_origins' ]);
+// Web route
+$di[ 'ratchet' ]->route(
+    $config[ 'server' ][ 'endpoint' ][ 'web' ],
+    $di[ 'server.web' ],
     $config[ 'server' ][ 'allowed_origins' ]);
 
 // Run the loop until we hit a halt signal

@@ -5,13 +5,14 @@ namespace App\Models;
 use Fn
   , PDO
   , DateTime
+  , App\Model
   , Particle\Validator\Validator
   , App\Traits\Model as ModelTrait
   , App\Exceptions\Validation as ValidationException
   , App\Exceptions\DatabaseUpdate as DatabaseUpdateException
   , App\Exceptions\DatabaseInsert as DatabaseInsertException;
 
-class Folder extends \App\Model
+class Folder extends Model
 {
     public $id;
     public $name;

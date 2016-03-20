@@ -12,10 +12,11 @@ namespace App\Models;
 
 use Fn
   , DateTime
+  , App\Model
   , Slim\PDO\Database
   , App\Traits\Model as ModelTrait;
 
-class Migration extends \App\Model
+class Migration extends Model
 {
     public $name;
     public $created_at;

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Fn
   , DateTime
+  , App\Model
   , Belt\Belt
   , Particle\Validator\Validator
   , Pb\Imap\Message as ImapMessage
@@ -12,7 +13,7 @@ use Fn
   , App\Exceptions\DatabaseUpdate as DatabaseUpdateException
   , App\Exceptions\DatabaseInsert as DatabaseInsertException;
 
-class Message extends \App\Model
+class Message extends Model
 {
     public $id;
     public $to;
