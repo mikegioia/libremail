@@ -4,7 +4,6 @@ namespace App\Server;
 
 use App\Log
   , Exception
-  , App\Server
   , App\Command
   , SplObjectStorage
   , React\Stream\Stream
@@ -12,8 +11,9 @@ use App\Log
   , React\EventLoop\LoopInterface
   , Ratchet\MessageComponentInterface;
 
-class StatsServer extends Server implements MessageComponentInterface
+class StatsServer implements MessageComponentInterface
 {
+    private $log;
     private $loop;
     private $message;
     private $clients;
@@ -25,7 +25,7 @@ class StatsServer extends Server implements MessageComponentInterface
     public function __construct ( Log $log, LoopInterface $loop )
     {
         $this->loop = $loop;
-        parent::__construct( $log );
+        $this->log = $log->getLogger();
         $this->clients = new SplObjectStorage;
 
         // Set up the STDIN and STDOUT streams
