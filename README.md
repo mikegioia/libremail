@@ -46,7 +46,7 @@ way outlined in `DATAFORMAT.md`.
 
 TBD
 
-### 3. IMAP to SQL Sycning Engine
+### 3. IMAP to SQL Syncing Engine
 
 Both email clients in this project utilise the syncing engine provided in the
 `sync` app. This application is designed to continually archive emails from any
