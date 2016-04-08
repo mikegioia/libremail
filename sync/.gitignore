@@ -1,4 +1,6 @@
 logs
+build
 vendor
 test.php
 attachments
+node_modules

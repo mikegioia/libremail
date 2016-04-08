@@ -18,6 +18,7 @@ class StatsServer implements MessageComponentInterface
     private $message;
     private $clients;
     private $isReading;
+    private $lastMessage;
     // Streams
     private $read;
     private $write;
@@ -34,6 +35,8 @@ class StatsServer implements MessageComponentInterface
 
     public function broadcast( $message )
     {
+        $this->lastMessage = $message;
+
         foreach ( $this->clients as $client ) {
             $client->send( $message );
         }
@@ -43,6 +46,10 @@ class StatsServer implements MessageComponentInterface
     {
         $this->log->debug( "New socket connection opened from #". $conn->resourceId );
         $this->clients->attach( $conn );
+
+        if ( $this->lastMessage ) {
+            $conn->send( $this->lastMessage );
+        }
     }
 
     public function onClose( ConnectionInterface $conn )

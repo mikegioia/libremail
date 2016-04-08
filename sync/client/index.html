@@ -1,13 +1,56 @@
-<script src="vendor/reconnectingWebsocket/reconnecting-websocket.js"></script>
-<script>
-  var ws = new ReconnectingWebSocket( 'ws://localhost:9898/stats' );
-  ws.onmessage = function ( evt ) {
-    console.log( JSON.parse( evt.data ) );
-  };
-  ws.onopen = function () {
-    console.log( 'Connected' );
-  };
-  ws.onclose = function () {
-    console.log( 'Disconnected' );
-  };
-</script>
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>LibreMail Sync -- Admin</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Load built CSS -->
+        <link rel="stylesheet" href="build/app.css">
+    </head>
+    <body>
+        <!-- Application layout -->
+        <header></header>
+        <main></main>
+        <!-- Header navigation -->
+        <script id="header" type="text/template">
+            <section class="status"></section>
+            <section class="actions"></section>
+        </script>
+        <!-- List of all folders -->
+        <script id="folders" type="text/template">
+            <section class="folders">
+                <div class="container u-full-width">
+                    {{#folders}}
+                        {{> folder}}
+                    {{/folders}}
+                    {{^folders}}
+                        No folders to display
+                    {{/folders}}
+                </div>
+            </section>
+        </script>
+        <!-- Individual folder -->
+        <script id="folder" type="text/template">
+            <div class="folder">
+                <span class="name">{{name}}</span>
+            </div>
+        </script>
+        <!-- Account status -->
+        <script id="status" type="text/template">
+
+        </script>
+        <!-- Account actions -->
+        <script id="actions" type="text/template">
+            <button class="">Wakeup Sync Engine</button>
+        </script>
+        <!-- Load built JS -->
+        <script type="text/javascript" src="build/app.js"></script>
+        <script type="text/javascript">
+            (function ( Pages ) {
+                (Pages.Stats()).load();
+            }( LibreMail.Pages ));
+        </script>
+    </body>
+</html>

@@ -99,12 +99,12 @@ $di[ 'ratchet' ] = new RatchetApp(
     $di[ 'loop' ] );
 // Socket route
 $di[ 'ratchet' ]->route(
-    $config[ 'server' ][ 'endpoint' ][ 'stats' ],
+    ENDPOINT_STATS,
     $di[ 'server.stats' ],
     $config[ 'server' ][ 'allowed_origins' ]);
 // Web route
 $di[ 'ratchet' ]->route(
-    $config[ 'server' ][ 'endpoint' ][ 'web' ],
+    ENDPOINT_WEB,
     $di[ 'server.web' ],
     $config[ 'server' ][ 'allowed_origins' ]);
 // Catch-all route
@@ -112,10 +112,6 @@ $di[ 'ratchet' ]->route(
     new Route( '/{any}', [], [ 'any' => '.*' ] ),
     $di[ 'server.web' ],
     $config[ 'server' ][ 'allowed_origins' ] );
-/*
-$di[ 'ratchet' ]->routes->add(
-
-*/
 
 // Run the loop until we hit a halt signal
 try {

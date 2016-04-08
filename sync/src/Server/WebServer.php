@@ -71,7 +71,8 @@ class WebServer implements HttpServerInterface
     {
         $response = new Response(
             200, [
-                "X-Powered-By" => APP_NAME
+                "X-Powered-By" => APP_NAME,
+                "Content-Type" => $this->getCotnentType( $path )
             ],
             file_get_contents( $path ));
 
@@ -87,7 +88,8 @@ class WebServer implements HttpServerInterface
     {
         $response = new Response(
             404, [
-                "X-Powered-By" => APP_NAME
+                "X-Powered-By" => APP_NAME,
+                "Content-Type" => "text/html"
             ],
             sprintf(
                 "<h1>%s</h1></center><hr>%s %s",
@@ -98,5 +100,24 @@ class WebServer implements HttpServerInterface
 
         $conn->send( $response );
         $conn->close();
+    }
+
+    /**
+     * Try to get the content type by file extension.
+     * @param string $path
+     * @return string
+     */
+    private function getCotnentType( $path )
+    {
+        $pathInfo = pathinfo( $path );
+        $types = [
+            "css" => "text/css",
+            "html" => "text/html",
+            "js" => "text/javascript"
+        ];
+
+        return ( isset( $types[ $pathInfo[ 'extension' ] ] ) )
+            ? $types[ $pathInfo[ 'extension' ] ]
+            : 'text/plain';
     }
 }

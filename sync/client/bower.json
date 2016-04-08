@@ -19,6 +19,8 @@
     "tests"
   ],
   "dependencies": {
+    "skeleton": "~2.0.4",
+    "mustache.js": "mustache#^2.2.1",
     "reconnectingWebsocket": "~1.0.0"
   }
 }
