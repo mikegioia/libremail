@@ -4,7 +4,7 @@ namespace App;
 
 use Exception
   , App\Command
-  , App\Events\StatsEvent
+  , App\Events\MessageEvent
   , App\Console\DaemonConsole
   , React\ChildProcess\Process
   , React\EventLoop\LoopInterface
@@ -162,7 +162,7 @@ class Daemon
         $this->processRestartInterval[ $process ] = $nextInterval;
     }
 
-    public function broadcastStats( $stats )
+    public function broadcast( $message )
     {
         if ( ! $this->webServerProcess ) {
             return FALSE;
@@ -171,7 +171,7 @@ class Daemon
         // Resume the stdin stream, send the message and then pause
         // it again.
         $this->webServerProcess->stdin->resume();
-        $this->webServerProcess->stdin->write( json_encode( $stats ) );
+        $this->webServerProcess->stdin->write( json_encode( $message ) );
         $this->webServerProcess->stdin->pause();
     }
 
@@ -234,8 +234,8 @@ class Daemon
                 break;
             case self::MESSAGE_STATS:
                 $this->emitter->dispatch(
-                    EV_BROADCAST_STATS,
-                    new StatsEvent( $message ) );
+                    EV_BROADCAST_MSG,
+                    new MessageEvent( $message ) );
                 break;
         }
     }

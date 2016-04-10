@@ -113,7 +113,9 @@ class WebServer implements HttpServerInterface
         $types = [
             "css" => "text/css",
             "html" => "text/html",
-            "js" => "text/javascript"
+            "js" => "text/javascript",
+            "woff" => "application/font-woff",
+            "woff2" => "application/font-woff"
         ];
 
         return ( isset( $types[ $pathInfo[ 'extension' ] ] ) )

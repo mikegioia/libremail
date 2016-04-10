@@ -17,10 +17,13 @@ use Fn
 class Stats
 {
     private $cli;
+    private $stats;
     private $daemon;
     private $asleep;
     private $running;
     private $startTime;
+    private $activeFolder;
+    private $activeAccount;
 
     public function __construct( Console $console )
     {
@@ -31,6 +34,7 @@ class Stats
     public function setAsleep( $asleep = TRUE )
     {
         $this->asleep = $asleep;
+        $this->unsetActiveFolder();
     }
 
     public function setRunning( $running = TRUE )
@@ -42,13 +46,45 @@ class Stats
         }
     }
 
+    public function setActiveAccount( $account )
+    {
+        $this->activeAccount = $account;
+
+        if ( $this->daemon ) {
+            $this->json( TRUE );
+        }
+    }
+
+    public function setActiveFolder( $folder )
+    {
+        $this->activeFolder = $folder;
+
+        // If we're in daemon mode, send this JSON message
+        if ( $this->daemon ) {
+            $this->json();
+        }
+    }
+
+    public function unsetActiveFolder()
+    {
+        $this->activeFolder = NULL;
+    }
+
     /**
      * Returns all of the statistics and sync status info on
      * all of the folders for all of the accounts.
+     * @param array $useCache If true, use it instead of fetching.
+     *   This is useful when sending the message to the client
+     *   like 'update the active folder' but without needing to
+     *   query for all folder statistics.
      * @return array
      */
-    public function getStats()
+    public function getStats( $useCache = FALSE )
     {
+        if ( $useCache === TRUE && ! is_null( $this->stats ) ) {
+            return $this->stats;
+        }
+
         // Get all of the accounts. For each, get all of the
         // folders and their statistics info. Build this into
         // an multi-array.
@@ -79,6 +115,8 @@ class Stats
 
             $stats[ $account->getEmail() ] = $folderStats;
         }
+
+        $this->stats = $stats;
 
         return $stats;
     }
@@ -112,14 +150,16 @@ class Stats
     /**
      * Prints the statistics as JSON to stdout.
      */
-    public function json()
+    public function json( $useCache = FALSE )
     {
         $stats = [
-            'accounts' => $this->getStats(),
             'type' => Daemon::MESSAGE_STATS,
+            'active' => $this->activeFolder,
             'asleep' => (bool) $this->asleep,
+            'account' => $this->activeAccount,
             'running' => (bool) $this->running,
-            'uptime' => time() - $this->startTime
+            'uptime' => time() - $this->startTime,
+            'accounts' => $this->getStats( $useCache)
         ];
 
         fwrite( STDOUT, json_encode( $stats ) );

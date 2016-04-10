@@ -140,9 +140,9 @@ $di[ 'emitter' ]->addListener(
 
 // Triggered to update the stats to all websocket connections
 $di[ 'emitter' ]->addListener(
-    EV_BROADCAST_STATS,
+    EV_BROADCAST_MSG,
     function ( Event $event ) use ( $di ) {
-        $di[ 'daemon' ]->broadcastStats( $event->getStats() );
+        $di[ 'daemon' ]->broadcast( $event->getMessage() );
     });
 
 // Trigger the events to load the timers

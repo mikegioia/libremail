@@ -44,13 +44,26 @@ module.exports = function ( grunt ) {
                 ],
                 dest: './build/app.css'
             }
+        },
+        copy: {
+            fonts: {
+                files: [{
+                    expand: true,
+                    flatten: true,
+                    src: [
+                        './src/fonts/**/*.woff'
+                    ],
+                    dest: './build/fonts/'
+                }]
+            }
         }
     });
 
+    grunt.loadNpmTasks( 'grunt-contrib-copy' );
     grunt.loadNpmTasks( 'grunt-contrib-watch' );
     grunt.loadNpmTasks( 'grunt-contrib-concat' );
 
-    grunt.registerTask( 'default', [ 'concat', 'watch' ] );
+    grunt.registerTask( 'default', [ 'concat', 'copy', 'watch' ] );
     grunt.registerTask( 'printenv', function () {
         console.log( process.env );
     });

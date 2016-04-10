@@ -15,38 +15,79 @@
         <main></main>
         <!-- Header navigation -->
         <script id="header" type="text/template">
-            <section class="status"></section>
-            <section class="actions"></section>
+            <div class="container u-max-full-width u-full-width">
+                <div class="row">
+                    <section class="accounts column one-third">
+                        {{account}}
+                        {{^account}}
+                            No account
+                        {{/account}}
+                    </section>
+                    <section class="status column one-third">
+                        <div class="icon">
+                        {{#running}}
+                            <i class="icon-running green"></i>
+                            <div class="label">Online</div>
+                        {{/running}}
+                        {{^running}}
+                            <i class="icon-running red"></i>
+                            <div class="label red">Offline!</div>
+                        {{/running}}
+                        </div>
+                        <div class="icon">
+                        {{#asleep}}
+                            <i class="icon-moon blue"></i>
+                            <div class="label">Asleep</div>
+                        {{/asleep}}
+                        {{^asleep}}
+                            <i class="icon-sun yellow"></i>
+                            <div class="label">Awake</div>
+                        {{/asleep}}
+                        </div>
+                        <div class="time">
+                            <span class="timespan">{{runningTime}}</span>
+                            <div class="label">Uptime</div>
+                        </div>
+                    </section>
+                    <section class="actions column one-third">
+                        <button>
+                            <i class="icon-restart"></i>
+                            Restart
+                        </button>
+                        <button>
+                            <i class="icon-cog"></i>
+                        </button>
+                    </section>
+                </div>
+            </div>
         </script>
         <!-- List of all folders -->
         <script id="folders" type="text/template">
-            <section class="folders">
-                <div class="container u-full-width">
-                    {{#folders}}
-                        {{> folder}}
-                    {{/folders}}
-                    {{^folders}}
-                        No folders to display
-                    {{/folders}}
+            <section class="folders u-cf">
+            {{#folders}}
+                <div id="{{id}}" class="folder{{#active}} active{{/active}}">
+                    {{> folder}}
                 </div>
+            {{/folders}}
+            {{^folders}}
+                No folders to display
+            {{/folders}}
             </section>
         </script>
         <!-- Individual folder -->
         <script id="folder" type="text/template">
-            <div class="folder">
-                <span class="name">{{name}}</span>
+            <div class="top">
+                <div class="progress" style="width: {{percent}}"></div>
+                <div class="name">{{name}}</div>
             </div>
-        </script>
-        <!-- Account status -->
-        <script id="status" type="text/template">
-
-        </script>
-        <!-- Account actions -->
-        <script id="actions" type="text/template">
-            <button class="">Wakeup Sync Engine</button>
+            <div class="bottom">
+                <span class="crumbs">{{&crumbs}}</span>
+                <span class="count">{{synced}} / {{count}}</span>
+            </div>
         </script>
         <!-- Load built JS -->
         <script type="text/javascript" src="build/app.js"></script>
+        <!-- Load the stats page -->
         <script type="text/javascript">
             (function ( Pages ) {
                 (Pages.Stats()).load();

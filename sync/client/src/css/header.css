@@ -1,0 +1,59 @@
+header section {
+    height: 5rem;
+    line-height: 3rem;
+}
+
+header section.accounts {
+    padding: 1rem 0 1rem 1.8rem;
+}
+
+header section.status {
+    padding: 0.5rem 0;
+    text-align: center;
+}
+
+header section.status .icon,
+header section.status .time {
+    margin: 0 0.5rem;
+    text-align: center;
+    display: inline-block;
+}
+
+header section.status .icon {
+    font-size: 2.2rem;
+}
+
+header section.status .icon i {
+    top: 0.1rem;
+    position: relative;
+}
+
+header section.status .label {
+    color: #666;
+    top: -0.4rem;
+    font-size: 0.9rem;
+    line-height: 1rem;
+    position: relative;
+    padding: 0.2rem 0.3rem;
+}
+
+header section.status .red {
+    color: #ee3f46;
+}
+
+header section.status .blue {
+    color: #007db6;
+}
+
+header section.status .green {
+    color: #4da74d;
+}
+
+header section.status .yellow {
+    color: #d6a70e;
+}
+
+header section.actions {
+    text-align: right;
+    padding: 1rem 1rem 1rem 0;
+}

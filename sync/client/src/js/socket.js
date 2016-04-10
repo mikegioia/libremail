@@ -15,7 +15,12 @@ LibreMail.Socket = (function ( ReconnectingWebSocket, JSON, Const, Emitter ) {
     };
 
     ws.onmessage = function ( evt ) {
-        Emitter.fire( Const.EV_STATS, JSON.parse( evt.data ) );
+        var data = JSON.parse( evt.data );
+        switch ( data.type ) {
+            case Const.MSG_STATS:
+                Emitter.fire( Const.EV_STATS, data );
+                break;
+        }
     };
 
     return ws;

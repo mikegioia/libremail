@@ -28,9 +28,15 @@ var LibreMail = {};
 
 // Constants used in application
 LibreMail.Const = {
+    // Message types
+    'MSG_STATS': 'stats',
+    // Events
     'EV_STATS': 'stats',
     'EV_WS_OPEN': 'ws_open',
     'EV_WS_CLOSE': 'ws_close',
+    'EV_LOG_DATA': 'log_data',
+    'EV_STOP_UPDATE': 'stop_update',
+    'EV_START_UPDATE': 'start_update',
     // @TODO this should be based off config file
     'WS_URL': 'ws://localhost:9898/stats'
 };

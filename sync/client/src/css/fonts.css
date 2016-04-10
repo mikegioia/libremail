@@ -1,0 +1,53 @@
+@font-face {
+    font-style: normal;
+    font-weight: normal;
+    font-family: 'icomoon';
+    src: url('fonts/icomoon.woff') format('woff');
+}
+
+[class^="icon-"], [class*=" icon-"] {
+    speak: none;
+    line-height: 1;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+
+    /* Use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'icomoon' !important;
+
+    /* Better Font Rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-moon:before {
+    content: "\1f319";
+}
+.icon-clock:before {
+    content: "\1f557";
+}
+.icon-cog:before {
+    content: "\1f527";
+}
+.icon-restart:before {
+    content: "\1f501";
+}
+.icon-sun:before {
+    content: "\1f31e";
+}
+.icon-download:before {
+    content: "\1f4e5";
+}
+.icon-plus:before {
+    content: "\2b";
+}
+.icon-check:before {
+    content: "\1f5f8";
+}
+.icon-cross:before {
+    content: "\1f5f4";
+}
+.icon-running:before {
+    content: "\1f3c3";
+}
