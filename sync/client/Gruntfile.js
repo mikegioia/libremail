@@ -40,7 +40,12 @@ module.exports = function ( grunt ) {
                 src: [
                     './vendor/skeleton/css/normalize.css',
                     './vendor/skeleton/css/skeleton.css',
-                    './src/css/**/*.css'
+                    './src/css/fonts.css',
+                    './src/css/stage.css',
+                    './src/css/buttons.css',
+                    './src/css/header.css',
+                    './src/css/folders.css',
+                    './src/css/media.css'
                 ],
                 dest: './build/app.css'
             }

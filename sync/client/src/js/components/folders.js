@@ -74,6 +74,7 @@ return function ( $root ) {
             node.className = ( folders[ i ].active )
                 ? "folder active"
                 : "folder";
+            node = null;
         }
     }
 
