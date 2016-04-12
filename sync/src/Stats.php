@@ -152,7 +152,7 @@ class Stats
      */
     public function json( $useCache = FALSE )
     {
-        $stats = [
+        Daemon::writeJson([
             'type' => Daemon::MESSAGE_STATS,
             'active' => $this->activeFolder,
             'asleep' => (bool) $this->asleep,
@@ -160,8 +160,6 @@ class Stats
             'running' => (bool) $this->running,
             'uptime' => time() - $this->startTime,
             'accounts' => $this->getStats( $useCache)
-        ];
-
-        fwrite( STDOUT, json_encode( $stats ) );
+        ]);
     }
 }

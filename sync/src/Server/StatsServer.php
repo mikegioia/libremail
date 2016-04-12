@@ -18,6 +18,7 @@ class StatsServer implements MessageComponentInterface
     private $message;
     private $clients;
     private $isReading;
+    private $messageSize;
     private $lastMessage;
     // Streams
     private $read;
@@ -87,18 +88,31 @@ class StatsServer implements MessageComponentInterface
 
     private function processMessage( $message )
     {
-        if ( substr( $message, 0, 1 ) === "{" ) {
+        // Start of message signal
+        if ( substr( $message, 0, 1 ) === "#" ) {
             $this->message = "";
             $this->isReading = TRUE;
+            $unpacked = unpack( "isize", substr( $message, 1, 4 ) );
+            $message = substr( $message, 5 );
+            $this->messageSize = intval( $unpacked[ 'size' ] );
         }
 
         if ( $this->isReading ) {
             $this->message .= $message;
+            $msg = $this->message;
+            $msgSize = $this->messageSize;
 
-            if ( substr( $message, -1 ) === "}" ) {
-                $this->isReading = FALSE;
-                $this->broadcast( $this->message );
+            if ( strlen( $msg ) >= $msgSize ) {
+                $json = substr( $msg, 0, $msgSize );
+                $nextMessage = substr( $msg, $msgSize + 1 );
                 $this->message = NULL;
+                $this->isReading = FALSE;
+                $this->messageSize = NULL;
+                $this->broadcast( $json );
+
+                if ( strlen( $nextMessage ) > 0 ) {
+                    $this->processMessage( $nextMessage );
+                }
             }
 
             return;

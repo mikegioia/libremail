@@ -49,7 +49,7 @@ return function ( $root ) {
 
         folderList = folderNames;
 
-        if ( ! d.active ) {
+        if ( d.asleep || ( ! d.active && ! activeFlag ) ) {
             if ( hasScrolled === true ) {
                 window.scrollTo( 0, 0 );
             }
@@ -90,7 +90,9 @@ return function ( $root ) {
         }
 
         for ( i in folders ) {
-            if ( ( ! active && ! activeFlag ) || folders[ i ].active ) {
+            if ( ( ! active && ! activeFlag )
+                || ( active && folders[ i ].path == active ) )
+            {
                 node = document.getElementById( folders[ i ].id );
                 node.innerHTML = Mustache.render( tpl.folder, folders[ i ] );
                 node.className = ( folders[ i ].active )
@@ -179,7 +181,7 @@ return function ( $root ) {
     function extendRedrawTimer () {
         activeFlag = true;
         clearTimeout( redrawTimer );
-        setTimeout( function () {
+        redrawTimer = setTimeout( function () {
             activeFlag = false;
         }, redrawTimeoutMs );
     }

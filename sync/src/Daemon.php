@@ -22,8 +22,9 @@ class Daemon
     private $console;
     private $command;
     // Used for internal message passing
-    private $message;
-    private $isReading;
+    private $message = [];
+    private $isReading = [];
+    private $messageSize = [];
     // Stored to send signals to
     private $syncProcess;
     // Ratchet websocket server
@@ -171,7 +172,7 @@ class Daemon
         // Resume the stdin stream, send the message and then pause
         // it again.
         $this->webServerProcess->stdin->resume();
-        $this->webServerProcess->stdin->write( json_encode( $message ) );
+        $this->webServerProcess->stdin->write( self::packJson( $message ) );
         $this->webServerProcess->stdin->pause();
     }
 
@@ -190,21 +191,47 @@ class Daemon
         $this->processPids = [];
     }
 
+    static public function writeJson( $json )
+    {
+        fwrite( STDOUT, self::packJson( $json ) );
+    }
+
+    static public function packJson( $json )
+    {
+        $encoded = json_encode( $json );
+        return sprintf(
+            "#%s%s",
+            pack( "i", strlen( $encoded ) ),
+            $encoded );
+    }
+
     private function processMessage( $message, $process )
     {
-        if ( substr( $message, 0, 1 ) === "{" ) {
-            $this->message = "";
-            $this->isReading = TRUE;
+        // Start of message signal
+        if ( substr( $message, 0, 1 ) === "#" ) {
+            $this->message[ $process ] = "";
+            $this->isReading[ $process ] = TRUE;
+            $unpacked = unpack( "isize", substr( $message, 1, 4 ) );
+            $message = substr( $message, 5 );
+            $this->messageSize[ $process ] = intval( $unpacked[ 'size' ] );
         }
 
-        if ( $this->isReading ) {
-            $this->message .= $message;
+        if ( $this->isReading[ $process ] ) {
+            $this->message[ $process ] .= $message;
+            $msg = $this->message[ $process ];
+            $msgSize = $this->messageSize[ $process ];
 
-            if ( substr( $message, -1 ) === "}" ) {
-                $this->isReading = FALSE;
-                $message = @json_decode( $this->message );
-                $this->message = NULL;
-                $this->handleMessage( $message, $process );
+            if ( strlen( $msg ) >= $msgSize ) {
+                $json = substr( $msg, 0, $msgSize );
+                $nextMessage = substr( $msg, $msgSize + 1 );
+                $this->message[ $process ] = NULL;
+                $this->isReading[ $process ] = FALSE;
+                $this->messageSize[ $process ] = NULL;
+                $this->handleMessage( @json_decode( $json ), $process );
+
+                if ( strlen( $nextMessage ) > 0 ) {
+                    $this->processMessage( $nextMessage, $process );
+                }
             }
 
             return;
