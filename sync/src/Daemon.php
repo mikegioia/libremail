@@ -200,7 +200,8 @@ class Daemon
     {
         $encoded = json_encode( $json );
         return sprintf(
-            "#%s%s",
+            "%s%s%s",
+            JSON_HEADER_CHAR,
             pack( "i", strlen( $encoded ) ),
             $encoded );
     }
@@ -208,7 +209,7 @@ class Daemon
     private function processMessage( $message, $process )
     {
         // Start of message signal
-        if ( substr( $message, 0, 1 ) === "#" ) {
+        if ( substr( $message, 0, 1 ) === JSON_HEADER_CHAR ) {
             $this->message[ $process ] = "";
             $this->isReading[ $process ] = TRUE;
             $unpacked = unpack( "isize", substr( $message, 1, 4 ) );

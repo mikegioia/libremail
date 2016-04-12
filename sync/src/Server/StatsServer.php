@@ -89,7 +89,7 @@ class StatsServer implements MessageComponentInterface
     private function processMessage( $message )
     {
         // Start of message signal
-        if ( substr( $message, 0, 1 ) === "#" ) {
+        if ( substr( $message, 0, 1 ) === JSON_HEADER_CHAR ) {
             $this->message = "";
             $this->isReading = TRUE;
             $unpacked = unpack( "isize", substr( $message, 1, 4 ) );
