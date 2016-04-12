@@ -11,6 +11,15 @@ return function ( $root ) {
     var hasScrolled;
     // Used for comparison during render
     var folderList = [];
+    // Used for throttling full re-draws. While a sync is in
+    // progress we'll get a stream of update messages. Inter-
+    // mixed in those will be messages without an active folder.
+    // The absence of the active folder will cause the update
+    // to re-draw every folder and jitter the screen. We can
+    // prevent this with a throttle timer.
+    var redrawTimer;
+    var activeFlag = false;
+    var redrawTimeoutMs = 10000;
     // DOM template nodes
     var $folder = document.getElementById( 'folder' );
     var $folders = document.getElementById( 'folders' );
@@ -35,7 +44,6 @@ return function ( $root ) {
             update( folders, d.active );
         }
         else {
-            console.log( 'drawing', d.active );
             draw( folders );
         }
 
@@ -73,6 +81,7 @@ return function ( $root ) {
 
         // If there's an active folder, just update the active one
         if ( active ) {
+            extendRedrawTimer();
             activeNodes = document.querySelectorAll( '.folder.active' );
 
             for ( i = 0; activeNode = activeNodes[ i ]; i++ ) {
@@ -81,7 +90,7 @@ return function ( $root ) {
         }
 
         for ( i in folders ) {
-            if ( ! active || folders[ i ].active ) {
+            if ( ( ! active && ! activeFlag ) || folders[ i ].active ) {
                 node = document.getElementById( folders[ i ].id );
                 node.innerHTML = Mustache.render( tpl.folder, folders[ i ] );
                 node.className = ( folders[ i ].active )
@@ -165,6 +174,14 @@ return function ( $root ) {
         }
 
         return true;
+    }
+
+    function extendRedrawTimer () {
+        activeFlag = true;
+        clearTimeout( redrawTimer );
+        setTimeout( function () {
+            activeFlag = false;
+        }, redrawTimeoutMs );
     }
 
     return {
