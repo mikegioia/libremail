@@ -32,9 +32,10 @@ return function ( $root ) {
         // If we already rendered the folders, just perform
         // an update on the folder meta.
         if ( arraysEqual( folderList, folderNames ) ) {
-            update( folders );
+            update( folders, d.active );
         }
         else {
+            console.log( 'drawing', d.active );
             draw( folders );
         }
 
@@ -64,17 +65,30 @@ return function ( $root ) {
             });
     }
 
-    function update( folders ) {
+    function update( folders, active ) {
         var i;
         var node;
+        var activeNode;
+        var activeNodes;
+
+        // If there's an active folder, just update the active one
+        if ( active ) {
+            activeNodes = document.querySelectorAll( '.folder.active' );
+
+            for ( i = 0; activeNode = activeNodes[ i ]; i++ ) {
+                activeNode.className = "folder";
+            }
+        }
 
         for ( i in folders ) {
-            node = document.getElementById( folders[ i ].id );
-            node.innerHTML = Mustache.render( tpl.folder, folders[ i ] );
-            node.className = ( folders[ i ].active )
-                ? "folder active"
-                : "folder";
-            node = null;
+            if ( ! active || folders[ i ].active ) {
+                node = document.getElementById( folders[ i ].id );
+                node.innerHTML = Mustache.render( tpl.folder, folders[ i ] );
+                node.className = ( folders[ i ].active )
+                    ? "folder active"
+                    : "folder";
+                node = null;
+            }
         }
     }
 

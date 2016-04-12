@@ -39,7 +39,9 @@ return function () {
     /**
      * Render the components.
      */
-    function render ( data ) {
+    function render ( _data ) {
+        data = _data;
+
         if ( data.account && ! flagStop ) {
             Header.render( data );
             Folders.render( data );
