@@ -18,47 +18,55 @@
             <div class="container u-max-full-width u-full-width">
                 <div class="row">
                     <section class="accounts column one-third">
-                        {{account}}
-                        {{^account}}
-                            No account
-                        {{/account}}
+                        {{> accounts}}
                     </section>
                     <section class="status column one-third">
-                        <div class="icon">
-                        {{#running}}
-                            <i class="icon-running green"></i>
-                            <div class="label">Online</div>
-                        {{/running}}
-                        {{^running}}
-                            <i class="icon-running red"></i>
-                            <div class="label red">Offline!</div>
-                        {{/running}}
-                        </div>
-                        <div class="icon">
-                        {{#asleep}}
-                            <i class="icon-moon blue"></i>
-                            <div class="label">Asleep</div>
-                        {{/asleep}}
-                        {{^asleep}}
-                            <i class="icon-sun yellow"></i>
-                            <div class="label">Awake</div>
-                        {{/asleep}}
-                        </div>
-                        <div class="time">
-                            <span class="timespan">{{runningTime}}</span>
-                            <div class="label">Uptime</div>
-                        </div>
+                        {{> status}}
                     </section>
                     <section class="actions column one-third">
-                        <button>
+                        <button id="restart">
                             <i class="icon-restart"></i>
                             Restart
                         </button>
-                        <button>
+                        <button class="account">
                             <i class="icon-cog"></i>
                         </button>
                     </section>
                 </div>
+            </div>
+        </script>
+        <!-- Account list -->
+        <script id="accounts" type="text/template">
+            {{account}}
+            {{^account}}
+                No account
+            {{/account}}
+        </script>
+        <!-- Status panel -->
+        <script id="status" type="text/template">
+            <div class="icon">
+            {{#running}}
+                <i class="icon-running green"></i>
+                <div class="label">Online</div>
+            {{/running}}
+            {{^running}}
+                <i class="icon-running red"></i>
+                <div class="label red">Offline!</div>
+            {{/running}}
+            </div>
+            <div class="icon">
+            {{#asleep}}
+                <i class="icon-moon blue"></i>
+                <div class="label">Asleep</div>
+            {{/asleep}}
+            {{^asleep}}
+                <i class="icon-sun yellow"></i>
+                <div class="label">Awake</div>
+            {{/asleep}}
+            </div>
+            <div class="time">
+                <span class="timespan">{{runningTime}}</span>
+                <div class="label">Uptime</div>
             </div>
         </script>
         <!-- List of all folders -->

@@ -163,6 +163,16 @@ class Daemon
         $this->processRestartInterval[ $process ] = $nextInterval;
     }
 
+    /**
+     * Sends a SIGCONT to the sync process to wake it up.
+     */
+    public function continueSync()
+    {
+        if ( isset( $this->processPids[ PROC_SYNC ] ) ) {
+            posix_kill( $this->processPids[ PROC_SYNC ], SIGCONT );
+        }
+    }
+
     public function broadcast( $message )
     {
         if ( ! $this->webServerProcess ) {

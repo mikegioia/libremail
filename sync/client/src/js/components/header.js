@@ -1,7 +1,7 @@
 /**
  * Header Component
  */
-LibreMail.Components.Header = (function ( Mustache ) {
+LibreMail.Components.Header = (function ( Const, Socket, Mustache ) {
 'use strict';
 // Returns a new instance
 return function ( $root ) {
@@ -9,19 +9,41 @@ return function ( $root ) {
     var namespace = '.header';
     // DOM template nodes
     var $header = document.getElementById( 'header' );
+    var $status = document.getElementById( 'status' );
+    var $accounts = document.getElementById( 'accounts' );
     // Templates
     var tpl = {
-        header: $header.innerHTML
+        header: $header.innerHTML,
+        status: $status.innerHTML,
+        accounts: $accounts.innerHTML
     };
+    // State for restart command
+    var isAsleep = false;
+    // State for rendering the parent template
+    var rootIsRendered = false;
+    // DOM nodes for updating
+    var $statusSection;
+    var $restartButton;
+    var $accountsSection;
 
     // Parse the templates
     Mustache.parse( tpl.header );
+    Mustache.parse( tpl.status );
+    Mustache.parse( tpl.accounts );
 
     /**
      * Triggered from Stats Page
      * @param Object data
      */
     function render ( data ) {
+        // Store this for the restart button
+        isAsleep = data.asleep;
+
+        if ( rootIsRendered === true ) {
+            update( data );
+            return;
+        }
+
         $root.innerHTML = Mustache.render(
             tpl.header, {
                 asleep: data.asleep,
@@ -32,7 +54,47 @@ return function ( $root ) {
                     return formatTime( this.uptime )
                 },
                 accounts: Object.keys( data.accounts )
+            }, {
+                status: tpl.status,
+                accounts: tpl.accounts
             });
+        rootIsRendered = true;
+        $statusSection = $root.querySelector( 'section.status' );
+        $accountsSection = $root.querySelector( 'section.accounts' );
+        $restartButton = $root.querySelector( 'button#restart' );
+
+        // Attach event handlers to DOM elements.
+        $restartButton.onclick = restart;
+    }
+
+    function restart () {
+        if ( ! isAsleep ) {
+            return;
+        }
+
+        Socket.send( Const.MSG_RESTART );
+    }
+
+    function update ( data ) {
+        $statusSection.innerHTML = Mustache.render(
+            tpl.status, {
+                asleep: data.asleep,
+                uptime: data.uptime,
+                running: data.running,
+                runningTime: function () {
+                    return formatTime( this.uptime )
+                }
+            });
+        $accountsSection.innerHTML = Mustache.render(
+            tpl.accounts, {
+                account: data.account,
+                accounts: Object.keys( data.accounts )
+            });
+
+        // Mark button disabled if the sync is running
+        $restartButton.className = ( ! isAsleep )
+            ? 'disabled'
+            : '';
     }
 
     function formatTime ( seconds ) {
@@ -55,4 +117,4 @@ return function ( $root ) {
     return {
         render: render
     };
-}}( Mustache ));
+}}( LibreMail.Const, LibreMail.Socket, Mustache ));

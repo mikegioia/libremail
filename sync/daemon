@@ -145,6 +145,13 @@ $di[ 'emitter' ]->addListener(
         $di[ 'daemon' ]->broadcast( $event->getMessage() );
     });
 
+// Triggered to wake up a sleeping sync process
+$di[ 'emitter' ]->addListener(
+    EV_CONTINUE_SYNC,
+    function ( Event $event ) use ( $di ) {
+        $di[ 'daemon' ]->continueSync();
+    });
+
 // Trigger the events to load the timers
 $di[ 'emitter' ]->dispatch( EV_START_SYNC );
 $di[ 'emitter' ]->dispatch( EV_START_SERVER );

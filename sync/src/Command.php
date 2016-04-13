@@ -10,9 +10,10 @@ class Command
 {
     private $log;
     private $emitter;
+    // Command format: !COMMAND\n
     private $regexMatch = '/^(!{1}[A-Z]+\n{1})$/';
     private $regexExtract = '/^(?:!{1})([A-Z]+)(?:\n{1})$/';
-
+    // Valid commands
     const STATS = 'STATS';
     const RESTART = 'RESTART';
 
@@ -30,7 +31,7 @@ class Command
      * A command has a special format. It needs a header that
      * conforms with our spec: !COMMAND\n
      * Each command starts with a !, be all caps, and end with
-     * a newline. As an example, restart would be: !RESTART.
+     * a newline. As an example, restart would be: "!RESTART\n"
      * @param string $message
      * @return boolean
      */
@@ -69,7 +70,7 @@ class Command
                 $this->log->info( "This would emit an event to get stats (SIGUSR2)" );
                 break;
             case self::RESTART:
-                $this->log->info( "This would emit an event to restart (SIGCONT)" );
+                $this->emitter->dispatch( EV_CONTINUE_SYNC );
                 break;
             default:
                 throw new BadCommandException( $message );

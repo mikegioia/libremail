@@ -3,12 +3,12 @@ button {
     height: 3rem;
     padding: 0 1rem;
     font-weight: 400;
+    background: #222;
     font-size: 1.5rem;
     letter-spacing: 0;
+    border-color: #111;
     line-height: 2.9rem;
     text-transform: none;
-    background: #222;
-    border-color: #111;
 }
 
 button.button-primary {
@@ -31,6 +31,15 @@ button.button-primary:active {
     color: #fff;
     border-color: #ab51c4;
     background-color: #ab51c4;
+}
+
+button.disabled,
+button.disabled:focus,
+button.disabled:hover,
+button.disabled:active {
+    color: #444;
+    background: #242424;
+    border-color: #1c1c1c;
 }
 
 button i {

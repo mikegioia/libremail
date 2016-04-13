@@ -30,6 +30,7 @@ var LibreMail = {};
 LibreMail.Const = {
     // Message types
     'MSG_STATS': 'stats',
+    'MSG_RESTART': '!RESTART\n',
     // Events
     'EV_STATS': 'stats',
     'EV_WS_OPEN': 'ws_open',
