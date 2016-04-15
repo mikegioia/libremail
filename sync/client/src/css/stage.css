@@ -26,3 +26,26 @@ main {
     width: 100%;
     position: absolute;
 }
+
+.loading {
+    top: 50%;
+    left: 50%;
+    width: 20rem;
+    height: 10rem;
+    margin-top: -8rem;
+    position: absolute;
+    text-align: center;
+    margin-left: -10rem;
+}
+
+.loading i {
+    color: #555;
+    display: block;
+    line-height: 1;
+    font-size: 10rem;
+}
+
+.loading span {
+    color: #777;
+    font-size: 2rem;
+}

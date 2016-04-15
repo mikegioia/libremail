@@ -22,11 +22,11 @@ return function () {
     }
 
     function events () {
-        Emitter.on( Const.EV_STATS, render );
-        Emitter.on( Const.EV_LOG_DATA, logData );
-        Emitter.on( Const.EV_WS_CLOSE, offline );
-        Emitter.on( Const.EV_STOP_UPDATE, stopUpdate );
-        Emitter.on( Const.EV_START_UPDATE, startUpdate );
+        Emitter.on( Const.EV.STATS, render );
+        Emitter.on( Const.EV.LOG_DATA, logData );
+        Emitter.on( Const.EV.WS_CLOSE, offline ); // @TODO move this to different page
+        Emitter.on( Const.EV.STOP_UPDATE, stopUpdate );
+        Emitter.on( Const.EV.START_UPDATE, startUpdate );
     }
 
     function components () {

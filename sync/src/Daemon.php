@@ -2,7 +2,8 @@
 
 namespace App;
 
-use Exception
+use App\Log
+  , Exception
   , App\Command
   , App\Events\MessageEvent
   , App\Console\DaemonConsole
@@ -13,6 +14,7 @@ use Exception
 
 class Daemon
 {
+    private $log;
     // Flag to not attempt to restart process
     private $halt;
     // Reference to the React event loop
@@ -39,12 +41,14 @@ class Daemon
     const MESSAGE_STATS = 'stats';
 
     public function __construct(
+        Log $log,
         LoopInterface $loop,
         Emitter $emitter,
         DaemonConsole $console,
         Command $command,
         Array $config )
     {
+        $this->log = $log;
         $this->loop = $loop;
         $this->config = $config;
         $this->emitter = $emitter;
@@ -153,9 +157,11 @@ class Daemon
             ? $decay * $currentInterval
             : $restartMax;
 
-        $this->loop->addTimer( $nextInterval, function ( $timer ) {
-            $this->emitter->dispatch( $event );
-        });
+        $this->loop->addTimer(
+            $nextInterval,
+            function ( $timer ) use ( $event ) {
+                $this->emitter->dispatch( $event );
+            });
 
         // Update the restart interval for next time. At some point,
         // this needs to reset back to the starting interval.
@@ -173,6 +179,19 @@ class Daemon
         }
     }
 
+    /**
+     * Sends a SIGUSR2 to the sync process to get a stats update.
+     */
+    public function pollStats()
+    {
+        if ( isset( $this->processPids[ PROC_SYNC ] ) ) {
+            posix_kill( $this->processPids[ PROC_SYNC ], SIGUSR2 );
+        }
+    }
+
+    /**
+     * Sends a message to the server process to forward to any clients.
+     */
     public function broadcast( $message )
     {
         if ( ! $this->webServerProcess ) {
@@ -184,6 +203,14 @@ class Daemon
         $this->webServerProcess->stdin->resume();
         $this->webServerProcess->stdin->write( self::packJson( $message ) );
         $this->webServerProcess->stdin->pause();
+    }
+
+    /**
+     * Sends a health report for the sync process and app.
+     */
+    public function broadcastHealth()
+    {
+        
     }
 
     public function halt()
@@ -227,7 +254,9 @@ class Daemon
             $this->messageSize[ $process ] = intval( $unpacked[ 'size' ] );
         }
 
-        if ( $this->isReading[ $process ] ) {
+        if ( isset( $this->isReading[ $process ] )
+            && $this->isReading[ $process ] )
+        {
             $this->message[ $process ] .= $message;
             $msg = $this->message[ $process ];
             $msgSize = $this->messageSize[ $process ];
@@ -288,7 +317,15 @@ class Daemon
     private function handleCommand( $message )
     {
         if ( $this->command->isValid( $message ) ) {
-            $this->command->run( $message );
+            // Ignore these but log them
+            try {
+                $this->command->run( $message );
+            }
+            catch ( BadCommandException $e ) {
+                $this->log->addNotice( $e->getMessage() );
+                return FALSE;
+            }
+
             return TRUE;
         }
 

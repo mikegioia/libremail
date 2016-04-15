@@ -8,16 +8,16 @@ use App\Exceptions\Error as ErrorException
 
 class Command
 {
-    private $log;
     private $emitter;
     // Command format: !COMMAND\n
     private $regexMatch = '/^(!{1}[A-Z]+\n{1})$/';
     private $regexExtract = '/^(?:!{1})([A-Z]+)(?:\n{1})$/';
     // Valid commands
     const STATS = 'STATS';
+    const HEALTH = 'HEALTH';
     const RESTART = 'RESTART';
 
-    public function __construct( Emitter $emitter = NULL, Log $log = NULL )
+    public function __construct( Emitter $emitter = NULL )
     {
         $this->emitter = $emitter;
 
@@ -49,10 +49,10 @@ class Command
      */
     public function run( $message )
     {
-        if ( ! $this->emitter || ! $this->log ) {
+        if ( ! $this->emitter ) {
             throw new ErrorException(
                 "A command was attempted to be run in a context ".
-                "without an Event Emitter or Logger." );
+                "without an Event Emitter." );
         }
 
         $matched = preg_match_all( $this->regexExtract, $message, $results );
@@ -67,13 +67,22 @@ class Command
 
         switch ( $results[ 1 ][ 0 ] ) {
             case self::STATS:
-                $this->log->info( "This would emit an event to get stats (SIGUSR2)" );
+                $this->emitter->dispatch( EV_POLL_STATS );
                 break;
             case self::RESTART:
                 $this->emitter->dispatch( EV_CONTINUE_SYNC );
                 break;
+            case self::HEALTH:
+                $this->emitter->dispatch( EV_POLL_DAEMON );
             default:
                 throw new BadCommandException( $message );
         }
+    }
+
+    public function 
+
+    static public function getMessage( $command )
+    {
+        return sprintf( "!%s\n", $command );
     }
 }

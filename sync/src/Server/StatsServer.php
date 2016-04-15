@@ -51,6 +51,11 @@ class StatsServer implements MessageComponentInterface
         if ( $this->lastMessage ) {
             $conn->send( $this->lastMessage );
         }
+
+        // Send a command to return the status of the sync script.
+        // If the daemon gets this and the sync script isn't running,
+        // then it'll trigger an event to broadcast an offline message.
+        $this->write->write( Command::getMessage( Command::HEALTH ) );
     }
 
     public function onClose( ConnectionInterface $conn )
@@ -126,9 +131,7 @@ class StatsServer implements MessageComponentInterface
         // restart the sync (wake up), force-fetch the stats,
         // shutdown the sync, etc. Send this to the daemon. If it's
         // a valid command, then send it to STDOUT.
-        $command = new Command();
-
-        if ( $command->isValid( $message ) ) {
+        if ( (new Command)->isValid( $message ) ) {
             $this->write->write( $message );
         }
     }

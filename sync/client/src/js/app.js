@@ -29,17 +29,24 @@ var LibreMail = {};
 // Constants used in application
 LibreMail.Const = {
     // Message types
-    'MSG_STATS': 'stats',
-    'MSG_RESTART': '!RESTART\n',
+    'MSG': {
+        'RESTART': '!RESTART\n'
+    },
     // Events
-    'EV_STATS': 'stats',
-    'EV_WS_OPEN': 'ws_open',
-    'EV_WS_CLOSE': 'ws_close',
-    'EV_LOG_DATA': 'log_data',
-    'EV_STOP_UPDATE': 'stop_update',
-    'EV_START_UPDATE': 'start_update',
+    'EV': {
+        'STATS': 'stats',
+        'ERROR': 'error',
+        'WS_OPEN': 'ws_open',
+        'ACCOUNTS': 'accounts',
+        'WS_CLOSE': 'ws_close',
+        'LOG_DATA': 'log_data',
+        'STOP_UPDATE': 'stop_update',
+        'START_UPDATE': 'start_update'
+    },
     // @TODO this should be based off config file
-    'WS_URL': 'ws://localhost:9898/stats'
+    'WS': {
+        'URL': 'ws://localhost:9898/stats'
+    }
 };
 
 // Containers

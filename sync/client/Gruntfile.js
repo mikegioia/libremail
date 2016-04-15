@@ -31,7 +31,7 @@ module.exports = function ( grunt ) {
                     './src/js/pages/*.js',
                     './src/js/components/*.js',
                 ],
-                dest: './build/app.js'
+                dest: './build/libremail.js'
             },
             css: {
                 options : {
@@ -47,7 +47,7 @@ module.exports = function ( grunt ) {
                     './src/css/folders.css',
                     './src/css/media.css'
                 ],
-                dest: './build/app.css'
+                dest: './build/libremail.css'
             }
         },
         copy: {

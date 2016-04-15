@@ -7,12 +7,18 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Load built CSS -->
-        <link rel="stylesheet" href="build/app.css">
+        <link rel="stylesheet" href="build/libremail.css">
     </head>
     <body>
         <!-- Application layout -->
-        <header></header>
-        <main></main>
+        <header>
+            <section class="accounts">LibreMail</section>
+        </header>
+        <main>
+            <div class="loading">
+                <i class="icon-mail"></i>
+                <span>Warming up</span>
+        </main>
         <!-- Header navigation -->
         <script id="header" type="text/template">
             <div class="container u-max-full-width u-full-width">
@@ -94,7 +100,7 @@
             </div>
         </script>
         <!-- Load built JS -->
-        <script type="text/javascript" src="build/app.js"></script>
+        <script type="text/javascript" src="build/libremail.js"></script>
         <!-- Load the stats page -->
         <script type="text/javascript">
             (function ( Pages ) {

@@ -21,6 +21,9 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-mail:before {
+    content: "\1f585";
+}
 .icon-moon:before {
     content: "\1f319";
 }
