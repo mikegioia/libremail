@@ -23,7 +23,7 @@ LibreMail.Socket = (function ( ReconnectingWebSocket, JSON, Const, Emitter ) {
 
         // Check if the type field is present
         if ( ! data.hasOwnProperty( 'type' )
-            || Const.EV.indexOf( data.type ) === -1 )
+            || Const.EV.hasOwnProperty( data.type ) )
         {
             data.type = Const.EV.ERROR;
         }

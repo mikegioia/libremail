@@ -5,6 +5,7 @@ namespace App;
 use Fn
   , App\Log
   , Exception
+  , App\Daemon
   , PDOException
   , Pimple\Container
   , App\Models\Migration as MigrationModel
@@ -49,31 +50,42 @@ class Diagnostics
                 'code' => 1,
                 'status' => NULL,
                 'message' => NULL,
-                'name' => 'log path is writable'
+                'name' => 'log path is writable',
+                'suggestion' =>
+                    'Check the permissions on the logging directory.'
             ],
             self::TEST_DB_CONN => [
                 'code' => 2,
                 'status' => NULL,
                 'message' => NULL,
-                'name' => 'database connection is alive'
+                'name' => 'database connection is alive',
+                'suggestion' =>
+                    'Make sure your SQL username and password are correct and '.
+                    'that you have a SQL database running.'
             ],
             self::TEST_DB_EXISTS => [
                 'code' => 3,
                 'status' => NULL,
                 'message' => NULL,
-                'name' => 'database was created'
+                'name' => 'database was created',
+                'suggestion' => 'You probably need to create the SQL database.'
             ],
             self::TEST_MAX_PACKET => [
                 'code' => 4,
                 'status' => NULL,
                 'message' => NULL,
-                'name' => 'max_allowed_packet is safe'
+                'name' => 'max_allowed_packet is safe',
+                'suggestion' =>
+                    'Update your max_allowed_packet in your SQL config file.'
             ],
             self::TEST_ATTACH_PATH => [
                 'code' => 5,
                 'status' => NULL,
                 'message' => NULL,
-                'name' => 'attachment path is writable'
+                'name' => 'attachment path is writable',
+                'suggestion' =>
+                    'Check the permissions on the attachment directory. This '.
+                    'directory is needed to save file attachments from your emails.'
             ]
         ];
     }
@@ -281,10 +293,13 @@ class Diagnostics
         $message = ( $e )
             ? $e->getMessage()
             : "Testing ". $this->tests[ $test ][ 'name' ];
+        $this->tests[ $test ][ 'status' ] = $status;
+        $this->tests[ $test ][ 'message' ] = $message;
 
-        // If we're not in diagnostic mode, then use exceptions
+        // If we're not in diagnostic mode (and not daemon mode), then
+        // use exceptions
         if ( ! $this->console->diagnostics ) {
-            if ( $status === STATUS_ERROR ) {
+            if ( $status === STATUS_ERROR && ! $this->console->daemon ) {
                 throw new FatalException(
                     "Failed diagnostic test #$code, $message" );
             }
@@ -317,9 +332,6 @@ class Diagnostics
                 $this->cli->dim( $message );
                 break;
         }
-
-        $this->tests[ $test ][ 'status' ] = $status;
-        $this->tests[ $test ][ 'message' ] = $message;
     }
 
     /**
@@ -327,6 +339,13 @@ class Diagnostics
      */
     private function finish()
     {
+        if ( $this->console->daemon ) {
+            Daemon::writeJson([
+                'tests' => $this->tests,
+                'type' => Daemon::MESSAGE_DIAGNOSTICS
+            ]);
+        }
+
         if ( ! $this->console->diagnostics ) {
             return;
         }
@@ -355,6 +374,16 @@ class Diagnostics
         $forwardException = FALSE )
     {
         if ( strpos( $e->getMessage(), "server has gone away" ) === FALSE ) {
+            if ( $di[ 'console' ]->daemon ) {
+                Daemon::writeJson([
+                    'error_type' => ERR_DATABASE,
+                    'message' => $e->getMessage(),
+                    'type' => Daemon::MESSAGE_ERROR,
+                    'suggestion' =>
+                        "You probably didn't run the installation script."
+                ]);
+            }
+
             throw new TerminateException(
                 "System encountered an un-recoverable database error. ".
                 "Going to halt now, please see the log file for info." );

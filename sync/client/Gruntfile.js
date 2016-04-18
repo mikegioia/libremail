@@ -45,6 +45,7 @@ module.exports = function ( grunt ) {
                     './src/css/buttons.css',
                     './src/css/header.css',
                     './src/css/folders.css',
+                    './src/css/status.css',
                     './src/css/media.css'
                 ],
                 dest: './build/libremail.css'

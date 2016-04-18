@@ -9,7 +9,9 @@ use App\Log
   , App\Console\DaemonConsole
   , React\ChildProcess\Process
   , React\EventLoop\LoopInterface
+  , App\Traits\JsonMessage as JsonMessageTrait
   , App\Exceptions\Terminate as TerminateException
+  , App\Exceptions\BadCommand as BadCommandException
   , Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 
 class Daemon
@@ -23,22 +25,26 @@ class Daemon
     private $emitter;
     private $console;
     private $command;
-    // Used for internal message passing
-    private $message = [];
-    private $isReading = [];
-    private $messageSize = [];
     // Stored to send signals to
     private $syncProcess;
+    // Log of diagnostic test results
+    private $diagnostics;
     // Ratchet websocket server
     private $webServerProcess;
     // References to true PIDs
     private $processPids = [];
     private $processRestartInterval = [];
 
+    // For JSON message handling
+    use JsonMessageTrait;
+
     const PROC_SYNC = 'sync';
     const PROC_SERVER = 'server';
     const MESSAGE_PID = 'pid';
     const MESSAGE_STATS = 'stats';
+    const MESSAGE_ERROR = 'error';
+    const MESSAGE_HEALTH = 'health';
+    const MESSAGE_DIAGNOSTICS = 'diagnostics';
 
     public function __construct(
         Log $log,
@@ -48,12 +54,12 @@ class Daemon
         Command $command,
         Array $config )
     {
-        $this->log = $log;
         $this->loop = $loop;
         $this->config = $config;
         $this->emitter = $emitter;
         $this->console = $console;
         $this->command = $command;
+        $this->log = $log->getLogger();
         $this->processRestartInterval = [
             PROC_SYNC => $config[ 'restart_interval' ][ PROC_SYNC ],
             PROC_SERVER => $config[ 'restart_interval' ][ PROC_SERVER ]
@@ -210,7 +216,18 @@ class Daemon
      */
     public function broadcastHealth()
     {
-        
+        $this->broadcast([
+            'tests' => $this->diagnostics,
+            'type' => self::MESSAGE_HEALTH,
+            'procs' => [
+                PROC_SYNC => ( isset( $this->processPids[ PROC_SYNC ] ) )
+                    ? TRUE
+                    : FALSE,
+                PROC_SERVER => ( isset( $this->processPids[ PROC_SERVER ] ) )
+                    ? TRUE
+                    : FALSE
+            ]
+        ]);
     }
 
     public function halt()
@@ -236,6 +253,7 @@ class Daemon
     static public function packJson( $json )
     {
         $encoded = json_encode( $json );
+
         return sprintf(
             "%s%s%s",
             JSON_HEADER_CHAR,
@@ -245,64 +263,42 @@ class Daemon
 
     private function processMessage( $message, $process )
     {
-        // Start of message signal
-        if ( substr( $message, 0, 1 ) === JSON_HEADER_CHAR ) {
-            $this->message[ $process ] = "";
-            $this->isReading[ $process ] = TRUE;
-            $unpacked = unpack( "isize", substr( $message, 1, 4 ) );
-            $message = substr( $message, 5 );
-            $this->messageSize[ $process ] = intval( $unpacked[ 'size' ] );
-        }
-
-        if ( isset( $this->isReading[ $process ] )
-            && $this->isReading[ $process ] )
-        {
-            $this->message[ $process ] .= $message;
-            $msg = $this->message[ $process ];
-            $msgSize = $this->messageSize[ $process ];
-
-            if ( strlen( $msg ) >= $msgSize ) {
-                $json = substr( $msg, 0, $msgSize );
-                $nextMessage = substr( $msg, $msgSize + 1 );
-                $this->message[ $process ] = NULL;
-                $this->isReading[ $process ] = FALSE;
-                $this->messageSize[ $process ] = NULL;
-                $this->handleMessage( @json_decode( $json ), $process );
-
-                if ( strlen( $nextMessage ) > 0 ) {
-                    $this->processMessage( $nextMessage, $process );
-                }
-            }
-
+        if ( ! ($parsed = $this->parseMessage( $message, $process )) ) {
             return;
         }
 
         // If the message was a command from a sub-process, then
         // handle that command. Otherwise print this message.
-        if ( $this->handleCommand( $message ) ) {
+        if ( $this->handleCommand( $parsed ) ) {
             return;
         }
 
-        fwrite( STDOUT, $message );
+        fwrite( STDOUT, $parsed );
     }
 
     /**
      * Reads in a JSON message from one of the child processes.
      * The message expects certain fields to be set:
      *   type: 'pid' or 'stats'
-     * @param stdClass $message
+     * @param string $json
      * @param string $process
      */
-    private function handleMessage( $message, $process )
+    private function handleMessage( $json, $process )
     {
+        $message = @json_decode( $json );
+
         switch ( $message->type ) {
             case self::MESSAGE_PID:
                 $this->processPids[ $process ] = $message->pid;
                 break;
             case self::MESSAGE_STATS:
+            case self::MESSAGE_ERROR:
                 $this->emitter->dispatch(
                     EV_BROADCAST_MSG,
                     new MessageEvent( $message ) );
+                break;
+            case self::MESSAGE_DIAGNOSTICS:
+                $this->diagnostics = $message->tests;
                 break;
         }
     }

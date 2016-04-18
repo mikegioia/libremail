@@ -24,7 +24,6 @@ return function () {
     function events () {
         Emitter.on( Const.EV.STATS, render );
         Emitter.on( Const.EV.LOG_DATA, logData );
-        Emitter.on( Const.EV.WS_CLOSE, offline ); // @TODO move this to different page
         Emitter.on( Const.EV.STOP_UPDATE, stopUpdate );
         Emitter.on( Const.EV.START_UPDATE, startUpdate );
     }
@@ -58,13 +57,6 @@ return function () {
 
     function logData () {
         console.log( data );
-    }
-
-    /**
-     * The socket closed, show an offline message.
-     */
-    function offline () {
-        alert( 'offline' );
     }
 
     return {

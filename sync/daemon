@@ -174,20 +174,17 @@ $di[ 'emitter' ]->dispatch( EV_START_SERVER );
 // Run the loop until we hit a halt signal
 try {
     runLoop: {
+        $di[ 'loop' ]->stop();
         $di[ 'loop' ]->run();
     }
-    echo "end loop run\n";
 }
 // Gracefully exit if we're terminated
 catch ( TerminateException $e ) {
-    echo "caugh terminate\n";
     $di[ 'log' ]->getLogger()->addInfo( $e->getMessage() );
     $HALT();
 }
 // Unhandled exceptions
 catch ( Exception $e ) {
-    echo "caught generic\n";
     $di[ 'log' ]->displayError( $e );
     $HALT();
 }
-echo "done\n";

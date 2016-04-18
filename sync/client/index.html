@@ -18,7 +18,35 @@
             <div class="loading">
                 <i class="icon-mail"></i>
                 <span>Warming up</span>
+            </div>
         </main>
+        <!-- Warming up -->
+        <script id="warmup" type="text/template">
+            <div class="loading">
+                <i class="icon-mail"></i>
+                <span>Waiting for signal<br>&hellip;</span>
+            </div>
+        </script>
+        <!-- Status message -->
+        <script id="status-message" type="text/template">
+            <section class="status-message">
+                <h1>{{heading}}</h1>
+                <div class="note">
+                    <div class="message">{{message}}</div>
+                {{#suggestion}}
+                    <div class="suggestion">{{suggestion}}</div>
+                {{/suggestion}}
+                {{#restart}}
+                    <div class="recheck">
+                        <button id="recheck">
+                            <i class="icon-restart"></i>
+                            Check Again
+                        </button>
+                    </div>
+                {{/restart}}
+                </div>
+            </section>
+        </script>
         <!-- Header navigation -->
         <script id="header" type="text/template">
             <div class="container u-max-full-width u-full-width">
@@ -104,6 +132,7 @@
         <!-- Load the stats page -->
         <script type="text/javascript">
             (function ( Pages ) {
+                (Pages.Global()).load();
                 (Pages.Stats()).load();
             }( LibreMail.Pages ));
         </script>

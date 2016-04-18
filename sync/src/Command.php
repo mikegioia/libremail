@@ -14,16 +14,13 @@ class Command
     private $regexExtract = '/^(?:!{1})([A-Z]+)(?:\n{1})$/';
     // Valid commands
     const STATS = 'STATS';
+    const START = 'START';
     const HEALTH = 'HEALTH';
     const RESTART = 'RESTART';
 
     public function __construct( Emitter $emitter = NULL )
     {
         $this->emitter = $emitter;
-
-        if ( $log ) {
-            $this->log = $log->getLogger();
-        }
     }
 
     /**
@@ -69,17 +66,19 @@ class Command
             case self::STATS:
                 $this->emitter->dispatch( EV_POLL_STATS );
                 break;
+            case self::START:
+                $this->emitter->dispatch( EV_START_SYNC );
+                break;
             case self::RESTART:
                 $this->emitter->dispatch( EV_CONTINUE_SYNC );
                 break;
             case self::HEALTH:
                 $this->emitter->dispatch( EV_POLL_DAEMON );
+                break;
             default:
                 throw new BadCommandException( $message );
         }
     }
-
-    public function 
 
     static public function getMessage( $command )
     {
