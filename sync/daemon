@@ -98,6 +98,7 @@ $pcntl->on( SIGQUIT, $TERMINATE );
 
 // Daemon manages the sync and websocket processes
 $di[ 'daemon' ] = new Daemon(
+    $di[ 'log' ],
     $di[ 'loop' ],
     $di[ 'emitter' ],
     $di[ 'console' ],
@@ -152,17 +153,30 @@ $di[ 'emitter' ]->addListener(
         $di[ 'daemon' ]->continueSync();
     });
 
+// Triggered to send stats update (SIGUSR2)
+$di[ 'emitter' ]->addListener(
+    EV_POLL_STATS,
+    function ( Event $event ) use ( $di ) {
+        $di[ 'daemon' ]->pollStats();
+    });
+
+// Sends a health report about the sync/server processes
+$di[ 'emitter' ]->addListener(
+    EV_POLL_DAEMON,
+    function ( Event $event ) use ( $di ) {
+        $di[ 'daemon' ]->broadcastHealth();
+    });
+
 // Trigger the events to load the timers
 $di[ 'emitter' ]->dispatch( EV_START_SYNC );
 $di[ 'emitter' ]->dispatch( EV_START_SERVER );
 
 // Run the loop until we hit a halt signal
 try {
-    $di[ 'loop' ]->run();
-}
-// Ignore these but log them
-catch ( BadCommandException $e ) {
-    $di[ 'log' ]->getLogger()->addNotice( $e->getMessage() );
+    runLoop: {
+        $di[ 'loop' ]->stop();
+        $di[ 'loop' ]->run();
+    }
 }
 // Gracefully exit if we're terminated
 catch ( TerminateException $e ) {

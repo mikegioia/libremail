@@ -40,7 +40,8 @@ class RatchetApp extends BaseRatchetApp
         }
         elseif ( $controller instanceof MessageComponentInterface ) {
             $decorated = new WsServer( $controller );
-        } else {
+        }
+        else {
             $decorated = $controller;
         }
 

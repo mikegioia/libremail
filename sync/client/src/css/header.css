@@ -1,6 +1,7 @@
 header section {
     height: 5rem;
     line-height: 3rem;
+    box-sizing: border-box;
 }
 
 header section.accounts {

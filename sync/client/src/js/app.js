@@ -29,17 +29,48 @@ var LibreMail = {};
 // Constants used in application
 LibreMail.Const = {
     // Message types
-    'MSG_STATS': 'stats',
-    'MSG_RESTART': '!RESTART\n',
+    MSG: {
+        HEALTH: '!HEALTH\n',
+        RESTART: '!RESTART\n'
+    },
     // Events
-    'EV_STATS': 'stats',
-    'EV_WS_OPEN': 'ws_open',
-    'EV_WS_CLOSE': 'ws_close',
-    'EV_LOG_DATA': 'log_data',
-    'EV_STOP_UPDATE': 'stop_update',
-    'EV_START_UPDATE': 'start_update',
+    EV: {
+        STATS: 'stats',
+        START: 'start',
+        ERROR: 'error',
+        HEALTH: 'health',
+        WS_OPEN: 'ws_open',
+        ACCOUNTS: 'accounts',
+        WS_CLOSE: 'ws_close',
+        LOG_DATA: 'log_data',
+        STOP_UPDATE: 'stop_update',
+        START_UPDATE: 'start_update'
+    },
     // @TODO this should be based off config file
-    'WS_URL': 'ws://localhost:9898/stats'
+    WS: {
+        URL: 'ws://localhost:9898/stats'
+    },
+    // Statuses
+    STATUS: {
+        error: 'error',
+        success: 'success'
+    },
+    // Language used in app
+    LANG: {
+        sprintf: function () {
+            var args = Array.prototype.slice.call(arguments);
+            return args.shift().replace( /%s/g, function () {
+                return args.shift();
+            });
+        },
+        server_offline_heading: "Server Offline",
+        server_offline_message:
+            "There was a problem making a connection to the server. " +
+            "The application is probably offline.",
+        error_heading: "Uh oh...",
+        health_error_message: "An error was found when testing if the %s. %s",
+        system_error_message: "An error was encountered! %s"
+    }
 };
 
 // Containers

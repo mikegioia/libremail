@@ -72,7 +72,7 @@ return function ( $root ) {
             return;
         }
 
-        Socket.send( Const.MSG_RESTART );
+        Socket.send( Const.MSG.RESTART );
     }
 
     function update ( data ) {

@@ -9,7 +9,8 @@ use App\Log
   , React\Stream\Stream
   , Ratchet\ConnectionInterface
   , React\EventLoop\LoopInterface
-  , Ratchet\MessageComponentInterface;
+  , Ratchet\MessageComponentInterface
+  , App\Traits\JsonMessage as JsonMessageTrait;
 
 class StatsServer implements MessageComponentInterface
 {
@@ -17,12 +18,13 @@ class StatsServer implements MessageComponentInterface
     private $loop;
     private $message;
     private $clients;
-    private $isReading;
-    private $messageSize;
     private $lastMessage;
     // Streams
     private $read;
     private $write;
+
+    // For JSON message handling
+    use JsonMessageTrait;
 
     public function __construct ( Log $log, LoopInterface $loop )
     {
@@ -51,6 +53,11 @@ class StatsServer implements MessageComponentInterface
         if ( $this->lastMessage ) {
             $conn->send( $this->lastMessage );
         }
+
+        // Send a command to return the status of the sync script.
+        // If the daemon gets this and the sync script isn't running,
+        // then it'll trigger an event to broadcast an offline message.
+        $this->write->write( Command::getMessage( Command::HEALTH ) );
     }
 
     public function onClose( ConnectionInterface $conn )
@@ -69,7 +76,7 @@ class StatsServer implements MessageComponentInterface
     public function onMessage( ConnectionInterface $from, $message )
     {
         $this->log->debug( "New socket message from #{$from->resourceId}: $message" );
-        $this->processMessage( $message );
+        $this->processMessage( $message, NULL );
     }
 
     private function setupInputStreams()
@@ -80,45 +87,17 @@ class StatsServer implements MessageComponentInterface
         // detect this format and keep reading until we reach the
         // end of the JSON stream.
         $this->read->on( 'data', function ( $data ) {
-            $message = $this->processMessage( $data );
+            $message = $this->processMessage( $data, NULL );
         });
 
         $this->write = new Stream( STDOUT, $this->loop );
     }
 
-    private function processMessage( $message )
+    private function processMessage( $message, $key )
     {
-        // Start of message signal
-        if ( substr( $message, 0, 1 ) === JSON_HEADER_CHAR ) {
-            $this->message = "";
-            $this->isReading = TRUE;
-            $unpacked = unpack( "isize", substr( $message, 1, 4 ) );
-            $message = substr( $message, 5 );
-            $this->messageSize = intval( $unpacked[ 'size' ] );
-        }
-
-        if ( $this->isReading ) {
-            $this->message .= $message;
-            $msg = $this->message;
-            $msgSize = $this->messageSize;
-
-            if ( strlen( $msg ) >= $msgSize ) {
-                $json = substr( $msg, 0, $msgSize );
-                $nextMessage = substr( $msg, $msgSize + 1 );
-                $this->message = NULL;
-                $this->isReading = FALSE;
-                $this->messageSize = NULL;
-                $this->broadcast( $json );
-
-                if ( strlen( $nextMessage ) > 0 ) {
-                    $this->processMessage( $nextMessage );
-                }
-            }
-
-            return;
-        }
-
-        if ( ! $this->write ) {
+        if ( ! $this->write 
+            || ! ($parsed = $this->parseMessage( $message )) )
+        {
             return;
         }
 
@@ -126,10 +105,13 @@ class StatsServer implements MessageComponentInterface
         // restart the sync (wake up), force-fetch the stats,
         // shutdown the sync, etc. Send this to the daemon. If it's
         // a valid command, then send it to STDOUT.
-        $command = new Command();
-
-        if ( $command->isValid( $message ) ) {
-            $this->write->write( $message );
+        if ( (new Command)->isValid( $parsed ) ) {
+            $this->write->write( $parsed );
         }
+    }
+
+    private function handleMessage( $json, $key )
+    {
+        $this->broadcast( $json );
     }
 }
