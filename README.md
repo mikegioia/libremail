@@ -2,11 +2,11 @@
 
 > **THIS IS UNDER ACTIVE DEVELOPMENT AND IN NO WAY READY FOR PUBLIC USE**
 
-This project encompasses three parts:
+This project consists of three parts:
 
-1. JavaScript-less HTML Email Client
-2. Kanban-style Email Client
-3. IMAP to SQL Syncing Engine
+1. IMAP to SQL Syncing Engine
+2. JavaScript-less HTML Email Client
+3. Kanban-style Email Client
 
 All of which are licensed under the GNU GPLv3. The goal of this project is to
 provide a fully free, modern, and extremely usable email client as well as an
@@ -18,7 +18,21 @@ your email in a much more intuitive card-based interface.
 Currently parts 1 and 3 are under active development, with part 2 coming later.
 Read below for more information about each application.
 
-### 1. JavaScript-less HTML Email Client
+### 1. IMAP to SQL Syncing Engine
+
+Both email clients in this project utilise the syncing engine provided in the
+`sync` app. This application is designed to continually archive emails from any
+number of IMAP servers and accounts. The data is saved in a format outlined in
+the `DATAFORMAT.md` file. Any application that saves data in the format outlined
+in that document can be used, but the `sync` app here is a PHP version that you
+can use.
+
+Please see the `sync` directory for full documentation on setting up the sync
+engine as a stand-alone, i.e. connecting accounts, populating test data, and
+the different ways with which you can run the application continuously
+(supervisor, cron, etc).
+
+### 2. JavaScript-less HTML Email Client
 
 As both a case-study and for usability's sake, one of the primary goals of this
 project is to create a web-based email client and server application that's
@@ -42,19 +56,6 @@ This requires your remote mail to be stored in a local SQL database. The `sync`
 app does this for you, but you're free to use anything that saves data in the
 way outlined in `DATAFORMAT.md`.
 
-### 2. Kanban-style Email Client
+### 3. Kanban-style Email Client
 
 TBD
-
-### 3. IMAP to SQL Syncing Engine
-
-Both email clients in this project utilise the syncing engine provided in the
-`sync` app. This application is designed to continually archive emails from any
-number of IMAP servers and accounts. The data is saved in a format outlined in
-the `DATAFORMAT.md` file. Any application that saves data in the format outlined
-in that document can be used, but the `sync` app here is a PHP version that you
-can use.
-
-Please see the `sync` directory for full documentation on setting up the sync
-engine, connecting accounts, populating test data, and the different ways with
-which you can run the application continuously (supervisor, cron, etc).
