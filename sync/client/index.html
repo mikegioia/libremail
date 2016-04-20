@@ -127,6 +127,60 @@
                 <span class="count">{{synced}} / {{count}}</span>
             </div>
         </script>
+        <!-- Account edit form -->
+        <script id="account-form" type="text/template">
+            <form>
+            {{#email}}
+                <h1>Account Info</h1>
+            {{/email}}
+            {{^email}}
+                <h1>Add an Email Account</h1>
+            {{/email}}
+                <div class="row">
+                    <div class="three columns">
+                        <label>Email</label>
+                    </div>
+                    <div class="eight columns">
+                        <input type="text" name="email" value="{{email}}" placeholder="you@gmail.com" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="three columns">
+                        <label>Password</label>
+                    </div>
+                    <div class="eight columns">
+                        <input type="text" name="password" value="{{password}}" />
+                        <div class="note">
+                            It's wise to
+                            <a href="https://security.google.com/settings/security/apppasswords" target="_blank">use a token</a>
+                            here!
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="three columns">
+                        <label>IMAP Address</label>
+                    </div>
+                    <div class="eight columns">
+                        <input type="text" name="host" value="{{host}}" placeholder="imap.gmail.com" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="three columns">
+                        <label>IMAP Port</label>
+                    </div>
+                    <div class="three columns">
+                        <input type="text" name="port" value="{{port}}" placeholder="993" />
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button class="button-primary" id="save">
+                        <i class="icon-check"></i>
+                        Save Account
+                    </button>
+                </div>
+            </form>
+        </script>
         <!-- Load built JS -->
         <script type="text/javascript" src="build/libremail.js"></script>
         <!-- Load the stats page -->

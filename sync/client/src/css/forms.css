@@ -1,0 +1,51 @@
+form {
+    width: 60%;
+    min-width: 40rem;
+    max-width: 60rem;
+    margin: 4rem auto 0;
+}
+
+form h1 {
+    font-size: 3rem;
+    margin-bottom: 3rem;
+}
+
+form label {
+    text-align: right;
+    font-weight: normal;
+    padding-top: 0.33rem;
+}
+
+form .buttons {
+    margin-top: 2rem;
+}
+
+form .note {
+    color: #666;
+    top: -1.25rem;
+    font-size: 1rem;
+    text-align: right;
+    position: relative;
+}
+
+form .note a {
+    color: #666;
+}
+
+form .note:hover {
+    color: #999;
+}
+
+form .note:hover a {
+    color: #aaa;
+}
+
+input[type="text"] {
+    width: 100%;
+    background: #555;
+    border: 1px solid #222;
+}
+
+input[type="text"]:focus {
+    border-color: #ab51c4;
+}

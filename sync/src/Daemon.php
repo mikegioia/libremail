@@ -25,6 +25,8 @@ class Daemon
     private $emitter;
     private $console;
     private $command;
+    // Flag if there are no accounts in the database
+    private $noAccounts;
     // Stored to send signals to
     private $syncProcess;
     // Log of diagnostic test results
@@ -44,6 +46,7 @@ class Daemon
     const MESSAGE_STATS = 'stats';
     const MESSAGE_ERROR = 'error';
     const MESSAGE_HEALTH = 'health';
+    const MESSAGE_NO_ACCOUNTS = 'no_accounts';
     const MESSAGE_DIAGNOSTICS = 'diagnostics';
 
     public function __construct(
@@ -219,6 +222,7 @@ class Daemon
         $this->broadcast([
             'tests' => $this->diagnostics,
             'type' => self::MESSAGE_HEALTH,
+            'no_accounts' => $this->noAccounts,
             'procs' => [
                 PROC_SYNC => ( isset( $this->processPids[ PROC_SYNC ] ) )
                     ? TRUE
@@ -243,6 +247,13 @@ class Daemon
         }
 
         $this->processPids = [];
+    }
+
+    static public function sendMessage( $type, $data = [] )
+    {
+        $data[ 'type' ] = $type;
+
+        return self::writeJson( $data );
     }
 
     static public function writeJson( $json )
@@ -292,10 +303,17 @@ class Daemon
                 $this->processPids[ $process ] = $message->pid;
                 break;
             case self::MESSAGE_STATS:
+                if ( $message->accounts ):
+                    $this->noAccounts = false;
+                endif;
+                // no break, broadcast
             case self::MESSAGE_ERROR:
                 $this->emitter->dispatch(
                     EV_BROADCAST_MSG,
                     new MessageEvent( $message ) );
+                break;
+            case self::MESSAGE_NO_ACCOUNTS:
+                $this->noAccounts = true;
                 break;
             case self::MESSAGE_DIAGNOSTICS:
                 $this->diagnostics = $message->tests;

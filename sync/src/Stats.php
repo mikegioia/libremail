@@ -5,7 +5,6 @@ namespace App;
 use Fn
   , App\Daemon
   , App\Console
-  , Pimple\Container
   , App\Models\Folder as FolderModel
   , App\Models\Account as AccountModel
   , App\Models\Message as MessageModel;
@@ -59,7 +58,6 @@ class Stats
     {
         $this->activeFolder = $folder;
 
-        // If we're in daemon mode, send this JSON message
         if ( $this->daemon ) {
             $this->json();
         }
@@ -68,6 +66,10 @@ class Stats
     public function unsetActiveFolder()
     {
         $this->activeFolder = NULL;
+
+        if ( $this->daemon ) {
+            $this->json();
+        }
     }
 
     /**
@@ -152,14 +154,14 @@ class Stats
      */
     public function json( $useCache = FALSE )
     {
-        Daemon::writeJson([
-            'type' => Daemon::MESSAGE_STATS,
-            'active' => $this->activeFolder,
-            'asleep' => (bool) $this->asleep,
-            'account' => $this->activeAccount,
-            'running' => (bool) $this->running,
-            'uptime' => time() - $this->startTime,
-            'accounts' => $this->getStats( $useCache)
-        ]);
+        Daemon::sendMessage(
+            Daemon::MESSAGE_STATS, [
+                'active' => $this->activeFolder,
+                'asleep' => (bool) $this->asleep,
+                'account' => $this->activeAccount,
+                'running' => (bool) $this->running,
+                'uptime' => time() - $this->startTime,
+                'accounts' => $this->getStats( $useCache)
+            ]);
     }
 }

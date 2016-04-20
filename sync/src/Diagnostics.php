@@ -340,10 +340,10 @@ class Diagnostics
     private function finish()
     {
         if ( $this->console->daemon ) {
-            Daemon::writeJson([
-                'tests' => $this->tests,
-                'type' => Daemon::MESSAGE_DIAGNOSTICS
-            ]);
+            Daemon::sendMessage(
+                Daemon::MESSAGE_DIAGNOSTICS, [
+                    'tests' => $this->tests,
+                ]);
         }
 
         if ( ! $this->console->diagnostics ) {
@@ -375,13 +375,13 @@ class Diagnostics
     {
         if ( strpos( $e->getMessage(), "server has gone away" ) === FALSE ) {
             if ( $di[ 'console' ]->daemon ) {
-                Daemon::writeJson([
-                    'error_type' => ERR_DATABASE,
-                    'message' => $e->getMessage(),
-                    'type' => Daemon::MESSAGE_ERROR,
-                    'suggestion' =>
-                        "You probably didn't run the installation script."
-                ]);
+                Daemon::sendMessage(
+                    Daemon::MESSAGE_ERROR, [
+                        'error_type' => ERR_DATABASE,
+                        'message' => $e->getMessage(),
+                        'suggestion' =>
+                            "You probably didn't run the installation script."
+                    ]);
             }
 
             throw new TerminateException(

@@ -55,3 +55,7 @@ button i.icon-cog {
     top: 0.1rem;
     left: 0.15rem;
 }
+
+button i.icon-check {
+    top: 0.125rem;
+}

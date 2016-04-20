@@ -6,6 +6,7 @@ LibreMail.Pages.Global = (function ( Const, Emitter, Components ) {
 // Returns a new instance
 return function () {
     // Components used
+    var Accounts;
     var StatusMessage;
 
     /**
@@ -24,8 +25,10 @@ return function () {
     }
 
     function components () {
-        StatusMessage = new Components.StatusMessage(
-            document.querySelector( 'main' ));
+        var main = document.querySelector( 'main' );
+
+        Accounts = new Components.Accounts( main );
+        StatusMessage = new Components.StatusMessage( main );
     }
 
     /**
@@ -47,13 +50,14 @@ return function () {
      * went wrong.
      */
     function health ( data ) {
-        // Sort by code first
         var i;
         var error;
         var suggestion;
         var tests = Object.keys( data.tests ).map( function ( k ) {
             return data.tests[ k ];
         });
+
+        // Sort by code first
         tests.sort( function ( a, b ) {
             return ( a.code > b.code)
                 ? 1
@@ -74,6 +78,14 @@ return function () {
 
         if ( error ) {
             StatusMessage.renderError( error, suggestion );
+        }
+
+        // Check the response for a noAccounts flag
+        if ( data.no_accounts === true ) {
+            Accounts.render();
+        }
+        else {
+            Accounts.tearDown();
         }
     }
 

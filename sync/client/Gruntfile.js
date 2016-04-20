@@ -41,6 +41,7 @@ module.exports = function ( grunt ) {
                     './vendor/skeleton/css/normalize.css',
                     './vendor/skeleton/css/skeleton.css',
                     './src/css/fonts.css',
+                    './src/css/forms.css',
                     './src/css/stage.css',
                     './src/css/buttons.css',
                     './src/css/header.css',

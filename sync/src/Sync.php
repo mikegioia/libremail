@@ -9,6 +9,7 @@ namespace App;
 use Fn
   , DateTime
   , Exception
+  , App\Daemon
   , PDOException
   , Monolog\Logger
   , Pb\Imap\Mailbox
@@ -171,6 +172,7 @@ class Sync
             // will pick up once the user creates an account and a
             // SIGCONT is sent to this process.
             if ( $this->daemon ) {
+                Daemon::sendMessage( Daemon::MESSAGE_NO_ACCOUNTS );
                 return TRUE;
             }
 
