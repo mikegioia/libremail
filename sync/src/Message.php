@@ -4,6 +4,7 @@ namespace App;
 
 use Exception
   , App\Message\PidMessage
+  , App\Message\TaskMessage
   , App\Message\ErrorMessage
   , App\Message\StatsMessage
   , App\Message\HealthMessage

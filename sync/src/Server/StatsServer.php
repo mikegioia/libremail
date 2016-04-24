@@ -5,6 +5,7 @@ namespace App\Server;
 use App\Log
   , Exception
   , App\Command
+  , App\Message
   , SplObjectStorage
   , React\Stream\Stream
   , Ratchet\ConnectionInterface
