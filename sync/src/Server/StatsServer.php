@@ -108,6 +108,15 @@ class StatsServer implements MessageComponentInterface
         if ( (new Command)->isValid( $parsed ) ) {
             $this->write->write( $parsed );
         }
+
+        // If it's a message of type 'task', execute that task
+        if ( Message::isValid( $parsed ) ) {
+            $message = Message::make( $parsed );
+
+            if ( $message->getType() == Message::MESSAGE_TASK ) {
+                echo "We got a task...\n";
+            }
+        }
     }
 
     private function handleMessage( $json, $key )

@@ -6,8 +6,11 @@ use Fn
   , App\Log
   , Exception
   , App\Daemon
+  , App\Message
   , PDOException
   , Pimple\Container
+  , App\Message\ErrorMessage
+  , App\Message\DiagnosticsMessage
   , App\Models\Migration as MigrationModel
   , App\Exceptions\Fatal as FatalException
   , App\Exceptions\Terminate as TerminateException
@@ -340,10 +343,10 @@ class Diagnostics
     private function finish()
     {
         if ( $this->console->daemon ) {
-            Daemon::sendMessage(
-                Daemon::MESSAGE_DIAGNOSTICS, [
-                    'tests' => $this->tests,
-                ]);
+            Message::send(
+                new DiagnosticsMessage(
+                    $this->tests
+                ));
         }
 
         if ( ! $this->console->diagnostics ) {
@@ -375,13 +378,12 @@ class Diagnostics
     {
         if ( strpos( $e->getMessage(), "server has gone away" ) === FALSE ) {
             if ( $di[ 'console' ]->daemon ) {
-                Daemon::sendMessage(
-                    Daemon::MESSAGE_ERROR, [
-                        'error_type' => ERR_DATABASE,
-                        'message' => $e->getMessage(),
-                        'suggestion' =>
-                            "You probably didn't run the installation script."
-                    ]);
+                Message::send(
+                    new ErrorMessage(
+                        ERR_DATABASE,
+                        $e->getMessage(),
+                        "You probably didn't run the installation script."
+                    ));
             }
 
             throw new TerminateException(

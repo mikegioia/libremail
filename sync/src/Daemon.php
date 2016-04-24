@@ -5,9 +5,12 @@ namespace App;
 use App\Log
   , Exception
   , App\Command
+  , App\Message
   , App\Events\MessageEvent
   , App\Console\DaemonConsole
+  , App\Message\HealthMessage
   , React\ChildProcess\Process
+  , App\Message\AbstractMessage
   , React\EventLoop\LoopInterface
   , App\Traits\JsonMessage as JsonMessageTrait
   , App\Exceptions\Terminate as TerminateException
@@ -42,12 +45,6 @@ class Daemon
 
     const PROC_SYNC = 'sync';
     const PROC_SERVER = 'server';
-    const MESSAGE_PID = 'pid';
-    const MESSAGE_STATS = 'stats';
-    const MESSAGE_ERROR = 'error';
-    const MESSAGE_HEALTH = 'health';
-    const MESSAGE_NO_ACCOUNTS = 'no_accounts';
-    const MESSAGE_DIAGNOSTICS = 'diagnostics';
 
     public function __construct(
         Log $log,
@@ -200,8 +197,9 @@ class Daemon
 
     /**
      * Sends a message to the server process to forward to any clients.
+     * @param AbstractMessage $message
      */
-    public function broadcast( $message )
+    public function broadcast( AbstractMessage $message )
     {
         if ( ! $this->webServerProcess ) {
             return FALSE;
@@ -210,7 +208,10 @@ class Daemon
         // Resume the stdin stream, send the message and then pause
         // it again.
         $this->webServerProcess->stdin->resume();
-        $this->webServerProcess->stdin->write( self::packJson( $message ) );
+        $this->webServerProcess->stdin->write(
+            Message::packJson(
+                $message->toArray()
+            ));
         $this->webServerProcess->stdin->pause();
     }
 
@@ -219,19 +220,18 @@ class Daemon
      */
     public function broadcastHealth()
     {
-        $this->broadcast([
-            'tests' => $this->diagnostics,
-            'type' => self::MESSAGE_HEALTH,
-            'no_accounts' => $this->noAccounts,
-            'procs' => [
-                PROC_SYNC => ( isset( $this->processPids[ PROC_SYNC ] ) )
-                    ? TRUE
-                    : FALSE,
-                PROC_SERVER => ( isset( $this->processPids[ PROC_SERVER ] ) )
-                    ? TRUE
-                    : FALSE
-            ]
-        ]);
+        $this->broadcast(
+            new HealthMessage(
+                $this->diagnostics, [
+                    PROC_SYNC => ( isset( $this->processPids[ PROC_SYNC ] ) )
+                        ? TRUE
+                        : FALSE,
+                    PROC_SERVER => ( isset( $this->processPids[ PROC_SERVER ] ) )
+                        ? TRUE
+                        : FALSE
+                ],
+                $this->noAccounts
+            ));
     }
 
     public function halt()
@@ -247,29 +247,6 @@ class Daemon
         }
 
         $this->processPids = [];
-    }
-
-    static public function sendMessage( $type, $data = [] )
-    {
-        $data[ 'type' ] = $type;
-
-        return self::writeJson( $data );
-    }
-
-    static public function writeJson( $json )
-    {
-        fwrite( STDOUT, self::packJson( $json ) );
-    }
-
-    static public function packJson( $json )
-    {
-        $encoded = json_encode( $json );
-
-        return sprintf(
-            "%s%s%s",
-            JSON_HEADER_CHAR,
-            pack( "i", strlen( $encoded ) ),
-            $encoded );
     }
 
     private function processMessage( $message, $process )
@@ -289,33 +266,38 @@ class Daemon
 
     /**
      * Reads in a JSON message from one of the child processes.
-     * The message expects certain fields to be set:
-     *   type: 'pid' or 'stats'
+     * The message expects certain fields to be set depending on
+     * the type.
      * @param string $json
      * @param string $process
      */
     private function handleMessage( $json, $process )
     {
-        $message = @json_decode( $json );
+        if ( ! Message::isValid( $json ) ) {
+            $this->log->addNotice( "Invalid message sent to Daemon: $json" );
+            return FALSE;
+        }
 
-        switch ( $message->type ) {
-            case self::MESSAGE_PID:
+        $message = Message::make( $json );
+
+        switch ( $message->getType() ) {
+            case Message::MESSAGE_PID:
                 $this->processPids[ $process ] = $message->pid;
                 break;
-            case self::MESSAGE_STATS:
+            case Message::MESSAGE_STATS:
                 if ( $message->accounts ):
                     $this->noAccounts = false;
                 endif;
                 // no break, broadcast
-            case self::MESSAGE_ERROR:
+            case Message::MESSAGE_ERROR:
                 $this->emitter->dispatch(
                     EV_BROADCAST_MSG,
                     new MessageEvent( $message ) );
                 break;
-            case self::MESSAGE_NO_ACCOUNTS:
+            case Message::MESSAGE_NO_ACCOUNTS:
                 $this->noAccounts = true;
                 break;
-            case self::MESSAGE_DIAGNOSTICS:
+            case Message::MESSAGE_DIAGNOSTICS:
                 $this->diagnostics = $message->tests;
                 break;
         }

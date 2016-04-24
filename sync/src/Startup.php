@@ -4,7 +4,8 @@ namespace App;
 
 use App\Daemon
   , Pimple\Container
-  , \App\Models\Account as AccountModel;
+  , App\Message\PidMessage
+  , App\Models\Account as AccountModel;
 
 /**
  * Runs at the start of the application and performs various
@@ -27,10 +28,7 @@ class Startup
         $this->log->info( "Process ID: ". getmypid() );
 
         if ( $this->console->daemon ) {
-            Daemon::sendMessage(
-                Daemon::MESSAGE_PID, [
-                    'pid' => getmypid()
-                ]);
+            Message::send( new PidMessage( getmypid() ) );
         }
 
         $this->checkIfAccountsExist();
@@ -49,10 +47,7 @@ class Startup
         $this->log->info( "Process ID: ". getmypid() );
 
         if ( $this->console->daemon ) {
-            Daemon::sendMessage(
-                Daemon::MESSAGE_PID, [
-                    'pid' => getmypid()
-                ]);
+            Message::send( new PidMessage( getmypid() ) );
         }
     }
 

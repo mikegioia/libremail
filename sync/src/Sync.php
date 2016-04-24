@@ -10,11 +10,13 @@ use Fn
   , DateTime
   , Exception
   , App\Daemon
+  , App\Message
   , PDOException
   , Monolog\Logger
   , Pb\Imap\Mailbox
   , Pimple\Container
   , League\CLImate\CLImate
+  , App\Message\NoAccountsMessage
   , App\Models\Folder as FolderModel
   , App\Models\Account as AccountModel
   , App\Models\Message as MessageModel
@@ -172,7 +174,7 @@ class Sync
             // will pick up once the user creates an account and a
             // SIGCONT is sent to this process.
             if ( $this->daemon ) {
-                Daemon::sendMessage( Daemon::MESSAGE_NO_ACCOUNTS );
+                Message::send( new NoAccountsMessage );
                 return TRUE;
             }
 

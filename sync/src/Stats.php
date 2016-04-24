@@ -5,6 +5,8 @@ namespace App;
 use Fn
   , App\Daemon
   , App\Console
+  , App\Message
+  , App\Message\StatsMessage
   , App\Models\Folder as FolderModel
   , App\Models\Account as AccountModel
   , App\Models\Message as MessageModel;
@@ -154,14 +156,14 @@ class Stats
      */
     public function json( $useCache = FALSE )
     {
-        Daemon::sendMessage(
-            Daemon::MESSAGE_STATS, [
-                'active' => $this->activeFolder,
-                'asleep' => (bool) $this->asleep,
-                'account' => $this->activeAccount,
-                'running' => (bool) $this->running,
-                'uptime' => time() - $this->startTime,
-                'accounts' => $this->getStats( $useCache)
-            ]);
+        Message::send(
+            new StatsMessage(
+                $this->activeFolder,
+                (bool) $this->asleep,
+                $this->activeAccount,
+                (bool) $this->running,
+                time() - $this->startTime,
+                $this->getStats( $useCache)
+            ));
     }
 }
