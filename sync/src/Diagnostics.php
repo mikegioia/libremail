@@ -4,14 +4,16 @@ namespace App;
 
 use Fn
   , App\Log
+  , App\Sync
   , Exception
   , App\Daemon
   , App\Message
   , PDOException
   , Pimple\Container
+  , League\CLImate\CLImate
   , App\Message\ErrorMessage
   , App\Message\DiagnosticsMessage
-  , App\Models\Migration as MigrationModel
+  , App\Model\Migration as MigrationModel
   , App\Exceptions\Fatal as FatalException
   , App\Exceptions\Terminate as TerminateException
   , App\Exceptions\MaxAllowedPacket as MaxAllowedPacketException
@@ -23,8 +25,13 @@ class Diagnostics
     private $di;
     private $cli;
     private $log;
-    private $config;
     private $console;
+
+    /**
+     * Statically set config used in static methods.
+     * @var array
+     */
+    static private $config;
 
     /**
      * Stores tests, their error messages, and statuses.
@@ -45,7 +52,6 @@ class Diagnostics
     {
         $this->di = $di;
         $this->cli = $di[ 'cli' ];
-        $this->config = $di[ 'config' ];
         $this->console = $di[ 'console' ];
         $this->log = $di[ 'log' ]->getLogger();
         $this->tests = [
@@ -91,6 +97,9 @@ class Diagnostics
                     'directory is needed to save file attachments from your emails.'
             ]
         ];
+
+        // Set the config statically
+        self::$config = $di[ 'config' ];
     }
 
     /**
@@ -114,6 +123,12 @@ class Diagnostics
     }
 
     /**
+     * No-op used to instantiate class if we're not running this
+     * on startup.
+     */
+    public function init() {}
+
+    /**
      * Check if the log path is writable.
      */
     public function testLogPathWritable()
@@ -121,7 +136,7 @@ class Diagnostics
         $this->startTest( self::TEST_LOG_PATH );
 
         try {
-            $path = Log::preparePath( $this->config[ 'log' ][ 'path' ] );
+            $path = Log::preparePath( self::$config[ 'log' ][ 'path' ] );
             Log::checkLogPath( FALSE, $path );
             $this->endTest( STATUS_SUCCESS, self::TEST_LOG_PATH );
         }
@@ -138,7 +153,7 @@ class Diagnostics
         $this->startTest( self::TEST_DB_CONN );
 
         try {
-            $dbConfig = $this->config[ 'sql' ];
+            $dbConfig = self::$config[ 'sql' ];
             $dbConfig[ 'database' ] = '';
             $dbFactory = $this->di->raw( 'db_factory' );
             $db = $dbFactory( $this->di, $dbConfig );
@@ -358,6 +373,25 @@ class Diagnostics
                 "There were errors encountered during the tests that ".
                 "prevent this application from running!" );
         }
+    }
+
+    /**
+     * Attempts to connect to the mail server using the new account
+     * settings from the prompt.
+     * @param Array $account Account credentials
+     * @throws Exception
+     */
+    static public function testImapConnection( Array $account )
+    {
+        $sync = new Sync;
+        $sync->setConfig( self::$config );
+        $sync->connect(
+            $account[ 'imap_host' ],
+            $account[ 'imap_port' ],
+            $account[ 'email' ],
+            $account[ 'password' ],
+            $folder = NULL,
+            $setRunning = FALSE );
     }
 
     /**

@@ -5,7 +5,7 @@ namespace App;
 use App\Daemon
   , Pimple\Container
   , App\Message\PidMessage
-  , App\Models\Account as AccountModel;
+  , App\Model\Account as AccountModel;
 
 /**
  * Runs at the start of the application and performs various

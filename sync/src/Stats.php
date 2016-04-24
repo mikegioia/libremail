@@ -7,9 +7,9 @@ use Fn
   , App\Console
   , App\Message
   , App\Message\StatsMessage
-  , App\Models\Folder as FolderModel
-  , App\Models\Account as AccountModel
-  , App\Models\Message as MessageModel;
+  , App\Model\Folder as FolderModel
+  , App\Model\Account as AccountModel
+  , App\Model\Message as MessageModel;
 
 /**
  * Reports statistics about the syncing process. This will

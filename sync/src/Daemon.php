@@ -278,26 +278,31 @@ class Daemon
             return FALSE;
         }
 
-        $message = Message::make( $json );
+        try {
+            $message = Message::make( $json );
+        }
+        catch ( Exception $e ) {
+            return FALSE;
+        }
 
         switch ( $message->getType() ) {
-            case Message::MESSAGE_PID:
+            case Message::PID:
                 $this->processPids[ $process ] = $message->pid;
                 break;
-            case Message::MESSAGE_STATS:
+            case Message::STATS:
                 if ( $message->accounts ):
                     $this->noAccounts = false;
                 endif;
                 // no break, broadcast
-            case Message::MESSAGE_ERROR:
+            case Message::ERROR:
                 $this->emitter->dispatch(
                     EV_BROADCAST_MSG,
                     new MessageEvent( $message ) );
                 break;
-            case Message::MESSAGE_NO_ACCOUNTS:
+            case Message::NO_ACCOUNTS:
                 $this->noAccounts = true;
                 break;
-            case Message::MESSAGE_DIAGNOSTICS:
+            case Message::DIAGNOSTICS:
                 $this->diagnostics = $message->tests;
                 break;
         }

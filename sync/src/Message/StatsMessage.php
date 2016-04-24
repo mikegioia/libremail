@@ -13,7 +13,7 @@ class StatsMessage extends AbstractMessage
     public $account;
     public $running;
     public $accounts;
-    protected $type = Message::MESSAGE_STATS;
+    protected $type = Message::STATS;
 
     public function __construct( $active, $asleep, $account, $running, $uptime, $accounts )
     {

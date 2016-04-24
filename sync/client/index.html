@@ -129,7 +129,7 @@
         </script>
         <!-- Account edit form -->
         <script id="account-form" type="text/template">
-            <form>
+            <form id="account-info" autocomplete="off" spellcheck="false">
             {{#email}}
                 <h1>Account Info</h1>
             {{/email}}
@@ -141,7 +141,7 @@
                         <label>Email</label>
                     </div>
                     <div class="eight columns">
-                        <input type="text" name="email" value="{{email}}" placeholder="you@gmail.com" />
+                        <input type="email" name="email" value="{{email}}" placeholder="you@gmail.com" required />
                     </div>
                 </div>
                 <div class="row">
@@ -149,7 +149,7 @@
                         <label>Password</label>
                     </div>
                     <div class="eight columns">
-                        <input type="text" name="password" value="{{password}}" />
+                        <input type="text" name="password" value="{{password}}" required />
                         <div class="note">
                             It's wise to
                             <a href="https://security.google.com/settings/security/apppasswords" target="_blank">use a token</a>
@@ -174,7 +174,7 @@
                     </div>
                 </div>
                 <div class="buttons">
-                    <button class="button-primary" id="save">
+                    <button type="submit" class="button-primary" id="save">
                         <i class="icon-check"></i>
                         Save Account
                     </button>

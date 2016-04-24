@@ -2,11 +2,11 @@
 
 namespace App\Console;
 
-use App\Sync
-  , Exception
+use Exception
   , App\Console
-  , App\Models\Account as AccountModel
-  , App\Models\Migration as MigrationModel;
+  , App\Diagnostics
+  , App\Model\Account as AccountModel
+  , App\Model\Migration as MigrationModel;
 
 class SyncConsole extends Console
 {
@@ -273,15 +273,8 @@ class SyncConsole extends Console
      */
     private function testConnection( $account )
     {
-        $sync = new Sync;
-        $sync->setConfig( $this->config );
-
         try {
-            $sync->connect(
-                $account[ 'imap_host' ],
-                $account[ 'imap_port' ],
-                $account[ 'email' ],
-                $account[ 'password' ] );
+            Diagnostics::testImapConnection( $account );
         }
         catch ( Exception $e ) {
             $this->cli->error(

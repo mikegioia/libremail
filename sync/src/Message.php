@@ -2,7 +2,9 @@
 
 namespace App;
 
-use Exception
+use Fn
+  , Exception
+  , Monolog\Logger
   , App\Message\PidMessage
   , App\Message\TaskMessage
   , App\Message\ErrorMessage
@@ -10,28 +12,37 @@ use Exception
   , App\Message\HealthMessage
   , App\Message\AbstractMessage
   , App\Message\NoAccountsMessage
-  , App\Message\DiagnosticsMessage;
+  , App\Message\DiagnosticsMessage
+  , App\Exceptions\Validation as ValidationException;
 
 class Message
 {
     // Valid messages
-    const MESSAGE_PID = 'pid';
-    const MESSAGE_TASK = 'task';
-    const MESSAGE_STATS = 'stats';
-    const MESSAGE_ERROR = 'error';
-    const MESSAGE_HEALTH = 'health';
-    const MESSAGE_NO_ACCOUNTS = 'no_accounts';
-    const MESSAGE_DIAGNOSTICS = 'diagnostics';
+    const PID = 'pid';
+    const TASK = 'task';
+    const STATS = 'stats';
+    const ERROR = 'error';
+    const HEALTH = 'health';
+    const NO_ACCOUNTS = 'no_accounts';
+    const DIAGNOSTICS = 'diagnostics';
+
+    // Injected during service registration
+    static protected $log;
 
     static private $validTypes = [
-        self::MESSAGE_PID,
-        self::MESSAGE_TASK,
-        self::MESSAGE_STATS,
-        self::MESSAGE_ERROR,
-        self::MESSAGE_HEALTH,
-        self::MESSAGE_NO_ACCOUNTS,
-        self::MESSAGE_DIAGNOSTICS
+        self::PID,
+        self::TASK,
+        self::STATS,
+        self::ERROR,
+        self::HEALTH,
+        self::NO_ACCOUNTS,
+        self::DIAGNOSTICS
     ];
+
+    static function setLog( Logger $log )
+    {
+        static::$log = $log;
+    }
 
     /**
      * Determines if a message is valid. This just means it's a JSON
@@ -84,44 +95,72 @@ class Message
      * Takes in a JSON object (should be validated first!) and
      * creates a new Message based off the type.
      * @param string $json
+     * @throws Exception
      * @return AbstractMessage
      */
     static public function make( $json )
     {
         if ( ! self::isValid( $json ) ) {
-            throw new Exception(
-                "Invalid message object passed to Message::make" );
+            $error = "Invalid message object passed to Message::make";
+            self::$log->error( $error );
+            throw new Exception( $error );
         }
 
         $m = @json_decode( $json );
 
-        switch ( $m->type ) {
-            case self::MESSAGE_PID:
-                return new PidMessage( $m->pid );
-            case self::MESSAGE_TASK:
-                return new TaskMessage( $m->data );
-            case self::MESSAGE_STATS:
-                return new StatsMessage(
-                    $m->active,
-                    $m->asleep,
-                    $m->account,
-                    $m->running,
-                    $m->uptime,
-                    $m->accounts );
-            case self::MESSAGE_ERROR:
-                return new ErrorMessage(
-                    $m->error_type,
-                    $m->message,
-                    $m->suggestion );
-            case self::MESSAGE_HEALTH:
-                return new HealthMessage(
-                    $m->tests,
-                    $m->procs,
-                    $m->no_accounts );
-            case self::MESSAGE_NO_ACCOUNTS:
-                return new NoAccountsMessage;
-            case self::MESSAGE_DIAGNOSTICS:
-                return new DiagnosticsMessage( $m->tests );
+        // Check that message contains the required fields.
+        try {
+            Fn\expects( $m )->toHave([ 'type' ]);
+
+            switch ( $m->type ) {
+                case self::PID:
+                    Fn\expects( $m )->toHave([ 'pid' ]);
+                    return new PidMessage( $m->pid );
+                case self::TASK:
+                    Fn\expects( $m )->toHave([ 'task', 'data' ]);
+                    return new TaskMessage( $m->task, $m->data );
+                case self::STATS:
+                    Fn\expects( $m )->toHave([
+                        'active', 'asleep', 'account', 'running',
+                        'uptime', 'accounts'
+                    ]);
+                    return new StatsMessage(
+                        $m->active,
+                        $m->asleep,
+                        $m->account,
+                        $m->running,
+                        $m->uptime,
+                        $m->accounts );
+                case self::ERROR:
+                    Fn\expects( $m )->toHave([
+                        'error_type', 'message', 'suggestion'
+                    ]);
+                    return new ErrorMessage(
+                        $m->error_type,
+                        $m->message,
+                        $m->suggestion );
+                case self::HEALTH:
+                    Fn\expects( $m )->toHave([
+                        'tests', 'procs', 'no_accounts'
+                    ]);
+                    return new HealthMessage(
+                        $m->tests,
+                        $m->procs,
+                        $m->no_accounts );
+                case self::NO_ACCOUNTS:
+                    return new NoAccountsMessage;
+                case self::DIAGNOSTICS:
+                    Fn\expects( $m )->toHave([ 'tests' ]);
+                    return new DiagnosticsMessage( $m->tests );
+            }
         }
+        catch ( ValidationException $e ) {
+            self::$log->error( $e->getMessage() );
+            throw new Exception( $e->getMessage() );
+        }
+
+        $error = "Invalid message type passed to Message::make";
+        self::$log->error( $error );
+        throw new Exception( $error );
     }
 }

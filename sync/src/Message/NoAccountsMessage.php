@@ -7,5 +7,5 @@ use App\Message
 
 class NoAccountsMessage extends AbstractMessage
 {
-    protected $type = Message::MESSAGE_NO_ACCOUNTS;
+    protected $type = Message::NO_ACCOUNTS;
 }

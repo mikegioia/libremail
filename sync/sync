@@ -140,8 +140,8 @@ $di[ 'db_factory' ] = $di->factory( function ( $c, $config = NULL ) {
 // output the results to the console and exit.
 $di[ 'diagnostics' ]->run();
 
-// PDO connection. This attempts to connect to the database. If it
-// fails here, the script will halt.
+// PDO connection. This attempts to connect to the database.
+// If it fails here, the script will halt.
 $di[ 'db' ] = $di[ 'db_factory' ];
 
 // Statically set the services in the base model
@@ -149,6 +149,9 @@ Model::setDb( $di[ 'db' ] );
 Model::setCLI( $di[ 'cli' ] );
 Model::setConfig( $di[ 'config' ] );
 Model::setLog( $di[ 'log' ]->getLogger() );
+
+// Statically set Message logging service
+Message::setLog( $di[ 'log' ]->getLogger() );
 
 // Parse the CLI
 $di[ 'console' ]->init();

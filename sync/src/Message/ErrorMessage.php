@@ -10,7 +10,7 @@ class ErrorMessage extends AbstractMessage
     public $message;
     public $error_type;
     public $suggestion;
-    protected $type = Message::MESSAGE_ERROR;
+    protected $type = Message::ERROR;
 
     public function __construct( $errorType, $message, $suggestion = "" )
     {

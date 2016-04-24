@@ -3,6 +3,7 @@
 namespace Fn;
 
 use DateTime
+  , App\Expects
   , DateInterval;
 
 /**
@@ -140,4 +141,12 @@ function unixFromNow( $minutes )
     $time->add( new DateInterval( 'PT'. $minutes .'M' ) );
 
     return $time->getTimestamp();
+}
+
+/**
+ * Wrapper for Expects assertion library.
+ */
+function expects( $data )
+{
+    return new Expects( $data );
 }

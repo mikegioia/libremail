@@ -8,10 +8,12 @@ use App\Message
 class TaskMessage extends AbstractMessage
 {
     public $data;
-    protected $type = Message::MESSAGE_TASK;
+    public $task;
+    protected $type = Message::TASK;
 
-    public function __construct( $data )
+    public function __construct( $task, $data )
     {
         $this->data = $data;
+        $this->task = $task;
     }
 }

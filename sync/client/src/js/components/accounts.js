@@ -14,7 +14,7 @@ return function ( $root ) {
         account_form: $accountForm.innerHTML
     };
     // DOM nodes
-    var $saveButton;
+    var $accountInfoForm;
     // To prevent re-rendering the form the user might be editing
     var isRendered = false;
 
@@ -35,12 +35,28 @@ return function ( $root ) {
             return;
         }
 
-        $root.innerHTML = Mustache.render( tpl.account_form, data );
         isRendered = true;
+        $root.innerHTML = Mustache.render( tpl.account_form, data );
+        $accountInfoForm = $root.querySelector( 'form#account-info' );
+        $accountInfoForm.onsubmit = save;
     }
 
     function tearDown () {
         isRendered = false;
+    }
+
+    /**
+     * Saves the account info form. This expects to be called in the
+     * context of a DOM event.
+     */
+    function save ( e ) {
+        e.preventDefault();
+        Socket.sendTask({
+            host: $accountInfoForm.host.value,
+            port: $accountInfoForm.port.value,
+            email: $accountInfoForm.email.value,
+            password: $accountInfoForm.password.value
+        });
     }
 
     return {

@@ -17,10 +17,10 @@ use Fn
   , Pimple\Container
   , League\CLImate\CLImate
   , App\Message\NoAccountsMessage
-  , App\Models\Folder as FolderModel
-  , App\Models\Account as AccountModel
-  , App\Models\Message as MessageModel
-  , App\Models\Migration as MigrationModel
+  , App\Model\Folder as FolderModel
+  , App\Model\Account as AccountModel
+  , App\Model\Message as MessageModel
+  , App\Model\Migration as MigrationModel
   , App\Exceptions\Error as ErrorException
   , App\Exceptions\Fatal as FatalException
   , App\Exceptions\Terminate as TerminateException
@@ -318,9 +318,10 @@ class Sync
      * @param string $email
      * @param string $password
      * @param string $folder Optional, like "INBOX"
+     * @param bool $setRunning Optional
      * @throws MissingIMAPConfigException
      */
-    public function connect( $host, $port, $email, $password, $folder = NULL )
+    public function connect( $host, $port, $email, $password, $folder = NULL, $setRunning = TRUE )
     {
         // Check the attachment directory is writeable
         $attachmentsPath = $this->checkAttachmentsPath( $email );
@@ -339,7 +340,10 @@ class Sync
             $folder,
             $attachmentsPath );
         $this->mailbox->getImapStream();
-        $this->setRunning( TRUE );
+
+        if ( $setRunning === TRUR ) {
+            $this->setRunning( TRUE );
+        }
     }
 
     public function disconnect()

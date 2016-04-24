@@ -78,10 +78,14 @@ $di[ 'loop' ] = Factory::create();
 // Set up the command handler
 $di[ 'command' ] = new Command( $di[ 'emitter' ], $di[ 'log' ] );
 
+// Statically set Message logging service
+Message::setLog( $di[ 'log' ]->getLogger() );
+
 // Set up the signal handler to shutdown
 $TERMINATE = function () {
     throw new TerminateException;
 };
+
 // Graceful shutdown
 $HALT = function () use ( $di ) {
     if ( isset( $di[ 'daemon' ] ) && $di[ 'daemon' ] ) {

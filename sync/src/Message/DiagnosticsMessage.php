@@ -8,7 +8,7 @@ use App\Message
 class DiagnosticsMessage extends AbstractMessage
 {
     public $tests;
-    protected $type = Message::MESSAGE_DIAGNOSTICS;
+    protected $type = Message::DIAGNOSTICS;
 
     public function __construct( $tests )
     {

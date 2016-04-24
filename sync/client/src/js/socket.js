@@ -31,5 +31,17 @@ LibreMail.Socket = (function ( ReconnectingWebSocket, JSON, Const, Emitter ) {
         Emitter.fire( data.type, data );
     };
 
+    /**
+     * Sends a message object for a task. This is just a helper and
+     * a wrapper around send().
+     */
+    ws.sendTask = function ( task, data ) {
+        ws.send( JSON.stringify({
+            data: data,
+            task: task,
+            type: 'task'
+        }));
+    };
+
     return ws;
 }( ReconnectingWebSocket, JSON, LibreMail.Const, LibreMail.Emitter ));

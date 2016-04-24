@@ -8,7 +8,7 @@ use App\Message
 class PidMessage extends AbstractMessage
 {
     public $pid;
-    protected $type = Message::MESSAGE_PID;
+    protected $type = Message::PID;
 
     public function __construct( $pid )
     {

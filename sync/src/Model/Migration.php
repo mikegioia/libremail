@@ -8,7 +8,7 @@
  * that script.
  */
 
-namespace App\Models;
+namespace App\Model;
 
 use Fn
   , DateTime

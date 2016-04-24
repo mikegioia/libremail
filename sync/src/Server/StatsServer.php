@@ -3,6 +3,7 @@
 namespace App\Server;
 
 use App\Log
+  , App\Task
   , Exception
   , App\Command
   , App\Message
@@ -112,10 +113,17 @@ class StatsServer implements MessageComponentInterface
 
         // If it's a message of type 'task', execute that task
         if ( Message::isValid( $parsed ) ) {
-            $message = Message::make( $parsed );
+            try {
+                $message = Message::make( $parsed );
 
-            if ( $message->getType() == Message::MESSAGE_TASK ) {
-                echo "We got a task...\n";
+                if ( $message->getType() == Message::TASK ) {
+                    $task = Task::make( $message->task, $message->data );
+                    $task->run();
+                }
+            }
+            catch ( Exception $e ) {
+                $this->log->notice( $e->getMessage() );
+                return;
             }
         }
     }

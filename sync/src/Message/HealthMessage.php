@@ -10,7 +10,7 @@ class HealthMessage extends AbstractMessage
     public $tests;
     public $procs;
     public $no_accounts;
-    protected $type = Message::MESSAGE_HEALTH;
+    protected $type = Message::HEALTH;
 
     public function __construct( $tests, $procs, $noAccounts )
     {
