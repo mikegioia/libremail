@@ -58,7 +58,7 @@ LibreMail.Const = {
     // Language used in app
     LANG: {
         sprintf: function () {
-            var args = Array.prototype.slice.call(arguments);
+            var args = Array.prototype.slice.call( arguments );
             return args.shift().replace( /%s/g, function () {
                 return args.shift();
             });

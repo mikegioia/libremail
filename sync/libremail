@@ -11,6 +11,7 @@
 use App\Log
   , App\Daemon
   , App\Command
+  , App\Message
   , App\Constants
   , Pimple\Container
   , Exception as Exception

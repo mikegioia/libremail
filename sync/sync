@@ -12,6 +12,7 @@ use App\Log
   , App\Sync
   , App\Model
   , App\Stats
+  , App\Message
   , App\Startup
   , App\Constants
   , App\Diagnostics
