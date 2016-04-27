@@ -284,7 +284,7 @@ class Daemon
         catch ( Exception $e ) {
             return FALSE;
         }
-
+$this->log->addInfo( "READING: ". $message->getType() );
         switch ( $message->getType() ) {
             case Message::PID:
                 $this->processPids[ $process ] = $message->pid;
@@ -295,6 +295,8 @@ class Daemon
                 endif;
                 // no break, broadcast
             case Message::ERROR:
+            case Message::ACCOUNT:
+            case Message::NOTIFICATION:
                 $this->emitter->dispatch(
                     EV_BROADCAST_MSG,
                     new MessageEvent( $message ) );

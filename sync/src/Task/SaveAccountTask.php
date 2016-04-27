@@ -4,8 +4,11 @@ namespace App\Task;
 
 use App\Task
   , Exception
+  , App\Message
   , App\Diagnostics
-  , App\Task\AbstractTask;
+  , App\Task\AbstractTask
+  , App\Message\AccountMessage
+  , App\Message\NotificationMessage;
 
 class SaveAccountTask extends AbstractTask
 {
@@ -20,6 +23,9 @@ class SaveAccountTask extends AbstractTask
      */
     public function run()
     {
+        // Lock the account page
+        Message::send( new AccountMessage( TRUE ) );
+
         // Check if the connection works
         try {
             Diagnostics::testImapConnection([
@@ -30,12 +36,21 @@ class SaveAccountTask extends AbstractTask
             ]);
         }
         catch ( Exception $e ) {
-            echo $e->getMessage(), "\n";
-            return;
+            Message::send(
+                new NotificationMessage(
+                    STATUS_ERROR,
+                    "There was a problem testing the IMAP connection: ".
+                    $e->getMessage()
+                ));
+            goto unlockAccount;
         }
 
         // Save the account
-        $accountModel = new AccountModel( $newAccount );
-        $accountModel->save();
+        //$accountModel = new AccountModel( $newAccount );
+        //$accountModel->save();
+
+        unlockAccount: {
+            Message::send( new AccountMessage( FALSE ) );
+        }
     }
 }

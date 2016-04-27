@@ -57,7 +57,7 @@ trait JsonMessage
 
             if ( strlen( $msg ) >= $msgSize ) {
                 $json = substr( $msg, 0, $msgSize );
-                $nextMessage = substr( $msg, $msgSize + 1 );
+                $nextMessage = substr( $msg, $msgSize );
                 $this->message[ $key ] = NULL;
                 $this->isReading[ $key ] = FALSE;
                 $this->messageSize[ $key ] = NULL;

@@ -13,7 +13,7 @@ form h1 {
 form label {
     text-align: right;
     font-weight: normal;
-    padding-top: 0.33rem;
+    padding-top: 0.5rem;
 }
 
 form .buttons {
@@ -43,6 +43,9 @@ form .note:hover a {
 input[type="text"],
 input[type="email"] {
     width: 100%;
+    height: 2.2em;
+    line-height: 2em;
+    padding: 0 0.75em;
     background-color: #555;
     border: 1px solid #222;
 }
