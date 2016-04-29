@@ -341,7 +341,7 @@ class Sync
             $attachmentsPath );
         $this->mailbox->getImapStream();
 
-        if ( $setRunning === TRUR ) {
+        if ( $setRunning === TRUE ) {
             $this->setRunning( TRUE );
         }
     }

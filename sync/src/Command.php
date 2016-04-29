@@ -38,6 +38,16 @@ class Command
     }
 
     /**
+     * Makes a new command string from a constant.
+     * @param string $command One of the command constants
+     * @return string
+     */
+    public function make( $command )
+    {
+        return "!$command\n";
+    }
+
+    /**
      * Runs the given command. If the message is not a valid command
      * this will throw an exception.
      * @param string $message

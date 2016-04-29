@@ -5,6 +5,7 @@ namespace App;
 use Fn
   , Exception
   , Monolog\Logger
+  , App\Server\StatsServer
   , App\Message\PidMessage
   , App\Message\TaskMessage
   , App\Message\ErrorMessage
@@ -76,14 +77,23 @@ class Message
         return TRUE;
     }
 
-    static public function send( AbstractMessage $message )
+    /**
+     * If a server is provided, broadcast the message directly.
+     */
+    static public function send( AbstractMessage $message, StatsServer $server = NULL )
     {
+        if ( $server ) {
+            $server->broadcast( json_encode( $message->toArray() ) );
+            return;
+        }
+
         return self::writeJson( $message->toArray() );
     }
 
     static public function writeJson( $json )
     {
         fwrite( STDOUT, self::packJson( $json ) );
+        flush();
     }
 
     static public function packJson( $json )

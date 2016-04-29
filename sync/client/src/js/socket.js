@@ -27,7 +27,7 @@ LibreMail.Socket = (function ( ReconnectingWebSocket, JSON, Const, Emitter ) {
         {
             data.type = Const.EV.ERROR;
         }
-
+console.log( data );
         Emitter.fire( data.type, data );
     };
 

@@ -18,7 +18,6 @@ class StatsServer implements MessageComponentInterface
 {
     private $log;
     private $loop;
-    private $message;
     private $clients;
     private $lastMessage;
     // Streams
@@ -38,6 +37,10 @@ class StatsServer implements MessageComponentInterface
         $this->setupInputStreams();
     }
 
+    /**
+     * Send a message to all connected clients.
+     * @param string $message JSON encoded message
+     */
     public function broadcast( $message )
     {
         $this->lastMessage = $message;
@@ -118,7 +121,13 @@ class StatsServer implements MessageComponentInterface
 
                 if ( $message->getType() == Message::TASK ) {
                     $task = Task::make( $message->task, $message->data );
-                    $task->run();
+                    $response = $task->run( $this );
+
+                    // The response itself can be a command. If it
+                    // is, send it to the Daemon.
+                    if ( (new Command)->isValid( $response ) ) {
+                        $this->write->write( $response );
+                    }
                 }
             }
             catch ( Exception $e ) {

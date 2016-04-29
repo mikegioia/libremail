@@ -116,6 +116,7 @@ class Model
                 "%s\n\n%s",
                 $message,
                 implode( "\n", $return )
-            ));
+            ),
+            ". \t\n\r\0\x0B" ) .".";
     }
 }

@@ -9,7 +9,8 @@ use PDO
   , App\Traits\Model as ModelTrait
   , App\Exceptions\Validation as ValidationException
   , App\Exceptions\AccountExists as AccountExistsException
-  , App\Exceptions\DatabaseInsert as DatabaseInsertException;
+  , App\Exceptions\DatabaseInsert as DatabaseInsertException
+  , App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 
 class Account extends Model
 {
@@ -48,34 +49,15 @@ class Account extends Model
     /**
      * Create a new account record.
      * @param array $data
-     * @throws ValidationException
      * @throws AccountExistsException
      * @throws DatabaseInsertException
+     * @throws DatabaseUpdateException
      */
     public function save( $data = [], $updateIfExists = FALSE )
     {
-        $val = new Validator;
-        $val->required( 'email', 'Email' )->lengthBetween( 0, 100 );
-        $val->required( 'service', 'Service type' )
-            ->inArray(
-                array_map(
-                    'strtolower',
-                    $this->config( 'email.services' )
-                ));
-        $val->required( 'password', 'Password' )->lengthBetween( 0, 100 );
-        $val->optional( 'imap_host', 'IMAP host' )->lengthBetween( 0, 50 );
-        $val->optional( 'imap_port', 'IMAP port' )->lengthBetween( 0, 5 );
-        $val->optional( 'imap_flags', 'IMAP flags' )->lengthBetween( 0, 50 );
         $this->setData( $data );
+        $this->validate();
         $data = $this->getData();
-
-        if ( ! $val->validate( $data ) ) {
-            throw new ValidationException(
-                $this->getErrorString(
-                    $val,
-                    "There was a problem creating this account."
-                ));
-        }
 
         // Check if this email exists
         $exists = $this->db()
@@ -127,6 +109,34 @@ class Account extends Model
         $this->id = $newAccountId;
     }
 
+    /**
+     * Validate the account data.
+     * @throws ValidationException
+     */
+    public function validate()
+    {
+        $val = new Validator;
+        $val->required( 'email', 'Email' )->lengthBetween( 0, 100 );
+        $val->required( 'service', 'Service type' )
+            ->inArray(
+                array_map(
+                    'strtolower',
+                    $this->config( 'email.services' )
+                ));
+        $val->required( 'password', 'Password' )->lengthBetween( 0, 100 );
+        $val->optional( 'imap_host', 'IMAP host' )->lengthBetween( 0, 50 );
+        $val->optional( 'imap_port', 'IMAP port' )->lengthBetween( 0, 5 );
+        $val->optional( 'imap_flags', 'IMAP flags' )->lengthBetween( 0, 50 );
+
+        if ( ! $val->validate( $this->getData() ) ) {
+            throw new ValidationException(
+                $this->getErrorString(
+                    $val,
+                    "There was a problem creating this account."
+                ));
+        }
+    }
+
     public function getActive()
     {
         return $this->db()
@@ -135,5 +145,46 @@ class Account extends Model
             ->where( 'is_active', '=', 1 )
             ->execute()
             ->fetchAll( PDO::FETCH_CLASS, $this->getClass() );
+    }
+
+    /**
+     * Uses the email address to try and infer the IMAP service.
+     */
+    public function loadServiceFromEmail()
+    {
+        // Build the array of services
+        $config = [];
+        $services = $this->config( 'email.services' );
+
+        foreach ( $services as $serviceName ) {
+            $key = strtolower( $serviceName );
+            $service = $this->config( "email.$key" );
+
+            if ( isset( $service[ 'domain' ] ) ) {
+                $config[ $service[ 'domain' ] ] = $service;
+                $config[ $service[ 'domain' ] ][ 'key' ] = $key;
+            }
+        }
+
+        // Get the domain from the email
+        $emailParts = explode( '@', $this->email );
+
+        if ( count( $emailParts ) !== 2 ) {
+            return;
+        }
+
+        if ( ! isset( $config[ $emailParts[ 1 ] ] ) ) {
+            $this->service = DEFAULT_SERVICE;
+
+            if ( ! $this->imap_port ) {
+                $this->imap_port = $config[ DEFAULT_SERVICE ][ 'port' ];
+            }
+
+            return;
+        }
+
+        $this->service = $config[ $emailParts[ 1 ] ][ 'key' ];
+        $this->imap_host = $config[ $emailParts[ 1 ] ][ 'host' ];
+        $this->imap_port = $config[ $emailParts[ 1 ] ][ 'port' ];
     }
 }
