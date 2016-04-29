@@ -20,6 +20,7 @@
                 <span>Warming up</span>
             </div>
         </main>
+        <section id="notifications" class="notifications"></section>
         <!-- Warming up -->
         <script id="warmup" type="text/template">
             <div class="loading">
@@ -180,6 +181,15 @@
                     </button>
                 </div>
             </form>
+        </script>
+        <!-- Notification -->
+        <script id="notification" type="text/template">
+            <div class="box {{status}}">
+                <a class="close" href="javascript:;">
+                    <i class="icon-cross"></i>
+                </a>
+                <div class="message">{{message}}</div>
+            </div>
         </script>
         <!-- Load built JS -->
         <script type="text/javascript" src="build/libremail.js"></script>

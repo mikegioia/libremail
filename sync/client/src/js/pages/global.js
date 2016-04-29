@@ -8,6 +8,7 @@ return function () {
     // Components used
     var Accounts;
     var StatusMessage;
+    var Notifications;
 
     /**
      * Attach events and instantiate Components
@@ -21,14 +22,18 @@ return function () {
         Emitter.on( Const.EV.ERROR, error );
         Emitter.on( Const.EV.HEALTH, health );
         Emitter.on( Const.EV.WS_OPEN, online );
+        Emitter.on( Const.EV.ACCOUNT, account );
         Emitter.on( Const.EV.WS_CLOSE, offline );
+        Emitter.on( Const.EV.NOTIFICATION, notification );
     }
 
     function components () {
         var main = document.querySelector( 'main' );
+        var notifications = document.getElementById( 'notifications' );
 
         Accounts = new Components.Accounts( main );
         StatusMessage = new Components.StatusMessage( main );
+        Notifications = new Components.Notifications( notifications );
     }
 
     /**
@@ -98,6 +103,20 @@ return function () {
                 Const.LANG.system_error_message,
                 data.message ),
             data.suggestion );
+    }
+
+    /**
+     * Renders a notification to the main element.
+     */
+    function notification ( data ) {
+        Notifications.insert( data );
+    }
+
+    /**
+     * Updates the account form with data from the server.
+     */
+    function account ( data ) {
+        Accounts.update( data );
     }
 
     return {

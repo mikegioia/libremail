@@ -59,8 +59,27 @@ return function ( $root ) {
         });
     }
 
+    /**
+     * Update the state of the account form.
+     */
+    function update ( data ) {
+        var i;
+        var elements;
+
+        if ( ! isRendered ) {
+            return;
+        }
+
+        elements = $accountInfoForm.elements;
+
+        for ( i = 0; i < elements.length; i++ ) {
+            elements[ i ].disabled = data.locked;
+        }
+    }
+
     return {
         render: render,
+        update: update,
         tearDown: tearDown
     };
 }}( LibreMail.Const, LibreMail.Socket, Mustache ));

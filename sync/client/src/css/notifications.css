@@ -1,0 +1,36 @@
+section.notifications {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 40%;
+    z-index: 3;
+    position: fixed;
+    max-width: 32rem;
+}
+
+section.notifications .notification {
+    margin: 1rem;
+    position: relative;
+}
+
+section.notifications .notification a.close {
+    color: #fff;
+    top: 0.25rem;
+    right: 0.5rem;
+    position: absolute;
+    text-decoration: none;
+}
+
+section.notifications .notification .box {
+    padding: 1rem 2rem 1rem 1.5rem;
+}
+
+section.notifications .notification .error {
+    color: #fff;
+    background-color: #ce3c3c;
+}
+
+section.notifications .notification .success {
+    color: #fff;
+    background-color: #28a94c;
+}

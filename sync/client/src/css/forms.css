@@ -55,3 +55,14 @@ input[type="email"]:focus {
     border-color: #ab51c4;
     background-color: #555;
 }
+
+button[disabled],
+button[disabled]:hover,
+button[disabled]:focus,
+button.button-primary[disabled],
+button.button-primary[disabled]:hover,
+button.button-primary[disabled]:focus {
+    color: #666;
+    background: #444;
+    border-color: #444;
+}
