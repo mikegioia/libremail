@@ -107,6 +107,7 @@ pcntl_signal( SIGUSR1, function ( $signo ) use ( $di ) {
         "SIGUSR1 received, printing text stats" );
     $di[ 'stats' ]->text();
 });
+
 // SIGUSR2 returns JSON
 pcntl_signal( SIGUSR2, function ( $signo ) use ( $di ) {
     $di[ 'log' ]->getLogger()->addDebug(

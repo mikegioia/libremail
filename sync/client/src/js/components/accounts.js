@@ -51,6 +51,8 @@ return function ( $root ) {
      */
     function save ( e ) {
         e.preventDefault();
+        showAltTitle();
+        lockForm( true );
         Socket.sendTask(
             Const.TASK.SAVE_ACCOUNT, {
                 host: $accountInfoForm.host.value,
@@ -64,18 +66,49 @@ return function ( $root ) {
      * Update the state of the account form.
      */
     function update ( data ) {
-        var i;
-        var elements;
-
         if ( ! isRendered ) {
             return;
         }
 
-        elements = $accountInfoForm.elements;
+        lockForm( false );
+
+        if ( data.updated ) {
+            Socket.send( Const.MSG.RESTART );
+        }
+        else {
+            showTitle();
+        }
+    }
+
+    function lockForm ( disabled ) {
+        var i;
+        var elements = $accountInfoForm.elements;
 
         for ( i = 0; i < elements.length; i++ ) {
-            elements[ i ].disabled = data.locked;
+            elements[ i ].disabled = disabled;
         }
+    }
+
+    function showAltTitle () {
+        $accountInfoForm
+            .querySelector( 'h1.title' )
+            .style
+            .display = 'none';
+        $accountInfoForm
+            .querySelector( 'h1.alt-title' )
+            .style
+            .display = 'block';
+    }
+
+    function showTitle () {
+        $accountInfoForm
+            .querySelector( 'h1.title' )
+            .style
+            .display = 'block';
+        $accountInfoForm
+            .querySelector( 'h1.alt-title' )
+            .style
+            .display = 'none';
     }
 
     return {

@@ -29,9 +29,6 @@ class SaveAccountTask extends AbstractTask
      */
     public function run( StatsServer $server = NULL )
     {
-        // Lock the account page
-        Message::send( new AccountMessage( TRUE ), $server );
-
         $account = [
             'email' => $this->email,
             'imap_host' => $this->host,
@@ -48,12 +45,7 @@ class SaveAccountTask extends AbstractTask
             $accountModel->validate();
         }
         catch ( ValidationException $e ) {
-            Message::send(
-                new NotificationMessage(
-                    STATUS_ERROR,
-                    $e->getMessage() ),
-                $server );
-            return $this->unlockWithStatus( FALSE, $server );
+            return $this->fail( $e->getMessage(), $server );
         }
 
         // Check if the connection works
@@ -61,40 +53,39 @@ class SaveAccountTask extends AbstractTask
             Diagnostics::testImapConnection( $accountModel->getData() );
         }
         catch ( Exception $e ) {
-            Message::send(
-                new NotificationMessage(
-                    STATUS_ERROR,
-                    "There was a problem testing the IMAP connection: ".
-                    $e->getMessage() ."." ),
+            return $this->fail(
+                "There was a problem testing the IMAP connection: ".
+                $e->getMessage() .".",
                 $server );
-            return $this->unlockWithStatus( FALSE, $server );
         }
 
         // Save the account
         try {
-            //$accountModel->save();
-            Message::send(
-                new NotificationMessage(
-                    STATUS_SUCCESS,
-                    "Your account has been added!" ),
-                $server );
+            $accountModel->save();
         }
         catch ( Exception $e ) {
-            Message::send(
-                new NotificationMessage(
-                    STATUS_ERROR,
-                    $e->getMessage() ),
-                $server );
-            return $this->unlockWithStatus( FALSE, $server );
+            return $this->fail( $e->getMessage(), $server );
         }
 
-        return $this->unlockWithStatus( TRUE, $server );
-            //Command::make( Command::START ));
+        Message::send(
+            new NotificationMessage(
+                STATUS_SUCCESS,
+                "Your account has been added!" ),
+            $server );
+        Message::send(
+            new AccountMessage( TRUE, $this->email ),
+            $server );
+
+        return TRUE;
     }
 
-    private function unlockWithStatus( $status, $server )
+    private function fail( $message, $server )
     {
+        Message::send(
+            new NotificationMessage( STATUS_ERROR, $message ),
+            $server );
         Message::send( new AccountMessage( FALSE ), $server );
-        return $status;
+
+        return FALSE;
     }
 }

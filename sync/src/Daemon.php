@@ -284,7 +284,7 @@ class Daemon
         catch ( Exception $e ) {
             return FALSE;
         }
-$this->log->addInfo( "READING: ". $message->getType() );
+
         switch ( $message->getType() ) {
             case Message::PID:
                 $this->processPids[ $process ] = $message->pid;

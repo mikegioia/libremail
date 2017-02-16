@@ -63,7 +63,7 @@
 }
 
 .folder.active.incomplete .progress {
-    background-color: #bf8f0b;
+    background-color: #fffaad;
 }
 
 .folder.active.incomplete .top,
@@ -79,4 +79,12 @@
   50%  { background: #d6a70e; }
   75%  { background: #f4c74b; }
   100% { background: #d6a70e; }
+}
+
+.folders .none {
+    color: #999;
+    padding: 1rem 2rem;
+    text-align: center;
+    margin: 20% auto 0;
+    background-color: #393939;
 }

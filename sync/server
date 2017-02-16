@@ -98,6 +98,7 @@ $HALT = function () use ( $di ) {
     if ( isset( $di[ 'loop' ] ) && $di[ 'loop' ] ) {
         $di[ 'loop' ]->stop();
     }
+
     throw new TerminateException;
 };
 

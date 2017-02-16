@@ -7,11 +7,13 @@ use App\Message
 
 class AccountMessage extends AbstractMessage
 {
-    public $locked;
+    public $email;
+    public $updated;
     protected $type = Message::ACCOUNT;
 
-    public function __construct( $locked )
+    public function __construct( $updated, $email )
     {
-        $this->locked = $locked;
+        $this->email = $email;
+        $this->updated = (bool) $updated;
     }
 }

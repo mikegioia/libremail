@@ -42,7 +42,9 @@ return function ( $root ) {
 
         // If we already rendered the folders, just perform
         // an update on the folder meta.
-        if ( arraysEqual( folderList, folderNames ) ) {
+        if ( folderList.length
+            && arraysEqual( folderList, folderNames ) )
+        {
             update( folders, d.active );
         }
         else {

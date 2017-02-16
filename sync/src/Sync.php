@@ -17,6 +17,7 @@ use Fn
   , Pimple\Container
   , League\CLImate\CLImate
   , App\Message\NoAccountsMessage
+  , App\Message\NotificationMessage
   , App\Model\Folder as FolderModel
   , App\Model\Account as AccountModel
   , App\Model\Message as MessageModel
@@ -46,6 +47,7 @@ class Sync
     private $mailbox;
     private $retries;
     private $interactive;
+    private $activeAccount;
     private $maxRetries = 5;
     private $retriesFolders;
     private $retriesMessages;
@@ -220,10 +222,13 @@ class Sync
     public function runAccount( AccountModel $account, $options = [] )
     {
         if ( $this->retries[ $account->email ] > $this->maxRetries ) {
-            $this->log->notice(
+            $message =
                 "The account '{$account->email}' has exceeded the max ".
                 "amount of retries after failure ({$this->maxRetries}) ".
-                "and is no longer being attempted to sync again." );
+                "and is no longer being attempted to sync again.";
+            $this->log->notice( $message );
+            $this->sendMessage( $message );
+
             return FALSE;
         }
 
@@ -804,6 +809,11 @@ class Sync
                 "Failed validation for marking deleted messages: ".
                 $e->getMessage() );
         }
+    }
+
+    private function sendMessage( $message, $status = STATUS_ERROR )
+    {
+        Message::send( new NotificationMessage( $status, $message ) );
     }
 
     private function checkForHalt()

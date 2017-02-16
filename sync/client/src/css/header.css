@@ -8,6 +8,10 @@ header section.accounts {
     padding: 1rem 0 1rem 1.8rem;
 }
 
+header section.accounts.disabled {
+    color: #444;
+}
+
 header section.status {
     padding: 0.5rem 0;
     text-align: center;

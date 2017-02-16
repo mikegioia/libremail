@@ -63,7 +63,7 @@
                             <i class="icon-restart"></i>
                             Restart
                         </button>
-                        <button class="account">
+                        <button id="account-options">
                             <i class="icon-cog"></i>
                         </button>
                     </section>
@@ -113,7 +113,7 @@
                 </div>
             {{/folders}}
             {{^folders}}
-                No folders to display
+                <div class="none">No folders to display</div>
             {{/folders}}
             </section>
         </script>
@@ -132,11 +132,12 @@
         <script id="account-form" type="text/template">
             <form id="account-info" autocomplete="off" spellcheck="false">
             {{#email}}
-                <h1>Account Info</h1>
+                <h1 class="title">Account Info</h1>
             {{/email}}
             {{^email}}
-                <h1>Add an Email Account</h1>
+                <h1 class="title">Add an Email Account</h1>
             {{/email}}
+                <h1 class="alt-title">Saving Account&hellip;</h1>
                 <div class="row">
                     <div class="three columns">
                         <label>Email</label>

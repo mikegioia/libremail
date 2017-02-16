@@ -10,6 +10,10 @@ form h1 {
     margin-bottom: 3rem;
 }
 
+form h1.alt-title {
+    display: none;
+}
+
 form label {
     text-align: right;
     font-weight: normal;

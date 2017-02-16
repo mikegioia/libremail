@@ -116,6 +116,7 @@ return function () {
      * Updates the account form with data from the server.
      */
     function account ( data ) {
+console.log( 'account update' );
         Accounts.update( data );
     }
 

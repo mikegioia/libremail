@@ -22,6 +22,7 @@ return function ( $root ) {
     // State for rendering the parent template
     var rootIsRendered = false;
     // DOM nodes for updating
+    var $optionsButton;
     var $statusSection;
     var $restartButton;
     var $accountsSection;
@@ -62,15 +63,22 @@ return function ( $root ) {
         $statusSection = $root.querySelector( 'section.status' );
         $restartButton = $root.querySelector( 'button#restart' );
         $accountsSection = $root.querySelector( 'section.accounts' );
+        $optionsButton = $root.querySelector( 'button#account-options' );
 
         // Attach event handlers to DOM elements.
         $restartButton.onclick = restart;
     }
 
     function tearDown () {
+        // Disable the buttons
+        $restartButton.className = 'disabled';
+        $optionsButton.className = 'disabled';
+        $accountsSection.className += ' disabled';
+
         isAsleep = false;
         $statusSection = null;
         $restartButton = null;
+        $optionsButton = null;
         rootIsRendered = false;
         $accountsSection = null;
     }
