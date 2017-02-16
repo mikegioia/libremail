@@ -1,7 +1,7 @@
 /**
  * Header Component
  */
-LibreMail.Components.Accounts = (function ( Const, Socket, Mustache ) {
+LibreMail.Components.Accounts = (function ( Const, Socket, Emitter, Mustache ) {
 'use strict';
 // Returns a new instance
 return function ( $root ) {
@@ -14,6 +14,7 @@ return function ( $root ) {
         account_form: $accountForm.innerHTML
     };
     // DOM nodes
+    var $cancelButton;
     var $accountInfoForm;
     // To prevent re-rendering the form the user might be editing
     var isRendered = false;
@@ -38,11 +39,15 @@ return function ( $root ) {
         isRendered = true;
         $root.innerHTML = Mustache.render( tpl.account_form, data );
         $accountInfoForm = $root.querySelector( 'form#account-info' );
+        $cancelButton = $accountInfoForm.querySelector( '#account-cancel' );
+        $cancelButton.onclick = cancel;
         $accountInfoForm.onsubmit = save;
     }
 
     function tearDown () {
         isRendered = false;
+        $cancelButton = null;
+        $accountInfoForm = null;
     }
 
     /**
@@ -60,6 +65,10 @@ return function ( $root ) {
                 email: $accountInfoForm.email.value,
                 password: $accountInfoForm.password.value
             });
+    }
+
+    function cancel ( e ) {
+        Emitter.fire( Const.EV.SHOW_FOLDERS );
     }
 
     /**
@@ -116,4 +125,4 @@ return function ( $root ) {
         update: update,
         tearDown: tearDown
     };
-}}( LibreMail.Const, LibreMail.Socket, Mustache ));
+}}( LibreMail.Const, LibreMail.Socket, LibreMail.Emitter, Mustache ));

@@ -25,6 +25,7 @@ return function () {
         Emitter.on( Const.EV.STATS, render );
         Emitter.on( Const.EV.LOG_DATA, logData );
         Emitter.on( Const.EV.WS_CLOSE, offline );
+        Emitter.on( Const.EV.SHOW_FOLDERS, update );
         Emitter.on( Const.EV.ACCOUNT, accountUpdated );
         Emitter.on( Const.EV.STOP_UPDATE, stopUpdate );
         Emitter.on( Const.EV.START_UPDATE, startUpdate );
@@ -47,6 +48,16 @@ return function () {
             Header.render( data );
             Folders.render( data );
         }
+    }
+
+    function update () {
+        if ( ! data ) {
+            return;
+        }
+
+        Folders.tearDown();
+        Header.render( data );
+        Folders.render( data );
     }
 
     function stopUpdate () {

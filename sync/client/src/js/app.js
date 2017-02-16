@@ -46,7 +46,8 @@ LibreMail.Const = {
         STOP_UPDATE: 'stop_update',
         START_UPDATE: 'start_update',
         ACCOUNT_INFO: 'account_info',
-        NOTIFICATION: 'notification'
+        NOTIFICATION: 'notification',
+        SHOW_FOLDERS: 'show_folders'
     },
     TASK: {
         SAVE_ACCOUNT: 'save_account',
