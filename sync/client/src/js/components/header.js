@@ -60,11 +60,19 @@ return function ( $root ) {
             });
         rootIsRendered = true;
         $statusSection = $root.querySelector( 'section.status' );
-        $accountsSection = $root.querySelector( 'section.accounts' );
         $restartButton = $root.querySelector( 'button#restart' );
+        $accountsSection = $root.querySelector( 'section.accounts' );
 
         // Attach event handlers to DOM elements.
         $restartButton.onclick = restart;
+    }
+
+    function tearDown () {
+        isAsleep = false;
+        $statusSection = null;
+        $restartButton = null;
+        rootIsRendered = false;
+        $accountsSection = null;
     }
 
     function restart () {
@@ -115,6 +123,7 @@ return function ( $root ) {
     }
 
     return {
-        render: render
+        render: render,
+        tearDown: tearDown
     };
 }}( LibreMail.Const, LibreMail.Socket, Mustache ));

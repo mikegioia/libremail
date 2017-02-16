@@ -41,12 +41,14 @@ LibreMail.Const = {
         HEALTH: 'health',
         WS_OPEN: 'ws_open',
         ACCOUNT: 'account',
-        ACCOUNTS: 'accounts',
         WS_CLOSE: 'ws_close',
         LOG_DATA: 'log_data',
         STOP_UPDATE: 'stop_update',
         START_UPDATE: 'start_update',
         NOTIFICATION: 'notification'
+    },
+    TASK: {
+        SAVE_ACCOUNT: 'save_account'
     },
     // @TODO this should be based off config file
     WS: {

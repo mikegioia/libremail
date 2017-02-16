@@ -21,13 +21,15 @@ LibreMail.Socket = (function ( ReconnectingWebSocket, JSON, Const, Emitter ) {
     ws.onmessage = function ( evt ) {
         var data = JSON.parse( evt.data );
 
+//console.log( 'MSG RECVD', data );
+
         // Check if the type field is present
         if ( ! data.hasOwnProperty( 'type' )
             || Const.EV.hasOwnProperty( data.type ) )
         {
             data.type = Const.EV.ERROR;
         }
-console.log( data );
+
         Emitter.fire( data.type, data );
     };
 
@@ -36,6 +38,7 @@ console.log( data );
      * a wrapper around send().
      */
     ws.sendTask = function ( task, data ) {
+//console.log( 'SENDING MSG', task, data );
         ws.send( JSON.stringify({
             data: data,
             task: task,

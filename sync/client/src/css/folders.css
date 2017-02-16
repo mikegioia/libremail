@@ -61,3 +61,23 @@
     position: absolute;
     background: #2d2d2d;
 }
+
+.folder.active.incomplete {
+    animation: colorchange 4s;
+    animation-iteration-count: infinite;
+}
+
+.folder.active.incomplete .top,
+.folder.active.incomplete .bottom,
+.folder.active.incomplete .bottom .count {
+    color: #5e4600;
+    background: transparent;
+}
+
+@keyframes colorchange {
+  0%   { background: #d6a70e; }
+  25%  { background: #f4c74b; }
+  50%  { background: #d6a70e; }
+  75%  { background: #f4c74b; }
+  100% { background: #d6a70e; }
+}

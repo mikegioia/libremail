@@ -24,6 +24,7 @@ return function () {
     function events () {
         Emitter.on( Const.EV.STATS, render );
         Emitter.on( Const.EV.LOG_DATA, logData );
+        Emitter.on( Const.EV.WS_CLOSE, offline );
         Emitter.on( Const.EV.STOP_UPDATE, stopUpdate );
         Emitter.on( Const.EV.START_UPDATE, startUpdate );
     }
@@ -57,6 +58,11 @@ return function () {
 
     function logData () {
         console.log( data );
+    }
+
+    function offline () {
+        Header.tearDown();
+        Folders.tearDown();
     }
 
     return {

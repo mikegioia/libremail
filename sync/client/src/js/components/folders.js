@@ -7,6 +7,8 @@ LibreMail.Components.Folders = (function ( Mustache ) {
 return function ( $root ) {
     // Event namespace
     var namespace = '.folders';
+    // Flag if the system is "auto-scrolling"
+    var syncActive;
     // Flag to reset scroll
     var hasScrolled;
     // Used for comparison during render
@@ -50,14 +52,17 @@ return function ( $root ) {
         folderList = folderNames;
 
         if ( d.asleep || ( ! d.active && ! activeFlag ) ) {
-            if ( hasScrolled === true ) {
+            if ( hasScrolled === true && syncActive === true ) {
                 window.scrollTo( 0, 0 );
+                syncActive = false;
             }
+
             return;
         }
 
         for ( i in folders ) {
             if ( folders[ i ].active ) {
+                syncActive = true;
                 scrollTo( folders[ i ].id );
                 break;
             }
@@ -76,6 +81,7 @@ return function ( $root ) {
     function update( folders, active ) {
         var i;
         var node;
+        var classes;
         var activeNode;
         var activeNodes;
 
@@ -90,17 +96,34 @@ return function ( $root ) {
         }
 
         for ( i in folders ) {
+            node = document.getElementById( folders[ i ].id );
+            node.innerHTML = Mustache.render( tpl.folder, folders[ i ] );
+
             if ( ( ! active && ! activeFlag )
                 || ( active && folders[ i ].path == active ) )
             {
-                node = document.getElementById( folders[ i ].id );
-                node.innerHTML = Mustache.render( tpl.folder, folders[ i ] );
-                node.className = ( folders[ i ].active )
-                    ? "folder active"
-                    : "folder";
-                node = null;
+                classes = [ "folder" ];
+
+                if ( folders[ i ].active ) {
+                    classes.push( "active" );
+                }
+
+                if ( folders[ i ].incomplete ) {
+                    classes.push( "incomplete" );
+                }
+
+                node.className = classes.join( " " );
             }
+
+            node = null;
         }
+    }
+
+    function tearDown () {
+        folderList = [];
+        syncActive = false;
+        activeFlag = false;
+        hasScrolled = false;
     }
 
     /**
@@ -123,6 +146,7 @@ return function ( $root ) {
                 synced: folders[ i ].synced,
                 percent: folders[ i ].percent,
                 id: 'folder-' + i.split( '/' ).join( '-' ),
+                incomplete: folders[ i ].synced < folders[ i ].count,
                 crumbs: function () {
                     var crumbs = this.path.split( '/' ).slice( 0, -1 );
                     return ( crumbs.length > 0 )
@@ -187,6 +211,7 @@ return function ( $root ) {
     }
 
     return {
-        render: render
+        render: render,
+        tearDown: tearDown
     };
 }}( Mustache ));

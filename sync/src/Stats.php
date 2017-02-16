@@ -110,7 +110,7 @@ class Stats
                     'count' => $folder->getCount(),
                     'synced' => $folder->getSynced(),
                     'percent' => ( $folder->getSynced() > 0 )
-                        ? Fn\percent( $folder->getCount() / $folder->getSynced() )
+                        ? Fn\percent( $folder->getSynced() / $folder->getCount() )
                         : (( $folder->getCount() > 0 )
                             ? "0%"
                             : "100%")

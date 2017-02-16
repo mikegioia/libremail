@@ -1,7 +1,6 @@
 section.notifications {
     top: 0;
     right: 0;
-    bottom: 0;
     width: 40%;
     z-index: 3;
     position: fixed;

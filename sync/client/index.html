@@ -108,7 +108,7 @@
         <script id="folders" type="text/template">
             <section class="folders u-cf">
             {{#folders}}
-                <div id="{{id}}" class="folder{{#active}} active{{/active}}">
+                <div id="{{id}}" class="folder{{#active}} active{{/active}}{{#incomplete}} incomplete{{/incomplete}}">
                     {{> folder}}
                 </div>
             {{/folders}}

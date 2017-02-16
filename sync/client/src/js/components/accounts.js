@@ -51,12 +51,13 @@ return function ( $root ) {
      */
     function save ( e ) {
         e.preventDefault();
-        Socket.sendTask({
-            host: $accountInfoForm.host.value,
-            port: $accountInfoForm.port.value,
-            email: $accountInfoForm.email.value,
-            password: $accountInfoForm.password.value
-        });
+        Socket.sendTask(
+            Const.TASK.SAVE_ACCOUNT, {
+                host: $accountInfoForm.host.value,
+                port: $accountInfoForm.port.value,
+                email: $accountInfoForm.email.value,
+                password: $accountInfoForm.password.value
+            });
     }
 
     /**
