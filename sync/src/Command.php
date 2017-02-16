@@ -13,6 +13,7 @@ class Command
     private $regexMatch = '/^(!{1}[A-Z]+\n{1})$/';
     private $regexExtract = '/^(?:!{1})([A-Z]+)(?:\n{1})$/';
     // Valid commands
+    const STOP  = 'STOP';
     const STATS = 'STATS';
     const START = 'START';
     const HEALTH = 'HEALTH';
@@ -73,6 +74,9 @@ class Command
         }
 
         switch ( $results[ 1 ][ 0 ] ) {
+            case self::STOP:
+                $this->emitter->dispatch( EV_STOP_SYNC );
+                break;
             case self::STATS:
                 $this->emitter->dispatch( EV_POLL_STATS );
                 break;
@@ -93,5 +97,14 @@ class Command
     static public function getMessage( $command )
     {
         return sprintf( "!%s\n", $command );
+    }
+
+    /**
+     * Sends the command to the Daemon.
+     */
+    static public function send( $command )
+    {
+        fwrite( STDOUT, $command );
+        flush();
     }
 }

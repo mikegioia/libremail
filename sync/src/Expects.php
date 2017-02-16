@@ -19,7 +19,7 @@ class Expects
         }
 
         if ( ! is_array( $data ) ) {
-            throw new \Exception( "Invalid expects". print_r($data,true));
+            throw new \Exception( "Invalid expects: ". print_r( $data, TRUE ) );
         }
 
         $this->data = $data;

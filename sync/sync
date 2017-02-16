@@ -117,6 +117,11 @@ pcntl_signal( SIGUSR2, function ( $signo ) use ( $di ) {
     $di[ 'stats' ]->json();
 });
 
+// SIGPWR stops the syncing. SIGSTOP throws an error.
+pcntl_signal( SIGPWR, function ( $signo ) use ( $di ) {
+    $di[ 'sync' ]->stop();
+});
+
 // PDO factory, this uses Slim-PDO as a wrapper
 $di[ 'db_factory' ] = $di->factory( function ( $c, $config = NULL ) {
     $dbConfig = ( $config ) ?: $c[ 'config' ][ 'sql' ];

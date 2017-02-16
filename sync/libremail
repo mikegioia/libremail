@@ -124,6 +124,13 @@ $di[ 'emitter' ]->addListener(
         $di[ 'daemon' ]->startWebServer();
     });
 
+// This event is fired to stop the sync process.
+$di[ 'emitter' ]->addListener(
+    EV_STOP_SYNC,
+    function ( Event $event ) use ( $di ) {
+        $di[ 'daemon' ]->stopSync();
+    });
+
 // Fired when the sync is terminated for any reason. This is
 // where we can restart the script or terminate gracefully.
 // During restart, we want to incorporate some form of

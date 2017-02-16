@@ -1,7 +1,7 @@
 /**
  * Header Component
  */
-LibreMail.Components.Header = (function ( Const, Socket, Mustache ) {
+LibreMail.Components.Header = (function ( Const, Socket, Emitter, Mustache ) {
 'use strict';
 // Returns a new instance
 return function ( $root ) {
@@ -75,6 +75,7 @@ return function ( $root ) {
         // Attach event handlers to DOM elements.
         $restartButton.onclick = restart;
         $editAccountButton.onclick = editAccount;
+        $removeAccountButton.onclick = removeAccount;
     }
 
     function tearDown () {
@@ -110,6 +111,26 @@ return function ( $root ) {
             Const.TASK.ACCOUNT_INFO, {
                 email: account
             });
+    }
+
+    function removeAccount () {
+        var email = window.prompt(
+            "If you're sure you want to remove this account, " +
+            "then please type the full email address. " );
+
+        if ( email === account ) {
+            Socket.sendTask(
+                Const.TASK.REMOVE_ACCOUNT, {
+                    email: account
+                });
+        }
+        else {
+            Emitter.fire(
+                Const.EV.NOTIFICATION, {
+                    status: Const.STATUS.error,
+                    message: "You didn't type in the correct address."
+                });
+        }
     }
 
     function update ( data ) {
@@ -155,4 +176,4 @@ return function ( $root ) {
         render: render,
         tearDown: tearDown
     };
-}}( LibreMail.Const, LibreMail.Socket, Mustache ));
+}}( LibreMail.Const, LibreMail.Socket, LibreMail.Emitter, Mustache ));

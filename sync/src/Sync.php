@@ -172,6 +172,8 @@ class Sync
         }
 
         if ( ! $accounts ) {
+            $this->stats->setActiveAccount( NULL );
+
             // If we're in daemon mode, just go to sleep. The script
             // will pick up once the user creates an account and a
             // SIGCONT is sent to this process.
@@ -388,9 +390,16 @@ class Sync
         }
     }
 
+    public function stop()
+    {
+        $this->halt = TRUE;
+        $this->sleep = TRUE;
+    }
+
     public function wake()
     {
         $this->wake = TRUE;
+        $this->halt = FALSE;
     }
 
     /**
@@ -822,7 +831,11 @@ class Sync
 
         if ( $this->halt === TRUE ) {
             $this->disconnect();
-            throw new TerminateException;
+
+            // If we just want to sleep, then don't terminate
+            if ( $this->sleep !== TRUE ) {
+                throw new TerminateException;
+            }
         }
     }
 

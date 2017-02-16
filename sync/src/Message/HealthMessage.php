@@ -14,8 +14,8 @@ class HealthMessage extends AbstractMessage
 
     public function __construct( $tests, $procs, $noAccounts )
     {
-        $this->tests = $tests;
-        $this->procs = $procs;
+        $this->tests = $tests ?: [];
+        $this->procs = $procs ?: [];
         $this->no_accounts = $noAccounts;
     }
 }

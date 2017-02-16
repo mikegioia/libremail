@@ -186,6 +186,16 @@ class Daemon
     }
 
     /**
+     * Sends a SIGSTOP to st sync process to stop it.
+     */
+    public function stopSync()
+    {
+        if ( isset( $this->processPids[ PROC_SYNC ] ) ) {
+            posix_kill( $this->processPids[ PROC_SYNC ], SIGSTOP );
+        }
+    }
+
+    /**
      * Sends a SIGUSR2 to the sync process to get a stats update.
      */
     public function pollStats()

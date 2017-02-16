@@ -50,7 +50,8 @@ LibreMail.Const = {
     },
     TASK: {
         SAVE_ACCOUNT: 'save_account',
-        ACCOUNT_INFO: 'account_info'
+        ACCOUNT_INFO: 'account_info',
+        REMOVE_ACCOUNT: 'remove_account'
     },
     // @TODO this should be based off config file
     WS: {
