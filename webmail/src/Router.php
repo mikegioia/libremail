@@ -14,16 +14,12 @@ class Router
 {
     // The route patterns and their handling functions
     private $routes = [];
-
     // The before middleware route patterns and their handling functions
     private $befores = [];
-
     // The function to be executed when no route has been matched
     protected $notFound;
-
     // Current baseroute, used for (sub)route mounting
     private $baseroute = '';
-
     // The Request Method that needs to be handled
     private $method = '';
 

@@ -30,6 +30,7 @@ class SaveAccountTask extends AbstractTask
     public function run( StatsServer $server = NULL )
     {
         $account = [
+            'is_active' => 1,
             'email' => $this->email,
             'imap_host' => $this->host,
             'imap_port' => $this->port,
@@ -61,7 +62,7 @@ class SaveAccountTask extends AbstractTask
 
         // Save the account
         try {
-            $accountModel->save();
+            $accountModel->save( [], TRUE );
         }
         catch ( Exception $e ) {
             return $this->fail( $e->getMessage(), $server );
@@ -70,7 +71,7 @@ class SaveAccountTask extends AbstractTask
         Message::send(
             new NotificationMessage(
                 STATUS_SUCCESS,
-                "Your account has been added!" ),
+                "Your account has been saved!" ),
             $server );
         Message::send(
             new AccountMessage( TRUE, $this->email ),
@@ -84,7 +85,9 @@ class SaveAccountTask extends AbstractTask
         Message::send(
             new NotificationMessage( STATUS_ERROR, $message ),
             $server );
-        Message::send( new AccountMessage( FALSE ), $server );
+        Message::send(
+            new AccountMessage( FALSE, $this->email ),
+            $server );
 
         return FALSE;
     }

@@ -99,6 +99,11 @@ return function ( $root ) {
 
         for ( i in folders ) {
             node = document.getElementById( folders[ i ].id );
+
+            if ( ! node ) {
+                continue;
+            }
+
             node.innerHTML = Mustache.render( tpl.folder, folders[ i ] );
 
             if ( ( ! active && ! activeFlag )
@@ -174,8 +179,14 @@ return function ( $root ) {
     }
 
     function scrollTo ( id ) {
+        var yPos;
         var node = document.getElementById( id );
-        var yPos = yPosition( node );
+
+        if ( ! node ) {
+            return;
+        }
+
+        yPos = yPosition( node );
 
         // If the element is fully visible, then don't scroll
         if ( yPos + node.clientHeight < window.innerHeight + window.scrollY

@@ -44,6 +44,7 @@ module.exports = function ( grunt ) {
                     './src/css/forms.css',
                     './src/css/stage.css',
                     './src/css/buttons.css',
+                    './src/css/dropdowns.css',
                     './src/css/header.css',
                     './src/css/folders.css',
                     './src/css/status.css',

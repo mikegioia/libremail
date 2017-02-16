@@ -17,6 +17,8 @@ return function ( $root ) {
         status: $status.innerHTML,
         accounts: $accounts.innerHTML
     };
+    // Account email
+    var account;
     // State for restart command
     var isAsleep = false;
     // State for rendering the parent template
@@ -26,6 +28,8 @@ return function ( $root ) {
     var $statusSection;
     var $restartButton;
     var $accountsSection;
+    var $editAccountButton;
+    var $removeAccountButton;
 
     // Parse the templates
     Mustache.parse( tpl.header );
@@ -37,6 +41,7 @@ return function ( $root ) {
      * @param Object data
      */
     function render ( data ) {
+        account = data.account;
         // Store this for the restart button
         isAsleep = data.asleep;
 
@@ -63,24 +68,33 @@ return function ( $root ) {
         $statusSection = $root.querySelector( 'section.status' );
         $restartButton = $root.querySelector( 'button#restart' );
         $accountsSection = $root.querySelector( 'section.accounts' );
+        $editAccountButton = $root.querySelector( 'a#account-edit' );
+        $removeAccountButton = $root.querySelector( 'a#account-remove' );
         $optionsButton = $root.querySelector( 'button#account-options' );
 
         // Attach event handlers to DOM elements.
         $restartButton.onclick = restart;
+        $editAccountButton.onclick = editAccount;
     }
 
     function tearDown () {
         // Disable the buttons
-        $restartButton.className = 'disabled';
-        $optionsButton.className = 'disabled';
-        $accountsSection.className += ' disabled';
+        if ( rootIsRendered ) {
+            $restartButton.className = 'disabled';
+            $optionsButton.className = 'disabled';
+            $accountsSection.className += ' disabled';
+        }
 
+        // Release memory
+        account = null;
         isAsleep = false;
         $statusSection = null;
         $restartButton = null;
         $optionsButton = null;
         rootIsRendered = false;
         $accountsSection = null;
+        $editAccountButton = null
+        $removeAccountButton = null;
     }
 
     function restart () {
@@ -89,6 +103,13 @@ return function ( $root ) {
         }
 
         Socket.send( Const.MSG.RESTART );
+    }
+
+    function editAccount () {
+        Socket.sendTask(
+            Const.TASK.ACCOUNT_INFO, {
+                email: account
+            });
     }
 
     function update ( data ) {

@@ -25,6 +25,7 @@ return function () {
         Emitter.on( Const.EV.STATS, render );
         Emitter.on( Const.EV.LOG_DATA, logData );
         Emitter.on( Const.EV.WS_CLOSE, offline );
+        Emitter.on( Const.EV.ACCOUNT, accountUpdated );
         Emitter.on( Const.EV.STOP_UPDATE, stopUpdate );
         Emitter.on( Const.EV.START_UPDATE, startUpdate );
     }
@@ -63,6 +64,17 @@ return function () {
     function offline () {
         Header.tearDown();
         Folders.tearDown();
+    }
+
+    /**
+     * Triggered when a save account task is completed. If the
+     * task is successful, then tear down the folders so that
+     * they are triggered to be re-rendered.
+     */
+    function accountUpdated ( data ) {
+        if ( data.updated ) {
+            Folders.tearDown();
+        }
     }
 
     return {

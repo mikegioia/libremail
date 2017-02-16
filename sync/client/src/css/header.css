@@ -62,3 +62,7 @@ header section.actions {
     text-align: right;
     padding: 1rem 1rem 1rem 0;
 }
+
+header section.actions #restart {
+    margin-right: 0.5rem;
+}

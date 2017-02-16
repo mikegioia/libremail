@@ -29,6 +29,7 @@ class Message
     const ACCOUNT = 'account';
     const NO_ACCOUNTS = 'no_accounts';
     const DIAGNOSTICS = 'diagnostics';
+    const ACCOUNT_INFO = 'account_info';
     const NOTIFICATION = 'notification';
 
     // Injected during service registration
@@ -43,6 +44,7 @@ class Message
         self::ACCOUNT,
         self::NO_ACCOUNTS,
         self::DIAGNOSTICS,
+        self::ACCOUNT_INFO,
         self::NOTIFICATION
     ];
 
@@ -164,10 +166,13 @@ class Message
                         $m->procs,
                         $m->no_accounts );
                 case self::ACCOUNT:
-                    Fn\expects( $m )->toHave([ 'locked' ]);
-                    return new AccountMessage( $m->locked );
+                    Fn\expects( $m )->toHave([ 'updated', 'email' ]);
+                    return new AccountMessage( $m->updated, $m->email );
                 case self::NO_ACCOUNTS:
                     return new NoAccountsMessage;
+                case self::ACCOUNT_INFO:
+                    Fn\expects( $m )->toHave([ 'account' ]);
+                    return new AccountInfoMessage( $m->account );
                 case self::NOTIFICATION:
                     Fn\expects( $m )->toHave([ 'status', 'message' ]);
                     return new NotificationMessage( $m->status, $m->message );

@@ -147,6 +147,20 @@ class Account extends Model
             ->fetchAll( PDO::FETCH_CLASS, $this->getClass() );
     }
 
+    public function getByEmail( $email )
+    {
+        $account = $this->db()
+            ->select()
+            ->from( 'accounts' )
+            ->where( 'email', '=', $email )
+            ->execute()
+            ->fetchObject();
+
+        return ( $account )
+            ? new self( $account )
+            : $account;
+    }
+
     /**
      * Uses the email address to try and infer the IMAP service.
      */
