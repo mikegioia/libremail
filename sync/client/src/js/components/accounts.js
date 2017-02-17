@@ -40,8 +40,11 @@ return function ( $root ) {
         $root.innerHTML = Mustache.render( tpl.account_form, data );
         $accountInfoForm = $root.querySelector( 'form#account-info' );
         $cancelButton = $accountInfoForm.querySelector( '#account-cancel' );
-        $cancelButton.onclick = cancel;
         $accountInfoForm.onsubmit = save;
+
+        if ( $cancelButton ) {
+            $cancelButton.onclick = cancel;
+        }
     }
 
     function tearDown () {

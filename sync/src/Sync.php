@@ -21,6 +21,7 @@ use Fn
   , App\Model\Folder as FolderModel
   , App\Model\Account as AccountModel
   , App\Model\Message as MessageModel
+  , App\Exceptions\Stop as StopException
   , App\Model\Migration as MigrationModel
   , App\Exceptions\Error as ErrorException
   , App\Exceptions\Fatal as FatalException
@@ -37,6 +38,7 @@ class Sync
     private $cli;
     private $log;
     private $halt;
+    private $stop;
     private $wake;
     private $sleep;
     private $config;
@@ -172,6 +174,7 @@ class Sync
         }
 
         if ( ! $accounts ) {
+$this->log->debug( "No accounts found" );
             $this->stats->setActiveAccount( NULL );
 
             // If we're in daemon mode, just go to sleep. The script
@@ -235,6 +238,7 @@ class Sync
         }
 
         $this->checkForHalt();
+$this->log->debug( "Setting active email: ". $account->email );
         $this->stats->setActiveAccount( $account->email );
         $this->log->info( "Starting sync for {$account->email}" );
 
@@ -296,6 +300,9 @@ class Sync
         catch ( FatalException $e ) {
             $this->log->critical( $e->getMessage() );
             exit( 1 );
+        }
+        catch ( StopException $e ) {
+            throw $e;
         }
         catch ( TerminateException $e ) {
             throw $e;
@@ -393,7 +400,6 @@ class Sync
     public function stop()
     {
         $this->halt = TRUE;
-        $this->sleep = TRUE;
     }
 
     public function wake()
@@ -462,6 +468,9 @@ class Sync
             $this->removeOldFolders( $folderList, $savedFolders, $account );
         }
         catch ( PDOException $e ) {
+            throw $e;
+        }
+        catch ( StopException $e ) {
             throw $e;
         }
         catch ( TerminateException $e ) {
@@ -650,6 +659,9 @@ class Sync
         catch ( PDOException $e ) {
             throw $e;
         }
+        catch ( StopException $e ) {
+            throw $e;
+        }
         catch ( TerminateException $e ) {
             throw $e;
         }
@@ -831,6 +843,12 @@ class Sync
 
         if ( $this->halt === TRUE ) {
             $this->disconnect();
+            $this->stats->setActiveAccount( NULL );
+
+            // If there was a stop command issued, then don't terminate
+            if ( $this->stop === TRUE ) {
+                throw new StopException;
+            }
 
             // If we just want to sleep, then don't terminate
             if ( $this->sleep !== TRUE ) {

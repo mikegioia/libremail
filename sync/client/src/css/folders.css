@@ -16,8 +16,18 @@
     background: #d6a70e;
 }
 
-.folder.incomplete:not(.active) {
-    background: rgba(214, 167, 14, 0.25);
+.folder.incomplete:not(.active) .top {
+    color: #aaa;
+    background: rgba(214, 167, 14, 0.1);
+}
+
+.folder.incomplete:not(.active) .bottom {
+    color: #777;
+    background: rgba(214, 167, 14, 0.1);
+}
+
+.folder.incomplete:not(.active) .bottom .count {
+    background: transparent;
 }
 
 .folder .progress {

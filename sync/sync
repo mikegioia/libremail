@@ -21,6 +21,7 @@ use App\Log
   , Exception as Exception
   , App\Console\SyncConsole
   , PDOException as PDOException
+  , App\Exceptions\Stop as StopException
   , App\Exceptions\Terminate as TerminateException;
 
 // Set up paths and constants
@@ -119,6 +120,8 @@ pcntl_signal( SIGUSR2, function ( $signo ) use ( $di ) {
 
 // SIGPWR stops the syncing. SIGSTOP throws an error.
 pcntl_signal( SIGPWR, function ( $signo ) use ( $di ) {
+    $di[ 'log' ]->getLogger()->addDebug(
+        "SIGPWR received, stopping sync" );
     $di[ 'sync' ]->stop();
 });
 
@@ -184,6 +187,12 @@ catch ( PDOException $e ) {
     $di[ 'log' ]->displayError( $e );
     Diagnostics::checkDatabaseException( $di, $e );
     sleep( $config[ 'app' ][ 'db' ][ 'sleep_minutes' ] * 60 );
+    goto runSyncLoop;
+}
+// Stop the current sync and re-run it
+catch ( StopException $e ) {
+    $di[ 'sync' ] = NULL;
+    sleep( 1 );
     goto runSyncLoop;
 }
 // Gracefully exit if we're terminated

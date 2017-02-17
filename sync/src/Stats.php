@@ -163,7 +163,7 @@ class Stats
                 $this->activeAccount,
                 (bool) $this->running,
                 time() - $this->startTime,
-                $this->getStats( $useCache)
+                $this->getStats( $useCache )
             ));
     }
 }

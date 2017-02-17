@@ -186,12 +186,12 @@ class Daemon
     }
 
     /**
-     * Sends a SIGSTOP to st sync process to stop it.
+     * Sends a SIGPWR to st sync process to stop it.
      */
     public function stopSync()
     {
         if ( isset( $this->processPids[ PROC_SYNC ] ) ) {
-            posix_kill( $this->processPids[ PROC_SYNC ], SIGSTOP );
+            posix_kill( $this->processPids[ PROC_SYNC ], SIGPWR );
         }
     }
 

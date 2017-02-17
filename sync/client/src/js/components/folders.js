@@ -37,8 +37,18 @@ return function ( $root ) {
 
     function render ( d ) {
         var i;
-        var folderNames = Object.keys( d.accounts[ d.account ] );
-        var folders = formatFolders( d.accounts[ d.account ], d.active );
+        var folders;
+        var folderNames;
+
+        if ( ! d.account
+            || ! d.accounts
+            || ! Object.keys( d.accounts ).length )
+        {
+            return;
+        }
+
+        folderNames = Object.keys( d.accounts[ d.account ] );
+        folders = formatFolders( d.accounts[ d.account ], d.active );
 
         // If we already rendered the folders, just perform
         // an update on the folder meta.
