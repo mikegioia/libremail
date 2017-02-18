@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/local/bin/php
 <?php
 
 /**
@@ -118,10 +118,10 @@ pcntl_signal( SIGUSR2, function ( $signo ) use ( $di ) {
     $di[ 'stats' ]->json();
 });
 
-// SIGPWR stops the syncing. SIGSTOP throws an error.
-pcntl_signal( SIGPWR, function ( $signo ) use ( $di ) {
+// SIGHUP stops the syncing. SIGSTOP throws an error.
+pcntl_signal( SIGHUP, function ( $signo ) use ( $di ) {
     $di[ 'log' ]->getLogger()->addDebug(
-        "SIGPWR received, stopping sync" );
+        "SIGHUP received, stopping sync" );
     $di[ 'sync' ]->stop();
 });
 
