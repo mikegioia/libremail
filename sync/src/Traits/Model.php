@@ -109,4 +109,26 @@ trait Model
             $data[ $key ] = (int) $data[ $key ];
         }
     }
+
+    /**
+     * Updates any values referenced in keys to be valid UTF8
+     * strings.
+     * @param array $data
+     * @param array $keys
+     */
+    private function updateUtf8Values( &$data, $keys )
+    {
+        foreach ( $keys as $key ) {
+            if ( ! isset( $data[ $key ] )
+                || mb_check_encoding( $data[ 'key' ] ) === TRUE )
+            {
+                continue;
+            }
+
+            $data[ $key ] = @iconv(
+                'UTF-8',
+                'UTF-8//IGNORE',
+                $data[ $key ] );
+        }
+    }
 }
