@@ -140,7 +140,7 @@ $di[ 'db_factory' ] = $di->factory( function ( $c, $config = NULL ) {
             $dsn,
             $dbConfig[ 'username' ],
             $dbConfig[ 'password' ] );
-        $db->query( 'SET NAMES utf8mb4;' );
+        $db->query( 'SET NAMES '. $dbConfig[ 'charset' ] .';' );
 
         return $db;
     }
