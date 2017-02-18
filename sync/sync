@@ -71,6 +71,7 @@ $di[ 'stats' ] = function ( $c ) {
 // Logging service
 $di[ 'log' ] = function ( $c ) {
     $interactive = ( $c[ 'console' ]->interactive === TRUE );
+
     return new Log(
         $c[ 'cli' ],
         $c[ 'config' ][ 'log' ],
@@ -135,10 +136,13 @@ $di[ 'db_factory' ] = $di->factory( function ( $c, $config = NULL ) {
         $dbConfig[ 'charset' ] );
 
     try {
-        return new Database(
+        $db = new Database(
             $dsn,
             $dbConfig[ 'username' ],
             $dbConfig[ 'password' ] );
+        $db->query( 'SET NAMES utf8mb4;' );
+
+        return $db;
     }
     catch ( PDOException $e ) {
         throw new TerminateException(
