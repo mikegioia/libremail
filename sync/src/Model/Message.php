@@ -244,6 +244,12 @@ class Message extends Model
                 ));
         }
 
+        // Update flags to have the right data type
+        $this->updateFlagValues( $data, [
+            'seen', 'draft', 'recent', 'flagged',
+            'deleted', 'answered'
+        ]);
+
         // Check if this message exists
         $exists = $this->db()
             ->select()

@@ -92,4 +92,21 @@ trait Model
             throw new NotFoundException( $type );
         }
     }
+
+    /**
+     * Updates any values referenced in keys to be valid flags
+     * for the database. A flag is 1 or 0.
+     * @param array $data
+     * @param array $keys
+     */
+    private function updateFlagValues( &$data, $keys )
+    {
+        foreach ( $keys as $key ) {
+            if ( ! isset( $data[ $key ] ) ) {
+                continue;
+            }
+
+            $data[ $key ] = (int) $data[ $key ];
+        }
+    }
 }
