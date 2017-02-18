@@ -249,6 +249,9 @@ class Message extends Model
             'seen', 'draft', 'recent', 'flagged',
             'deleted', 'answered'
         ]);
+        $this->updateUtf8Values( $data, [
+            'subject', 'text_html', 'text_plain'
+        ]);
 
         // Check if this message exists
         $exists = $this->db()
