@@ -701,12 +701,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "451bd2c37ee06550927c47fd2d89610db53a092e"
+                "reference": "fab3a93444ce74bdbc16dee20044f130a94d6e52"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/451bd2c37ee06550927c47fd2d89610db53a092e",
-                "reference": "451bd2c37ee06550927c47fd2d89610db53a092e",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/fab3a93444ce74bdbc16dee20044f130a94d6e52",
+                "reference": "fab3a93444ce74bdbc16dee20044f130a94d6e52",
                 "shasum": ""
             },
             "require": {
@@ -742,7 +742,7 @@
                 "source": "https://github.com/ParticleBits/imap/tree/master",
                 "issues": "https://github.com/ParticleBits/imap/issues"
             },
-            "time": "2017-02-17 00:52:29"
+            "time": "2017-02-19 16:15:34"
         },
         {
             "name": "particlebits/zend-mail",
@@ -750,12 +750,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/zend-mail.git",
-                "reference": "ed62fa459c3d5fa429c2f8b6bcde177a132486ca"
+                "reference": "cf9727644fb64dbdc1678474266cbd17e1863638"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/zend-mail/zipball/ed62fa459c3d5fa429c2f8b6bcde177a132486ca",
-                "reference": "ed62fa459c3d5fa429c2f8b6bcde177a132486ca",
+                "url": "https://api.github.com/repos/ParticleBits/zend-mail/zipball/cf9727644fb64dbdc1678474266cbd17e1863638",
+                "reference": "cf9727644fb64dbdc1678474266cbd17e1863638",
                 "shasum": ""
             },
             "require": {
@@ -830,7 +830,7 @@
             "support": {
                 "source": "https://github.com/ParticleBits/zend-mail/tree/master"
             },
-            "time": "2017-02-17 00:05:55"
+            "time": "2017-02-19 16:10:50"
         },
         {
             "name": "particlebits/zend-mime",
@@ -1295,12 +1295,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "48e343e59e7c7f7cb6171b919082fb4a18df89a6"
+                "reference": "33f852c649ddb902a73d49fadda90e37bb76cd47"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/48e343e59e7c7f7cb6171b919082fb4a18df89a6",
-                "reference": "48e343e59e7c7f7cb6171b919082fb4a18df89a6",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/33f852c649ddb902a73d49fadda90e37bb76cd47",
+                "reference": "33f852c649ddb902a73d49fadda90e37bb76cd47",
                 "shasum": ""
             },
             "require": {
@@ -1350,7 +1350,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2017-02-02 13:15:15"
+            "time": "2017-02-18 17:35:19"
         },
         {
             "name": "symfony/http-foundation",
@@ -1358,12 +1358,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "faf4bf27e3d4cb4234ebb0c8a8e3534b7113597d"
+                "reference": "83fd8ffacc649ac78729f992d89814a130ca6218"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/faf4bf27e3d4cb4234ebb0c8a8e3534b7113597d",
-                "reference": "faf4bf27e3d4cb4234ebb0c8a8e3534b7113597d",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/83fd8ffacc649ac78729f992d89814a130ca6218",
+                "reference": "83fd8ffacc649ac78729f992d89814a130ca6218",
                 "shasum": ""
             },
             "require": {
@@ -1403,7 +1403,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2017-02-16 22:50:29"
+            "time": "2017-02-18 17:35:19"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -1470,12 +1470,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/routing.git",
-                "reference": "bd04b3246221603b37264636a5058a2b5e56ce0c"
+                "reference": "f2773faed45193e6cdf703df70b4f9f4f58e7dc6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/routing/zipball/bd04b3246221603b37264636a5058a2b5e56ce0c",
-                "reference": "bd04b3246221603b37264636a5058a2b5e56ce0c",
+                "url": "https://api.github.com/repos/symfony/routing/zipball/f2773faed45193e6cdf703df70b4f9f4f58e7dc6",
+                "reference": "f2773faed45193e6cdf703df70b4f9f4f58e7dc6",
                 "shasum": ""
             },
             "require": {
@@ -1537,7 +1537,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-02-12 19:14:59"
+            "time": "2017-02-18 17:35:19"
         },
         {
             "name": "zendframework/zend-hydrator",
@@ -1706,12 +1706,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-validator.git",
-                "reference": "8c6b4f2d37c7ef21a979638cb48e03c043062c8a"
+                "reference": "2c659f743adf9078477b880110526381294317af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-validator/zipball/8c6b4f2d37c7ef21a979638cb48e03c043062c8a",
-                "reference": "8c6b4f2d37c7ef21a979638cb48e03c043062c8a",
+                "url": "https://api.github.com/repos/zendframework/zend-validator/zipball/2c659f743adf9078477b880110526381294317af",
+                "reference": "2c659f743adf9078477b880110526381294317af",
                 "shasum": ""
             },
             "require": {
@@ -1734,13 +1734,13 @@
                 "zendframework/zend-uri": "^2.5"
             },
             "suggest": {
-                "zendframework/zend-db": "Zend\\Db component",
+                "zendframework/zend-db": "Zend\\Db component, required by the (No)RecordExists validator",
                 "zendframework/zend-filter": "Zend\\Filter component, required by the Digits validator",
-                "zendframework/zend-i18n": "Zend\\I18n component to allow translation of validation error messages as well as to use the various Date validators",
+                "zendframework/zend-i18n": "Zend\\I18n component to allow translation of validation error messages",
                 "zendframework/zend-i18n-resources": "Translations of validator messages",
-                "zendframework/zend-math": "Zend\\Math component",
+                "zendframework/zend-math": "Zend\\Math component, required by the Csrf validator",
                 "zendframework/zend-servicemanager": "Zend\\ServiceManager component to allow using the ValidatorPluginManager and validator chains",
-                "zendframework/zend-session": "Zend\\Session component",
+                "zendframework/zend-session": "Zend\\Session component, required by the Csrf validator",
                 "zendframework/zend-uri": "Zend\\Uri component, required by the Uri and Sitemap\\Loc validators"
             },
             "type": "library",
@@ -1769,7 +1769,7 @@
                 "validator",
                 "zf2"
             ],
-            "time": "2017-01-29 17:28:12"
+            "time": "2017-02-18 17:43:12"
         }
     ],
     "packages-dev": [],
