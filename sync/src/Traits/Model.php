@@ -120,7 +120,7 @@ trait Model
     {
         foreach ( $keys as $key ) {
             if ( ! isset( $data[ $key ] )
-                || mb_check_encoding( $data[ 'key' ] ) === TRUE )
+                || mb_check_encoding( $data[ $key ] ) === TRUE )
             {
                 continue;
             }
