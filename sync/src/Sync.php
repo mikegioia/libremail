@@ -881,12 +881,17 @@ class Sync
      * this happens we want to terminate the sync and let the whole
      * thing pick back up.
      * @param Exception $e
-     * @throws TerminateException
+     * @throws StopException
      */
     private function checkForClosedConnection( Exception $e )
     {
-        if ( strpos( $e->getMessage, "connection closed?" ) !== FALSE ) {
-            throw new TerminateException;
+        if ( strpos( $e->getMessage(), "connection closed?" ) !== FALSE ) {
+            $this->sendMessage(
+                "The IMAP connection was lost. Your internet connection ".
+                "could be down or it could just be a network error. The ".
+                "system will sleep for a bit before re-trying.".
+                STATUS_ERROR );
+            throw new StopException;
         }
     }
 

@@ -196,7 +196,7 @@ catch ( PDOException $e ) {
 // Stop the current sync and re-run it
 catch ( StopException $e ) {
     $di[ 'sync' ] = NULL;
-    sleep( 1 );
+    sleep( 5 );
     goto runSyncLoop;
 }
 // Gracefully exit if we're terminated
