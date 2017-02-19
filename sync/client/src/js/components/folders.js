@@ -103,7 +103,9 @@ return function ( $root ) {
             activeNodes = document.querySelectorAll( '.folder.active' );
 
             for ( i = 0; activeNode = activeNodes[ i ]; i++ ) {
-                activeNode.className = "folder";
+                activeNode.className = activeNode
+                    .className
+                    .replace( "active", "" );
             }
         }
 

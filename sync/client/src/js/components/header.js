@@ -65,13 +65,7 @@ return function ( $root ) {
                 accounts: tpl.accounts
             });
         rootIsRendered = true;
-        $statusSection = $root.querySelector( 'section.status' );
-        $restartButton = $root.querySelector( 'button#restart' );
-        $accountsSection = $root.querySelector( 'section.accounts' );
-        $editAccountButton = $root.querySelector( 'a#account-edit' );
-        $removeAccountButton = $root.querySelector( 'a#account-remove' );
-        $optionsButton = $root.querySelector( 'button#account-options' );
-
+        loadDomElements();
         // Attach event handlers to DOM elements.
         $restartButton.onclick = restart;
         $editAccountButton.onclick = editAccount;
@@ -96,6 +90,22 @@ return function ( $root ) {
         $accountsSection = null;
         $editAccountButton = null
         $removeAccountButton = null;
+    }
+
+    function reset () {
+        $root.innerHTML = Mustache.render(
+            tpl.header, {
+                asleep: true,
+                accounts: [],
+                running: false,
+                account: account,
+                runningTime: '---'
+            }, {
+                status: tpl.status,
+                accounts: tpl.accounts
+            });
+        rootIsRendered = true;
+        loadDomElements();
     }
 
     function restart () {
@@ -155,6 +165,15 @@ return function ( $root ) {
             : '';
     }
 
+    function loadDomElements () {
+        $statusSection = $root.querySelector( 'section.status' );
+        $restartButton = $root.querySelector( 'button#restart' );
+        $accountsSection = $root.querySelector( 'section.accounts' );
+        $editAccountButton = $root.querySelector( 'a#account-edit' );
+        $removeAccountButton = $root.querySelector( 'a#account-remove' );
+        $optionsButton = $root.querySelector( 'button#account-options' );
+    }
+
     function formatTime ( seconds ) {
         if ( seconds < 60 ) {
             return seconds + "s";
@@ -173,6 +192,7 @@ return function ( $root ) {
     }
 
     return {
+        reset: reset,
         render: render,
         tearDown: tearDown
     };
