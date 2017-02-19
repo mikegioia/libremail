@@ -73,6 +73,7 @@ return function () {
     }
 
     function offline () {
+        Header.reset();
         Header.tearDown();
         Folders.tearDown();
     }
