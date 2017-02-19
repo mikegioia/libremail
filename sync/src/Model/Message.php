@@ -282,7 +282,22 @@ class Message extends Model
             $this->id = $exists->id;
             unset( $data[ 'id' ] );
             unset( $data[ 'created_at' ] );
-            $updated = $updateMessage( $this->db(), $this->id, $data );
+
+            try {
+                $updated = $updateMessage( $this->db(), $this->id, $data );
+            }
+            catch ( PDOException $e ) {
+                // Check for bad UTF-8 errors
+                if ( strpos( $e->getMessage(), "Incorrect string value:" ) ) {
+                    $data[ 'subject' ] = Encoding::fixUTF8( $data[ 'subject' ] );
+                    $data[ 'text_html' ] = Encoding::fixUTF8( $data[ 'text_html' ] );
+                    $data[ 'text_plain' ] = Encoding::fixUTF8( $data[ 'text_plain' ] );
+                    $newMessageId = $updateMessage( $this->db(), $data );
+                }
+                else {
+                    throw $e;
+                }
+            }
 
             if ( $updated === FALSE ) {
                 throw new DatabaseUpdateException(
@@ -303,9 +318,14 @@ class Message extends Model
         catch ( PDOException $e ) {
             // Check for bad UTF-8 errors
             if ( strpos( $e->getMessage(), "Incorrect string value:" ) ) {
-                exit('hit error!');
+                $data[ 'subject' ] = Encoding::fixUTF8( $data[ 'subject' ] );
+                $data[ 'text_html' ] = Encoding::fixUTF8( $data[ 'text_html' ] );
+                $data[ 'text_plain' ] = Encoding::fixUTF8( $data[ 'text_plain' ] );
+                $newMessageId = $insertMessage( $this->db(), $data );
             }
-            exit('another error');
+            else {
+                throw $e;
+            }
         }
 
         if ( ! $newMessageId ) {
