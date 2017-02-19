@@ -7,6 +7,7 @@ use Fn
   , App\Model
   , Belt\Belt
   , PDOException
+  , ForceUTF8\Encoding
   , Particle\Validator\Validator
   , Pb\Imap\Message as ImapMessage
   , App\Traits\Model as ModelTrait
