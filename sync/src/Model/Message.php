@@ -6,6 +6,7 @@ use Fn
   , DateTime
   , App\Model
   , Belt\Belt
+  , PDOException
   , Particle\Validator\Validator
   , Pb\Imap\Message as ImapMessage
   , App\Traits\Model as ModelTrait
@@ -262,16 +263,26 @@ class Message extends Model
             ->where( 'account_id', '=', $this->account_id )
             ->execute()
             ->fetchObject();
+        $updateMessage = function ( $db, $id, $data ) {
+            return $db
+                ->update( $data )
+                ->table( 'messages' )
+                ->where( 'id', '=', $id )
+                ->execute();
+        };
+        $insertMessage = function ( $db, $data ) {
+            return $db
+                ->insert( array_keys( $data ) )
+                ->into( 'messages' )
+                ->values( array_values( $data ) )
+                ->execute();
+        };
 
         if ( $exists ) {
             $this->id = $exists->id;
             unset( $data[ 'id' ] );
             unset( $data[ 'created_at' ] );
-            $updated = $this->db()
-                ->update( $data )
-                ->table( 'messages' )
-                ->where( 'id', '=', $this->id )
-                ->execute();
+            $updated = $updateMessage( $this->db(), $this->id, $data );
 
             if ( $updated === FALSE ) {
                 throw new DatabaseUpdateException(
@@ -285,11 +296,17 @@ class Message extends Model
         $createdAt = new DateTime;
         unset( $data[ 'id' ] );
         $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
-        $newMessageId = $this->db()
-            ->insert( array_keys( $data ) )
-            ->into( 'messages' )
-            ->values( array_values( $data ) )
-            ->execute();
+
+        try {
+            $newMessageId = $insertMessage( $this->db(), $data );
+        }
+        catch ( PDOException $e ) {
+            // Check for bad UTF-8 errors
+            if ( strpos( $e->getMessage(), "Incorrect string value:" ) ) {
+                exit('hit error!');
+            }
+            exit('another error');
+        }
 
         if ( ! $newMessageId ) {
             throw new DatabaseInsertException(
