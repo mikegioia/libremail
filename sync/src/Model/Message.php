@@ -46,6 +46,9 @@ class Message extends Model
 
     private $unserializedAttachments;
 
+    // Options
+    const OPT_TRUNCATE_FIELDS = 'truncate_fields';
+
     use ModelTrait;
 
     public function getData()
@@ -304,9 +307,14 @@ class Message extends Model
      * Saves the meta information and content for a message as data
      * on the class object.
      * @param array $meta
+     * @param array $options
      */
-    public function setMessageData( ImapMessage $message )
+    public function setMessageData( ImapMessage $message, array $options = [] )
     {
+        if ( Fn\get( $options, self::OPT_TRUNCATE_FIELDS ) === TRUE ) {
+            $message->subject = substr( $message->subject, 0, 270 );
+        }
+
         $this->setData([
             'size' => $message->size,
             'date' => $message->date,

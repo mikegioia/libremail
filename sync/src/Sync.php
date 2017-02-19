@@ -767,7 +767,10 @@ $this->log->debug( "Setting active email: ". $account->email );
                 'folder_id' => $folder->getId(),
                 'account_id' => $folder->getAccountId(),
             ]);
-            $message->setMessageData( $imapMessage );
+            $message->setMessageData( $imapMessage, [
+                // This will trim subjects to the max size
+                MessageModel::OPT_TRUNCATE_FIELDS => TRUE
+            ]);
         }
         catch ( PDOException $e ) {
             throw $e;
@@ -782,6 +785,7 @@ $this->log->debug( "Setting active email: ". $account->email );
             $this->log->warning(
                 "Failed download for message {$messageId}: ".
                 $e->getMessage() );
+            // @TODO Check for 'connection closed' error in fwrite
             return;
         }
 
