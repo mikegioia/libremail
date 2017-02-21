@@ -56,7 +56,7 @@ them, run the following:
     $> git update-index --assume-unchanged config/local.ini
 
 View all possible configuration options:
-[Configuration Options](https://github.com/mikegioia/libremail/tree/master/sync/doc/configuration.md)
+[Configuration Options](https://github.com/mikegioia/libremail/tree/master/sync/doc/configuration.md#configuration-options)
 
 ### 3. Install Composer Dependencies
 
@@ -93,7 +93,7 @@ run any other database operations.
 
 Before you begin, you can run `./sync --help` to see a list of what options you
 have. View all possible configuration options and their details:
-[Configuration Options](https://github.com/mikegioia/libremail/tree/master/sync/doc/sync-options.md)
+[Configuration Options](https://github.com/mikegioia/libremail/tree/master/sync/doc/sync-options.md#sync-options)
 
 To get started, run:
 
