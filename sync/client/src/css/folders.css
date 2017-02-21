@@ -72,7 +72,7 @@
 }
 
 .folder.active.incomplete {
-    animation: colorchange 4s;
+    animation: colorchange 120s;
     animation-iteration-count: infinite;
 }
 
@@ -84,15 +84,17 @@
 .folder.active.incomplete .top,
 .folder.active.incomplete .bottom,
 .folder.active.incomplete .bottom .count {
-    color: #5e4600;
     background: transparent;
+    color: rgba(0, 0, 0, 0.6);
 }
 
 @keyframes colorchange {
   0%   { background: #d6a70e; }
-  25%  { background: #f4c74b; }
-  50%  { background: #d6a70e; }
-  75%  { background: #f4c74b; }
+  16%  { background: #75e57a; }
+  32%  { background: #74e1ed; }
+  50%  { background: #d1baff; }
+  68%  { background: #ffafe2; }
+  82%  { background: #ffbd60; }
   100% { background: #d6a70e; }
 }
 
