@@ -4,6 +4,7 @@ This application synchronises IMAP accounts to a local MySQL database. You can
 use this as a standalone method to periodically download your email, or you can
 use it with the two clients bundled with this tool.
 
+![Sync Web Screenshot](http://mikegioia.github.io/libremail/images/sync_web_screenshot.png)
 ![Sync Screenshot](http://mikegioia.github.io/libremail/images/sync_screenshot.png)
 
 ---
