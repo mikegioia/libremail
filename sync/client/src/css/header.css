@@ -58,6 +58,10 @@ header section.status .yellow {
     color: #d6a70e;
 }
 
+header section.status .offline {
+    color: #777;
+}
+
 header section.actions {
     text-align: right;
     padding: 1rem 1rem 1rem 0;

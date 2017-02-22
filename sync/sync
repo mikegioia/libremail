@@ -91,6 +91,7 @@ $HALT = function ( $signo ) use ( $di ) {
     }
 };
 
+pcntl_signal( SIGHUP, $HALT );
 pcntl_signal( SIGINT, $HALT );
 pcntl_signal( SIGTERM, $HALT );
 pcntl_signal( SIGQUIT, $HALT );
@@ -122,10 +123,10 @@ pcntl_signal( SIGUSR2, function ( $signo ) use ( $di ) {
     endif;
 });
 
-// SIGHUP stops the syncing. SIGSTOP throws an error.
-pcntl_signal( SIGHUP, function ( $signo ) use ( $di ) {
-    $di[ 'log' ]->getLogger()->addDebug(
-        "SIGHUP received, stopping sync" );
+// SIGURG stops the syncing
+pcntl_signal( SIGURG, function ( $signo ) use ( $di ) {
+    $di[ 'log' ]->getLogger()->addInfo(
+        "SIGURG received, stopping sync" );
     if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ):
         $di[ 'sync' ]->stop();
     endif;
