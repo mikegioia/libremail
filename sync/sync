@@ -1,4 +1,4 @@
-#!/usr/local/bin/php
+#!/usr/bin/php
 <?php
 
 /**
@@ -91,39 +91,44 @@ $HALT = function ( $signo ) use ( $di ) {
     }
 };
 
-pcntl_signal( SIGHUP, $HALT );
 pcntl_signal( SIGINT, $HALT );
 pcntl_signal( SIGTERM, $HALT );
 pcntl_signal( SIGQUIT, $HALT );
 
 // No-op, continue sync if asleep
 pcntl_signal( SIGCONT, function ( $signo ) use ( $di ) {
-    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ) {
-        $di[ 'sync' ]->wake();
-    }
     $di[ 'log' ]->getLogger()->addInfo(
         "SIGCONT received, restarting sync" );
+    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ):
+        $di[ 'sync' ]->wake();
+    endif;
 });
 
 // Return back statistics on the current sync
 pcntl_signal( SIGUSR1, function ( $signo ) use ( $di ) {
     $di[ 'log' ]->getLogger()->addDebug(
         "SIGUSR1 received, printing text stats" );
-    $di[ 'stats' ]->text();
+    if ( isset( $di[ 'stats' ] ) && $di[ 'stats' ] ):
+        $di[ 'stats' ]->text();
+    endif;
 });
 
 // SIGUSR2 returns JSON
 pcntl_signal( SIGUSR2, function ( $signo ) use ( $di ) {
     $di[ 'log' ]->getLogger()->addDebug(
         "SIGUSR2 received, printing JSON stats" );
-    $di[ 'stats' ]->json();
+    if ( isset( $di[ 'stats' ] ) && $di[ 'stats' ] ):
+        $di[ 'stats' ]->json();
+    endif;
 });
 
 // SIGHUP stops the syncing. SIGSTOP throws an error.
 pcntl_signal( SIGHUP, function ( $signo ) use ( $di ) {
     $di[ 'log' ]->getLogger()->addDebug(
         "SIGHUP received, stopping sync" );
-    $di[ 'sync' ]->stop();
+    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ):
+        $di[ 'sync' ]->stop();
+    endif;
 });
 
 // PDO factory, this uses Slim-PDO as a wrapper

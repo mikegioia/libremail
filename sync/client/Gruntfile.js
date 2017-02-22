@@ -72,6 +72,7 @@ module.exports = function ( grunt ) {
     grunt.loadNpmTasks( 'grunt-contrib-watch' );
     grunt.loadNpmTasks( 'grunt-contrib-concat' );
 
+    grunt.registerTask( 'build', [ 'concat', 'copy' ] );
     grunt.registerTask( 'default', [ 'concat', 'copy', 'watch' ] );
     grunt.registerTask( 'printenv', function () {
         console.log( process.env );

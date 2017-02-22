@@ -20,7 +20,15 @@ return function ( $root ) {
     // to re-draw every folder and jitter the screen. We can
     // prevent this with a throttle timer.
     var redrawTimer;
+    // Used for crawling stale folders that may still have an
+    // incomplete flag on them.
+    var spiderTimer;
+    var spiderStore = {};
+    // This is not used, see crawlFolders
+    var spiderWaitMs = 0;
     var activeFlag = false;
+    var spiderDelayMs = 5000;
+    var spiderTimeoutMs = 2000;
     var redrawTimeoutMs = 10000;
     // DOM template nodes
     var $folder = document.getElementById( 'folder' );
@@ -62,6 +70,7 @@ return function ( $root ) {
         }
 
         folderList = folderNames;
+        startSpiderCrawl( spiderDelayMs );
 
         if ( d.asleep || ( ! d.active && ! activeFlag ) ) {
             if ( hasScrolled === true && syncActive === true ) {
@@ -93,7 +102,6 @@ return function ( $root ) {
     function update( folders, active ) {
         var i;
         var node;
-        var classes;
         var activeNode;
         var activeNodes;
 
@@ -121,20 +129,45 @@ return function ( $root ) {
             if ( ( ! active && ! activeFlag )
                 || ( active && folders[ i ].path == active ) )
             {
-                classes = [ "folder" ];
-
-                if ( folders[ i ].active ) {
-                    classes.push( "active" );
-                }
-
-                if ( folders[ i ].incomplete ) {
-                    classes.push( "incomplete" );
-                }
-
-                node.className = classes.join( " " );
+                updateFolderClasses( node, folders[ i ] );
             }
 
             node = null;
+        }
+    }
+
+    function updateFolderClasses ( node, folder ) {
+        var classes = [ "folder" ];
+
+        if ( folder.active ) {
+            classes.push( "active" );
+        }
+
+        if ( folder.incomplete ) {
+            classes.push( "incomplete" );
+        }
+
+        node.className = classes.join( " " );
+        spiderStore[ folder.id ] = (new Date).getTime();
+    }
+
+    function cleanupFolderClasses ( node ) {
+        var count;
+        var synced;
+        var classes;
+
+        if ( ! node
+            || ! node.className
+            || node.className.indexOf( "active" ) !== -1 )
+        {
+            return;
+        }
+
+        count = node.querySelector( 'input.count' ).value;
+        synced = node.querySelector( 'input.synced' ).value;
+
+        if ( synced >= count ) {
+            node.className = node.className.replace( "incomplete", "" );
         }
     }
 
@@ -233,6 +266,42 @@ return function ( $root ) {
         redrawTimer = setTimeout( function () {
             activeFlag = false;
         }, redrawTimeoutMs );
+    }
+
+    /**
+     * Crawls the folders on a timer, looking for any that
+     * should have their classname cleaned up.
+     */
+    function startSpiderCrawl ( timeout ) {
+        clearTimeout( spiderTimer );
+        spiderTimer = setTimeout( crawlFolders, spiderDelayMs );
+    }
+
+    function crawlFolders () {
+        var i;
+        var folders;
+        var time = (new Date).getTime();
+
+        if ( ! activeFlag ) {
+            startSpiderCrawl( spiderTimeoutMs );
+            return;
+        }
+
+        folders = document.querySelectorAll( '.folder.incomplete:not(.active)' );
+
+        for ( i in folders ) {
+            // If it's been active within a wait period, ignore it
+            if ( spiderWaitMs
+                && spiderStore[ folders[ i ].id ]
+                && time - spiderStore[ folders[ i ].id ] < spiderWaitMs )
+            {
+                continue;
+            }
+
+            cleanupFolderClasses( folders[ i ] );
+        }
+
+        startSpiderCrawl( spiderTimeoutMs );
     }
 
     return {
