@@ -96,100 +96,28 @@ Before you begin, you can run `./sync --help` to see a list of what options you
 have. View all possible configuration options and their details:
 [Configuration Options](https://github.com/mikegioia/libremail/tree/master/sync/doc/sync-options.md#sync-options)
 
-To get started, run:
+To use the **CLI** tool (debug mode), run:
 
     $> ./sync
 
-And follow the onscreen instructions!
+And follow the onscreen instructions.
+
+To use the **Web** tool, run:
+
+    $> ./libremail
+
+This tool will run silently and write to `/logs`. Open your browser and go
+to [localhost:9898](http://localhost:9898) to view the Web client.
 
 ## Using an Init Script or Supervisor
 
 If you'd like to run this sync script in the background all the time, then it
 is recommended to use some sort of supervisor or watchdog program to monitor if
-the script fails for any reason.
+the script fails for any reason. Here are some guides for Linux and MacOS:
 
-### SystemD
-
-Create a file `libremail.service` and place it in `~/.config/systemd/user/`.
-Make sure to update the paths to the files in PIDFile and ExecStart.
-
-```
-[Unit]
-Description=LibreMail IMAP Syncing Engine
-Documentation=https://github.com/mikegioia/libremail
-After=network.target network-online.target
-
-[Service]
-Type=simple
-PIDFile=/path/to/home/.config/libremail/sync.pid
-ExecStart=/path/to/LibreMail/sync/sync -b
-ExecStop=/bin/kill -15 $MAINPID
-Restart=always
-
-[Install]
-WantedBy=default.target
-```
-
-To enable and activate the service, run:
-
-    $> systemctl --user daemon-reload
-    $> systemctl --user start libremail
-
-### SysV Init
-
-Create a file at `/etc/init.d/libremail` with executable permissions owned
-by `root:root`. Make sure to update the paths to the files in EXEC and
-possibly PIDFILE. Also change the user and group in RUNAS.
-
-```
-#!/bin/sh
-
-### BEGIN INIT INFO
-# Provides:           libremail
-# Required-Start:
-# Required-Stop:
-# Default-Start:      2 3 4 5
-# Default-Stop:       0 1 6
-# Short-Description:  libremail
-# Description: LibreMail IMAP Syncing Engine
-### END INIT INFO
-
-. /lib/lsb/init-functions
-
-OPTS="-b"
-RUNAS="user:group"
-PIDFILE=/var/run/libremail.pid
-EXEC=/path/to/LibreMail/sync/sync
-
-case "$1" in
-    start)
-        if [ -f $PIDFILE ]
-        then
-            log_begin_msg "$PIDFILE exists, process is already running or crashed"
-        else
-            log_begin_msg "Starting LibreMail..."
-            start-stop-daemon --start --chuid $RUNAS --pidfile $PIDFILE \
-                --make-pidfile --background --exec $EXEC -- $OPTS
-        fi
-        log_end_msg 0
-        ;;
-    stop)
-        log_begin_msg "Stopping LibreMail"
-        if [ ! -f $PIDFILE ]
-        then
-            echo "$PIDFILE does not exist, process is not running"
-        else
-            PID=$(cat $PIDFILE)
-            start-stop-daemon --stop --quiet --pidfile $PIDFILE
-            rm -f $PIDFILE
-        fi
-        log_end_msg 0
-        ;;
-    *)
-        echo "Please use start or stop as first argument"
-        ;;
-esac
-```
+ - [SystemD](https://github.com/mikegioia/libremail/tree/master/sync/doc/systemd.md#systemd)
+ - [SysV Init](https://github.com/mikegioia/libremail/tree/master/sync/doc/sysv-init.md#sysv-init)
+ - [MacOS LaunchD](https://github.com/mikegioia/libremail/tree/master/sync/doc/macos-launchd.md#macos-launchd)
 
 ## Submitting Bugs
 
