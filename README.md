@@ -1,6 +1,7 @@
 # LibreMail
 
-> **THIS IS UNDER ACTIVE DEVELOPMENT AND IN NO WAY READY FOR PUBLIC USE**
+> **Under Active Development**
+> [`Sync`](sync) is ready to use!
 
 This project consists of three parts:
 
@@ -13,10 +14,9 @@ provide a fully free, modern, and extremely usable email client as well as an
 easy to use tool for storing your remote email in a local SQL database.
 
 Additionally, I set out to create a Kanban-style email client to interact with
-your email in a much more intuitive card-based interface.
-
-Currently parts 1 and 3 are under active development, with part 2 coming later.
-Read below for more information about each application.
+your email in a much more intuitive, card-based interface. Currently, part 1 is
+finished and part 2 has started. Read below for more information about each
+application.
 
 ### 1. IMAP to SQL Syncing Engine
 
@@ -43,11 +43,12 @@ script files on every page request.
 This has implications for anyone who disables JavaScript by default, anyone who
 may not want to run JavaScript on their Internet connection, or anyone who may
 be using a mobile or antique browser, or a browser over a slow Internet
-connection.
+connection. Even managing a JavaScript white-list is problematic because you're
+still trusting the website and application to never be compromised.
 
 Web applications and pages can not only function, but thrive in a JavaScript-
 less environment. The [`webmail`](webmail) application in this project provides
-a rich GMail-style interface for interacting with the local email saved to a SQL
+a rich GMail-style interface for interacting with the local email saved in a SQL
 database from the [`sync`](sync) app. It's mobile-friendly, extremely light-
 weight, and provides almost full parity to GMail's email client.
 

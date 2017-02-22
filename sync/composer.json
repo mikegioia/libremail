@@ -41,5 +41,9 @@
         "mkraemer/react-pcntl": "^2.0",
         "neitanod/forceutf8": "^2.0"
     },
-    "minimum-stability": "dev"
+    "bin": "libremail",
+    "minimum-stability": "dev",
+    "require-dev": {
+        "clue/phar-composer": "^1.0"
+    }
 }

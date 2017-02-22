@@ -52,6 +52,8 @@ CREATE TABLE IF NOT EXISTS `folders` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `account_id` int(10) unsigned NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `count` int(10) unsigned DEFAULT '0',
+  `synced` int(10) unsigned DEFAULT '0',
   `deleted` tinyint(1) unsigned DEFAULT '0',
   `ignored` tinyint(1) unsigned DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -64,6 +66,8 @@ CREATE TABLE IF NOT EXISTS `folders` (
 - `account_id` Foreign key referencing the account from the `accounts` table.
 - `name` Full global name of the folder as saved on the IMAP server. For
    example, this would be 'Accounts/Listserv/Libremail' instead of 'Libremail'.
+- `count` Total number of messages in the folder.
+- `synced` Number of messages that have been downloaded for this folder.
 - `deleted` Boolean flag denoting if the folder was deleted on the IMAP server.
    Deleted folders should not be synced.
 - `ignored` Boolean flag denoting if the folder should be ignored from sycning
@@ -81,7 +85,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `unique_id` int(10) unsigned DEFAULT NULL,
   `date_str` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   `charset` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `subject` varchar(270) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `subject` varchar(270) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `message_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
   `in_reply_to` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
   `size` int(10) unsigned DEFAULT NULL,
@@ -90,10 +94,10 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `from` text COLLATE utf8_unicode_ci,
   `cc` text COLLATE utf8_unicode_ci,
   `reply_to` text COLLATE utf8_unicode_ci,
-  `text_plain` text COLLATE utf8_unicode_ci,
-  `text_html` text COLLATE utf8_unicode_ci,
-  `references` text COLLATE utf8_unicode_ci,
-  `attachments` text COLLATE utf8_unicode_ci,
+  `text_plain` longtext COLLATE utf8mb4_unicode_ci,
+  `text_html` longtext COLLATE utf8mb4_unicode_ci,
+  `references` text COLLATE utf8mb4_unicode_ci,
+  `attachments` text COLLATE utf8mb4_unicode_ci,
   `seen` tinyint(1) unsigned DEFAULT NULL,
   `draft` tinyint(1) unsigned DEFAULT NULL,
   `recent` tinyint(1) unsigned DEFAULT NULL,
@@ -104,11 +108,14 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `date` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  INDEX (`account_id`),
   INDEX (`folder_id`),
   INDEX (`unique_id`),
+  INDEX (`account_id`),
+  INDEX (`folder_id`),
+  INDEX (`deleted`),
+  INDEX (`synced`),
   INDEX (`date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ```
 
