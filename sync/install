@@ -1,0 +1,34 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+#
+# LibreMail Installation Manager
+#
+# @author   Mike Gioia <mike@particlebits.com>
+# @name:    install
+# @about:   Check paths, create directories, check if sync and server can
+#           run, and check database connection.
+##
+
+## Load path and platform
+basepath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
+platform=
+
+## Load local.ini file settings
+
+
+## Check if logs folder exists and create it if not
+
+
+## If no database settings exist, then ask for username and password
+
+
+## @TODO
+## For MacOS, make sure brew is installed. Then install php7, mysql, node,
+## npm, and the extensions php70-pcntl and php70-ev.
+
+
+## Look for php, 
+## Check for npm, grunt, and bower and install them if they're not
+## set up.
+
