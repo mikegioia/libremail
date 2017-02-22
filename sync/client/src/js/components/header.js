@@ -97,9 +97,9 @@ return function ( $root ) {
             tpl.header, {
                 asleep: true,
                 accounts: [],
+                offline: true,
                 running: false,
                 account: account,
-                runningTime: '---'
             }, {
                 status: tpl.status,
                 accounts: tpl.accounts

@@ -110,7 +110,12 @@
             {{/asleep}}
             </div>
             <div class="time">
+            {{#offline}}
+                <span class="offline">&mdash;</span>
+            {{/offline}}
+            {{^offline}}
                 <span class="timespan">{{runningTime}}</span>
+            {{/offline}}
                 <div class="label">Uptime</div>
             </div>
         </script>

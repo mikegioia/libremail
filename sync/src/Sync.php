@@ -405,6 +405,7 @@ class Sync
     public function stop()
     {
         $this->halt = TRUE;
+        $this->stop = TRUE;
     }
 
     public function wake()
