@@ -93,7 +93,6 @@ return function ( $root ) {
     function update( folders, active ) {
         var i;
         var node;
-        var classes;
         var activeNode;
         var activeNodes;
 
@@ -121,20 +120,51 @@ return function ( $root ) {
             if ( ( ! active && ! activeFlag )
                 || ( active && folders[ i ].path == active ) )
             {
-                classes = [ "folder" ];
-
-                if ( folders[ i ].active ) {
-                    classes.push( "active" );
-                }
-
-                if ( folders[ i ].incomplete ) {
-                    classes.push( "incomplete" );
-                }
-
-                node.className = classes.join( " " );
+                updateFolderClasses( node, folders[ i ] );
+                // We want to set up a timer to update the last active
+                // folder and clean up any class names.
+                setDelayedCleanup( folders[ i ].id );
             }
 
             node = null;
+        }
+    }
+
+    function updateFolderClasses ( node, folder ) {
+        var classes = [ "folder" ];
+
+        if ( folder.active ) {
+            classes.push( "active" );
+        }
+
+        if ( folder.incomplete ) {
+            classes.push( "incomplete" );
+        }
+
+        node.className = classes.join( " " );
+    }
+
+    function setDelayedCleanup ( folderId ) {
+        setTimeout( function () {
+            cleanupFolderClasses( folderId );
+        }, 500 );
+    }
+
+    function cleanupFolderClasses ( folderId ) {
+        var count;
+        var synced;
+        var classes;
+        var node = document.getElementById( folderId );
+
+        if ( ! node ) {
+            return;
+        }
+
+        count = node.querySelector( 'input.count' ).value;
+        synced = node.querySelector( 'input.synced' ).value;
+
+        if ( synced >= count ) {
+            node.className = node.className.replace( "incomplete", "" );
         }
     }
 
