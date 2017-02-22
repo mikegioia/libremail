@@ -18,6 +18,11 @@ script:
   a systemd service, managed via a hypervisor, or any other method of
   watchdogging or monitoring a PHP script.
 
+* `--diagnostics | -d`
+
+  Runs through the diagnostic tests and reports any errors. Use this to start
+  debugging any failures.
+
 * `--folder <folder> | -f <folder>`
 
   Runs the sync script for the specified folder only, and then halts. This is
@@ -27,15 +32,25 @@ script:
   argument is the full name of the IMAP folder: 'INBOX', or 'Accounts/Support'
   are examples.
 
+* `--create | -c`
+
+  Run the sync script but only prompt for adding a new IMAP account.
+
+* `--daemon | -e`
+
+  Run the sync script in daemon mode. This supresses output to the console
+  and instead writes everything to the log files.
+
 * `--updatedb | -u`
 
   Updates the database by running the migration scripts in `db/`. These scripts
   will only run once so you can run this as many times as you'd like.
 
-* `--diagnostics | -d`
+* `--sleep | -s`
 
-  Runs through the diagnostic tests and reports any errors. Use this to start
-  debugging any failures.
+  Run the sync script in sleep mode. This keeps the entire sync disabled and will
+  not make any IMAP connections or do anything but respond to signals. It can be
+  helpful for signal testing.
 
 * `--help | -h`
 

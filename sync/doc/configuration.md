@@ -22,6 +22,12 @@ If you just wanted to increase the memory of your application. This is a good id
   memory to parse in PHP, due do how large strings are parsed. 256M is a
   better, safer limit and I set mine as high as 1GB.
 
+* `db[sleep_minutes]`
+
+  Integer, defaults to `10`. This is the number of monutes the script will
+  sleep after a non-recoverable database error is encountered, before
+  starting back up again.
+
 * `sync[wait_seconds]`
 
   Integer, defaults to `10`. This is the number of seconds to wait before
@@ -60,10 +66,6 @@ happens when the app is running in the background.
 
   Defaults to `true` but set to `false` if you want to suppress stack traces
   from showing in the logs or the CLI.
-
-* `name`
-
-  String, any name for the application. Defaults to `libremail`.
 
 * `path`
 
@@ -105,3 +107,52 @@ happens when the app is running in the background.
 
   Relative or absolute path for saving email attachments. Defaults to a local
 directory named `attachments`.
+
+#### [daemonlog]
+
+* `level[cli]`
+
+  Integer, defaults to `7`. See the `[log]` section above for more info.
+  This corresponds to the log file written by the master `libremail`
+  process.
+
+* `level[file]`
+
+  Integer, defaults to `7`. See the `[log]` section above for more info.
+
+* `stacktrace`
+
+  Defaults to `true`. See the `[log]` section above for more info.
+
+* `path`
+
+  Defaults to `logs/daemon.log`. See the `[log]` section above for more
+  info.
+
+#### [server]
+
+* `port`
+
+  The port for accessing the Web client. This defaults to `9898`, so to
+  access the client you would navigate to
+  [http://localhost:9898]([http://localhost:9898]).
+
+#### [serverlog]
+
+* `level[cli]`
+
+  Integer, defaults to `7`. See the `[log]` section above for more info.
+  This corresponds to the log file written by the web server process.
+
+* `level[file]`
+
+  Integer, defaults to `5`. See the `[log]` section above for more info.
+
+* `stacktrace`
+
+  Defaults to `true`. See the `[log]` section above for more info.
+
+* `path`
+
+  Defaults to `logs/server.log`. See the `[log]` section above for more
+  info.

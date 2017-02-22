@@ -5,19 +5,25 @@ use this as a standalone method to periodically download your email, or you can
 use it with the two clients bundled with this tool.
 
 ![Sync Web Screenshot](http://mikegioia.github.io/libremail/images/sync_web_screenshot.png)
+
+> Web Client admin interface
+
+
 ![Sync Screenshot](http://mikegioia.github.io/libremail/images/sync_screenshot.png)
+
+> Command Line interface
 
 ---
 
 ## Contents
 
 - [Installation](https://github.com/mikegioia/libremail/tree/master/sync#installation)
-- [Run the IMAP Sync](https://github.com/mikegioia/libremail/tree/master/sync#run-the-sync)
     1. [Create Database](https://github.com/mikegioia/libremail/tree/master/sync#1-create-database)
     2. [Configure the Application](https://github.com/mikegioia/libremail/tree/master/sync#2-configure-the-application)
     3. [Install Composer Dependencies](https://github.com/mikegioia/libremail/tree/master/sync#5-install-composer-dependencies)
     4. [Running the Diagnostic Tests](https://github.com/mikegioia/libremail/tree/master/sync#3-running-the-diagnostic-tests)
     5. [Running SQL Migration Scripts](https://github.com/mikegioia/libremail/tree/master/sync#4-running-sql-migration-scripts)
+- [Run the IMAP Sync](https://github.com/mikegioia/libremail/tree/master/sync#run-the-sync)
 - [Using an Init Script or Supervisor](https://github.com/mikegioia/libremail/tree/master/sync#using-an-init-script-or-supervisor)
 - [Submitting Bugs](https://github.com/mikegioia/libremail/tree/master/sync#submitting-bugs)
 
@@ -31,28 +37,29 @@ following command:
     MariaDB [(none)]> CREATE DATABASE `libremail`;
 
 The database name is a configuration option, so if you'd like to change this to
-be something other than `libremail`, feel free to use anything.
+be something other than `libremail`, make sure you
+[update the config setting](https://github.com/mikegioia/libremail/tree/master/sync/doc/configuration.md#sql).
 
-##### 1.1 `max_allowed_packet` (MariaDB/MySQL)
+#### 1.1 `max_allowed_packet` (MariaDB/MySQL)
 
-Because of the amount of data that may be written to SQL (long email message text)
-a configuration setting needs to be enabled for MySQL databases allowing a larger
-packet size to be sent in a query. To do this, add the following line to your SQL
-config file:
+Because of the amount of data that may be written to SQL (long email message
+text) a configuration setting needs to be enabled for MySQL databases allowing a
+larger packet size to be sent in a query. To do this, add the following line to
+your SQL config file:
 
     [mysqld]
     max_allowed_pack = 500M
 
-You don't have to use 500MB as your packet size, but anything 16MB or higher is advised.
+You don't have to use 500MB as your packet size, but anything 16MB or higher is
+advised.
 
 ### 2. Configure the Application
 
-Configuration options are saved in `config/default.ini`. **Do not modify this
-file or anything in it**. All of your modifications should go into
-`config/local.ini` and should be in the
-[INI file format](https://en.wikipedia.org/wiki/INI_file), just like the default
-file. If you would like to make changes to `config/local.ini` but not ever commit
-them, run the following:
+Configuration options are saved in `config/default.ini`. Do not modify this file
+or anything in it. **All of your changes should go into `config/local.ini`** and
+should be in the [INI file format](https://en.wikipedia.org/wiki/INI_file), just
+like the default file. If you would like to make changes to `config/local.ini`
+but not ever commit them, run the following:
 
     $> git update-index --assume-unchanged config/local.ini
 
@@ -61,7 +68,8 @@ View all possible configuration options:
 
 ### 3. Install Composer Dependencies
 
-Download the vendor packages via composer:
+Download the vendor packages via
+[Composer](https://getcomposer.org):
 
     $> composer install
 
@@ -92,7 +100,7 @@ run any other database operations.
 
 ## Run the Sync
 
-Before you begin, you can run `./sync --help` to see a list of what options you
+If you'd like, you can run `./sync --help` to see a list of what options you
 have. View all possible configuration options and their details:
 [Configuration Options](https://github.com/mikegioia/libremail/tree/master/sync/doc/sync-options.md#sync-options)
 
@@ -100,14 +108,14 @@ To use the **CLI** tool (debug mode), run:
 
     $> ./sync
 
-And follow the onscreen instructions.
+and follow the onscreen instructions.
 
 To use the **Web** tool, run:
 
     $> ./libremail
 
-This tool will run silently and write to `/logs`. Open your browser and go
-to [localhost:9898](http://localhost:9898) to view the Web client.
+This tool will run silently and write to `/logs`. Open your browser and go to
+[localhost:9898](http://localhost:9898) to view the Web client.
 
 ## Using an Init Script or Supervisor
 
