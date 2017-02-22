@@ -145,9 +145,11 @@ return function ( $root ) {
     }
 
     function setDelayedCleanup ( folderId ) {
-        setTimeout( function () {
-            cleanupFolderClasses( folderId );
-        }, 500 );
+        for ( var i = 1; i <= 8; i *= 2 ) {
+            setTimeout( function () {
+                cleanupFolderClasses( folderId );
+            }, 500 * i );
+        }
     }
 
     function cleanupFolderClasses ( folderId ) {
