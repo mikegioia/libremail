@@ -1,6 +1,7 @@
 # LibreMail
 
 > **Under Active Development**
+>
 > [`Sync`](sync) is ready to use!
 
 This project consists of three parts:
