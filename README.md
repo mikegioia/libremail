@@ -7,7 +7,7 @@
 This project consists of three parts:
 
 1. [IMAP to SQL Syncing Engine](#1-imap-to-sql-syncing-engine)
-2. [JavaScript-less HTML Email Client](#2-javascript-less-html-email-client)
+2. [JavaScript-free HTML Email Client](#2-javascript-free-html-email-client)
 3. Kanban-style Email Client
 
 All of which are licensed under the GNU GPLv3. The goal of this project is to
@@ -33,7 +33,7 @@ engine as a stand-alone, i.e. connecting accounts, populating test data, and
 the different ways with which you can run the application continuously
 (supervisor, cron, etc).
 
-### 2. JavaScript-less HTML Email Client
+### 2. JavaScript-free HTML Email Client
 
 As both a case-study and for usability's sake, one of the primary goals of this
 project is to create a web-based email client and server application that's
@@ -48,7 +48,7 @@ connection. Even managing a JavaScript white-list is problematic because you're
 still trusting the website and application to never be compromised.
 
 Web applications and pages can not only function, but thrive in a JavaScript-
-less environment. The [`webmail`](webmail) application in this project provides
+free environment. The [`webmail`](webmail) application in this project provides
 a rich GMail-style interface for interacting with the local email saved in a SQL
 database from the [`sync`](sync) app. It's mobile-friendly, extremely light-
 weight, and provides almost full parity to GMail's email client.
