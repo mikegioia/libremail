@@ -169,6 +169,9 @@ return function ( $root ) {
         if ( synced >= count ) {
             node.className = node.className.replace( "incomplete", "" );
         }
+        else if ( node.className.indexOf( "incomplete" ) === -1 ) {
+            node.className = node.className + " incomplete";
+        }
     }
 
     function tearDown () {
@@ -287,7 +290,7 @@ return function ( $root ) {
             return;
         }
 
-        folders = document.querySelectorAll( '.folder.incomplete:not(.active)' );
+        folders = document.querySelectorAll( '.folder:not(.active)' );
 
         for ( i in folders ) {
             // If it's been active within a wait period, ignore it
