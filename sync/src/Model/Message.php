@@ -197,7 +197,7 @@ class Message extends Model
             ->where( 'deleted', '=', 0 )
             ->where( 'folder_id', '=', $folderId )
             ->where( 'account_id', '=', $accountId )
-            ->limit( $offset, $limit )
+            ->limit( $limit, $offset )
             ->execute()
             ->fetchAll();
 

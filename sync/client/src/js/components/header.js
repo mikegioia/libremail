@@ -175,6 +175,10 @@ return function ( $root ) {
     }
 
     function formatTime ( seconds ) {
+        var days;
+        var hours;
+        var minutes;
+
         if ( seconds < 60 ) {
             return seconds + "s";
         }
@@ -182,12 +186,22 @@ return function ( $root ) {
             return Math.floor( seconds / 60 ) + "m";
         }
         else if ( seconds < 86400 ) {
+            minutes = Math.floor( (seconds % 3600) / 60 );
+
             return Math.floor( seconds / 3600 ) + "h"
-                + " " + Math.floor( (seconds % 3600) / 60 ) + "m";
+                + ( minutes ? " " + minutes + "m" : "" );
+        }
+        else if ( seconds < 31536000 ) {
+            hours = Math.floor( (seconds / 86400) % 3600 );
+
+            return Math.floor( seconds / 86400 ) + "d"
+                + ( hours ? " " + hours + "h" : "" );
         }
         else {
-            return Math.floor( seconds / 86400 ) + "d"
-                + " " + Math.floor( (seconds / 86400) % 3600 ) + "h";
+            days = Math.floor( seconds % 31536000 );
+
+            return Math.floor( seconds / 31536000 ) + "y"
+                + ( days ? " " + days + "d" : "" );
         }
     }
 
