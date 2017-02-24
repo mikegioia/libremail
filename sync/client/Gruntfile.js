@@ -65,14 +65,41 @@ module.exports = function ( grunt ) {
                     dest: './build/fonts/'
                 }]
             }
+        },
+        // HTML paths
+        replace: {
+            dist: {
+                overwrite: true,
+                src: [ 'index.html' ],
+                replacements: [{
+                    from: 'href="build/',
+                    to: 'href="dist/'
+                }, {
+                    from: 'src="build/',
+                    to: 'src="dist/'
+                }]
+            },
+            build: {
+                overwrite: true,
+                src: [ 'index.html' ],
+                replacements: [{
+                    from: 'href="dist/',
+                    to: 'href="build/'
+                }, {
+                    from: 'src="dist/',
+                    to: 'src="build/'
+                }]
+            }
         }
     });
 
+    grunt.loadNpmTasks( 'grunt-text-replace' );
     grunt.loadNpmTasks( 'grunt-contrib-copy' );
     grunt.loadNpmTasks( 'grunt-contrib-watch' );
     grunt.loadNpmTasks( 'grunt-contrib-concat' );
 
-    grunt.registerTask( 'build', [ 'concat', 'copy' ] );
+    grunt.registerTask( 'dist', [ 'replace:dist' ] );
+    grunt.registerTask( 'build', [ 'concat', 'copy', 'replace:build' ] );
     grunt.registerTask( 'default', [ 'concat', 'copy', 'watch' ] );
     grunt.registerTask( 'printenv', function () {
         console.log( process.env );
