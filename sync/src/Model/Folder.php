@@ -227,6 +227,8 @@ class Folder extends Model
             $indexed[ $folder->getName() ] = $folder;
         }
 
+        ksort( $indexed );
+
         return $indexed;
     }
 }

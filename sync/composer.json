@@ -49,8 +49,5 @@
         "sync",
         "server",
         "libremail"
-    ],
-    "config": {
-        "bin-dir": "./"
-    }
+    ]
 }

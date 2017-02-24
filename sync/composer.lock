@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "56bd002d1457844946cb2d694a7f73f9",
-    "content-hash": "6144ee7efcd4663d98fb179d5288a978",
+    "hash": "c38086847d6fb63af82740a964091af6",
+    "content-hash": "2f0cd272f4a97391a7a7b82130dcf4ba",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -439,12 +439,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mikegioia/Slim-PDO.git",
-                "reference": "d879475e3b9c784b9f711b39deda0e0383be0411"
+                "reference": "79fa9b6ce3c47e421e6567dd579646acdc035a48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikegioia/Slim-PDO/zipball/d879475e3b9c784b9f711b39deda0e0383be0411",
-                "reference": "d879475e3b9c784b9f711b39deda0e0383be0411",
+                "url": "https://api.github.com/repos/mikegioia/Slim-PDO/zipball/79fa9b6ce3c47e421e6567dd579646acdc035a48",
+                "reference": "79fa9b6ce3c47e421e6567dd579646acdc035a48",
                 "shasum": ""
             },
             "require": {
@@ -486,7 +486,7 @@
                 "docs": "https://github.com/mikegioia/Slim-PDO/blob/master/docs/README.md",
                 "source": "https://github.com/mikegioia/Slim-PDO/tree/master"
             },
-            "time": "2016-01-07 04:00:00"
+            "time": "2017-02-23 13:38:21"
         },
         {
             "name": "mkraemer/react-pcntl",
@@ -701,12 +701,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "fab3a93444ce74bdbc16dee20044f130a94d6e52"
+                "reference": "a4e47e40496b01e199ba2ec1eaf089c04df39f24"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/fab3a93444ce74bdbc16dee20044f130a94d6e52",
-                "reference": "fab3a93444ce74bdbc16dee20044f130a94d6e52",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/a4e47e40496b01e199ba2ec1eaf089c04df39f24",
+                "reference": "a4e47e40496b01e199ba2ec1eaf089c04df39f24",
                 "shasum": ""
             },
             "require": {
@@ -742,7 +742,7 @@
                 "source": "https://github.com/ParticleBits/imap/tree/master",
                 "issues": "https://github.com/ParticleBits/imap/issues"
             },
-            "time": "2017-02-19 16:15:34"
+            "time": "2017-02-23 20:20:09"
         },
         {
             "name": "particlebits/zend-mail",
@@ -1295,12 +1295,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "33f852c649ddb902a73d49fadda90e37bb76cd47"
+                "reference": "a96f2ef967287e19d294c27c4aea7b2dc8d55371"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/33f852c649ddb902a73d49fadda90e37bb76cd47",
-                "reference": "33f852c649ddb902a73d49fadda90e37bb76cd47",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/a96f2ef967287e19d294c27c4aea7b2dc8d55371",
+                "reference": "a96f2ef967287e19d294c27c4aea7b2dc8d55371",
                 "shasum": ""
             },
             "require": {
@@ -1350,7 +1350,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2017-02-18 17:35:19"
+            "time": "2017-02-21 10:07:34"
         },
         {
             "name": "symfony/http-foundation",
@@ -1358,12 +1358,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "83fd8ffacc649ac78729f992d89814a130ca6218"
+                "reference": "9723780247b0c207f4937e8f31163a0c2d7231f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/83fd8ffacc649ac78729f992d89814a130ca6218",
-                "reference": "83fd8ffacc649ac78729f992d89814a130ca6218",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/9723780247b0c207f4937e8f31163a0c2d7231f5",
+                "reference": "9723780247b0c207f4937e8f31163a0c2d7231f5",
                 "shasum": ""
             },
             "require": {
@@ -1403,7 +1403,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2017-02-18 17:35:19"
+            "time": "2017-02-21 10:07:34"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -1470,12 +1470,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/routing.git",
-                "reference": "f2773faed45193e6cdf703df70b4f9f4f58e7dc6"
+                "reference": "5589001440a5dcc36e856a138400f524d111f493"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/routing/zipball/f2773faed45193e6cdf703df70b4f9f4f58e7dc6",
-                "reference": "f2773faed45193e6cdf703df70b4f9f4f58e7dc6",
+                "url": "https://api.github.com/repos/symfony/routing/zipball/5589001440a5dcc36e856a138400f524d111f493",
+                "reference": "5589001440a5dcc36e856a138400f524d111f493",
                 "shasum": ""
             },
             "require": {
@@ -1537,7 +1537,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-02-18 17:35:19"
+            "time": "2017-02-21 10:07:34"
         },
         {
             "name": "zendframework/zend-hydrator",
@@ -2383,7 +2383,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.4.0"
+        "php": ">=5.6.0"
     },
     "platform-dev": []
 }

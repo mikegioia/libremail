@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `to` text COLLATE utf8_unicode_ci,
   `from` text COLLATE utf8_unicode_ci,
   `cc` text COLLATE utf8_unicode_ci,
+  `bcc` text COLLATE utf8_unicode_ci,
   `reply_to` text COLLATE utf8_unicode_ci,
   `text_plain` longtext COLLATE utf8mb4_unicode_ci,
   `text_html` longtext COLLATE utf8mb4_unicode_ci,
@@ -147,6 +148,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
    the form "Full name <fullname@example.org>".
 - `from` String containing the entire `From` mail header value.
 - `cc` String containing the entire `Cc` mail header value.
+- `bcc` String containing the entire `Bcc` mail header value.
 - `reply_to` String containing the entire `Reply-To` or `Return-Path` mail
    header value.
 - `text_plain` The full string text of the `text/plain` part of the message.

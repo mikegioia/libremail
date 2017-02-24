@@ -20,6 +20,7 @@ class Message extends Model
     public $id;
     public $to;
     public $cc;
+    public $bcc;
     public $from;
     public $date;
     public $size;
@@ -59,6 +60,7 @@ class Message extends Model
             'id' => $this->id,
             'to' => $this->to,
             'cc' => $this->cc,
+            'bcc' => $this->bcc,
             'from' => $this->from,
             'date' => $this->date,
             'size' => $this->size,
@@ -378,6 +380,7 @@ class Message extends Model
             // address as the index and the name as the value. Create
             // the proper comma separated strings for these fields.
             'cc' => $this->formatAddress( $message->cc ),
+            'bcc' => $this->formatAddress( $message->bcc ),
             'reply_to' => $this->formatAddress( $message->replyTo ),
             'attachments' => $this->formatAttachments( $message->getAttachments() )
         ]);
