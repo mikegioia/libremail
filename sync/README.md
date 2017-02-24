@@ -1,8 +1,8 @@
 # IMAP Sync
 
 This application synchronises IMAP accounts to a local MySQL database. You can
-use this as a standalone method to periodically download your email, or you can
-use it with the two clients bundled with this tool.
+use this as a standalone method to periodically download your email. The script
+is meant to run forever with almost zero maintenance :D
 
 #### Web Client Admin Interface
 
