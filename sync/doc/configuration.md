@@ -5,7 +5,7 @@ Here are the configuration options you can overwrite in `config/local.ini`. Plea
 ```
 [app]
 
-memory="256M"
+memory="512M"
 ```
 
 If you just wanted to increase the memory of your application. This is a good idea if you have large file attachments.
@@ -14,13 +14,13 @@ If you just wanted to increase the memory of your application. This is a good id
 
 * `memory`
 
-  String, defaults to `"128M"`. This is the PHP memory size limit for the
+  String, defaults to `"256M"`. This is the PHP memory size limit for the
   sync script. The application will use whatever your default memory limit
   is for your PHP install, but you can override that here. It's best to
-  leave this at 128 MB as a minimum, otherwise some of your emails may not
+  leave this at 256 MB as a minimum, otherwise some of your emails may not
   download. Emails with large (or many) attachments require an excess of
-  memory to parse in PHP, due do how large strings are parsed. 256M is a
-  better, safer limit and I set mine as high as 1GB.
+  memory to parse in PHP, due do how large strings are parsed. I set mine
+  as high as 1 GB but 256 MB has been found to get all attachments.
 
 * `db[sleep_minutes]`
 
