@@ -2004,6 +2004,10 @@ return function ( $root ) {
             "If you're sure you want to remove this account, " +
             "then please type the full email address. " );
 
+        if ( ! email ) {
+            return;
+        }
+
         if ( email === account ) {
             Socket.sendTask(
                 Const.TASK.REMOVE_ACCOUNT, {
@@ -2068,9 +2072,9 @@ return function ( $root ) {
                 + ( minutes ? " " + minutes + "m" : "" );
         }
         else if ( seconds < 31536000 ) {
-            hours = Math.floor( (seconds / 86400) % 3600 );
+            hours = Math.floor( (seconds / 3600) % 24 );
 
-            return Math.floor( seconds / 86400 ) + "d"
+            return Math.floor( (seconds / 3600) / 24 ) + "d"
                 + ( hours ? " " + hours + "h" : "" );
         }
         else {
