@@ -190,4 +190,13 @@ class Message
         self::$log->error( $error );
         throw new Exception( $error );
     }
+
+    /**
+     * Generic helper for writing to the server log file.
+     * @param string $message
+     */
+    static public function debug( $message )
+    {
+        self::$log->debug( $message );
+    }
 }
