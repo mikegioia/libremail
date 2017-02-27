@@ -43,7 +43,14 @@ class StatsServer implements MessageComponentInterface
      */
     public function broadcast( $message )
     {
-        $this->lastMessage = $message;
+        $obj = @json_decode( $message );
+
+        if ( ! $this->lastMessage
+            || ( isset( $obj->type )
+                && $obj->type === Message::STATS ) )
+        {
+            $this->lastMessage = $message;
+        }
 
         foreach ( $this->clients as $client ) {
             $client->send( $message );

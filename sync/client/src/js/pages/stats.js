@@ -51,7 +51,7 @@ return function () {
     }
 
     function update () {
-        if ( ! data ) {
+        if ( ! data || ! Object.keys( data ? data : {} ).length ) {
             return;
         }
 

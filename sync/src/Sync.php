@@ -126,7 +126,6 @@ class Sync
             $this->gc();
             $this->checkForHalt();
             $this->setRunning();
-            $this->setAsleep( FALSE );
 
             if ( $this->wake === TRUE ) {
                 $wakeUnix = 0;
@@ -138,6 +137,8 @@ class Sync
                 sleep( 60 );
                 continue;
             }
+
+            $this->setAsleep( FALSE );
 
             if ( ! $this->run() ) {
                 throw new TerminateException( "Sync was prevented from running" );

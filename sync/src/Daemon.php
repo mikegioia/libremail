@@ -39,6 +39,7 @@ class Daemon
     // References to true PIDs
     private $processPids = [];
     private $processRestartInterval = [];
+    private $processLastRestartTime = [];
 
     // For JSON message handling
     use JsonMessageTrait;
@@ -60,6 +61,10 @@ class Daemon
         $this->console = $console;
         $this->command = $command;
         $this->log = $log->getLogger();
+        $this->processLastRestartTime = [
+            PROC_SYNC => time(),
+            PROC_SERVER => time()
+        ];
         $this->processRestartInterval = [
             PROC_SYNC => $config[ 'restart_interval' ][ PROC_SYNC ],
             PROC_SERVER => $config[ 'restart_interval' ][ PROC_SERVER ]
@@ -156,9 +161,20 @@ class Daemon
      */
     public function restartWithDecay( $process, $event )
     {
+        $now = time();
         $decay = $this->config[ 'decay' ][ $process ];
         $restartMax = $this->config[ 'restart_max' ][ $process ];
-        $currentInterval = $this->processRestartInterval[ $process ];
+
+        // We want to eventually reset this back to the starting
+        // point if the process has been running for over an hour.
+        if ( $now - $this->processLastRestartTime[ $process ] >= 3600 ) {
+            $currentInterval = $this->config[ 'restart_interval' ][ $process ];
+        }
+        else {
+            $currentInterval = $this->processRestartInterval[ $process ];
+        }
+
+        // Now figure out the next interval to run this process
         $nextInterval = ( $decay * $currentInterval < $restartMax )
             ? $decay * $currentInterval
             : $restartMax;
@@ -169,9 +185,8 @@ class Daemon
                 $this->emitter->dispatch( $event );
             });
 
-        // Update the restart interval for next time. At some point,
-        // this needs to reset back to the starting interval.
-        // @TODO
+        // Update the restart interval for next time
+        $this->processLastRestartTime[ $process ] = $now;
         $this->processRestartInterval[ $process ] = $nextInterval;
     }
 
