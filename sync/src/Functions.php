@@ -150,3 +150,17 @@ function expects( $data )
 {
     return new Expects( $data );
 }
+
+/**
+ * Look for a string in an array of possibilities.
+ */
+function contains( $subject, $list )
+{
+    foreach ( $list as $item ) {
+        if ( strpos( $subject, $item ) !== FALSE ) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}

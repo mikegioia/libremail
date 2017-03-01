@@ -189,9 +189,10 @@ class Account extends Model
 
         if ( ! isset( $config[ $emailParts[ 1 ] ] ) ) {
             $this->service = DEFAULT_SERVICE;
+            $other = $this->config( 'email.other' );
 
             if ( ! $this->imap_port ) {
-                $this->imap_port = $config[ DEFAULT_SERVICE ][ 'port' ];
+                $this->imap_port = $other[ 'port' ];
             }
 
             return;

@@ -66,11 +66,10 @@ $di[ 'cli' ] = function ( $c ) {
 
 // Logging service
 $di[ 'log' ] = function ( $c ) {
-    $interactive = ( $c[ 'console' ]->interactive === TRUE );
     return new Log(
         $c[ 'cli' ],
         $c[ 'config' ][ 'serverlog' ],
-        $interactive );
+        $c[ 'console' ]->interactive === TRUE );
 };
 
 // Initialize the error and exception handlers
@@ -180,8 +179,7 @@ try {
 // Uncaught PDO exceptions, this should only be the
 // connection error.
 catch ( PDOException $e ) {
-    $di[ 'log' ]->displayError( $e );
-    Diagnostics::checkDatabaseException( $di, $e );
+    Diagnostics::checkDatabaseException( $di, $e, TRUE );
     goto runLoop;
 }
 // Gracefully exit if we're terminated
