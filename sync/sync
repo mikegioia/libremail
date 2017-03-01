@@ -194,8 +194,7 @@ try {
 // try to reconnect. Otherwise terminate.
 catch ( PDOException $e ) {
     $di[ 'sync' ] = NULL;
-    $di[ 'log' ]->displayError( $e );
-    Diagnostics::checkDatabaseException( $di, $e );
+    Diagnostics::checkDatabaseException( $di, $e, TRUE );
     sleep( $config[ 'app' ][ 'db' ][ 'sleep_minutes' ] * 60 );
     goto runSyncLoop;
 }

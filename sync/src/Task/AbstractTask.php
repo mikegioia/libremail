@@ -6,6 +6,9 @@ use ReflectionClass;
 
 abstract class AbstractTask
 {
+    /**
+     * @var string Comes from Task class constants.
+     */
     protected $type;
 
     /**

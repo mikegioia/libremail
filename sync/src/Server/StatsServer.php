@@ -7,6 +7,7 @@ use App\Log
   , Exception
   , App\Command
   , App\Message
+  , PDOException
   , SplObjectStorage
   , React\Stream\Stream
   , Ratchet\ConnectionInterface
@@ -80,8 +81,14 @@ class StatsServer implements MessageComponentInterface
 
     public function onError( ConnectionInterface $conn, Exception $e )
     {
+        // Throw any PDO errors
+        if ( get_class( $e ) === "PDOException" ) {
+            throw $e;
+        }
+
         $this->log->notice(
             "Error encountered from socket connection: ". $e->getMessage() );
+        $this->clients->detach( $conn );
         $conn->close();
     }
 
@@ -99,7 +106,7 @@ class StatsServer implements MessageComponentInterface
         // detect this format and keep reading until we reach the
         // end of the JSON stream.
         $this->read->on( 'data', function ( $data ) {
-            $message = $this->processMessage( $data, NULL );
+            $this->processMessage( $data, NULL );
         });
 
         $this->write = new Stream( STDOUT, $this->loop );
@@ -137,9 +144,12 @@ class StatsServer implements MessageComponentInterface
                     }
                 }
             }
+            // Keep throwing these
+            catch ( PDOException $e ) {
+                throw $e;
+            }
             catch ( Exception $e ) {
                 $this->log->notice( $e->getMessage() );
-                return;
             }
         }
     }

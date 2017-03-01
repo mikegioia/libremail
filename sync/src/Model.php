@@ -3,6 +3,7 @@
 namespace App;
 
 use Monolog\Logger
+  , Pimple\Container
   , Slim\PDO\Database
   , League\CLImate\CLImate
   , Particle\Validator\Validator;
@@ -10,9 +11,20 @@ use Monolog\Logger
 class Model
 {
     static protected $db;
+    static protected $di;
     static protected $cli;
     static protected $log;
     static protected $config;
+
+    /**
+     * @var bool Mode for returning new DB instance.
+     */
+    static protected $factoryMode = FALSE;
+
+    /**
+     * @var Database Local reference if in factory mode.
+     */
+    protected $localDb;
 
     public function __construct( $data = NULL )
     {
@@ -62,8 +74,24 @@ class Model
         static::$config = $config;
     }
 
+    static function setDbFactory( Container $di )
+    {
+        static::$di = $di;
+        static::$factoryMode = TRUE;
+    }
+
     public function db()
     {
+        if ( static::$factoryMode === TRUE ) {
+            if ( isset( $this->localDb ) ) {
+                return $this->localDb;
+            }
+
+            $this->localDb = static::$di[ 'db_factory' ];
+
+            return $this->localDb;
+        }
+
         return static::$db;
     }
 

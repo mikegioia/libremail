@@ -1355,6 +1355,7 @@ return function () {
 
     function events () {
         Emitter.on( Const.EV.STATS, render );
+        Emitter.on( Const.EV.ERROR, offline );
         Emitter.on( Const.EV.LOG_DATA, logData );
         Emitter.on( Const.EV.WS_CLOSE, offline );
         Emitter.on( Const.EV.SHOW_FOLDERS, update );

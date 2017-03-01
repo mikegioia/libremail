@@ -410,35 +410,46 @@ class Diagnostics
         PDOException $e,
         $forwardException = FALSE )
     {
-        if ( strpos( $e->getMessage(), "server has gone away" ) === FALSE ) {
-            if ( $di[ 'console' ]->daemon ) {
-                Message::send(
-                    new ErrorMessage(
-                        ERR_DATABASE,
-                        $e->getMessage(),
-                        "You probably didn't run the installation script."
-                    ));
-            }
+        $messages = [
+            'Lost connection',
+            'Error while sending',
+            'server has gone away',
+            'is dead or not enabled',
+            'no connection to the server',
+            'decryption failed or bad record mac',
+            'SSL connection has been closed unexpectedly'
+        ];
 
-            throw new TerminateException(
-                "System encountered an un-recoverable database error. ".
-                "Going to halt now, please see the log file for info." );
-            return FALSE;
-        }
-
-        // This should drop the DB connection
-        $di[ 'db' ] = NULL;
-
-        try {
-            // Create a new database connection. This will throw a
-            // TerminateException on failure to connect.
-            $di[ 'db' ] = $di[ 'db_factory' ];
-            Model::setDb( $di[ 'db' ] );
-        }
-        catch ( TerminateException $err ) {
-            if ( $forwardException ) {
-                throw $err;
-            }
-        }
+        if ( ! Fn\contains( $e->getMessage(), $messages ) ) {
+             if ( $di[ 'console' ]->daemon ) {
+                 Message::send(
+                     new ErrorMessage(
+                         ERR_DATABASE,
+                         $e->getMessage(),
+                        "This could be a timeout problem, and if so the ".
+                        "server is restarting itself."
+                     ));
+             }
+ 
+             throw new TerminateException(
+                 "System encountered an un-recoverable database error. ".
+                 "Going to halt now, please see the log file for info." );
+             return FALSE;
+         }
+ 
+         // This should drop the DB connection
+         $di[ 'db' ] = NULL;
+ 
+         try {
+             // Create a new database connection. This will throw a
+             // TerminateException on failure to connect.
+             $di[ 'db' ] = $di[ 'db_factory' ];
+             Model::setDb( $di[ 'db' ] );
+         }
+         catch ( TerminateException $err ) {
+             if ( $forwardException ) {
+                 throw $err;
+             }
+         }
     }
 }
