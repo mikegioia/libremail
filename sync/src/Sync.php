@@ -56,6 +56,9 @@ class Sync
     private $gcEnabled = FALSE;
     private $gcMemEnabled = FALSE;
 
+    // Options
+    const OPT_SKIP_DOWNLOAD = 'skip_download';
+
     /**
      * Constructor can either take a dependency container or have
      * the dependencies loaded individually. The di method is
@@ -277,7 +280,7 @@ class Sync
                 $folders = $folderModel->getByAccount( $account->getId() );
                 // First pass, just log the message stats
                 $this->syncMessages( $account, $folders, [
-                    'skip_download' => TRUE
+                    self::OPT_SKIP_DOWNLOAD => TRUE
                 ]);
 
                 // If the all that's requested is to update the folder stats,
@@ -460,6 +463,8 @@ class Sync
                 "The account '{$account->email}' has exceeded the max ".
                 "amount of retries after folder sync failure ".
                 "({$this->maxRetries})." );
+            // @TODO increment a counter on the folder record
+            // if its >=3 then mark folder as inactive
             throw new FolderSyncException;
         }
 
@@ -590,7 +595,7 @@ class Sync
      */
     private function syncMessages( AccountModel $account, $folders, $options = [] )
     {
-        if ( Fn\get( $options, 'skip_download' ) === TRUE ) {
+        if ( Fn\get( $options, self::OPT_SKIP_DOWNLOAD ) === TRUE ) {
             $this->log->debug( "Updating folder counts" );
         }
         else {
@@ -601,7 +606,8 @@ class Sync
             $this->retriesMessages[ $account->email ] = 1;
 
             try {
-                $this->syncFolderMessages( $account, $folder, $options );
+//                $this->syncFolderMessages( $account, $folder, $options );
+                $this->updateFolderThreads( $account, $folder, $options );
             }
             catch ( MessagesSyncException $e ) {
                 $this->log->error( $e->getMessage() );
@@ -724,7 +730,7 @@ class Sync
         // Update folder stats with count
         $folder->saveStats( $total, $syncedCount );
 
-        if ( Fn\get( $options, 'skip_download' ) === TRUE ) {
+        if ( Fn\get( $options, self::OPT_SKIP_DOWNLOAD ) === TRUE ) {
             return;
         }
 
@@ -843,6 +849,85 @@ class Sync
                 "Failed validation for marking deleted messages: ".
                 $e->getMessage() );
         }
+    }
+
+    /**
+     * Reads in all of the messages for a folder and tries to update
+     * as many thread IDs as possible.
+     * @param AccountModel $account
+     * @param FolderModel $folder
+     * @param array $options
+     */
+    private function updateFolderThreads( AccountModel $account, FolderModel $folder, $options )
+    {
+        if ( $folder->isIgnored() ) {
+            return;
+        }
+
+        $offset = 0;
+        $limit = 1000;
+        $messageModel = new MessageModel;
+        $this->log->debug( 'Updating thread IDs' );
+        $messages = $messageModel->getByFolderForThreading(
+            $account->getId(),
+            $folder->getId(),
+            $limit,
+            $offset );
+
+        // Read in a batch of messages, looking specifically for their
+        // ID, Message ID, and Reply-To ID.
+        while ( $messages && count( $messages ) > 0 ) {
+            foreach ( $messages as $message ) {
+                $this->updateMessageThreadId( $message, $messageModel );
+            }
+
+            $this->log->debug( 'Getting next batch of messages' );
+            $offset += $limit;
+            $messages = $messageModel->getByFolderForThreading(
+                $account->getId(),
+                $folder->getId(),
+                $limit,
+                $offset );
+        }
+    }
+
+    /**
+     * Adds a thread ID to the message. Searches forward and back looking
+     * for any thread ID that is saved on any message. If found, update
+     * this message with that thread ID.
+     * @param object $message
+     * @param MessageModel $model
+     */
+    private function updateMessageThreadId( $message, MessageModel $model )
+    {
+        $threadId = $message->id;
+        $siblings = $model->getMessageSiblings(
+            $message->message_id,
+            $message->in_reply_to );
+        $this->log->debug( 'Getting thread ID for '. $message->id );
+echo count($siblings);
+print_r($siblings);
+        while ( count( $siblings ) > 0 ) {
+            $nextSiblings = [];
+
+            foreach ( $siblings as $sibling ) {
+                if ( $sibling->thread_id ) {
+                    $threadId = $sibling->thread_id;
+                    break 2;
+                }
+
+                $nextSiblings = array_merge(
+                    $nextSiblings,
+                    $model->getBy( $sibling->message_id ) );
+            }
+
+            $siblings = array_filter( $nextSiblings );
+echo count($siblings);
+print_r($siblings);
+sleep( 2 );
+        }
+exit;
+        $model->updateThreadId( $message->id, $threadId );
     }
 
     private function sendMessage( $message, $status = STATUS_ERROR )

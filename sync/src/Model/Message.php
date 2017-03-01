@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use Fn
+  , PDO
   , DateTime
   , App\Model
   , Belt\Belt
@@ -121,6 +122,7 @@ class Message extends Model
         }
 
         $this->unserializedAttachments = @unserialize( $this->attachments );
+
         return $this->unserializedAttachments;
     }
 
@@ -174,6 +176,53 @@ class Message extends Model
             ->fetch();
 
         return ( $messages ) ? $messages[ 'count' ] : 0;
+    }
+
+    /**
+     * Returns messages for the thread ID computation.
+     * @param int $accountId
+     * @param int $folderId
+     * @param int $limit
+     * @param int $offset
+     * @return array of stdClass objects
+     */
+    public function getByFolderForThreading( $accountId, $folderId, $limit, $offset )
+    {
+        $this->requireInt( $limit, "Limit" );
+        $this->requireInt( $offset, "Offset" );
+        $this->requireInt( $folderId, "Folder ID" );
+        $this->requireInt( $accountId, "Account ID" );
+
+        return $this->db()
+            ->select([ 'id', 'message_id', 'in_reply_to', 'thread_id' ])
+            ->from( 'messages' )
+            ->where( 'folder_id', '=', $folderId )
+            ->where( 'account_id', '=', $accountId )
+            ->whereNull( 'thread_id' )
+            ->limit( $limit, $offset )
+            ->execute()
+            ->fetchAll( PDO::FETCH_OBJ );
+    }
+
+    /**
+     * Returns any "sibling" messages. This is one that replies to or
+     * is replied to by the specified message.
+     * @param string $messageId
+     * @param string $inReplyTo
+     * @return array of stdClass objects
+     */
+    public function getMessageSiblings( $messageId, $inReplyTo )
+    {
+        $this->requireString( $messageId );
+        $this->requireString( $inReplyTo );
+
+        $query = $this->db()
+            ->select([ 'id', 'message_id', 'in_reply_to', 'thread_id' ])
+            ->from( 'messages' )
+            ->where( 'in_reply_to', '=', $messageId )
+            ->orWhere( 'message_id', '=', $inReplyTo )
+            ->execute()
+            ->fetchAll( PDO::FETCH_OBJ );
     }
 
     /**
@@ -405,6 +454,28 @@ class Message extends Model
             ->where( 'folder_id', '=', $folderId )
             ->where( 'account_id', '=', $accountId )
             ->whereIn( 'unique_id', $uniqueIds )
+            ->execute();
+
+        if ( ! $updated ) {
+            throw new DatabaseUpdateException(
+                MESSAGE,
+                $this->getError() );
+        }
+    }
+
+    /**
+     * Saves a thread ID for a message.
+     * @param int $id
+     * @param int $threadId
+     */
+    public function updateThreadId( $id, $threadId )
+    {
+        $this->requireInt( $id, "Message ID" );
+        $this->requireInt( $threadId, "Thread ID" );
+        $updated = $this->db()
+            ->update([ 'thread_id' => $threadId ])
+            ->table( 'messages' )
+            ->where( 'id', '=', $id )
             ->execute();
 
         if ( ! $updated ) {

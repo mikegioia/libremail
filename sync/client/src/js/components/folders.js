@@ -127,7 +127,11 @@ return function ( $root ) {
             node.innerHTML = Mustache.render( tpl.folder, folders[ i ] );
 
             if ( ( ! active && ! activeFlag )
-                || ( active && folders[ i ].path == active ) )
+                || ( active && folders[ i ].path == active )
+                || ( ! folders[ i ].incomplete
+                    && node.className.indexOf( "incomplete" ) !== -1 )
+                || ( folders[ i ].incomplete
+                    && node.className.indexOf( "incomplete" ) === -1 ) )
             {
                 updateFolderClasses( node, folders[ i ] );
             }
