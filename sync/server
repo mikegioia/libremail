@@ -159,13 +159,10 @@ $di[ 'ratchet' ]->route(
 
 // Run the loop until we hit a halt signal
 try {
-    // PDO connection. This attempts to connect to the database.
-    // If it fails here, the script will halt.
-    $di[ 'db' ] = $di[ 'db_factory' ];
-
-    // This attempts to connect to the database. If it
-    // fails here, the script will halt.
-    Model::setDb( $di[ 'db_factory' ] );
+    // This sets the entire dependency container into the
+    // model class as a static reference. Whenever the db()
+    // is requested, a new connection will be made.
+    Model::setDbFactory( $di );
 
     // Kick off the server application
     $startup = new Startup( $di );
