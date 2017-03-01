@@ -29,10 +29,11 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `date` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  INDEX (`date`),
+  INDEX (`synced`),
+  INDEX (`deleted`),
   INDEX (`folder_id`),
   INDEX (`unique_id`),
   INDEX (`account_id`),
-  INDEX (`deleted`),
-  INDEX (`synced`),
-  INDEX (`date`)
+  INDEX (`message_id`(16))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
