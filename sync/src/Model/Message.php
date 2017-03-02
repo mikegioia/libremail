@@ -532,7 +532,7 @@ class Message extends Model
                 }
             }
 
-            if ( $updated === FALSE ) {
+            if ( ! Belt::isNumber( $updated ) ) {
                 throw new DatabaseUpdateException(
                     MESSAGE,
                     $this->db()->getError() );
@@ -634,7 +634,7 @@ class Message extends Model
             ->whereIn( 'unique_id', $uniqueIds )
             ->execute();
 
-        if ( ! $updated ) {
+        if ( ! Belt::isNumber( $updated ) ) {
             throw new DatabaseUpdateException(
                 MESSAGE,
                 $this->getError() );
@@ -656,7 +656,7 @@ class Message extends Model
             ->whereIn( 'id', $messageIds )
             ->execute();
 
-        if ( ! $updated ) {
+        if ( ! Belt::isNumber( $updated ) ) {
             throw new DatabaseUpdateException(
                 MESSAGE,
                 $this->getError() );

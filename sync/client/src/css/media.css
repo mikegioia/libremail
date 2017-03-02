@@ -1,3 +1,27 @@
+@media (max-width: 720px) {
+    header section.accounts {
+        display: none;
+    }
+    header section.status {
+        margin-left: 0;
+        text-align: left;
+        width: 60% !important;
+    }
+    header section.status .info,
+    header section.status .time {
+        text-align: left;
+    }
+    header section.actions {
+        float: right;
+        margin-left: 0;
+        width: 40% !important;
+    }
+    #restart span {
+        display: none;
+    }
+}
+
+
 @media (min-width: 1200px) {
     html {
         font-size: 87.5%;
