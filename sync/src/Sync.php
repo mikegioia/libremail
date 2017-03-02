@@ -606,7 +606,7 @@ class Sync
             $this->retriesMessages[ $account->email ] = 1;
 
             try {
-//                $this->syncFolderMessages( $account, $folder, $options );
+                $this->syncFolderMessages( $account, $folder, $options );
                 $this->updateFolderThreads( $account, $folder, $options );
             }
             catch ( MessagesSyncException $e ) {
@@ -746,6 +746,9 @@ class Sync
             $progress = $this->cli->progress()->total( 100 );
         }
 
+        // Sort these newest first to get the new mail earlier
+        arsort( $toDownload );
+
         foreach ( $toDownload as $messageId => $uniqueId ) {
             $this->downloadMessage( $messageId, $uniqueId, $folder );
 
@@ -864,70 +867,26 @@ class Sync
             return;
         }
 
-        $offset = 0;
-        $limit = 1000;
+        $limit = 250;
         $messageModel = new MessageModel;
-        $this->log->debug( 'Updating thread IDs' );
-        $messages = $messageModel->getByFolderForThreading(
+        $this->log->debug(
+            "Updating thread IDs in {$folder->name} for ".
+            $account->email );
+        $ids = $messageModel->getIdsForThreadingByFolder(
             $account->getId(),
-            $folder->getId(),
-            $limit,
-            $offset );
+            $folder->getId() );
+        $count = count( $ids );
 
         // Read in a batch of messages, looking specifically for their
         // ID, Message ID, and Reply-To ID.
-        while ( $messages && count( $messages ) > 0 ) {
+        for ( $offset = 0; $offset < $count; $offset += $limit ) {
+            $slice = array_slice( $ids, $offset, $limit );
+            $messages = $messageModel->getByIds( $slice );
+
             foreach ( $messages as $message ) {
-                $this->updateMessageThreadId( $message, $messageModel );
+                $message->updateThreadId();
             }
-
-            $this->log->debug( 'Getting next batch of messages' );
-            $offset += $limit;
-            $messages = $messageModel->getByFolderForThreading(
-                $account->getId(),
-                $folder->getId(),
-                $limit,
-                $offset );
         }
-    }
-
-    /**
-     * Adds a thread ID to the message. Searches forward and back looking
-     * for any thread ID that is saved on any message. If found, update
-     * this message with that thread ID.
-     * @param object $message
-     * @param MessageModel $model
-     */
-    private function updateMessageThreadId( $message, MessageModel $model )
-    {
-        $threadId = $message->id;
-        $siblings = $model->getMessageSiblings(
-            $message->message_id,
-            $message->in_reply_to );
-        $this->log->debug( 'Getting thread ID for '. $message->id );
-echo count($siblings);
-print_r($siblings);
-        while ( count( $siblings ) > 0 ) {
-            $nextSiblings = [];
-
-            foreach ( $siblings as $sibling ) {
-                if ( $sibling->thread_id ) {
-                    $threadId = $sibling->thread_id;
-                    break 2;
-                }
-
-                $nextSiblings = array_merge(
-                    $nextSiblings,
-                    $model->getBy( $sibling->message_id ) );
-            }
-
-            $siblings = array_filter( $nextSiblings );
-echo count($siblings);
-print_r($siblings);
-sleep( 2 );
-        }
-exit;
-        $model->updateThreadId( $message->id, $threadId );
     }
 
     private function sendMessage( $message, $status = STATUS_ERROR )

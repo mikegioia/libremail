@@ -72,7 +72,7 @@
 }
 
 .folder.active.incomplete {
-    animation: colorchange 120s;
+    animation: colorchange 20s;
     animation-iteration-count: infinite;
 }
 

@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   INDEX (`deleted`),
   INDEX (`folder_id`),
   INDEX (`unique_id`),
+  INDEX (`thread_id`),
   INDEX (`account_id`),
   INDEX (`message_id`(16))
   INDEX (`in_reply_to`(16))
