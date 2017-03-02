@@ -604,6 +604,7 @@ class Sync
 
         foreach ( $folders as $folder ) {
             $this->retriesMessages[ $account->email ] = 1;
+            $this->stats->setActiveFolder( $folder->name );
 
             try {
                 $this->syncFolderMessages( $account, $folder, $options );
@@ -613,6 +614,7 @@ class Sync
                 $this->log->error( $e->getMessage() );
             }
 
+            $this->stats->unsetActiveFolder();
             $this->checkForHalt();
         }
     }
@@ -660,14 +662,12 @@ class Sync
             // Select the folder's mailbox, this is sent to the
             // messages sync library to perform operations on
             $this->mailbox->select( $folder->name );
-            $this->stats->setActiveFolder( $folder->name );
             $newIds = $this->mailbox->getUniqueIds();
             $savedIds = $messageModel->getSyncedIdsByFolder(
                 $account->getId(),
                 $folder->getId() );
             $this->downloadMessages( $newIds, $savedIds, $folder, $options );
             $this->markDeleted( $newIds, $savedIds, $folder, $options );
-            $this->stats->unsetActiveFolder();
             $this->checkForHalt();
         }
         catch ( PDOException $e ) {
