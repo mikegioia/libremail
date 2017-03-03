@@ -167,8 +167,12 @@ return function ( $root ) {
             return;
         }
 
-        count = node.querySelector( 'input.count' ).value;
-        synced = node.querySelector( 'input.synced' ).value;
+        count = parseInt(
+            node.querySelector( 'input.count' ).value,
+            10 );
+        synced = parseInt(
+            node.querySelector( 'input.synced' ).value,
+            10 );
 
         if ( synced >= count ) {
             node.className = node.className.replace( "incomplete", "" );
