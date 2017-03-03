@@ -19,6 +19,30 @@
     #restart span {
         display: none;
     }
+    .folder {
+        width: calc(100%/3);
+    }
+}
+
+@media (max-width: 600px) {
+    html {
+        font-size: 71.875%;
+    }
+    .folder {
+        width: calc(100%/2);
+    }
+}
+
+@media (max-width: 460px) {
+    #restart {
+        display: none;
+    }
+}
+
+@media (max-width: 380px) {
+    .folder {
+        width: 100%;
+    }
 }
 
 

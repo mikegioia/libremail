@@ -40,6 +40,7 @@
 
 .folder .top {
     color: #aaa;
+    overflow: hidden;
     font-size: 1.4rem;
     line-height: 2rem;
     background: #2d2d2d;
@@ -55,17 +56,19 @@
 
 .folder .bottom {
     color: #555;
+    overflow: hidden;
     font-size: 0.9rem;
     line-height: 2rem;
     position: relative;
     background: #2d2d2d;
     white-space: nowrap;
-    padding: 0 0.8rem 0.2rem;
+    padding: 0 0 0.2rem 0.8rem;
+    border-right: 0.8rem solid rgba(0, 0, 0, 0);
 }
 
 .folder .bottom .count {
+    right: 0;
     top: -0.2rem;
-    right: 0.6rem;
     padding: 0.2rem;
     position: absolute;
     background: #2d2d2d;

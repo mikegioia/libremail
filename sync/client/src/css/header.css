@@ -1,3 +1,7 @@
+header .container {
+    padding: 0;
+}
+
 header section {
     height: 5rem;
     line-height: 3rem;

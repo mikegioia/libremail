@@ -885,6 +885,7 @@ class Sync
 
             foreach ( $messages as $message ) {
                 $message->updateThreadId();
+                $this->checkForHalt();
             }
         }
     }
