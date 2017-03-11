@@ -56,6 +56,9 @@ class Sync
     private $gcEnabled = FALSE;
     private $gcMemEnabled = FALSE;
 
+    // Options
+    const OPT_SKIP_DOWNLOAD = 'skip_download';
+
     /**
      * Constructor can either take a dependency container or have
      * the dependencies loaded individually. The di method is
@@ -277,7 +280,7 @@ class Sync
                 $folders = $folderModel->getByAccount( $account->getId() );
                 // First pass, just log the message stats
                 $this->syncMessages( $account, $folders, [
-                    'skip_download' => TRUE
+                    self::OPT_SKIP_DOWNLOAD => TRUE
                 ]);
 
                 // If the all that's requested is to update the folder stats,
@@ -460,6 +463,8 @@ class Sync
                 "The account '{$account->email}' has exceeded the max ".
                 "amount of retries after folder sync failure ".
                 "({$this->maxRetries})." );
+            // @TODO increment a counter on the folder record
+            // if its >=3 then mark folder as inactive
             throw new FolderSyncException;
         }
 
@@ -590,7 +595,7 @@ class Sync
      */
     private function syncMessages( AccountModel $account, $folders, $options = [] )
     {
-        if ( Fn\get( $options, 'skip_download' ) === TRUE ) {
+        if ( Fn\get( $options, self::OPT_SKIP_DOWNLOAD ) === TRUE ) {
             $this->log->debug( "Updating folder counts" );
         }
         else {
@@ -599,14 +604,17 @@ class Sync
 
         foreach ( $folders as $folder ) {
             $this->retriesMessages[ $account->email ] = 1;
+            $this->stats->setActiveFolder( $folder->name );
 
             try {
                 $this->syncFolderMessages( $account, $folder, $options );
+                $this->updateFolderThreads( $account, $folder, $options );
             }
             catch ( MessagesSyncException $e ) {
                 $this->log->error( $e->getMessage() );
             }
 
+            $this->stats->unsetActiveFolder();
             $this->checkForHalt();
         }
     }
@@ -654,14 +662,12 @@ class Sync
             // Select the folder's mailbox, this is sent to the
             // messages sync library to perform operations on
             $this->mailbox->select( $folder->name );
-            $this->stats->setActiveFolder( $folder->name );
             $newIds = $this->mailbox->getUniqueIds();
             $savedIds = $messageModel->getSyncedIdsByFolder(
                 $account->getId(),
                 $folder->getId() );
             $this->downloadMessages( $newIds, $savedIds, $folder, $options );
             $this->markDeleted( $newIds, $savedIds, $folder, $options );
-            $this->stats->unsetActiveFolder();
             $this->checkForHalt();
         }
         catch ( PDOException $e ) {
@@ -724,7 +730,7 @@ class Sync
         // Update folder stats with count
         $folder->saveStats( $total, $syncedCount );
 
-        if ( Fn\get( $options, 'skip_download' ) === TRUE ) {
+        if ( Fn\get( $options, self::OPT_SKIP_DOWNLOAD ) === TRUE ) {
             return;
         }
 
@@ -739,6 +745,9 @@ class Sync
                 "Syncing $count new $noun in {$folder->name}:" );
             $progress = $this->cli->progress()->total( 100 );
         }
+
+        // Sort these newest first to get the new mail earlier
+        arsort( $toDownload );
 
         foreach ( $toDownload as $messageId => $uniqueId ) {
             $this->downloadMessage( $messageId, $uniqueId, $folder );
@@ -842,6 +851,42 @@ class Sync
             $this->log->notice(
                 "Failed validation for marking deleted messages: ".
                 $e->getMessage() );
+        }
+    }
+
+    /**
+     * Reads in all of the messages for a folder and tries to update
+     * as many thread IDs as possible.
+     * @param AccountModel $account
+     * @param FolderModel $folder
+     * @param array $options
+     */
+    private function updateFolderThreads( AccountModel $account, FolderModel $folder, $options )
+    {
+        if ( $folder->isIgnored() ) {
+            return;
+        }
+
+        $limit = 250;
+        $messageModel = new MessageModel;
+        $this->log->debug(
+            "Updating thread IDs in {$folder->name} for ".
+            $account->email );
+        $ids = $messageModel->getIdsForThreadingByFolder(
+            $account->getId(),
+            $folder->getId() );
+        $count = count( $ids );
+
+        // Read in a batch of messages, looking specifically for their
+        // ID, Message ID, and Reply-To ID.
+        for ( $offset = 0; $offset < $count; $offset += $limit ) {
+            $slice = array_slice( $ids, $offset, $limit );
+            $messages = $messageModel->getByIds( $slice );
+
+            foreach ( $messages as $message ) {
+                $message->updateThreadId();
+                $this->checkForHalt();
+            }
         }
     }
 

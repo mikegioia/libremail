@@ -1158,6 +1158,10 @@ button i.icon-check {
 .dropdown li a:hover {
     background-color: #555;
 }
+header .container {
+    padding: 0;
+}
+
 header section {
     height: 5rem;
     line-height: 3rem;
@@ -1272,6 +1276,7 @@ header section.actions #restart {
 
 .folder .top {
     color: #aaa;
+    overflow: hidden;
     font-size: 1.4rem;
     line-height: 2rem;
     background: #2d2d2d;
@@ -1287,24 +1292,26 @@ header section.actions #restart {
 
 .folder .bottom {
     color: #555;
+    overflow: hidden;
     font-size: 0.9rem;
     line-height: 2rem;
     position: relative;
     background: #2d2d2d;
     white-space: nowrap;
-    padding: 0 0.8rem 0.2rem;
+    padding: 0 0 0.2rem 0.8rem;
+    border-right: 0.8rem solid rgba(0, 0, 0, 0);
 }
 
 .folder .bottom .count {
+    right: 0;
     top: -0.2rem;
-    right: 0.6rem;
     padding: 0.2rem;
     position: absolute;
     background: #2d2d2d;
 }
 
 .folder.active.incomplete {
-    animation: colorchange 120s;
+    animation: colorchange 20s;
     animation-iteration-count: infinite;
 }
 
@@ -1404,6 +1411,54 @@ section.notifications .notification .success {
     color: #fff;
     background-color: #28a94c;
 }
+@media (max-width: 720px) {
+    header section.accounts {
+        display: none;
+    }
+    header section.status {
+        margin-left: 0;
+        text-align: left;
+        width: 60% !important;
+    }
+    header section.status .info,
+    header section.status .time {
+        text-align: left;
+    }
+    header section.actions {
+        float: right;
+        margin-left: 0;
+        width: 40% !important;
+    }
+    #restart span {
+        display: none;
+    }
+    .folder {
+        width: calc(100%/3);
+    }
+}
+
+@media (max-width: 600px) {
+    html {
+        font-size: 71.875%;
+    }
+    .folder {
+        width: calc(100%/2);
+    }
+}
+
+@media (max-width: 460px) {
+    #restart {
+        display: none;
+    }
+}
+
+@media (max-width: 380px) {
+    .folder {
+        width: 100%;
+    }
+}
+
+
 @media (min-width: 1200px) {
     html {
         font-size: 87.5%;

@@ -1690,7 +1690,11 @@ return function ( $root ) {
             node.innerHTML = Mustache.render( tpl.folder, folders[ i ] );
 
             if ( ( ! active && ! activeFlag )
-                || ( active && folders[ i ].path == active ) )
+                || ( active && folders[ i ].path == active )
+                || ( ! folders[ i ].incomplete
+                    && node.className.indexOf( "incomplete" ) !== -1 )
+                || ( folders[ i ].incomplete
+                    && node.className.indexOf( "incomplete" ) === -1 ) )
             {
                 updateFolderClasses( node, folders[ i ] );
             }
@@ -1726,8 +1730,12 @@ return function ( $root ) {
             return;
         }
 
-        count = node.querySelector( 'input.count' ).value;
-        synced = node.querySelector( 'input.synced' ).value;
+        count = parseInt(
+            node.querySelector( 'input.count' ).value,
+            10 );
+        synced = parseInt(
+            node.querySelector( 'input.synced' ).value,
+            10 );
 
         if ( synced >= count ) {
             node.className = node.className.replace( "incomplete", "" );

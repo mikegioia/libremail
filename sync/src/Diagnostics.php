@@ -421,35 +421,38 @@ class Diagnostics
         ];
 
         if ( ! Fn\contains( $e->getMessage(), $messages ) ) {
-             if ( $di[ 'console' ]->daemon ) {
-                 Message::send(
-                     new ErrorMessage(
-                         ERR_DATABASE,
-                         $e->getMessage(),
+            if ( $di[ 'console' ]->daemon ) {
+                Message::send(
+                    new ErrorMessage(
+                        ERR_DATABASE,
+                        $e->getMessage(),
                         "This could be a timeout problem, and if so the ".
                         "server is restarting itself."
-                     ));
-             }
- 
-             throw new TerminateException(
-                 "System encountered an un-recoverable database error. ".
-                 "Going to halt now, please see the log file for info." );
-             return FALSE;
+                    ));
+            }
+            else {
+                $di[ 'log' ]->getLogger()->addNotice( $e->getMessage() );
+            }
+
+            throw new TerminateException(
+                "System encountered an un-recoverable database error. ".
+                "Going to halt now, please see the log file for info." );
+            return FALSE;
          }
  
-         // This should drop the DB connection
-         $di[ 'db' ] = NULL;
+        // This should drop the DB connection
+        $di[ 'db' ] = NULL;
  
-         try {
-             // Create a new database connection. This will throw a
-             // TerminateException on failure to connect.
-             $di[ 'db' ] = $di[ 'db_factory' ];
-             Model::setDb( $di[ 'db' ] );
-         }
-         catch ( TerminateException $err ) {
-             if ( $forwardException ) {
-                 throw $err;
-             }
-         }
+        try {
+            // Create a new database connection. This will throw a
+            // TerminateException on failure to connect.
+            $di[ 'db' ] = $di[ 'db_factory' ];
+            Model::setDb( $di[ 'db' ] );
+        }
+        catch ( TerminateException $err ) {
+            if ( $forwardException ) {
+                throw $err;
+            }
+        }
     }
 }
