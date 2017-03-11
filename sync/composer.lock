@@ -4,6 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
+    "hash": "c013103cd9be08b775ca1849fab403e8",
     "content-hash": "c572623311f38f04bc103ebed134ab17",
     "packages": [
         {
@@ -52,7 +53,7 @@
                 "server",
                 "sockets"
             ],
-            "time": "2017-01-06T14:36:36+00:00"
+            "time": "2017-01-06 14:36:36"
         },
         {
             "name": "container-interop/container-interop",
@@ -83,7 +84,7 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
-            "time": "2017-02-14T19:40:03+00:00"
+            "time": "2017-02-14 19:40:03"
         },
         {
             "name": "evenement/evenement",
@@ -174,7 +175,7 @@
                 "exception"
             ],
             "abandoned": "guzzle/guzzle",
-            "time": "2014-08-11T04:32:36+00:00"
+            "time": "2014-08-11 04:32:36"
         },
         {
             "name": "guzzle/http",
@@ -232,7 +233,7 @@
                 "http client"
             ],
             "abandoned": "guzzle/guzzle",
-            "time": "2014-08-11T04:32:36+00:00"
+            "time": "2014-08-11 04:32:36"
         },
         {
             "name": "guzzle/parser",
@@ -277,7 +278,7 @@
                 "url"
             ],
             "abandoned": "guzzle/guzzle",
-            "time": "2014-02-05T18:29:46+00:00"
+            "time": "2014-02-05 18:29:46"
         },
         {
             "name": "guzzle/stream",
@@ -331,7 +332,7 @@
                 "stream"
             ],
             "abandoned": "guzzle/guzzle",
-            "time": "2014-05-01T21:36:02+00:00"
+            "time": "2014-05-01 21:36:02"
         },
         {
             "name": "ilya/belt",
@@ -379,7 +380,7 @@
                 "tools",
                 "utilities"
             ],
-            "time": "2014-05-21T08:48:47+00:00"
+            "time": "2014-05-21 08:48:47"
         },
         {
             "name": "league/climate",
@@ -531,7 +532,7 @@
                 "pcntl",
                 "react"
             ],
-            "time": "2016-11-16T14:20:20+00:00"
+            "time": "2016-11-16 14:20:20"
         },
         {
             "name": "monolog/monolog",
@@ -1032,25 +1033,26 @@
         },
         {
             "name": "react/child-process",
-            "version": "v0.4.1",
+            "version": "v0.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/child-process.git",
-                "reference": "3ab4f83c6f6c5862f7ca28d999a92d327472a671"
+                "reference": "be6ebd7763170626794cbcb5c7b7ffdf5c9a4cb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/child-process/zipball/3ab4f83c6f6c5862f7ca28d999a92d327472a671",
-                "reference": "3ab4f83c6f6c5862f7ca28d999a92d327472a671",
+                "url": "https://api.github.com/repos/reactphp/child-process/zipball/be6ebd7763170626794cbcb5c7b7ffdf5c9a4cb4",
+                "reference": "be6ebd7763170626794cbcb5c7b7ffdf5c9a4cb4",
                 "shasum": ""
             },
             "require": {
                 "evenement/evenement": "~2.0",
                 "php": ">=5.4.0",
                 "react/event-loop": "0.4.*",
-                "react/stream": "~0.4.2"
+                "react/stream": "^0.5 || ^0.4.4"
             },
             "require-dev": {
+                "phpunit/phpunit": "^5.0 || ^4.8.10",
                 "sebastian/environment": "~1.0"
             },
             "type": "library",
@@ -1067,7 +1069,7 @@
             "keywords": [
                 "process"
             ],
-            "time": "2016-08-01T18:09:48+00:00"
+            "time": "2017-03-10 13:33:18"
         },
         {
             "name": "react/event-loop",
@@ -1164,7 +1166,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket/zipball/d1fec4f53f171b4214201263fb1499afb57e624b",
+                "url": "https://api.github.com/repos/reactphp/socket/zipball/ce015ec5879b96f5d30905f035f223aa85013fcc",
                 "reference": "d1fec4f53f171b4214201263fb1499afb57e624b",
                 "shasum": ""
             },
@@ -1173,7 +1175,7 @@
                 "php": ">=5.3.0",
                 "react/event-loop": "0.4.*|0.3.*",
                 "react/promise": "^2.0 || ^1.1",
-                "react/stream": "^0.4.5"
+                "react/stream": "^0.6 || ^0.5 || ^0.4.5"
             },
             "type": "library",
             "extra": {
@@ -1198,7 +1200,7 @@
         },
         {
             "name": "react/stream",
-            "version": "v0.4.6",
+            "version": "0.4.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/stream.git",
@@ -1238,7 +1240,7 @@
                 "pipe",
                 "stream"
             ],
-            "time": "2017-01-25T14:44:14+00:00"
+            "time": "2017-01-25 14:44:14"
         },
         {
             "name": "seld/cli-prompt",
@@ -1357,12 +1359,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "a89f37eb484d8b8e81fb87749c2ccf2aea661d8b"
+                "reference": "3706991cb3e0ad6ba3a51ec4fa610c42369acff1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/a89f37eb484d8b8e81fb87749c2ccf2aea661d8b",
-                "reference": "a89f37eb484d8b8e81fb87749c2ccf2aea661d8b",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/3706991cb3e0ad6ba3a51ec4fa610c42369acff1",
+                "reference": "3706991cb3e0ad6ba3a51ec4fa610c42369acff1",
                 "shasum": ""
             },
             "require": {
@@ -1402,7 +1404,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-01 16:03:54"
+            "time": "2017-03-05 21:52:44"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -1469,28 +1471,30 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/routing.git",
-                "reference": "3112755a65688717264116441e2d2ff5c17a9c53"
+                "reference": "4393cb25db97e96321fa2f96a9001c32df32f55d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/routing/zipball/3112755a65688717264116441e2d2ff5c17a9c53",
-                "reference": "3112755a65688717264116441e2d2ff5c17a9c53",
+                "url": "https://api.github.com/repos/symfony/routing/zipball/4393cb25db97e96321fa2f96a9001c32df32f55d",
+                "reference": "4393cb25db97e96321fa2f96a9001c32df32f55d",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.5.9"
             },
             "conflict": {
-                "symfony/config": "<2.8"
+                "symfony/config": "<2.8",
+                "symfony/yaml": "<3.3"
             },
             "require-dev": {
                 "doctrine/annotations": "~1.0",
                 "doctrine/common": "~2.2",
                 "psr/log": "~1.0",
                 "symfony/config": "~2.8|~3.0",
+                "symfony/dependency-injection": "~2.8|~3.0",
                 "symfony/expression-language": "~2.8|~3.0",
                 "symfony/http-foundation": "~2.8|~3.0",
-                "symfony/yaml": "~2.8|~3.0"
+                "symfony/yaml": "~3.3"
             },
             "suggest": {
                 "doctrine/annotations": "For using the annotation loader",
@@ -1536,7 +1540,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-02-28 21:57:59"
+            "time": "2017-03-06 19:18:14"
         },
         {
             "name": "zendframework/zend-hydrator",
@@ -1824,7 +1828,7 @@
                 "bundle dependencies",
                 "executable phar"
             ],
-            "time": "2015-11-15T18:36:37+00:00"
+            "time": "2015-11-15 18:36:37"
         },
         {
             "name": "doctrine/inflector",
@@ -1951,7 +1955,7 @@
             "keywords": [
                 "phar"
             ],
-            "time": "2014-12-03T23:26:45+00:00"
+            "time": "2014-12-03 23:26:45"
         },
         {
             "name": "knplabs/packagist-api",
@@ -2004,7 +2008,7 @@
                 "composer",
                 "packagist"
             ],
-            "time": "2014-09-17T13:49:46+00:00"
+            "time": "2014-09-17 13:49:46"
         },
         {
             "name": "phine/exception",
@@ -2107,7 +2111,7 @@
                 "system"
             ],
             "abandoned": true,
-            "time": "2013-10-15T22:58:04+00:00"
+            "time": "2013-10-15 22:58:04"
         },
         {
             "name": "symfony/console",
@@ -2115,12 +2119,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "42645e1a6d36fd4177751bea0e607d039c9a1b7d"
+                "reference": "81508e6fac4476771275a3f4f53c3fee9b956bfa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/42645e1a6d36fd4177751bea0e607d039c9a1b7d",
-                "reference": "42645e1a6d36fd4177751bea0e607d039c9a1b7d",
+                "url": "https://api.github.com/repos/symfony/console/zipball/81508e6fac4476771275a3f4f53c3fee9b956bfa",
+                "reference": "81508e6fac4476771275a3f4f53c3fee9b956bfa",
                 "shasum": ""
             },
             "require": {
@@ -2168,7 +2172,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2017-02-21 14:21:52"
+            "time": "2017-03-04 11:00:12"
         },
         {
             "name": "symfony/debug",
@@ -2282,12 +2286,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "0aa0e5683f33ebc040c58627bbb8b3514a1bfa4f"
+                "reference": "41336b20b52f5fd5b42a227e394e673c8071118f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/0aa0e5683f33ebc040c58627bbb8b3514a1bfa4f",
-                "reference": "0aa0e5683f33ebc040c58627bbb8b3514a1bfa4f",
+                "url": "https://api.github.com/repos/symfony/process/zipball/41336b20b52f5fd5b42a227e394e673c8071118f",
+                "reference": "41336b20b52f5fd5b42a227e394e673c8071118f",
                 "shasum": ""
             },
             "require": {
@@ -2323,7 +2327,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2017-02-21 08:33:48"
+            "time": "2017-03-04 12:20:59"
         },
         {
             "name": "tedivm/jshrink",
@@ -2369,7 +2373,7 @@
                 "javascript",
                 "minifier"
             ],
-            "time": "2015-07-04T07:35:09+00:00"
+            "time": "2015-07-04 07:35:09"
         }
     ],
     "aliases": [],
