@@ -21,6 +21,8 @@ application.
 
 ### 1. IMAP to SQL Syncing Engine
 
+![Ready](https://img.shields.io/badge/status-ready-brightgreen.svg?style=flat-square)
+
 Both email clients in this project utilise the syncing engine provided in the
 [`sync`](sync) app. This application is designed to continually archive emails
 from any number of IMAP servers and accounts. The data is saved in a format
@@ -34,6 +36,8 @@ the different ways with which you can run the application continuously
 (supervisor, cron, etc).
 
 ### 2. JavaScript-free HTML Email Client
+
+![Started](https://img.shields.io/badge/status-started-yellow.svg?style=flat-square)
 
 As both a case-study and for usability's sake, one of the primary goals of this
 project is to create a web-based email client and server application that's
@@ -60,4 +64,4 @@ saves data in the way outlined in [`DATAFORMAT.md`](DATAFORMAT.md).
 
 ### 3. Kanban-style Email Client
 
-TBD
+![Not Started](https://img.shields.io/badge/status-not%20started-lightgrey.svg?style=flat-square)
