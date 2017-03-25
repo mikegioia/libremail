@@ -38,6 +38,8 @@ $config = array_replace_recursive( $default, $local );
 
 // Set the memory limit from the config
 ini_set( 'memory_limit', $config[ 'app' ][ 'memory' ] );
+ini_set( 'mysql.connect_timeout', $config[ 'sql' ][ 'timeout' ] );
+ini_set( 'default_socket_timeout', $config[ 'sql' ][ 'timeout' ] ); 
 
 // Load the vendor libraries
 require( BASEPATH .'/vendor/autoload.php' );
@@ -146,6 +148,7 @@ $di[ 'db_factory' ] = $di->factory( function ( $c, $config = NULL ) {
             $dsn,
             $dbConfig[ 'username' ],
             $dbConfig[ 'password' ] );
+        $db->query( 'SET SESSION wait_timeout = 30;' );
         $db->query( 'SET NAMES '. $dbConfig[ 'charset' ] .';' );
 
         return $db;

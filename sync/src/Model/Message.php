@@ -176,6 +176,7 @@ class Message extends Model
         $this->requireInt( $accountId, "Account ID" );
         $messages = $this->db()
             ->select()
+            ->clear()
             ->count( 1, 'count' )
             ->from( 'messages' )
             ->where( 'synced', '=', 1 )
@@ -227,6 +228,7 @@ class Message extends Model
         $this->requireInt( $accountId, "Account ID" );
         $messages = $this->db()
             ->select()
+            ->clear()
             ->count( 1, 'count' )
             ->from( 'messages' )
             ->where( 'folder_id', '=', $folderId )
