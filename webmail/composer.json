@@ -3,5 +3,10 @@
         "psr-4": {
             "App\\": "src/"
         }
+    },
+    "require": {
+        "slim/php-view": "^2.2",
+        "ezyang/htmlpurifier": "dev-master",
+        "zendframework/zend-escaper": "^2.5"
     }
 }

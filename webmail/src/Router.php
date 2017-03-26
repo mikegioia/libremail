@@ -5,7 +5,9 @@
  * the specified callback.
  *
  * Based entirely on Bramus Van Damme's Router:
- * https://github.com/bramus/router
+ *   https://github.com/bramus/router
+ * Copied here for formatting and extending. The file isn't big
+ * enough to pull from Composer or manage upstream changes.
  */
 
 namespace App;
@@ -16,12 +18,12 @@ class Router
     private $routes = [];
     // The before middleware route patterns and their handling functions
     private $befores = [];
-    // The function to be executed when no route has been matched
-    protected $notFound;
-    // Current baseroute, used for (sub)route mounting
-    private $baseroute = '';
     // The Request Method that needs to be handled
     private $method = '';
+    // Current baseroute, used for (sub)route mounting
+    private $baseroute = '';
+    // The function to be executed when no route has been matched
+    protected $notFound;
 
     /**
      * Store a before middleware route and a handling function to be executed

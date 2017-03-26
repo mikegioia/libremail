@@ -9,7 +9,11 @@ require( __DIR__ .'/../vendor/autoload.php' );
 $router = new \App\Router();
 
 $router->get( '/', function () {
-    echo "Hello world";
+    echo file_get_contents( __DIR__ .'/demo.html' );
+});
+
+$router->post( '/', function () {
+    echo file_get_contents( __DIR__ .'/demo.html' );
 });
 
 $router->match( 'GET', '/about', function () {
