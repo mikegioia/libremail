@@ -5,6 +5,8 @@
         }
     },
     "require": {
+        "php": ">=5.4.0",
+        "ext-mbstring": "*",
         "slim/php-view": "^2.2",
         "ezyang/htmlpurifier": "dev-master",
         "zendframework/zend-escaper": "^2.5"
