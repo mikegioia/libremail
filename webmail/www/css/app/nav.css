@@ -9,6 +9,7 @@ header {
     height: 5rem;
     width: 100%;
     background: #f1f1f1;
+    position: fixed;
 }
 
 header a.icon.button {

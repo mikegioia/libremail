@@ -1,0 +1,46 @@
+<!-- Contextual menu for selected messages -->
+<div id="actions-menu" class="actions menu">
+    <div class="dropdown inline-blocked control">
+        <a href="#" class="icon button" data-tooltip="Select">
+            <i class="fa fa-minus-square-o"></i>
+            <i class="fa fa-caret-down"></i>
+        </a>
+        <ul>
+            <li>
+                <input type="submit" name="select_all" value="All" />
+            </li>
+            <li>
+                <input type="submit" name="select_none" value="None" />
+            </li>
+            <li>
+                <input type="submit" name="select_read" value="Read" />
+            </li>
+            <li>
+                <input type="submit" name="select_unread" value="Unread" />
+            </li>
+            <li>
+                <input type="submit" name="select_starred" value="Starred" />
+            </li>
+            <li>
+                <input type="submit" name="select_unstarred" value="Unstarred" />
+            </li>
+        </ul>
+    </div>
+    <a href="#" class="icon button control" data-tooltip="Archive">
+        <i class="fa fa-archive"></i>
+    </a>
+    <a href="#" class="icon button control" data-tooltip="Delete">
+        <i class="fa fa-trash-o"></i>
+    </a>
+    <a href="#" class="icon button control">
+        <span class="normal">Mark as read</span>
+    </a>
+    <a href="#move-messages" class="icon button control" data-tooltip="Move to">
+        <i class="fa fa-folder-o"></i>
+        <i class="fa fa-plus"></i>
+    </a>
+    <a href="#apply-labels" class="icon button control" data-tooltip="Labels">
+        <i class="fa fa-tag"></i>
+        <i class="fa fa-plus"></i>
+    </a>
+</div><!-- /actions menu -->

@@ -1,0 +1,15 @@
+<input type="checkbox" id="mailbox-everything-checkbox" class="mailbox-checkbox" />
+<h5>
+    <label for="mailbox-everything-checkbox">
+        <i class="fa fa-caret-down arrow"></i>
+        <i class="fa fa-caret-right arrow"></i>
+    </label>
+    <span>Everything else</span>
+</h5>
+<div id="mailbox-everything" class="mailbox">
+    <?php
+    echo $render( 'messages/messages', [
+        'messages' => $messages
+    ]);
+    echo $render( 'messages/actions-menu' ); ?>
+</div>

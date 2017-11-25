@@ -216,3 +216,9 @@ input[type="checkbox"].msg-checkbox {
     text-align: right;
     width: 8rem;
 }
+
+.msg-contents.seen .date,
+.msg-contents.seen .names,
+.msg-contents.seen .subject span {
+    font-weight: 700;
+}

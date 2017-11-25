@@ -1,0 +1,27 @@
+<!-- Label sidebar -->
+<div class="folder-selector" id="apply-labels">
+    <h4 class="u-cf">
+        <span>Apply Labels</span>
+        <a href="#" class="close">
+            <i class="fa fa-close"></i>
+        </a>
+    </h4>
+    <input type="search" list="folder-list" value="" name="apply_labels[]" placeholder="Search..." />
+    <div class="list">
+    <?php
+    foreach ( $folders as $folder ): ?>
+        <input type="checkbox" value="<?php echo $folder->full_name; ?>" name="apply_labels[]"
+            class="move-to-checkbox" id="moveto-checkbox-<?php echo $folder->id; ?>" />
+        <label for="moveto-checkbox-<?php echo $folder->id; ?>">
+            <?php echo $folder->full_name; ?>
+        </label>
+    <?php
+    endforeach; ?>
+    </div>
+    <div class="actions">
+        <button type="submit" class="icon button button-primary">
+            <i class="fa fa-tag"></i>&nbsp;
+            Apply Labels to Messages
+        </button>
+    </div>
+</div><!-- /apply labels selector -->

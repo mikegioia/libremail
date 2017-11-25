@@ -1,0 +1,36 @@
+<nav class="no-select">
+    <a id="compose" class="button button-primary" tabindex="3">Compose</a>
+    <div id="nav-wrapper">
+        <ul id="mailboxes">
+            <li class="active">
+                <a href="inbox" class="mailbox">Inbox</a>
+                <label class="folder-label"></label>
+            </li>
+            <li>
+                <a href="starred" class="mailbox">Starred</a>
+                <label class="folder-label"></label>
+            </li>
+            <li>
+                <a href="sent" class="mailbox">Sent</a>
+                <label class="folder-label"></label>
+            </li>
+            <li>
+                <a href="drafts" class="mailbox">Drafts</a>
+                <label class="folder-label"></label>
+            </li>
+            <li>
+                <a href="all" class="mailbox">All Mail</a>
+                <label class="folder-label"></label>
+            </li>
+        </ul>
+        <ul id="folders">
+        <?php
+        foreach ( $folderTree as $item ):
+            echo $render( 'nav/folder', [
+                'folder' => $item[ 'folder' ],
+                'children' => $item[ 'children' ]
+            ]);
+        endforeach; ?>
+        </ul>
+    </div>
+</nav>

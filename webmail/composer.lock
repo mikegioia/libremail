@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1900174331136aa2956cf3e91679da7c",
-    "content-hash": "06c0df19cf4048778a1669d82210f2d5",
+    "content-hash": "248f1c49eab2fc36cdb3b9f2e212c178",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -13,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ezyang/htmlpurifier.git",
-                "reference": "6d50e5282afdfdfc3e0ff6d192aff56c5629b3d4"
+                "reference": "5988f2958346b0f8f3acee0de36ff8954594c64b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/6d50e5282afdfdfc3e0ff6d192aff56c5629b3d4",
-                "reference": "6d50e5282afdfdfc3e0ff6d192aff56c5629b3d4",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/5988f2958346b0f8f3acee0de36ff8954594c64b",
+                "reference": "5988f2958346b0f8f3acee0de36ff8954594c64b",
                 "shasum": ""
             },
             "require": {
@@ -52,106 +51,62 @@
             "keywords": [
                 "html"
             ],
-            "time": "2017-03-13 06:30:53"
+            "time": "2017-10-08T23:52:05+00:00"
         },
         {
-            "name": "psr/http-message",
-            "version": "1.0.1",
+            "name": "mikegioia/pdo",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/php-fig/http-message.git",
-                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363"
+                "url": "https://github.com/mikegioia/Slim-PDO.git",
+                "reference": "d0aea81ead68dfb074d68fe4c0017ad5a0ee2499"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-message/zipball/f6561bf28d520154e4b0ec72be95418abe6d9363",
-                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363",
+                "url": "https://api.github.com/repos/mikegioia/Slim-PDO/zipball/d0aea81ead68dfb074d68fe4c0017ad5a0ee2499",
+                "reference": "d0aea81ead68dfb074d68fe4c0017ad5a0ee2499",
                 "shasum": ""
             },
             "require": {
+                "ext-pdo": "*",
                 "php": ">=5.3.0"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
-                    "Psr\\Http\\Message\\": "src/"
+                    "Slim\\PDO\\": "src/PDO/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "authors": [
                 {
-                    "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
-                }
-            ],
-            "description": "Common interface for HTTP messages",
-            "homepage": "https://github.com/php-fig/http-message",
-            "keywords": [
-                "http",
-                "http-message",
-                "psr",
-                "psr-7",
-                "request",
-                "response"
-            ],
-            "time": "2016-08-06 14:39:51"
-        },
-        {
-            "name": "slim/php-view",
-            "version": "2.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/slimphp/PHP-View.git",
-                "reference": "122ed121a8d9cf91a94020814d2a3ee6c836754f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/slimphp/PHP-View/zipball/122ed121a8d9cf91a94020814d2a3ee6c836754f",
-                "reference": "122ed121a8d9cf91a94020814d2a3ee6c836754f",
-                "shasum": ""
-            },
-            "require": {
-                "psr/http-message": "^1.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.8",
-                "slim/slim": "^3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Slim\\Views\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
+                    "name": "Fabian de Laender",
+                    "email": "fabian@faapz.nl",
+                    "homepage": "http://faapz.nl",
+                    "role": "Developer"
+                },
                 {
-                    "name": "Glenn Eggleton",
-                    "email": "geggleto@gmail.com"
+                    "name": "Mike Gioia",
+                    "homepage": "http://mikegioia.com",
+                    "email": "mikegioia@gmail.com"
                 }
             ],
-            "description": "Render PHP view scripts into a PSR-7 Response object.",
+            "description": "PDO database library for Slim Framework",
+            "homepage": "https://github.com/mikegioia/Slim-PDO",
             "keywords": [
+                "database",
                 "framework",
-                "php",
-                "phtml",
-                "renderer",
-                "slim",
-                "template",
-                "view"
+                "pdo",
+                "slim"
             ],
-            "time": "2016-10-11 07:43:08"
+            "support": {
+                "issues": "https://github.com/mikegioia/Slim-PDO/issues",
+                "docs": "https://github.com/mikegioia/Slim-PDO/blob/master/docs/README.md",
+                "source": "https://github.com/mikegioia/Slim-PDO/tree/master"
+            },
+            "time": "2017-03-25T21:37:24+00:00"
         },
         {
             "name": "zendframework/zend-escaper",
@@ -195,19 +150,20 @@
                 "escaper",
                 "zf2"
             ],
-            "time": "2016-06-30 19:48:38"
+            "time": "2016-06-30T19:48:38+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "mikegioia/pdo": 20,
         "ezyang/htmlpurifier": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.4.0",
+        "php": "^5.6|^7.0",
         "ext-mbstring": "*"
     },
     "platform-dev": []

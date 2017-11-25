@@ -1,0 +1,39 @@
+<?php
+echo $render( 'header' );
+
+echo $render( 'nav', [
+    'folderTree' => $folderTree
+]); ?>
+
+<section id="main">
+    <form action="#" method="post">
+        <?php
+        echo $render( 'messages/actions' ); ?>
+
+        <section id="msg-list" class="no-select">
+            <?php
+            echo $render( 'messages/starred', [
+                'starred' => $starred
+            ]);
+            echo $render( 'messages/everything', [
+                'messages' => $messages
+            ]);
+            echo $render( 'messages/footer' ); ?>
+        </section>
+
+        <?php
+        echo $render( 'messages/move-messages', [
+            'folders' => $folders
+        ]);
+        echo $render( 'messages/apply-folder', [
+            'folders' => $folders
+        ]); ?>
+    </form>
+</section>
+
+<?php
+echo $render( 'messages/datalist', [
+    'folders' => $folders
+]);
+
+echo $render( 'footer' ); ?>

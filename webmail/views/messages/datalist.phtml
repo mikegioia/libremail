@@ -1,0 +1,8 @@
+<!-- Datalist for folders -->
+<datalist id="folder-list">
+<?php
+foreach ( $folders as $folder ): ?>
+    <option value="<?php echo $folder->name; ?>"><?php echo $folder->full_name; ?></option>
+<?php
+endforeach; ?>
+</datalist>

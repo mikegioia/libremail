@@ -936,7 +936,7 @@ class Sync
             $this->sendMessage(
                 "The IMAP connection was lost. Your internet connection ".
                 "could be down or it could just be a network error. The ".
-                "system will sleep for a bit before re-trying.".
+                "system will sleep for a bit before re-trying.",
                 STATUS_ERROR );
             throw new StopException;
         }

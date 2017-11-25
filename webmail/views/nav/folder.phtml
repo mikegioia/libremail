@@ -1,0 +1,32 @@
+<?php
+if ( $folder->ignored != 1 ): ?>
+    <li class="<?php echo $children ? 'w-sub' : ''; ?>">
+        <input type="checkbox" id="folder-<?php echo $folder->id; ?>-checkbox" class="folder-checkbox" />
+        <a href="folder/<?php echo $folder->id; ?>" class="mailbox">
+            <?php echo $folder->name; ?>
+        </a>
+        <label for="folder-<?php echo $folder->id; ?>-checkbox" class="folder-label">
+        <?php
+        if ( $children ): ?>
+            <i class="fa fa-caret-right"></i>
+            <i class="fa fa-caret-down"></i>
+        <?php
+        endif; ?>
+        </label>
+        <a class="color" style="background-color: <?php echo $folder->color; ?>"></a>
+    <?php
+    if ( $children ): ?>
+        <ul class="sub">
+        <?php
+        foreach ( $children as $child ):
+            echo $render( 'nav/folder', [
+                'folder' => $child[ 'folder' ],
+                'children' => $child[ 'children' ]
+            ]);
+        endforeach; ?>
+        </ul>
+    <?php
+    endif; ?>
+    </li>
+<?php
+endif; ?>

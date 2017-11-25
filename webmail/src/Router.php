@@ -222,12 +222,12 @@ class Router
         elseif ( $_SERVER[ 'REQUEST_METHOD' ] === 'POST' ) {
             $headers = $this->getRequestHeaders();
             $headerSet = isset( $headers[ 'X-HTTP-Method-Override' ] );
-            $methodExists = in_array(
-                $headers[ 'X-HTTP-Method-Override' ],
-                [ 'PUT', 'DELETE', 'PATCH' ] );
+            $methodExists = $headerSet
+                && in_array(
+                    $headers[ 'X-HTTP-Method-Override' ],
+                    [ 'PUT', 'DELETE', 'PATCH' ] );
 
-            if ( $headerSet && $methodExists )
-            {
+            if ( $methodExists ) {
                 $method = $headers[ 'X-HTTP-Method-Override' ];
             }
         }

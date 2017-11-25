@@ -1,0 +1,31 @@
+<!-- Folder sidebar -->
+<div class="folder-selector" id="move-messages">
+    <h4 class="u-cf">
+        <span>Move Messages</span>
+        <a href="#" class="close">
+            <i class="fa fa-close"></i>
+        </a>
+    </h4>
+    <input type="search" list="folder-list" value="" name="move_to[]" placeholder="Search..." />
+    <div class="list">
+    <?php
+    foreach ( $folders as $folder ): ?>
+        <input type="checkbox" value="<?php echo $folder->full_name; ?>" name="move_to[]"
+            class="move-to-checkbox" id="moveto-checkbox-<?php echo $folder->id; ?>" />
+        <label for="moveto-checkbox-<?php echo $folder->id; ?>">
+            <?php echo $folder->full_name; ?>
+        </label>
+    <?php
+    endforeach; ?>
+    </div>
+    <div class="actions">
+        <button type="submit" class="icon button button-primary">
+            <i class="fa fa-folder-open-o"></i>&nbsp;
+            Move to Selected Folders
+        </button>
+        <span class="hint">
+            <i class="fa fa-arrow-left"></i>
+            Save
+        </span>
+    </div>
+</div><!-- /move messages selector -->

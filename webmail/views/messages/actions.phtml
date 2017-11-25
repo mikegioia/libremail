@@ -1,0 +1,50 @@
+<section id="msg-actions" class="no-select">
+    <!-- Default menu for unselected messages -->
+    <div class="default menu">
+        <div class="dropdown inline-blocked control">
+            <a href="#" class="icon button" data-tooltip="Select" tabindex="-1">
+                <i class="fa fa-square-o"></i>
+                <i class="fa fa-caret-down"></i>
+            </a>
+            <ul>
+                <li>
+                    <input type="submit" name="select_all" value="All" />
+                </li>
+                <li>
+                    <input type="submit" name="select_none" value="None" />
+                </li>
+                <li>
+                    <input type="submit" name="select_read" value="Read" />
+                </li>
+                <li>
+                    <input type="submit" name="select_unread" value="Unread" />
+                </li>
+                <li>
+                    <input type="submit" name="select_starred" value="Starred" />
+                </li>
+                <li>
+                    <input type="submit" name="select_unstarred" value="Unstarred" />
+                </li>
+            </ul>
+        </div>
+        <a href="#" class="icon button control" data-tooltip="Refresh" tabindex="4">
+            <i class="fa fa-refresh"></i>
+        </a>
+        <div class="dropdown inline-blocked control">
+            <a href="#" class="icon button">
+                <span class="normal">More</span>
+                <i class="fa fa-caret-down"></i>
+            </a>
+            <ul>
+                <li>
+                    <input type="submit" name="mark_all_read" value="Mark all as read" />
+                </li>
+                <li class="notice">
+                    <em>
+                        Select messages to see more actions
+                    </em>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
