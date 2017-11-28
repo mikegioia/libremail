@@ -64,7 +64,7 @@ class Message extends Model
             ->select([
                 'id', '`to`', 'cc', 'bcc', '`from`',
                 '`date`', 'seen', 'subject', 'flagged',
-                'substring(text_plain, 1, 100) as text_plain',
+                'substring(text_plain, 1, 260) as text_plain',
                 'count(thread_id) as thread_count'
             ])
             ->from( 'messages' )

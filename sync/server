@@ -48,7 +48,7 @@ unset( $constants );
 ini_set( 'memory_limit', $config[ 'app' ][ 'memory' ] );
 
 // Set up dependency container and register all services
-$di = new Container();
+$di = new Container;
 
 // Store the configuration as a service
 $di[ 'config' ] = $config;
