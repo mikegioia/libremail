@@ -32,17 +32,17 @@
         "ext-mysql": "*",
         "particlebits/imap": "@dev",
         "pimple/pimple": "~3.0",
-        "monolog/monolog": "^1.17",
-        "league/climate": "dev-master",
-        "particle/validator": "^1.0",
-        "ilya/belt": "~2",
+        "monolog/monolog": "^1.23",
+        "league/climate": "~3.2",
+        "particle/validator": "~2.3",
+        "ilya/belt": "~2.1",
         "mikegioia/pdo": "@dev",
-        "react/event-loop": "^0.4.1",
-        "react/child-process": "^0.4.0",
-        "cboden/ratchet": "^0.3.4",
+        "neitanod/forceutf8": "^2.0",
         "symfony/event-dispatcher": "^3.0",
-        "mkraemer/react-pcntl": "^2.0",
-        "neitanod/forceutf8": "^2.0"
+        "react/event-loop": "^0.4.3",
+        "cboden/ratchet": "^0.3.6",
+        "react/child-process": "^0.4.3",
+        "mkraemer/react-pcntl": "^3.0"
     },
     "suggest": {
         "ext-ev": "*"

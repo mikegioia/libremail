@@ -64,7 +64,8 @@ class Messages
     private function setSnippet( Message &$message, Escaper $escaper )
     {
         $text = strip_tags( $message->text_plain );
-        $message->snippet = trim( $escaper->escapeHtml( $text ) );
+        $text = trim( $escaper->escapeHtml( $text ) );
+        $message->snippet = ltrim( $text, "-_" );
     }
 
     /**

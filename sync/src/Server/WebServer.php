@@ -2,12 +2,12 @@
 
 namespace App\Server;
 
-use App\Log
-  , Exception
-  , Ratchet\ConnectionInterface
-  , Guzzle\Http\Message\Response
-  , Ratchet\Http\HttpServerInterface
-  , Guzzle\Http\Message\RequestInterface;
+use App\Log;
+use Exception;
+use Ratchet\ConnectionInterface;
+use Guzzle\Http\Message\Response;
+use Ratchet\Http\HttpServerInterface;
+use Guzzle\Http\Message\RequestInterface;
 
 class WebServer implements HttpServerInterface
 {
@@ -72,7 +72,7 @@ class WebServer implements HttpServerInterface
         $response = new Response(
             200, [
                 "X-Powered-By" => APP_NAME,
-                "Content-Type" => $this->getCotnentType( $path )
+                "Content-Type" => $this->getContentType( $path )
             ],
             file_get_contents( $path ));
 
@@ -107,7 +107,7 @@ class WebServer implements HttpServerInterface
      * @param string $path
      * @return string
      */
-    private function getCotnentType( $path )
+    private function getContentType( $path )
     {
         $pathInfo = pathinfo( $path );
         $types = [
