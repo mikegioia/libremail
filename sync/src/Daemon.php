@@ -232,12 +232,12 @@ class Daemon
 
         // Resume the stdin stream, send the message and then pause
         // it again.
-        //$this->webServerProcess->stdin->resume();
+        $this->webServerProcess->stdin->resume();
         $this->webServerProcess->stdin->write(
             Message::packJson(
                 $message->toArray()
             ));
-        //$this->webServerProcess->stdin->pause();
+        $this->webServerProcess->stdin->pause();
     }
 
     /**
