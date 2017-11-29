@@ -262,8 +262,17 @@ class Messages
         }
     }
 
+    /**
+     * Syncs the seen flag between the IMAP mailbox and SQL.
+     * @param AccountModel $account
+     * @param FolderModel $model
+     */
     private function updateSeenFlags( AccountModel $account, FolderModel $folder )
     {
+        // Fetch all seen message IDs from the mailbox
 
+        // Mark as unseen anything in this collection
+
+        // Mark as seen anything unseen that's not in this collection
     }
 }
