@@ -28,6 +28,9 @@ class Messages
     private $mailbox;
     private $interactive;
 
+    const FLAG_UNSEEN = 'UNSEEN';
+    const FLAG_FLAGGED = 'FLAGGED';
+
     /**
      * @param Logger $log
      * @param CLImate $cli
@@ -56,17 +59,18 @@ class Messages
      * @param array $savedIds Existing message IDs
      * @param array $options (see syncMessages)
      */
-    public function run(
-        AccountModel $account,
-        FolderModel $folder,
-        $newIds,
-        $savedIds,
-        $options )
+    public function run( AccountModel $account, FolderModel $folder, $options )
     {
+        $newIds = $this->mailbox->getUniqueIds();
+        $savedIds = (new MessageModel)->getSyncedIdsByFolder(
+            $account->getId(),
+            $folder->getId() );
+
         $this->downloadMessages( $newIds, $savedIds, $folder, $options );
         $this->markDeleted( $newIds, $savedIds, $folder, $options );
         $this->updateThreads( $account, $folder );
         $this->updateSeenFlags( $account, $folder );
+        $this->updateFlaggedFlags( $account, $folder );
     }
 
     /**
@@ -214,8 +218,7 @@ class Messages
             " in {$folder->name}" );
 
         try {
-            $messageModel = new MessageModel;
-            $messageModel->markDeleted(
+            (new MessageModel)->markDeleted(
                 $toDelete,
                 $folder->getAccountId(),
                 $folder->getId() );
@@ -269,10 +272,98 @@ class Messages
      */
     private function updateSeenFlags( AccountModel $account, FolderModel $folder )
     {
-        // Fetch all seen message IDs from the mailbox
+        // Fetch all unseen message IDs from the mailbox
+        $unseenIds = $this->mailbox->search( self::FLAG_UNSEEN, TRUE );
 
         // Mark as unseen anything in this collection
+        if ( $unseenIds ) {
+            $count = count( $unseenIds );
+            $this->log->info(
+                "Marking $count as unseen in {$folder->name}" );
+
+            try {
+                (new MessageModel)->markFlag(
+                    $unseenIds,
+                    $folder->getAccountId(),
+                    $folder->getId(),
+                    MessageModel::FLAG_SEEN,
+                    FALSE );
+            }
+            catch ( ValidationException $e ) {
+                $this->log->notice(
+                    "Failed validation for marking unseen messages: ".
+                    $e->getMessage() );
+            }
+        }
 
         // Mark as seen anything unseen that's not in this collection
+        $this->log->debug(
+            "Marking remaining messages as seen in {$folder->name}" );
+
+        try {
+            (new MessageModel)->markFlag(
+                $unseenIds,
+                $folder->getAccountId(),
+                $folder->getId(),
+                MessageModel::FLAG_SEEN,
+                TRUE,
+                TRUE ); // Inverse
+        }
+        catch ( ValidationException $e ) {
+            $this->log->notice(
+                "Failed validation for marking seen messages: ".
+                $e->getMessage() );
+        }
+    }
+
+    /**
+     * Syncs the flagged (starred) flag between the IMAP mailbox and SQL.
+     * @param AccountModel $account
+     * @param FolderModel $model
+     */
+    private function updateFlaggedFlags( AccountModel $account, FolderModel $folder )
+    {
+        // Fetch all flagged message IDs from the mailbox
+        $flaggedIds = $this->mailbox->search( self::FLAG_FLAGGED, TRUE );
+
+        // Mark as flagged anything in this collection
+        if ( $flaggedIds ) {
+            $count = count( $flaggedIds );
+            $this->log->info(
+                "Marking $count as flagged in {$folder->name}" );
+
+            try {
+                (new MessageModel)->markFlag(
+                    $flaggedIds,
+                    $folder->getAccountId(),
+                    $folder->getId(),
+                    MessageModel::FLAG_FLAGGED,
+                    TRUE );
+            }
+            catch ( ValidationException $e ) {
+                $this->log->notice(
+                    "Failed validation for marking flagged messages: ".
+                    $e->getMessage() );
+            }
+        }
+
+        // Mark as seen anything unseen that's not in this collection
+        $this->log->debug(
+            "Marking remaining messages as seen in {$folder->name}" );
+
+        try {
+            (new MessageModel)->markFlag(
+                $flaggedIds,
+                $folder->getAccountId(),
+                $folder->getId(),
+                MessageModel::FLAG_FLAGGED,
+                FALSE,
+                TRUE ); // Inverse
+        }
+        catch ( ValidationException $e ) {
+            $this->log->notice(
+                "Failed validation for marking un-flagged messages: ".
+                $e->getMessage() );
+        }
     }
 }

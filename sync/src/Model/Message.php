@@ -2,19 +2,19 @@
 
 namespace App\Model;
 
-use Fn
-  , PDO
-  , DateTime
-  , App\Model
-  , Belt\Belt
-  , PDOException
-  , ForceUTF8\Encoding
-  , Particle\Validator\Validator
-  , Pb\Imap\Message as ImapMessage
-  , App\Traits\Model as ModelTrait
-  , App\Exceptions\Validation as ValidationException
-  , App\Exceptions\DatabaseUpdate as DatabaseUpdateException
-  , App\Exceptions\DatabaseInsert as DatabaseInsertException;
+use Fn;
+use PDO;
+use DateTime;
+use App\Model;
+use Belt\Belt;
+use PDOException;
+use ForceUTF8\Encoding;
+use Particle\Validator\Validator;
+use Pb\Imap\Message as ImapMessage;
+use App\Traits\Model as ModelTrait;
+use App\Exceptions\Validation as ValidationException;
+use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
+use App\Exceptions\DatabaseInsert as DatabaseInsertException;
 
 class Message extends Model
 {
@@ -52,6 +52,10 @@ class Message extends Model
 
     // Options
     const OPT_TRUNCATE_FIELDS = 'truncate_fields';
+
+    // Flags
+    const FLAG_SEEN = 'seen';
+    const FLAG_FLAGGED = 'flagged';
 
     use ModelTrait;
 
@@ -619,6 +623,9 @@ class Message extends Model
      * Takes in an array of message unique IDs and marks them all as
      * deleted in the database.
      * @param array $uniqueIds
+     * @param int $accountId
+     * @param int $folderId
+     * @throws DatabaseUpdateException
      */
     public function markDeleted( $uniqueIds, $accountId, $folderId )
     {
@@ -635,6 +642,54 @@ class Message extends Model
             ->where( 'account_id', '=', $accountId )
             ->whereIn( 'unique_id', $uniqueIds )
             ->execute();
+
+        if ( ! Belt::isNumber( $updated ) ) {
+            throw new DatabaseUpdateException(
+                MESSAGE,
+                $this->getError() );
+        }
+    }
+
+    /**
+     * Takes in an array of message unique IDs and sets a flag to on.
+     * @param array $uniqueIds
+     * @param int $accountId
+     * @param int $folderId
+     * @param string $flag
+     * @param bool $state On or off
+     * @param bool $inverse If set, do where not in $uniqueIds query
+     */
+    public function markFlag( $uniqueIds, $accountId, $folderId, $flag, $state = TRUE, $inverse = FALSE )
+    {
+        if ( $inverse === FALSE
+            && ( ! is_array( $uniqueIds ) || ! count( $uniqueIds ) ) )
+        {
+            return;
+        }
+
+        $this->isValidFlag( $state, "State" );
+        $this->requireInt( $folderId, "Folder ID" );
+        $this->requireInt( $accountId, "Account ID" );
+        $this->requireValue( $flag, [
+            self::FLAG_SEEN, self::FLAG_FLAGGED
+        ]);
+        $query = $this->db()
+            ->update([ $flag => $state ? 1 : 0 ])
+            ->table( 'messages' )
+            ->where( $flag, '=', $state ? 0 : 1 )
+            ->where( 'folder_id', '=', $folderId )
+            ->where( 'account_id', '=', $accountId );
+
+        if ( $inverse === TRUE ) {
+            if ( count( $uniqueIds ) ) {
+                $query->whereNotIn( 'unique_id', $uniqueIds );
+            }
+        }
+        else {
+            $query->whereIn( 'unique_id', $uniqueIds );
+        }
+
+        $updated = $query->execute();
 
         if ( ! Belt::isNumber( $updated ) ) {
             throw new DatabaseUpdateException(

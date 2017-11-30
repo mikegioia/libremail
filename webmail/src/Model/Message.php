@@ -60,12 +60,13 @@ class Message extends Model
      */
     public function getThreadsByFolder( $accountId, $folderId )
     {
+        $threads = [];
+        $threadIds = [];
         $messages = $this->db()
             ->select([
-                'id', '`to`', 'cc', 'bcc', '`from`',
-                '`date`', 'seen', 'subject', 'flagged',
-                'substring(text_plain, 1, 260) as text_plain',
-                'count(thread_id) as thread_count'
+                'id', '`to`', 'cc', 'bcc', '`from`', '`date`',
+                'seen', 'subject', 'flagged', 'thread_id',
+               // 'substring(text_plain, 1, 260) as text_plain'
             ])
             ->from( 'messages' )
             ->where( 'deleted', '=', 0 )
@@ -75,6 +76,32 @@ class Message extends Model
             ->orderBy( 'date', Model::DESC )
             ->execute()
             ->fetchAll( PDO::FETCH_CLASS, get_class() );
+
+        // Count all messages by thread ID and add that as a property
+        // on each message
+        foreach ( $messages as $message ) {
+            $threadIds[] = $message->thread_id;
+        }
+
+        $threadCounts = $this->db()
+            ->select([ 'thread_id', 'count(1) as thread_count' ])
+            ->from( 'messages' )
+            ->where( 'deleted', '=', 0 )
+            ->whereIn( 'thread_id', $threadIds )
+            ->where( 'account_id', '=', $accountId )
+            ->groupBy( 'thread_id' )
+            ->execute()
+            ->fetchAll();
+
+        foreach ( $threadCounts as $row ) {
+            $threads[ $row[ 'thread_id' ] ] = $row[ 'thread_count' ];
+        }
+
+        foreach ( $messages as $message ) {
+            $message->thread_count = ( isset( $threads[ $message->thread_id ] ) )
+                ? $threads[ $message->thread_id ]
+                : 1;
+        }
 
         return $messages ?: [];
     }

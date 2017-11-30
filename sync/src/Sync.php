@@ -609,11 +609,7 @@ class Sync
             // Select the folder's mailbox, this is sent to the
             // messages sync library to perform operations on
             $this->mailbox->select( $folder->name );
-            $newIds = $this->mailbox->getUniqueIds();
-            $savedIds = (new MessageModel)->getSyncedIdsByFolder(
-                $account->getId(),
-                $folder->getId() );
-            $messageSync->run( $account, $folder, $newIds, $savedIds, $options );
+            $messageSync->run( $account, $folder, $options );
             $this->checkForHalt();
         }
         catch ( PDOException $e ) {
