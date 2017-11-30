@@ -273,7 +273,7 @@ class Message extends Model
     /**
      * Finds the message by using the Reply-To address from a message.
      * Looks up by Message ID, and teturns a thread ID if it finds one.
-     * If not, it recursives through the history until the end.
+     * If not, it recurses through the history until the end.
      * @param string $inReplyTo
      * @param array $ids Reference to all message IDs found
      * @param array $loopIds Reference list to prevent infinite loops
