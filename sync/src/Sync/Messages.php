@@ -35,6 +35,7 @@ class Messages
      * @param Logger $log
      * @param CLImate $cli
      * @param Emitter $emitter
+     * @param Mailbox $mailbox
      * @param bool $interactive
      */
     public function __construct(
@@ -68,7 +69,6 @@ class Messages
 
         $this->downloadMessages( $newIds, $savedIds, $folder, $options );
         $this->markDeleted( $newIds, $savedIds, $folder, $options );
-        $this->updateThreads( $account, $folder );
         $this->updateSeenFlags( $account, $folder );
         $this->updateFlaggedFlags( $account, $folder );
     }
@@ -231,41 +231,6 @@ class Messages
     }
 
     /**
-     * Reads in all of the messages for a folder and tries to update
-     * as many thread IDs as possible.
-     * @param AccountModel $account
-     * @param FolderModel $folder
-     */
-    private function updateThreads( AccountModel $account, FolderModel $folder )
-    {
-        if ( $folder->isIgnored() ) {
-            return;
-        }
-
-        $limit = 250;
-        $messageModel = new MessageModel;
-        $this->log->debug(
-            "Updating thread IDs in {$folder->name} for ".
-            $account->email );
-        $ids = $messageModel->getIdsForThreadingByFolder(
-            $account->getId(),
-            $folder->getId() );
-        $count = count( $ids );
-
-        // Read in a batch of messages, looking specifically for their
-        // ID, Message ID, and Reply-To ID.
-        for ( $offset = 0; $offset < $count; $offset += $limit ) {
-            $slice = array_slice( $ids, $offset, $limit );
-            $messages = $messageModel->getByIds( $slice );
-
-            foreach ( $messages as $message ) {
-                $message->updateThreadId();
-                $this->emitter->emit( Sync::EVENT_CHECK_HALT );
-            }
-        }
-    }
-
-    /**
      * Syncs the seen flag between the IMAP mailbox and SQL.
      * @param AccountModel $account
      * @param FolderModel $model
@@ -278,16 +243,19 @@ class Messages
         // Mark as unseen anything in this collection
         if ( $unseenIds ) {
             $count = count( $unseenIds );
-            $this->log->info(
-                "Marking $count as unseen in {$folder->name}" );
 
             try {
-                (new MessageModel)->markFlag(
+                $updated = (new MessageModel)->markFlag(
                     $unseenIds,
                     $folder->getAccountId(),
                     $folder->getId(),
                     MessageModel::FLAG_SEEN,
                     FALSE );
+
+                if ( $updated ) {
+                    $this->log->info(
+                        "Marking $updated as unseen in {$folder->name}" );
+                }
             }
             catch ( ValidationException $e ) {
                 $this->log->notice(
@@ -297,17 +265,19 @@ class Messages
         }
 
         // Mark as seen anything unseen that's not in this collection
-        $this->log->debug(
-            "Marking remaining messages as seen in {$folder->name}" );
-
         try {
-            (new MessageModel)->markFlag(
+            $updated =  (new MessageModel)->markFlag(
                 $unseenIds,
                 $folder->getAccountId(),
                 $folder->getId(),
                 MessageModel::FLAG_SEEN,
                 TRUE,
                 TRUE ); // Inverse
+
+            if ( $updated ) {
+                $this->log->debug(
+                    "Marking {$updated} as seen in {$folder->name}" );
+            }
         }
         catch ( ValidationException $e ) {
             $this->log->notice(
@@ -329,16 +299,19 @@ class Messages
         // Mark as flagged anything in this collection
         if ( $flaggedIds ) {
             $count = count( $flaggedIds );
-            $this->log->info(
-                "Marking $count as flagged in {$folder->name}" );
 
             try {
-                (new MessageModel)->markFlag(
+                $updated = (new MessageModel)->markFlag(
                     $flaggedIds,
                     $folder->getAccountId(),
                     $folder->getId(),
                     MessageModel::FLAG_FLAGGED,
                     TRUE );
+
+                if ( $updated ) {
+                    $this->log->info(
+                        "Marking $updated as flagged in {$folder->name}" );
+                }
             }
             catch ( ValidationException $e ) {
                 $this->log->notice(
@@ -348,17 +321,19 @@ class Messages
         }
 
         // Mark as seen anything unseen that's not in this collection
-        $this->log->debug(
-            "Marking remaining messages as seen in {$folder->name}" );
-
         try {
-            (new MessageModel)->markFlag(
+            $updated = (new MessageModel)->markFlag(
                 $flaggedIds,
                 $folder->getAccountId(),
                 $folder->getId(),
                 MessageModel::FLAG_FLAGGED,
                 FALSE,
                 TRUE ); // Inverse
+
+            if ( $updated ) {
+                $this->log->debug(
+                    "Marking {$updated} as un-flagged in {$folder->name}" );
+            }
         }
         catch ( ValidationException $e ) {
             $this->log->notice(

@@ -18,6 +18,7 @@ use Pimple\Container;
 use League\CLImate\CLImate;
 use App\Message\NoAccountsMessage;
 use App\Sync\Folders as FolderSync;
+use App\Sync\Threads as ThreadSync;
 use App\Message\NotificationMessage;
 use App\Model\Folder as FolderModel;
 use App\Sync\Messages as MessageSync;
@@ -48,6 +49,7 @@ class Sync
     private $running;
     private $mailbox;
     private $retries;
+    private $threader;
     private $interactive;
     private $activeAccount;
     private $maxRetries = 5;
@@ -301,6 +303,10 @@ class Sync
                 // going to run again in 15 minutes, why not just do two passes
                 // and download any extra messages while we can?
                 $this->syncMessages( $account, $folders );
+                // Update all thread IDs. This will run for a long time for the
+                // first iteration, and all subsequent runs will only update
+                // threads for any new messages.
+                $this->updateThreads( $account );
             }
         }
         catch ( PDOException $e ) {
@@ -329,8 +335,8 @@ class Sync
             return $this->runAccount( $account );
         }
 
-        $this->log->info( "Sync complete for {$account->email}" );
         $this->disconnect();
+        $this->log->info( "Sync complete for {$account->email}" );
 
         return TRUE;
     }
@@ -559,6 +565,23 @@ class Sync
             $this->stats->unsetActiveFolder();
             $this->checkForHalt();
         }
+    }
+
+    /**
+     * Updates message threads. See Threading class for info.
+     * @param AccountModel $account
+     */
+    private function updateThreads( AccountModel $account )
+    {
+        if ( ! $this->threader ) {
+            $this->threader = new ThreadSync(
+                $this->log,
+                $this->cli,
+                $this->emitter,
+                $this->interactive );
+        }
+
+        $this->threader->run( $account );
     }
 
     /**
