@@ -42,6 +42,7 @@ class Sync
     private $stop;
     private $wake;
     private $sleep;
+    private $quick;
     private $config;
     private $folder;
     private $daemon;
@@ -50,6 +51,7 @@ class Sync
     private $mailbox;
     private $retries;
     private $threader;
+    private $threading;
     private $interactive;
     private $activeAccount;
     private $maxRetries = 5;
@@ -86,9 +88,11 @@ class Sync
             $this->stats = $di[ 'stats' ];
             $this->config = $di[ 'config' ];
             $this->log = $di[ 'log' ]->getLogger();
+            $this->quick = $di[ 'console' ]->quick;
             $this->sleep = $di[ 'console' ]->sleep;
             $this->folder = $di[ 'console' ]->folder;
             $this->daemon = $di[ 'console' ]->daemon;
+            $this->threading = $di[ 'console' ]->threading;
             $this->interactive = $di[ 'console' ]->interactive;
         }
 
@@ -249,6 +253,14 @@ class Sync
             return FALSE;
         }
 
+        // If we're running in threading mode, just update threads
+        if ( $this->threading === TRUE ) {
+            $this->log->info( "Syncing threads for {$account->email}" );
+            $this->updateThreads( $account );
+
+            return TRUE;
+        }
+
         $this->checkForHalt();
         $this->stats->setActiveAccount( $account->email );
         $this->log->info( "Starting sync for {$account->email}" );
@@ -303,6 +315,8 @@ class Sync
                 // going to run again in 15 minutes, why not just do two passes
                 // and download any extra messages while we can?
                 $this->syncMessages( $account, $folders );
+                // Disconnect the IMAP connection, but leave the running flag on
+                $this->disconnect( TRUE );
                 // Update all thread IDs. This will run for a long time for the
                 // first iteration, and all subsequent runs will only update
                 // threads for any new messages.
@@ -368,7 +382,9 @@ class Sync
             $email,
             $password,
             $folder,
-            $attachmentsPath );
+            $attachmentsPath, [
+                Mailbox::OPT_SKIP_ATTACHMENTS => $this->quick
+            ]);
         $this->mailbox->getImapStream();
 
         if ( $setRunning === TRUE ) {
@@ -376,7 +392,7 @@ class Sync
         }
     }
 
-    public function disconnect()
+    public function disconnect( $running = FALSE )
     {
         if ( $this->mailbox ) {
             try {
@@ -390,7 +406,7 @@ class Sync
 
         $this->mailbox = NULL;
         $this->setAsleep( FALSE );
-        $this->setRunning( FALSE );
+        $this->setRunning( $running );
     }
 
     public function setAsleep( $asleep = TRUE )
@@ -628,7 +644,9 @@ class Sync
                 $this->cli,
                 $this->emitter,
                 $this->mailbox,
-                $this->interactive );
+                $this->interactive, [
+                    MessageSync::OPT_SKIP_CONTENT => $this->quick
+                ]);
             // Select the folder's mailbox, this is sent to the
             // messages sync library to perform operations on
             $this->mailbox->select( $folder->name );

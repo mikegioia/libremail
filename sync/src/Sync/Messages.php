@@ -27,9 +27,12 @@ class Messages
     private $emitter;
     private $mailbox;
     private $interactive;
+    private $skipContent = FALSE;
 
     const FLAG_UNSEEN = 'UNSEEN';
     const FLAG_FLAGGED = 'FLAGGED';
+
+    const OPT_SKIP_CONTENT = 'skip_content';
 
     /**
      * @param Logger $log
@@ -43,13 +46,18 @@ class Messages
         CLImate $cli,
         Emitter $emitter,
         Mailbox $mailbox,
-        $interactive )
+        $interactive,
+        array $options = [] )
     {
         $this->log = $log;
         $this->cli = $cli;
         $this->emitter = $emitter;
         $this->mailbox = $mailbox;
         $this->interactive = $interactive;
+
+        if ( isset( $options[ self::OPT_SKIP_CONTENT ] ) ) {
+            $this->skipContent = $options[ self::OPT_SKIP_CONTENT ];
+        }
     }
 
     /**
@@ -164,7 +172,8 @@ class Messages
             ]);
             $message->setMessageData( $imapMessage, [
                 // This will trim subjects to the max size
-                MessageModel::OPT_TRUNCATE_FIELDS => TRUE
+                MessageModel::OPT_TRUNCATE_FIELDS => TRUE,
+                MessageModel::OPT_SKIP_CONTENT => $this->skipContent
             ]);
         }
         catch ( PDOException $e ) {

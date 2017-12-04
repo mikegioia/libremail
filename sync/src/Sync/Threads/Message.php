@@ -6,8 +6,11 @@ use App\Model\Message as MessageModel;
 
 class Message
 {
-    private $id;
+    // Storage of all SQL IDs with this message ID
+    private $ids = [];
+    // Lowest SQL ID of all messages in the thread
     private $threadId;
+    // Message ID header from the IMAP message
     private $messageId;
     // Indexed by message ID to be used as a set
     private $references = [];
@@ -17,19 +20,23 @@ class Message
     public function __construct( MessageModel $message )
     {
         $this->threadId = NULL;
-        $this->id = $message->id;
+        $this->ids[] = $message->id;
+        $this->messageId = trim( $message->message_id );
 
-        // Store some message ID
-        $messageId = trim( $message->message_id );
-        $this->messageId = $messageId ?: $this->id;
+        // If there's no message ID, then we need to give it one.
+        // Even if it's a random ID we still need it in case this
+        // message connects other messages through its references.
+        if ( ! strlen( $this->messageId ) ) {
+            $this->messageId = "message-{$message->id}";
+        }
 
         // Stores the initial set of message references
         $this->storeReferences( $message );
     }
 
-    public function getId()
+    public function getIds()
     {
-        return $this->id;
+        return $this->ids;
     }
 
     public function getMessageId()
@@ -40,6 +47,13 @@ class Message
     public function getReferences()
     {
         return $this->references;
+    }
+
+    public function getThreadId()
+    {
+        return ( $this->threadId )
+            ? $this->threadId
+            : min( $this->ids );
     }
 
     /**
@@ -69,7 +83,12 @@ class Message
             return TRUE;
         }
 
-        (new MessageModel)->saveThreadId( $this->id, $this->threadId );
+        $messageModel = new MessageModel;
+
+        foreach ( $this->ids as $id ) {
+            $messageModel->saveThreadId( (int) $id, (int) $this->threadId );
+        }
+
         $this->dirty = FALSE;
     }
 
@@ -100,5 +119,16 @@ class Message
         }
 
         $this->references = array_flip( array_unique( $this->references ) );
+    }
+
+    /**
+     * Merge another Message object into this one.
+     * @param Message $message
+     */
+    public function merge( Message $message )
+    {
+        $this->ids = array_unique(
+            array_merge( $this->ids, $message->getIds() ) );
+        $this->references = $this->references + $message->getReferences();
     }
 }

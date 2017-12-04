@@ -8,7 +8,7 @@
  * Pass 2: Run through each message's references and
  *   and compact the union of references on all messages,
  *   along with the lowest numbered internal ID as the
- *   thread ID. 
+ *   thread ID.
  */
 
 namespace App\Sync;
@@ -31,14 +31,14 @@ class Threads
     private $progress;
     private $interactive;
 
-    // Master index of messages and references
-    private $messages = [];
     // Index of the most recent message known
     private $maxId;
     // Total IDs to fetch
     private $totalIds;
     // Current index position in message processing
     private $currentId;
+    // Master index of messages and references
+    private $messages = [];
 
     // How many messages to fetch at once
     const BATCH_SIZE = 1000;
@@ -128,10 +128,10 @@ class Threads
                 $i,
                 $this->maxId,
                 self::BATCH_SIZE );
-            
+
             foreach ( $messages as $message ) {
                 $this->storeMessage( $message );
-                $this->updateProgress( ++$count );
+                $this->updateProgress( ++$count, $this->totalIds );
             }
 
             $this->currentId = $i;
@@ -149,7 +149,15 @@ class Threads
     private function storeMessage( MessageModel $message )
     {
         $threadMessage = new ThreadMessage( $message );
-        $this->messages[ $threadMessage->getMessageId() ] = $threadMessage;
+        $messageId = $threadMessage->getMessageId();
+
+        if ( isset( $this->messages[ $messageId ] ) ) {
+            $existingMessage = $this->messages[ $messageId ];
+            $existingMessage->merge( $threadMessage );
+        }
+        else {
+            $this->messages[ $messageId ] = $threadMessage;
+        }
     }
 
     /**
@@ -183,12 +191,9 @@ class Threads
             }
 
             // Update all processed messages with this set of references
-            foreach ( $processed as $messageId => $index ) {
+            foreach ( $refs as $messageId => $index ) {
                 $message = $this->messages[ $messageId ];
-
-                if ( $message->getId() ) {
-                    $message->setThreadId( $threadId );
-                }
+                $message->setThreadId( $threadId );
             }
         }
     }
@@ -201,7 +206,11 @@ class Threads
      * @param array $processed List of processed message IDs
      * @param int $threadId Final thread ID to set
      */
-    private function updateMessageThread( ThreadMessage $message, &$refs, &$processed, &$threadId )
+    private function updateMessageThread(
+        ThreadMessage $message,
+        array &$refs,
+        array &$processed,
+        &$threadId )
     {
         if ( isset( $this->allProcessed[ $message->getMessageId() ] ) ) {
             return;
@@ -212,9 +221,10 @@ class Threads
         $this->allProcessed[ $message->getMessageId() ] = TRUE;
 
         if ( ! $threadId
-            || ( $message->getId() && $message->getId() < $threadId ) )
+            || ( $message->getThreadId()
+                && $message->getThreadId() < $threadId ) )
         {
-            $threadId = $message->getId();
+            $threadId = $message->getThreadId();
         }
 
         // For each reference, add it's references to our set
@@ -226,7 +236,7 @@ class Threads
                         'id' => NULL,
                         'references' => '',
                         'in_reply_to' => '',
-                        'message_id' => $refId,
+                        'message_id' => $refId
                     ]));
             }
 
@@ -252,7 +262,7 @@ class Threads
 
         foreach ( $this->messages as $message ) {
             $message->save();
-            $this->updateProgress( ++$count );
+            $this->updateProgress( ++$count, $total );
 
             if ( $count % 100 === 0 ) {
                 $this->emitter->emit( Sync::EVENT_CHECK_HALT );
@@ -272,10 +282,10 @@ class Threads
         }
     }
 
-    private function updateProgress( $count )
+    private function updateProgress( $count, $total )
     {
-        if ( $this->interactive && $count <= $this->totalIds ) {
-            $this->progress->current( ( $count / $this->totalIds ) * 100 );
+        if ( $this->interactive && $count <= $total ) {
+            $this->progress->current( ( $count / $total ) * 100 );
         }
     }
 

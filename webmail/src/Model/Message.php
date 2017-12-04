@@ -64,9 +64,9 @@ class Message extends Model
         $threadIds = [];
         $messages = $this->db()
             ->select([
-                'id', '`to`', 'cc', 'bcc', '`from`', '`date`',
+                'id', '`to`', 'cc', '`from`', '`date`',
                 'seen', 'subject', 'flagged', 'thread_id',
-               // 'substring(text_plain, 1, 260) as text_plain'
+                'substring(text_plain, 1, 260) as text_plain'
             ])
             ->from( 'messages' )
             ->where( 'deleted', '=', 0 )
@@ -83,26 +83,64 @@ class Message extends Model
             $threadIds[] = $message->thread_id;
         }
 
-        $threadCounts = $this->db()
-            ->select([ 'thread_id', 'count(1) as thread_count' ])
+        $messageIds = [];
+        $threadMessages = $this->db()
+            ->select([
+                '`from`', 'thread_id', 'message_id', 'subject'
+            ])
             ->from( 'messages' )
             ->where( 'deleted', '=', 0 )
             ->whereIn( 'thread_id', $threadIds )
             ->where( 'account_id', '=', $accountId )
-            ->groupBy( 'thread_id' )
+            ->orderBy( 'date', Model::ASC )
             ->execute()
-            ->fetchAll();
+            ->fetchAll( PDO::FETCH_CLASS );
 
-        foreach ( $threadCounts as $row ) {
-            $threads[ $row[ 'thread_id' ] ] = $row[ 'thread_count' ];
+        foreach ( $threadMessages as $row ) {
+            if ( $row->message_id ) {
+                if ( isset( $messageIds[ $row->message_id ] ) ) {
+                    continue;
+                }
+
+                $messageIds[ $row->message_id ] = TRUE;
+            }
+
+            if ( ! isset( $threads[ $row->thread_id ] ) ) {
+                $threads[ $row->thread_id ] = (object) [
+                    'count' => 0,
+                    'names' => [],
+                    'subject' => $row->subject
+                ];
+            }
+
+            $threads[ $row->thread_id ]->count++;
+            $threads[ $row->thread_id ]->names[] = $this->getName( $row->from );
         }
 
         foreach ( $messages as $message ) {
-            $message->thread_count = ( isset( $threads[ $message->thread_id ] ) )
-                ? $threads[ $message->thread_id ]
-                : 1;
+            $message->names = [];
+            $message->thread_count = 1;
+
+            if ( isset( $threads[ $message->thread_id ] ) ) {
+                $found = $threads[ $message->thread_id ];
+                $message->names = $found->names;
+                $message->subject = $found->subject;
+                $message->thread_count = $found->count;
+            }
         }
 
         return $messages ?: [];
+    }
+
+    private function getName( $from )
+    {
+        $from = trim( $from );
+        $pos = strpos( $from, '<' );
+
+        if ( $pos !== FALSE && $pos > 0 ) {
+            return trim( substr( $from, 0, $pos ) );
+        }
+
+        return trim( $from, '<> ' );
     }
 }

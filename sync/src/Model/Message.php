@@ -51,6 +51,7 @@ class Message extends Model
     private $unserializedAttachments;
 
     // Options
+    const OPT_SKIP_CONTENT = 'skip_content';
     const OPT_TRUNCATE_FIELDS = 'truncate_fields';
 
     // Flags
@@ -432,6 +433,11 @@ class Message extends Model
     {
         if ( Fn\get( $options, self::OPT_TRUNCATE_FIELDS ) === TRUE ) {
             $message->subject = substr( $message->subject, 0, 270 );
+        }
+
+        if ( Fn\get( $options, self::OPT_SKIP_CONTENT ) === TRUE ) {
+            $message->textHtml = NULL;
+            $message->textPlain = NULL;
         }
 
         $this->setData([
