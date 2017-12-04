@@ -58,7 +58,7 @@ if ( ! $account ) {
 // Set up libraries
 $router = new Router;
 $folders = new Folders( $account );
-$messages = new Messages( $account );
+$messages = new Messages( $account, $folders );
 
 // Set up routes
 $router->get( '/', function () use ( $folders, $messages ) {

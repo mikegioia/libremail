@@ -173,7 +173,8 @@ input[type="checkbox"].msg-checkbox {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 18rem;
+    width: 19rem;
+    padding-right: 1rem;
 }
 
 .msg-contents .subject {
@@ -185,7 +186,7 @@ input[type="checkbox"].msg-checkbox {
     text-decoration: none;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: calc(100% - 29.75rem );
+    width: calc(100% - 33.75rem );
 }
 
 .msg-checkbox:checked + .msg-label + .msg-contents .subject {

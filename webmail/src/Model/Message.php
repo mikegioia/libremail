@@ -86,7 +86,8 @@ class Message extends Model
         $messageIds = [];
         $threadMessages = $this->db()
             ->select([
-                '`from`', 'thread_id', 'message_id', 'subject'
+                '`from`', 'thread_id', 'message_id',
+                'folder_id', 'subject'
             ])
             ->from( 'messages' )
             ->where( 'deleted', '=', 0 )
@@ -109,22 +110,26 @@ class Message extends Model
                 $threads[ $row->thread_id ] = (object) [
                     'count' => 0,
                     'names' => [],
+                    'folders' => [],
                     'subject' => $row->subject
                 ];
             }
 
             $threads[ $row->thread_id ]->count++;
+            $threads[ $row->thread_id ]->folders[] = (int) $row->folder_id;
             $threads[ $row->thread_id ]->names[] = $this->getName( $row->from );
         }
 
         foreach ( $messages as $message ) {
             $message->names = [];
+            $message->folders = [];
             $message->thread_count = 1;
 
             if ( isset( $threads[ $message->thread_id ] ) ) {
                 $found = $threads[ $message->thread_id ];
                 $message->names = $found->names;
                 $message->subject = $found->subject;
+                $message->folders = $found->folders;
                 $message->thread_count = $found->count;
             }
         }
