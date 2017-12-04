@@ -41,6 +41,8 @@ class Message extends Model
 
     private $unserializedAttachments;
 
+    const MAX_LIMIT = 2000;
+
     public function getAttachments()
     {
         if ( ! is_null( $this->unserializedAttachments ) ) {
@@ -50,6 +52,34 @@ class Message extends Model
         $this->unserializedAttachments = @unserialize( $this->attachments );
 
         return $this->unserializedAttachments;
+    }
+
+    public function getThreadCountsByFolder( $accountId, $folderId )
+    {
+        $counts = (object) [
+            'flagged' => 0,
+            'unflagged' => 0
+        ];
+        $results = $this->db()
+            ->select([ 'thread_id', 'flagged' ])
+            ->from( 'messages' )
+            ->where( 'deleted', '=', 0 )
+            ->where( 'folder_id', '=', $folderId )
+            ->where( 'account_id', '=', $accountId )
+            ->groupBy( 'thread_id' )
+            ->execute()
+            ->fetchAll( PDO::FETCH_CLASS );
+
+        foreach ( $results as $result ) {
+            if ( $result->flagged == 1 ) {
+                $counts->flagged++;
+            }
+            else {
+                $counts->unflagged++;
+            }
+        }
+
+        return $counts;
     }
 
     /**
@@ -74,6 +104,7 @@ class Message extends Model
             ->where( 'account_id', '=', $accountId )
             ->groupBy( 'thread_id' )
             ->orderBy( 'date', Model::DESC )
+            ->limit( self::MAX_LIMIT )
             ->execute()
             ->fetchAll( PDO::FETCH_CLASS, get_class() );
 

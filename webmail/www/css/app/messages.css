@@ -18,7 +18,7 @@ section #msg-list {
 
 section #msg-list h5 {
     font-size: 1.75rem;
-    margin: 0.5rem 1rem 0.5rem 0;
+    margin: 0.75rem 1rem 0.5rem 0;
 }
 
 section #msg-list h5 ~ h5 {
@@ -50,6 +50,19 @@ section #msg-list h5 .fa-caret-right {
 
 section #msg-list h5 span {
     margin-left: 0.5rem;
+}
+
+section #msg-list h5 strong {
+    float: right;
+    font-size: 1.3rem;
+    position: relative;
+    top: 0.5rem;
+    padding-right: 0.8rem;
+}
+
+section #msg-list h5 em {
+    font-weight: normal;
+    font-style: normal;
 }
 
 section #msg-list .mailbox-checkbox:checked + h5 {
@@ -162,7 +175,7 @@ input[type="checkbox"].msg-checkbox {
     color: #d6a70e;
     float: left;
     line-height: 3rem;
-    padding-right: 0.25rem;
+    padding-right: 0.2rem;
     text-align: center;
     width: 3rem;
 }
@@ -186,7 +199,7 @@ input[type="checkbox"].msg-checkbox {
     text-decoration: none;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: calc(100% - 33.75rem );
+    width: calc(100% - 33rem);
 }
 
 .msg-checkbox:checked + .msg-label + .msg-contents .subject {

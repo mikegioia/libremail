@@ -31,16 +31,20 @@ class Messages
      * Load the threads for a folder. Returns two arrays, a starred
      * (or flagged) collection, and non-starred.
      * @param int $folderId
+     * @param int $page
      * @param int $limit
-     * @param int $offset
-     * @return [ array, array ] Messages
+     * @return [ array, array, array ] Messages, Messages, ints
      */
-    public function getThreads( $folderId, $limit = 50, $offset = 0 )
+    public function getThreads( $folderId, $page = 1, $limit = 50 )
     {
         $flagged = [];
         $unflagged = [];
+        $messageModel = new Message;
         $escaper = new Escaper( self::UTF8 );
-        $messages = (new Message)->getThreadsByFolder(
+        $messages = $messageModel->getThreadsByFolder(
+            $this->accountId,
+            $folderId );
+        $messageCounts = $messageModel->getThreadCountsByFolder(
             $this->accountId,
             $folderId );
 
@@ -58,7 +62,10 @@ class Messages
             }
         }
 
-        return [ $flagged, $unflagged ];
+        // @TODO slice the flagged/unflagged arrays by page
+        $counts = $this->buildCounts( $messageCounts, $page, $limit );
+
+        return [ $flagged, $unflagged, $counts ];
     }
 
     /**
@@ -146,5 +153,27 @@ class Messages
     private function setFolders( Message &$message )
     {
 
+    }
+
+    private function buildCounts( $counts, $page, $limit )
+    {
+        $start = $page + (($page - 1) * $limit);
+
+        return (object) [
+            'flagged' => (object) [
+                'start' => $start,
+                'total' => $counts->flagged,
+                'end' => ( $counts->flagged < $limit )
+                    ? $counts->flagged
+                    : $limit
+            ],
+            'unflagged' => (object) [
+                'start' => $start,
+                'total' => $counts->unflagged,
+                'end' => ( $counts->unflagged < $limit )
+                    ? $counts->unflagged
+                    : $limit
+            ]
+        ];
     }
 }

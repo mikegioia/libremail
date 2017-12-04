@@ -16,6 +16,7 @@ section#main {
     position: fixed;
     right: 0;
     top: 5rem;
+    z-index: 2;
 }
 
 a:hover,
