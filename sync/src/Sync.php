@@ -525,7 +525,11 @@ class Sync
         $this->log->debug( "Syncing IMAP folders for {$account->email}" );
 
         try {
-            $folderSync = new FolderSync( $this->log, $this->cli, $this->emitter );
+            $folderSync = new FolderSync(
+                $this->log,
+                $this->cli,
+                $this->emitter,
+                $this->interactive );
             $folderList = $this->mailbox->getFolders();
             $savedFolders = (new FolderModel)->getByAccount( $account->getId() );
             $folderSync->run( $folderList, $savedFolders, $account );

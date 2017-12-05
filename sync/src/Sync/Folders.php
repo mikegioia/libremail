@@ -19,16 +19,20 @@ class Folders
     private $log;
     private $cli;
     private $emitter;
+    private $interactive;
 
     /**
      * @param Logger $log
      * @param CLImate $cli
+     * @param Emitter $emitter
+     * @param bool $interactive
      */
-    public function __construct( Logger $log, CLImate $cli, Emitter $emitter )
+    public function __construct( Logger $log, CLImate $cli, Emitter $emitter, $interactive )
     {
         $this->log = $log;
         $this->cli = $cli;
         $this->emitter = $emitter;
+        $this->interactive = $interactive;
     }
 
     /**
