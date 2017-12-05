@@ -401,14 +401,17 @@ class Diagnostics
      * @param Container $di Dependency container
      * @param PDOException $e The recently thrown exception
      * @param bool $forwardException On failed re-connect, forward the
-     *   termination exception.
+     *   termination exception
+     * @param int $sleepSeconds Number of seconds to halt before
+     *   creating the new database connection
      * @throws TerminateException If re-connect fails and the flag
      *   $forwardException is true.
      */
     static public function checkDatabaseException(
-        Container $di,
+        Container &$di,
         PDOException $e,
-        $forwardException = FALSE )
+        $forwardException = FALSE,
+        $sleepSeconds = NULL )
     {
         $messages = [
             'Lost connection',
@@ -437,12 +440,21 @@ class Diagnostics
             throw new TerminateException(
                 "System encountered an un-recoverable database error. ".
                 "Going to halt now, please see the log file for info." );
-            return FALSE;
-         }
- 
+        }
+        else {
+            $di[ 'log' ]->getLogger()->addDebug(
+                "Database connection lost: ". $e->getMessage() );
+        }
+
         // This should drop the DB connection
         $di[ 'db' ] = NULL;
- 
+
+        if ( is_numeric( $sleepSeconds ) ) {
+            $di[ 'log' ]->getLogger()->addDebug(
+                "Sleeping $sleepSeconds before attempting to re-connect." );
+            sleep( $sleepSeconds );
+        }
+
         try {
             // Create a new database connection. This will throw a
             // TerminateException on failure to connect.

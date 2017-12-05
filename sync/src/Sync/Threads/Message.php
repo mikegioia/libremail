@@ -19,8 +19,8 @@ class Message
 
     public function __construct( MessageModel $message )
     {
-        $this->threadId = NULL;
         $this->ids[] = $message->id;
+        $this->threadId = $message->thread_id;
         $this->messageId = trim( $message->message_id );
 
         // If there's no message ID, then we need to give it one.

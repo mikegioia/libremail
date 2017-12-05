@@ -8,21 +8,22 @@
  * from the CLI or managed via a supervisor. It works by checking
  * a list of saved IMAP credentials and runs through a flow of tasks.
  */
-use App\Log
-  , App\Sync
-  , App\Model
-  , App\Stats
-  , App\Message
-  , App\Startup
-  , App\Constants
-  , App\Diagnostics
-  , Pimple\Container
-  , Slim\PDO\Database
-  , Exception as Exception
-  , App\Console\SyncConsole
-  , PDOException as PDOException
-  , App\Exceptions\Stop as StopException
-  , App\Exceptions\Terminate as TerminateException;
+use App\Log;
+use App\Sync;
+use App\Model;
+use App\Stats;
+use App\Message;
+use App\Startup;
+use App\Constants;
+use App\Diagnostics;
+use Pimple\Container;
+use Slim\PDO\Database;
+use Exception as Exception;
+use App\Console\SyncConsole;
+use PDOException as PDOException;
+use App\Sync\Threads as ThreadSync;
+use App\Exceptions\Stop as StopException;
+use App\Exceptions\Terminate as TerminateException;
 
 // Set up paths and constants
 set_time_limit( 0 );
@@ -74,16 +75,24 @@ $di[ 'stats' ] = function ( $c ) {
 
 // Logging service
 $di[ 'log' ] = function ( $c ) {
-    $interactive = ( $c[ 'console' ]->interactive === TRUE );
-
     return new Log(
         $c[ 'cli' ],
         $c[ 'config' ][ 'log' ],
-        $interactive );
+        $c[ 'console' ]->interactive === TRUE );
 };
 
 // Initialize the error and exception handlers
 $di[ 'log' ]->init();
+
+// Store a static reference to the threading system. This should be
+// saved in the container because the threading operation needs to
+// query and organize a large amount of data during the first pass.
+$di[ 'threader' ] = function ( $c ) {
+    return new ThreadSync(
+        $c[ 'log' ]->getLogger(),
+        $c[ 'cli' ],
+        $c[ 'console' ]->interactive === TRUE );
+};
 
 // Set up the signal handler to shutdown
 $HALT = function ( $signo ) use ( $di ) {
@@ -199,8 +208,8 @@ try {
 // try to reconnect. Otherwise terminate.
 catch ( PDOException $e ) {
     $di[ 'sync' ] = NULL;
-    Diagnostics::checkDatabaseException( $di, $e, TRUE );
-    sleep( $config[ 'app' ][ 'db' ][ 'sleep_minutes' ] * 60 );
+    $sec = $config[ 'app' ][ 'db' ][ 'sleep_minutes' ] * 60;
+    Diagnostics::checkDatabaseException( $di, $e, TRUE, $sec );
     goto runSyncLoop;
 }
 // Stop the current sync and re-run it

@@ -18,7 +18,6 @@ use Pimple\Container;
 use League\CLImate\CLImate;
 use App\Message\NoAccountsMessage;
 use App\Sync\Folders as FolderSync;
-use App\Sync\Threads as ThreadSync;
 use App\Message\NotificationMessage;
 use App\Model\Folder as FolderModel;
 use App\Sync\Messages as MessageSync;
@@ -50,6 +49,7 @@ class Sync
     private $running;
     private $mailbox;
     private $retries;
+    private $emitter;
     private $threader;
     private $threading;
     private $interactive;
@@ -87,6 +87,7 @@ class Sync
             $this->cli = $di[ 'cli' ];
             $this->stats = $di[ 'stats' ];
             $this->config = $di[ 'config' ];
+            $this->threader = $di[ 'threader' ];
             $this->log = $di[ 'log' ]->getLogger();
             $this->quick = $di[ 'console' ]->quick;
             $this->sleep = $di[ 'console' ]->sleep;
@@ -216,8 +217,6 @@ class Sync
             throw new Exception( "Halting script" );
         }
 
-        $this->setupEmitter();
-
         // Loop through the active accounts and perform the sync
         // sequentially. The IMAP methods throw exceptions so want
         // to wrap this is a try/catch block.
@@ -252,6 +251,8 @@ class Sync
 
             return FALSE;
         }
+
+        $this->setupEmitter();
 
         // If we're running in threading mode, just update threads
         if ( $this->threading === TRUE ) {
@@ -484,6 +485,10 @@ class Sync
      */
     private function setupEmitter()
     {
+        if ( $this->emitter ) {
+            return;
+        }
+
         $this->emitter = new Emitter;
 
         $this->emitter->on( self::EVENT_CHECK_HALT, function () {
@@ -589,15 +594,7 @@ class Sync
      */
     private function updateThreads( AccountModel $account )
     {
-        if ( ! $this->threader ) {
-            $this->threader = new ThreadSync(
-                $this->log,
-                $this->cli,
-                $this->emitter,
-                $this->interactive );
-        }
-
-        $this->threader->run( $account );
+        $this->threader->run( $account, $this->emitter );
     }
 
     /**

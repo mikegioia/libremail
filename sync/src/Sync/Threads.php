@@ -46,18 +46,12 @@ class Threads
     /**
      * @param Logger $log
      * @param CLImate $cli
-     * @param Emitter $emitter
      * @param bool $interactive
      */
-    public function __construct(
-        Logger $log,
-        CLImate $cli,
-        Emitter $emitter,
-        $interactive )
+    public function __construct( Logger $log, CLImate $cli, $interactive )
     {
         $this->log = $log;
         $this->cli = $cli;
-        $this->emitter = $emitter;
         $this->interactive = $interactive;
     }
 
@@ -67,8 +61,9 @@ class Threads
      * either be set up to handle multiple accounts, or the sync script
      * should not run for multiple accounts on the same process.
      * @param AccountModel $account
+     * @param Emitter $emitter
      */
-    public function run( AccountModel $account )
+    public function run( AccountModel $account, Emitter $emitter )
     {
         if ( ! $this->account || $account->id !== $this->account->id ) {
             $this->maxId = NULL;
@@ -79,6 +74,7 @@ class Threads
             $this->account = $account;
         }
 
+        $this->emitter = $emitter;
         $this->storeMaxMessageId();
         $this->storeTotalMessageIds();
 
@@ -116,11 +112,12 @@ class Threads
     {
         $count = 0;
         $i = $this->currentId;
+        $total = $this->maxId - $i;
         $messageModel = new MessageModel;
         $this->log->debug(
             "Storing messages for threading for {$this->account->email}" );
         $this->printMemory();
-        $this->startProgress( 1, $this->totalIds );
+        $this->startProgress( 1, $total );
 
         for ( $i; $i < $this->maxId; $i += self::BATCH_SIZE ) {
             $messages = $messageModel->getRangeForThreading(
@@ -131,7 +128,7 @@ class Threads
 
             foreach ( $messages as $message ) {
                 $this->storeMessage( $message );
-                $this->updateProgress( ++$count, $this->totalIds );
+                $this->updateProgress( ++$count, $total );
             }
 
             $this->currentId = $i;
@@ -235,6 +232,7 @@ class Threads
                     new MessageModel([
                         'id' => NULL,
                         'references' => '',
+                        'thread_id' => NULL,
                         'in_reply_to' => '',
                         'message_id' => $refId
                     ]));
