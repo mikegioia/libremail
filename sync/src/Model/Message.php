@@ -2,19 +2,19 @@
 
 namespace App\Model;
 
-use Fn
-  , PDO
-  , DateTime
-  , App\Model
-  , Belt\Belt
-  , PDOException
-  , ForceUTF8\Encoding
-  , Particle\Validator\Validator
-  , Pb\Imap\Message as ImapMessage
-  , App\Traits\Model as ModelTrait
-  , App\Exceptions\Validation as ValidationException
-  , App\Exceptions\DatabaseUpdate as DatabaseUpdateException
-  , App\Exceptions\DatabaseInsert as DatabaseInsertException;
+use Fn;
+use PDO;
+use DateTime;
+use App\Model;
+use Belt\Belt;
+use PDOException;
+use ForceUTF8\Encoding;
+use Particle\Validator\Validator;
+use Pb\Imap\Message as ImapMessage;
+use App\Traits\Model as ModelTrait;
+use App\Exceptions\Validation as ValidationException;
+use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
+use App\Exceptions\DatabaseInsert as DatabaseInsertException;
 
 class Message extends Model
 {
@@ -51,7 +51,12 @@ class Message extends Model
     private $unserializedAttachments;
 
     // Options
+    const OPT_SKIP_CONTENT = 'skip_content';
     const OPT_TRUNCATE_FIELDS = 'truncate_fields';
+
+    // Flags
+    const FLAG_SEEN = 'seen';
+    const FLAG_FLAGGED = 'flagged';
 
     use ModelTrait;
 
@@ -137,6 +142,48 @@ class Message extends Model
     }
 
     /**
+     * Fetches a range of messages for an account. Used during the
+     * threading computation.
+     * @param int $accountId
+     * @param int $minId
+     * @param int $maxId
+     * @param int $limit
+     * @return array Messages
+     */
+    public function getRangeForThreading( $accountId, $minId, $maxId, $limit )
+    {
+        return $this->db()
+            ->select([
+                'id', 'thread_id', 'message_id',
+                'in_reply_to', '`references`'
+            ])
+            ->from( 'messages' )
+            ->where( 'id', '>=', $minId )
+            ->where( 'id', '<=', $maxId )
+            ->where( 'account_id', '=', $accountId )
+            ->limit( $limit )
+            ->execute()
+            ->fetchAll( PDO::FETCH_CLASS, $this->getClass() );
+    }
+
+    /**
+     * Finds the highest ID for an account.
+     * @param int $accountId
+     * @return int
+     */
+    public function getMaxMessageId( $accountId )
+    {
+        $row = $this->db()
+            ->select([ 'max(id) as max' ])
+            ->from( 'messages' )
+            ->where( 'account_id', '=', $accountId )
+            ->execute()
+            ->fetch();
+
+        return $row ? $row[ 'max' ] : 0;
+    }
+
+    /**
      * Returns a list of integer unique IDs given an account ID
      * and a folder ID to search. This fetches IDs in pages to
      * not exceed any memory limits on the query response.
@@ -165,6 +212,26 @@ class Message extends Model
     }
 
     /**
+     * Returns a count of unique IDs for an account.
+     * @param int $accountId
+     * @return int
+     */
+    public function countByAccount( $accountId )
+    {
+        $this->requireInt( $accountId, "Account ID" );
+        $messages = $this->db()
+            ->select()
+            ->clear()
+            ->count( 1, 'count' )
+            ->from( 'messages' )
+            ->where( 'account_id', '=', $accountId )
+            ->execute()
+            ->fetch();
+
+        return ( $messages ) ? $messages[ 'count' ] : 0;
+    }
+
+    /**
      * Returns a count of unique IDs for a folder.
      * @param int $accountId
      * @param int $folderId
@@ -190,194 +257,13 @@ class Message extends Model
     }
 
     /**
-     * Returns message IDs for the thread ID computation.
-     * @param int $accountId
-     * @param int $folderId
-     * @return array of ints
-     */
-    public function getIdsForThreadingByFolder( $accountId, $folderId )
-    {
-        $ids = [];
-        $limit = 10000;
-        $count = $this->countIdsForThreadingByFolder( $accountId, $folderId );
-
-        for ( $offset = 0; $offset < $count; $offset += $limit ) {
-            $ids = array_merge(
-                $ids,
-                $this->getPagedIdsForThreadingByFolder(
-                    $accountId,
-                    $folderId,
-                    $offset,
-                    $limit
-                ));
-        }
-
-        return $ids;
-    }
-
-    /**
-     * Returns a count of messages without a thread ID for a
-     * given folder and account ID.
-     * @param int $accountId
-     * @param int $folderId
-     * @return int
-     */
-    public function countIdsForThreadingByFolder( $accountId, $folderId )
-    {
-        $this->requireInt( $folderId, "Folder ID" );
-        $this->requireInt( $accountId, "Account ID" );
-        $messages = $this->db()
-            ->select()
-            ->clear()
-            ->count( 1, 'count' )
-            ->from( 'messages' )
-            ->where( 'folder_id', '=', $folderId )
-            ->where( 'account_id', '=', $accountId )
-            ->whereNull( 'thread_id' )
-            ->execute()
-            ->fetch();
-
-        return ( $messages ) ? $messages[ 'count' ] : 0;
-    }
-
-    /**
-     * Adds a thread ID to the message. Searches forward and back looking
-     * for any thread ID that is saved on any message. If found, update
-     * this message with that thread ID.
-     */
-    public function updateThreadId()
-    {
-        if ( $this->thread_id ) {
-            return;
-        }
-
-        // This will store all messages found in the chain. Everything in
-        // here will get the best thread ID found.
-        $ids = [ $this->id ];
-        // Where the Message ID is this Reply-To
-        $pastThreadId = $this->findPastThreadId( $this->in_reply_to, $ids );
-        $futureThreadId = $this->findFutureThreadId( $this->message_id, $ids );
-        $threadId = ( $pastThreadId ) ?: $futureThreadId;
-
-        if ( ! $threadId ) {
-            $threadId = $this->id;
-        }
-
-        $this->saveThreadId( $threadId, $ids );
-    }
-
-    /**
-     * Finds the message by using the Reply-To address from a message.
-     * Looks up by Message ID, and teturns a thread ID if it finds one.
-     * If not, it recursives through the history until the end.
-     * @param string $inReplyTo
-     * @param array $ids Reference to all message IDs found
-     * @param array $loopIds Reference list to prevent infinite loops
-     * @return int | NULL
-     */
-    private function findPastThreadId( $inReplyTo, &$ids, &$loopIds = [] )
-    {
-        if ( ! $inReplyTo || in_array( $inReplyTo, $loopIds ) ) {
-            return NULL;
-        }
-
-        $messages = $this->db()
-            ->select()
-            ->from( 'messages' )
-            ->where( 'message_id', '=', $inReplyTo )
-            ->execute()
-            ->fetchAll( PDO::FETCH_CLASS, $this->getClass() );
-
-        if ( ! $messages ) {
-            return NULL;
-        }
-
-        $loopIds[] = $inReplyTo;
-
-        foreach ( $messages as $message ) {
-            $ids[] = $message->id;
-        }
-
-        foreach ( $messages as $message ) {
-            if ( $message->thread_id ) {
-                return $message->thread_id;
-            }
-
-            if ( $message->in_reply_to ) {
-                $threadId = $this->findPastThreadId(
-                    $message->in_reply_to,
-                    $ids,
-                    $loopIds );
-
-                if ( $threadId ) {
-                    return $threadId;
-                }
-            }
-        }
-
-        return NULL;
-    }
-
-    /**
-     * Finds the message by using the Message-ID from a message.
-     * Looks up by InReplyTo, and teturns a thread ID if it finds one.
-     * If not, it recursives through the future until the end.
-     * @param string $messageId
-     * @param array $ids Reference to all message IDs found
-     * @param array $loopIds Reference list to prevent infinite loops
-     * @return int | null
-     */
-    private function findFutureThreadId( $messageId, &$ids, &$loopIds = [] )
-    {
-        if ( ! $messageId || in_array( $messageId, $loopIds ) ) {
-            return;
-        }
-
-        $messages = $this->db()
-            ->select()
-            ->from( 'messages' )
-            ->where( 'in_reply_to', '=', $messageId )
-            ->execute()
-            ->fetchAll( PDO::FETCH_CLASS, $this->getClass() );
-
-        if ( ! $messages ) {
-            return NULL;
-        }
-
-        $loopIds[] = $messageId;
-
-        foreach ( $messages as $message ) {
-            $ids[] = $message->id;
-        }
-
-        foreach ( $messages as $message ) {
-            if ( $message->thread_id ) {
-                return $message->thread_id;
-            }
-
-            if ( $message->message_id ) {
-                $threadId = $this->findFutureThreadId(
-                    $message->message_id,
-                    $ids,
-                    $loopIds );
-
-                if ( $threadId ) {
-                    return $threadId;
-                }
-            }
-        }
-
-        return NULL;
-    }
-
-    /**
      * This method is called by getSyncedIdsByFolder to return a
      * page of results.
      * @param int $accountId
      * @param int $folderId
      * @param int $offset
      * @param int $limit
-     * @return array
+     * @return array of ints
      */
     private function getPagedSyncedIdsByFolder( $accountId, $folderId, $offset = 0, $limit = 100 )
     {
@@ -401,41 +287,6 @@ class Message extends Model
 
         foreach ( $messages as $message ) {
             $ids[] = $message[ 'unique_id' ];
-        }
-
-        return $ids;
-    }
-
-    /**
-     * This method is called by getIdsForThreadingByFolder to return a
-     * page of results.
-     * @param int $accountId
-     * @param int $folderId
-     * @param int $offset
-     * @param int $limit
-     * @return array of ints
-     */
-    private function getPagedIdsForThreadingByFolder( $accountId, $folderId, $offset = 0, $limit = 100 )
-    {
-        $ids = [];
-        $this->requireInt( $folderId, "Folder ID" );
-        $this->requireInt( $accountId, "Account ID" );
-        $messages = $this->db()
-            ->select([ 'id' ])
-            ->from( 'messages' )
-            ->where( 'folder_id', '=', $folderId )
-            ->where( 'account_id', '=', $accountId )
-            ->whereNull( 'thread_id' )
-            ->limit( $limit, $offset )
-            ->execute()
-            ->fetchAll();
-
-        if ( ! $messages ) {
-            return $ids;
-        }
-
-        foreach ( $messages as $message ) {
-            $ids[] = $message[ 'id' ];
         }
 
         return $ids;
@@ -584,6 +435,11 @@ class Message extends Model
             $message->subject = substr( $message->subject, 0, 270 );
         }
 
+        if ( Fn\get( $options, self::OPT_SKIP_CONTENT ) === TRUE ) {
+            $message->textHtml = NULL;
+            $message->textPlain = NULL;
+        }
+
         $this->setData([
             'size' => $message->size,
             'date' => $message->date,
@@ -619,6 +475,9 @@ class Message extends Model
      * Takes in an array of message unique IDs and marks them all as
      * deleted in the database.
      * @param array $uniqueIds
+     * @param int $accountId
+     * @param int $folderId
+     * @throws DatabaseUpdateException
      */
     public function markDeleted( $uniqueIds, $accountId, $folderId )
     {
@@ -644,18 +503,68 @@ class Message extends Model
     }
 
     /**
+     * Takes in an array of message unique IDs and sets a flag to on.
+     * @param array $uniqueIds
+     * @param int $accountId
+     * @param int $folderId
+     * @param string $flag
+     * @param bool $state On or off
+     * @param bool $inverse If set, do where not in $uniqueIds query
+     */
+    public function markFlag( $uniqueIds, $accountId, $folderId, $flag, $state = TRUE, $inverse = FALSE )
+    {
+        if ( $inverse === FALSE
+            && ( ! is_array( $uniqueIds ) || ! count( $uniqueIds ) ) )
+        {
+            return;
+        }
+
+        $this->isValidFlag( $state, "State" );
+        $this->requireInt( $folderId, "Folder ID" );
+        $this->requireInt( $accountId, "Account ID" );
+        $this->requireValue( $flag, [
+            self::FLAG_SEEN, self::FLAG_FLAGGED
+        ]);
+        $query = $this->db()
+            ->update([ $flag => $state ? 1 : 0 ])
+            ->table( 'messages' )
+            ->where( $flag, '=', $state ? 0 : 1 )
+            ->where( 'folder_id', '=', $folderId )
+            ->where( 'account_id', '=', $accountId );
+
+        if ( $inverse === TRUE ) {
+            if ( count( $uniqueIds ) ) {
+                $query->whereNotIn( 'unique_id', $uniqueIds );
+            }
+        }
+        else {
+            $query->whereIn( 'unique_id', $uniqueIds );
+        }
+
+        $updated = $query->execute();
+
+        if ( ! Belt::isNumber( $updated ) ) {
+            throw new DatabaseUpdateException(
+                MESSAGE,
+                $this->getError() );
+        }
+
+        return $updated;
+    }
+
+    /**
      * Saves a thread ID for the given messages.
      * @param int $id
      * @param int $threadId
      */
-    public function saveThreadId( $threadId, $messageIds )
+    public function saveThreadId( $id, $threadId )
     {
+        $this->requireInt( $id, "Message ID" );
         $this->requireInt( $threadId, "Thread ID" );
-        $this->requireInt( $this->id, "Message ID" );
         $updated = $this->db()
             ->update([ 'thread_id' => $threadId ])
             ->table( 'messages' )
-            ->whereIn( 'id', $messageIds )
+            ->where( 'id', '=', $id )
             ->execute();
 
         if ( ! Belt::isNumber( $updated ) ) {

@@ -1,7 +1,7 @@
 /**
  * Dropdowns
  *
- * z-index range: 10-20
+ * z-index range: 21-25
  */
 .dropdown {
     position: relative;
@@ -23,7 +23,7 @@
     padding: 0.25rem 0;
     position: absolute;
     top: calc(3.5rem - 1px);
-    z-index: 10;
+    z-index: 21;
 }
 
 .dropdown ul.right-menu {
@@ -47,7 +47,7 @@
     border-bottom: none;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
-    z-index: 11;
+    z-index: 22;
 }
 
 .dropdown > a:focus + ul,
@@ -94,9 +94,10 @@
 .dropdown li.notice {
     border-top: 1px solid #ddd;
     color: #999;
-    line-height: 2rem;
+    line-height: 1.6rem;
     margin-top: 0.25rem;
     padding: 0.66rem 1rem;
+    font-size: 1.2rem;
 }
 
 .dropdown li .left-icon {

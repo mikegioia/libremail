@@ -11,12 +11,17 @@ echo $render( 'nav', [
         echo $render( 'messages/actions' ); ?>
 
         <section id="msg-list" class="no-select">
-            <?php
+        <?php
+        if ( $flagged ):
             echo $render( 'messages/starred', [
-                'starred' => $starred
+                'starred' => $flagged,
+                'counts' => $counts->flagged
             ]);
+        endif;
+
             echo $render( 'messages/everything', [
-                'messages' => $messages
+                'messages' => $unflagged,
+                'counts' => $counts->unflagged
             ]);
             echo $render( 'messages/footer' ); ?>
         </section>

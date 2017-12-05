@@ -2,12 +2,14 @@
 
 namespace App;
 
+use App\Folders;
 use App\Model\Account;
 use App\Model\Message;
 use Zend\Escaper\Escaper;
 
 class Messages
 {
+    private $folders;
     private $accountId;
 
     const UTF8 = 'utf-8';
@@ -17,9 +19,11 @@ class Messages
 
     /**
      * @param Account $account
+     * @param Folders $folders
      */
-    public function __construct( Account $account )
+    public function __construct( Account $account, Folders $folders )
     {
+        $this->folders = $folders;
         $this->accountId = $account->id;
     }
 
@@ -27,20 +31,25 @@ class Messages
      * Load the threads for a folder. Returns two arrays, a starred
      * (or flagged) collection, and non-starred.
      * @param int $folderId
+     * @param int $page
      * @param int $limit
-     * @param int $offset
-     * @return [ array, array ] Messages
+     * @return [ array, array, array ] Messages, Messages, ints
      */
-    public function getThreads( $folderId, $limit = 50, $offset = 0 )
+    public function getThreads( $folderId, $page = 1, $limit = 50 )
     {
         $flagged = [];
         $unflagged = [];
+        $messageModel = new Message;
         $escaper = new Escaper( self::UTF8 );
-        $messages = (new Message)->getThreadsByFolder(
+        $messages = $messageModel->getThreadsByFolder(
+            $this->accountId,
+            $folderId );
+        $messageCounts = $messageModel->getThreadCountsByFolder(
             $this->accountId,
             $folderId );
 
         foreach ( $messages as $message ) {
+            $this->setFolders( $message );
             $this->setNameList( $message );
             $this->setDisplayDate( $message );
             $this->setSnippet( $message, $escaper );
@@ -53,7 +62,10 @@ class Messages
             }
         }
 
-        return [ $flagged, $unflagged ];
+        // @TODO slice the flagged/unflagged arrays by page
+        $counts = $this->buildCounts( $messageCounts, $page, $limit );
+
+        return [ $flagged, $unflagged, $counts ];
     }
 
     /**
@@ -77,11 +89,43 @@ class Messages
      */
     private function setNameList( Message &$message )
     {
-        $message->names = $message->from;
+        $count = count( $message->names );
+        $unique = array_values( array_unique( $message->names ) );
+        $uniqueCount = count( $unique );
+
+        if ( $uniqueCount === 1 ) {
+            $message->names = trim( $unique[ 0 ], '"' );
+        }
+        elseif ( $uniqueCount ) {
+            $message->names = $this->getNames( $unique, $uniqueCount );
+        }
+        else {
+            $message->names = trim( $message->from );
+        }
 
         if ( $message->thread_count > 1 ) {
-            $message->names .= "(". $message->thread_count .")";
+            $message->names .= " (". $message->thread_count .")";
         }
+    }
+
+    /**
+     * Prepare the name strings for the message.
+     * @param array $list List of all names on the message
+     * @param int $count Number of unique names in the set
+     * @return string
+     */
+    private function getNames( $list, $count )
+    {
+        $firstName = current( explode( " ", current( $list ) ) );
+        $lastName = current( explode( " ", end( $list ) ) );
+        $firstName = trim( $firstName, '"' );
+        $lastName = trim( $lastName, '"' );
+
+        if ( $count === 2 ) {
+            return sprintf( "%s, %s", $firstName, $lastName );
+        }
+
+        return sprintf( "%s .. %s", $firstName, $lastName );
     }
 
     /**
@@ -100,5 +144,36 @@ class Messages
         else {
             $message->display_date = date( self::DATE_SHORT, $messageTime );
         }
+    }
+
+    /**
+     * Prepare the folder labels for the message.
+     * @param Message $message
+     */
+    private function setFolders( Message &$message )
+    {
+
+    }
+
+    private function buildCounts( $counts, $page, $limit )
+    {
+        $start = $page + (($page - 1) * $limit);
+
+        return (object) [
+            'flagged' => (object) [
+                'start' => $start,
+                'total' => $counts->flagged,
+                'end' => ( $counts->flagged < $limit )
+                    ? $counts->flagged
+                    : $limit
+            ],
+            'unflagged' => (object) [
+                'start' => $start,
+                'total' => $counts->unflagged,
+                'end' => ( $counts->unflagged < $limit )
+                    ? $counts->unflagged
+                    : $limit
+            ]
+        ];
     }
 }

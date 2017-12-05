@@ -15,12 +15,14 @@ class SyncConsole extends Console
 
     // Command line arguments
     public $help;
+    public $quick;
     public $sleep;
     public $create;
     public $folder;
     public $daemon;
     public $verbose;
     public $updatedb;
+    public $threading;
     public $background;
     public $diagnostics;
     public $interactive;
@@ -81,10 +83,22 @@ class SyncConsole extends Console
                 'defaultValue' => TRUE,
                 'noValue' => TRUE
             ],
+            'quick' => [
+                'prefix' => 'q',
+                'longPrefix' => 'quick',
+                'description' => 'Skips downloading attachments and message content',
+                'noValue' => TRUE
+            ],
             'sleep' => [
                 'prefix' => 's',
                 'longPrefix' => 'sleep',
                 'description' => 'Runs with sync disabled; useful for signal testing',
+                'noValue' => TRUE
+            ],
+            'threading' => [
+                'prefix' => 't',
+                'longPrefix' => 'threading',
+                'description' => 'Runs only the threading operation, sync is disabled',
                 'noValue' => TRUE
             ],
             'updatedb' => [
@@ -103,12 +117,14 @@ class SyncConsole extends Console
     {
         $this->cli->arguments->parse();
         $this->help = $this->cli->arguments->get( 'help' );
+        $this->quick = $this->cli->arguments->get( 'quick' );
         $this->sleep = $this->cli->arguments->get( 'sleep' );
         $this->create = $this->cli->arguments->get( 'create' );
         $this->folder = $this->cli->arguments->get( 'folder' );
         $this->daemon = $this->cli->arguments->get( 'daemon' );
         $this->verbose = $this->cli->arguments->get( 'verbose' );
         $this->updatedb = $this->cli->arguments->get( 'updatedb' );
+        $this->threading = $this->cli->arguments->get( 'threading' );
         $this->background = $this->cli->arguments->get( 'background' );
         $this->diagnostics = $this->cli->arguments->get( 'diagnostics' );
         $this->interactive = $this->cli->arguments->get( 'interactive' );
@@ -122,6 +138,7 @@ class SyncConsole extends Console
         if ( $this->sleep === TRUE
             || $this->create === TRUE
             || $this->updatedb === TRUE
+            || $this->threading === TRUE
             || $this->diagnostics === TRUE )
         {
             $this->interactive = TRUE;
@@ -153,9 +170,18 @@ class SyncConsole extends Console
             exit( 0 );
         }
 
-        // If we're in interactive mode, sent the sync message
+        // If we're in interactive mode, send the sync message
         if ( $this->interactive === TRUE ) {
             $this->cli->info( "Starting IMAP sync in interactive mode" );
+        }
+
+        // Send other info messages
+        if ( $this->threading === TRUE ) {
+            $this->cli->info( "Message sync skipped, only threading activated" );
+        }
+        elseif ( $this->quick === TRUE ) {
+            $this->cli->info(
+                "Attachments and message contents will not be downloaded" );
         }
     }
 

@@ -85,6 +85,14 @@ trait Model
         }
     }
 
+    public function requireValue( $value, $collection )
+    {
+        if ( ! Belt::contains( $collection, $value ) ) {
+            throw new ValidationException(
+                "$value must be one of ". implode( ', ', $collection ) ."." );
+        }
+    }
+
     public function handleNotFound( $result, $type, $fail )
     {
         if ( ! $result && $fail === TRUE )

@@ -6,32 +6,32 @@
 
 namespace App;
 
-use Fn
-  , DateTime
-  , Exception
-  , App\Daemon
-  , App\Message
-  , PDOException
-  , Monolog\Logger
-  , Pb\Imap\Mailbox
-  , Pimple\Container
-  , League\CLImate\CLImate
-  , App\Message\NoAccountsMessage
-  , App\Message\NotificationMessage
-  , App\Model\Folder as FolderModel
-  , App\Model\Account as AccountModel
-  , App\Model\Message as MessageModel
-  , App\Exceptions\Stop as StopException
-  , App\Model\Migration as MigrationModel
-  , App\Exceptions\Error as ErrorException
-  , App\Exceptions\Fatal as FatalException
-  , App\Exceptions\Terminate as TerminateException
-  , App\Exceptions\Validation as ValidationException
-  , App\Exceptions\FolderSync as FolderSyncException
-  , App\Exceptions\MessagesSync as MessagesSyncException
-  , App\Exceptions\MissingIMAPConfig as MissingIMAPConfigException
-  , Pb\Imap\Exceptions\MessageSizeLimit as MessageSizeLimitException
-  , App\Exceptions\AttachmentsPathNotWriteable as AttachmentsPathNotWriteableException;
+use Fn;
+use DateTime;
+use Exception;
+use App\Daemon;
+use App\Message;
+use PDOException;
+use Monolog\Logger;
+use Pb\Imap\Mailbox;
+use Pimple\Container;
+use League\CLImate\CLImate;
+use App\Message\NoAccountsMessage;
+use App\Sync\Folders as FolderSync;
+use App\Message\NotificationMessage;
+use App\Model\Folder as FolderModel;
+use App\Sync\Messages as MessageSync;
+use App\Model\Account as AccountModel;
+use App\Model\Message as MessageModel;
+use Evenement\EventEmitter as Emitter;
+use App\Exceptions\Stop as StopException;
+use App\Model\Migration as MigrationModel;
+use App\Exceptions\Fatal as FatalException;
+use App\Exceptions\Terminate as TerminateException;
+use App\Exceptions\FolderSync as FolderSyncException;
+use App\Exceptions\MessagesSync as MessagesSyncException;
+use App\Exceptions\MissingIMAPConfig as MissingIMAPConfigException;
+use App\Exceptions\AttachmentsPathNotWriteable as AttachmentsPathNotWriteableException;
 
 class Sync
 {
@@ -41,6 +41,7 @@ class Sync
     private $stop;
     private $wake;
     private $sleep;
+    private $quick;
     private $config;
     private $folder;
     private $daemon;
@@ -48,6 +49,9 @@ class Sync
     private $running;
     private $mailbox;
     private $retries;
+    private $emitter;
+    private $threader;
+    private $threading;
     private $interactive;
     private $activeAccount;
     private $maxRetries = 5;
@@ -58,6 +62,11 @@ class Sync
 
     // Options
     const OPT_SKIP_DOWNLOAD = 'skip_download';
+
+    // Events
+    const EVENT_CHECK_HALT = 'check_halt';
+    const EVENT_GARBAGE_COLLECT = 'garbage_collect';
+    const EVENT_CHECK_CLOSED_CONN = 'check_closed_connection';
 
     /**
      * Constructor can either take a dependency container or have
@@ -78,10 +87,13 @@ class Sync
             $this->cli = $di[ 'cli' ];
             $this->stats = $di[ 'stats' ];
             $this->config = $di[ 'config' ];
+            $this->threader = $di[ 'threader' ];
             $this->log = $di[ 'log' ]->getLogger();
+            $this->quick = $di[ 'console' ]->quick;
             $this->sleep = $di[ 'console' ]->sleep;
             $this->folder = $di[ 'console' ]->folder;
             $this->daemon = $di[ 'console' ]->daemon;
+            $this->threading = $di[ 'console' ]->threading;
             $this->interactive = $di[ 'console' ]->interactive;
         }
 
@@ -240,6 +252,16 @@ class Sync
             return FALSE;
         }
 
+        $this->setupEmitter();
+
+        // If we're running in threading mode, just update threads
+        if ( $this->threading === TRUE ) {
+            $this->log->info( "Syncing threads for {$account->email}" );
+            $this->updateThreads( $account );
+
+            return TRUE;
+        }
+
         $this->checkForHalt();
         $this->stats->setActiveAccount( $account->email );
         $this->log->info( "Starting sync for {$account->email}" );
@@ -294,6 +316,12 @@ class Sync
                 // going to run again in 15 minutes, why not just do two passes
                 // and download any extra messages while we can?
                 $this->syncMessages( $account, $folders );
+                // Disconnect the IMAP connection, but leave the running flag on
+                $this->disconnect( TRUE );
+                // Update all thread IDs. This will run for a long time for the
+                // first iteration, and all subsequent runs will only update
+                // threads for any new messages.
+                $this->updateThreads( $account );
             }
         }
         catch ( PDOException $e ) {
@@ -322,8 +350,8 @@ class Sync
             return $this->runAccount( $account );
         }
 
-        $this->log->info( "Sync complete for {$account->email}" );
         $this->disconnect();
+        $this->log->info( "Sync complete for {$account->email}" );
 
         return TRUE;
     }
@@ -355,7 +383,9 @@ class Sync
             $email,
             $password,
             $folder,
-            $attachmentsPath );
+            $attachmentsPath, [
+                Mailbox::OPT_SKIP_ATTACHMENTS => $this->quick
+            ]);
         $this->mailbox->getImapStream();
 
         if ( $setRunning === TRUE ) {
@@ -363,7 +393,7 @@ class Sync
         }
     }
 
-    public function disconnect()
+    public function disconnect( $running = FALSE )
     {
         if ( $this->mailbox ) {
             try {
@@ -377,7 +407,7 @@ class Sync
 
         $this->mailbox = NULL;
         $this->setAsleep( FALSE );
-        $this->setRunning( FALSE );
+        $this->setRunning( $running );
     }
 
     public function setAsleep( $asleep = TRUE )
@@ -451,6 +481,30 @@ class Sync
     }
 
     /**
+     * Attaches events to emitter for sub-classes.
+     */
+    private function setupEmitter()
+    {
+        if ( $this->emitter ) {
+            return;
+        }
+
+        $this->emitter = new Emitter;
+
+        $this->emitter->on( self::EVENT_CHECK_HALT, function () {
+            $this->checkForHalt();
+        });
+
+        $this->emitter->on( self::EVENT_GARBAGE_COLLECT, function () {
+            $this->gc();
+        });
+
+        $this->emitter->on( self::EVENT_CHECK_CLOSED_CONN, function ( $e ) {
+            $this->checkForClosedConnection( $e );
+        });
+    }
+
+    /**
      * Syncs a collection of IMAP folders to the database.
      * @param AccountModel $account Account to sync
      * @throws FolderSyncException
@@ -471,13 +525,14 @@ class Sync
         $this->log->debug( "Syncing IMAP folders for {$account->email}" );
 
         try {
-            $folderModel = new FolderModel;
+            $folderSync = new FolderSync(
+                $this->log,
+                $this->cli,
+                $this->emitter,
+                $this->interactive );
             $folderList = $this->mailbox->getFolders();
-            $savedFolders = $folderModel->getByAccount( $account->getId() );
-            $count = iterator_count( $folderList );
-            $this->log->debug( "Found $count ". Fn\plural( 'folder', $count ) );
-            $this->addNewFolders( $folderList, $savedFolders, $account );
-            $this->removeOldFolders( $folderList, $savedFolders, $account );
+            $savedFolders = (new FolderModel)->getByAccount( $account->getId() );
+            $folderSync->run( $folderList, $savedFolders, $account );
         }
         catch ( PDOException $e ) {
             throw $e;
@@ -499,87 +554,6 @@ class Sync
             $this->retriesFolders[ $account->email ]++;
             $this->checkForHalt();
             $this->syncFolders( $account );
-        }
-    }
-
-    /**
-     * Adds new folders from IMAP to the database.
-     * @param array $folderList
-     * @param FolderModel array $savedFolders
-     * @param AccountModel $account
-     */
-    private function addNewFolders( $folderList, $savedFolders, AccountModel $account )
-    {
-        $i = 1;
-        $toAdd = [];
-
-        foreach ( $folderList as $folderName ) {
-            if ( ! array_key_exists( (string) $folderName, $savedFolders ) ) {
-                $toAdd[] = $folderName;
-            }
-        }
-
-        if ( ! ( $count = count( $toAdd ) ) ) {
-            $this->log->debug( "No new folders to save" );
-            return;
-        }
-
-        if ( $this->interactive ) {
-            $this->cli->whisper(
-                "Adding $count new ". Fn\plural( 'folder', $count ) .":" );
-            $progress = $this->cli->progress()->total( $count );
-        }
-        else {
-            $this->log->info(
-                "Adding $count new ". Fn\plural( 'folder', $count ) );
-        }
-
-        foreach ( $toAdd as $folderName ) {
-            $folder = new FolderModel([
-                'name' => $folderName,
-                'account_id' => $account->getId()
-            ]);
-            $folder->save();
-            $folders[ $folder->getId() ] = $folder;
-
-            if ( $this->interactive ) {
-                $progress->current( $i++ );
-            }
-
-            $this->checkForHalt();
-        }
-    }
-
-    /**
-     * Removes purged folders no longer in the mailbox from the database.
-     * @param array $folderList
-     * @param FolderModel array $savedFolders
-     * @param AccountModel $account
-     */
-    private function removeOldFolders( $folderList, $savedFolders, AccountModel $account )
-    {
-        $lookup = [];
-        $toRemove = [];
-
-        foreach ( $folderList as $folderName ) {
-            $lookup[] = $folderName;
-        }
-
-        foreach ( $savedFolders as $savedFolder ) {
-            if ( ! in_array( $savedFolder->getName(), $lookup ) ) {
-                $toRemove[] = $savedFolder;
-            }
-        }
-
-        if ( ! ( $count = count( $toRemove ) ) ) {
-            $this->log->debug( "No folders to remove" );
-            return;
-        }
-
-        $this->log->info( "Removing $count ". Fn\plural( 'folder', $count ) );
-
-        foreach ( $toRemove as $folder ) {
-            $folder->delete();
         }
     }
 
@@ -608,7 +582,6 @@ class Sync
 
             try {
                 $this->syncFolderMessages( $account, $folder, $options );
-                $this->updateFolderThreads( $account, $folder, $options );
             }
             catch ( MessagesSyncException $e ) {
                 $this->log->error( $e->getMessage() );
@@ -617,6 +590,15 @@ class Sync
             $this->stats->unsetActiveFolder();
             $this->checkForHalt();
         }
+    }
+
+    /**
+     * Updates message threads. See Threading class for info.
+     * @param AccountModel $account
+     */
+    private function updateThreads( AccountModel $account )
+    {
+        $this->threader->run( $account, $this->emitter );
     }
 
     /**
@@ -658,16 +640,18 @@ class Sync
         //     to SQL database
         //  4. Mark deleted in SQL anything in 2 and not 1
         try {
-            $messageModel = new MessageModel;
+            $messageSync = new MessageSync(
+                $this->log,
+                $this->cli,
+                $this->emitter,
+                $this->mailbox,
+                $this->interactive, [
+                    MessageSync::OPT_SKIP_CONTENT => $this->quick
+                ]);
             // Select the folder's mailbox, this is sent to the
             // messages sync library to perform operations on
             $this->mailbox->select( $folder->name );
-            $newIds = $this->mailbox->getUniqueIds();
-            $savedIds = $messageModel->getSyncedIdsByFolder(
-                $account->getId(),
-                $folder->getId() );
-            $this->downloadMessages( $newIds, $savedIds, $folder, $options );
-            $this->markDeleted( $newIds, $savedIds, $folder, $options );
+            $messageSync->run( $account, $folder, $options );
             $this->checkForHalt();
         }
         catch ( PDOException $e ) {
@@ -696,203 +680,11 @@ class Sync
         }
     }
 
-    /**
-     * This is the engine that downloads and saves messages for a
-     * given mailbox and folder. Given a list of current message IDs
-     * retrieved from IMAP, and a list of the IDs we have in the
-     * database, copy all the new messages down and mark the removed
-     * ones as such in the database.
-     * @param array $newIds
-     * @param array $savedIds
-     * @param FolderModel $folder
-     * @param array $options (see syncMessages)
-     */
-    private function downloadMessages( $newIds, $savedIds, FolderModel $folder, $options )
-    {
-        // First get the list of messages to download by taking
-        // a diff of the arrays. Download all these messages.
-        $i = 1;
-        $progress = NULL;
-        $total = count( $newIds );
-        $toDownload = array_diff( $newIds, $savedIds );
-        $count = count( $toDownload );
-        $syncedCount = $total - $count;
-        $noun = Fn\plural( 'message', $total );
-        $this->log->debug( "Downloading messages in {$folder->name}" );
-
-        if ( $count ) {
-            $this->log->info( "{$folder->name}: found $total $noun, $count new" );
-        }
-        else {
-            $this->log->debug( "Found $total $noun, none are new" );
-        }
-
-        // Update folder stats with count
-        $folder->saveStats( $total, $syncedCount );
-
-        if ( Fn\get( $options, self::OPT_SKIP_DOWNLOAD ) === TRUE ) {
-            return;
-        }
-
-        if ( ! $count ) {
-            $this->log->debug( "No new messages, skipping {$folder->name}" );
-            return;
-        }
-
-        if ( $this->interactive ) {
-            $noun = Fn\plural( 'message', $count );
-            $this->cli->whisper(
-                "Syncing $count new $noun in {$folder->name}:" );
-            $progress = $this->cli->progress()->total( 100 );
-        }
-
-        // Sort these newest first to get the new mail earlier
-        arsort( $toDownload );
-
-        foreach ( $toDownload as $messageId => $uniqueId ) {
-            $this->downloadMessage( $messageId, $uniqueId, $folder );
-
-            if ( $this->interactive ) {
-                $progress->current( ( $i++ / $count ) * 100 );
-            }
-
-            $message = NULL;
-            $imapMessage = NULL;
-
-            // Save stats about the folder
-            $folder->saveStats( $total, ++$syncedCount );
-
-            // After each download, try to reclaim memory.
-            $this->gc();
-            $this->checkForHalt();
-        }
-
-        $this->gc();
-    }
-
-    /**
-     * Download a specified message by message ID.
-     * @param integer $messageId
-     * @param integer $uniqueId
-     * @param FolderModel $folder
-     */
-    private function downloadMessage( $messageId, $uniqueId, FolderModel $folder )
-    {
-        try {
-            $imapMessage = $this->mailbox->getMessage( $messageId );
-            $message = new MessageModel([
-                'synced' => 1,
-                'folder_id' => $folder->getId(),
-                'account_id' => $folder->getAccountId(),
-            ]);
-            $message->setMessageData( $imapMessage, [
-                // This will trim subjects to the max size
-                MessageModel::OPT_TRUNCATE_FIELDS => TRUE
-            ]);
-        }
-        catch ( PDOException $e ) {
-            throw $e;
-        }
-        catch ( MessageSizeLimitException $e ) {
-            $this->log->notice(
-                "Size exceeded during download of message $messageId: ".
-                $e->getMessage() );
-            return;
-        }
-        catch ( Exception $e ) {
-            $this->log->warning(
-                "Failed download for message {$messageId}: ".
-                $e->getMessage() );
-            $this->checkForClosedConnection( $e );
-            return;
-        }
-
-        // Save the meta info that comes back from the server
-        // regardless if the record exists.
-        try {
-            $message->save();
-        }
-        catch ( ValidationException $e ) {
-            $this->log->notice(
-                "Failed validation for message $messageId: ".
-                $e->getMessage() );
-        }
-    }
-
-    /**
-     * For any messages we have saved that didn't come back from the
-     * mailbox, mark them as deleted in the database.
-     * @param array $newIds
-     * @param array $savedIds
-     * @param FolderModel $folder
-     */
-    private function markDeleted( $newIds, $savedIds, FolderModel $folder )
-    {
-        $toDelete = array_diff( $savedIds, $newIds );
-        $count = count( $toDelete );
-
-        if ( ! $count ) {
-            $this->log->debug( "No messages to delete in {$folder->name}" );
-            return;
-        }
-
-        $this->log->info(
-            "Marking $count deletion". ( $count == 1 ? '' : 's' ) .
-            " in {$folder->name}" );
-
-        try {
-            $messageModel = new MessageModel;
-            $messageModel->markDeleted(
-                $toDelete,
-                $folder->getAccountId(),
-                $folder->getId() );
-        }
-        catch ( ValidationException $e ) {
-            $this->log->notice(
-                "Failed validation for marking deleted messages: ".
-                $e->getMessage() );
-        }
-    }
-
-    /**
-     * Reads in all of the messages for a folder and tries to update
-     * as many thread IDs as possible.
-     * @param AccountModel $account
-     * @param FolderModel $folder
-     * @param array $options
-     */
-    private function updateFolderThreads( AccountModel $account, FolderModel $folder, $options )
-    {
-        if ( $folder->isIgnored() ) {
-            return;
-        }
-
-        $limit = 250;
-        $messageModel = new MessageModel;
-        $this->log->debug(
-            "Updating thread IDs in {$folder->name} for ".
-            $account->email );
-        $ids = $messageModel->getIdsForThreadingByFolder(
-            $account->getId(),
-            $folder->getId() );
-        $count = count( $ids );
-
-        // Read in a batch of messages, looking specifically for their
-        // ID, Message ID, and Reply-To ID.
-        for ( $offset = 0; $offset < $count; $offset += $limit ) {
-            $slice = array_slice( $ids, $offset, $limit );
-            $messages = $messageModel->getByIds( $slice );
-
-            foreach ( $messages as $message ) {
-                $message->updateThreadId();
-                $this->checkForHalt();
-            }
-        }
-    }
-
     private function sendMessage( $message, $status = STATUS_ERROR )
     {
-        Message::send( new NotificationMessage( $status, $message ) );
+        if ( $this->daemon ) {
+            Message::send( new NotificationMessage( $status, $message ) );
+        }
     }
 
     /**

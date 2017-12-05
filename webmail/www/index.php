@@ -58,15 +58,16 @@ if ( ! $account ) {
 // Set up libraries
 $router = new Router;
 $folders = new Folders( $account );
-$messages = new Messages( $account );
+$messages = new Messages( $account, $folders );
 
 // Set up routes
 $router->get( '/', function () use ( $folders, $messages ) {
-    list( $starred, $messages ) = $messages->getThreads(
+    list( $starred, $messages, $counts ) = $messages->getThreads(
         $folders->getInboxId() );
     echo (new View)->render( 'inbox', [
-        'starred' => $starred,
-        'messages' => $messages,
+        'counts' => $counts,
+        'flagged' => $starred,
+        'unflagged' => $messages,
         'folders' => $folders->get(),
         'folderTree' => $folders->getTree()
     ]);

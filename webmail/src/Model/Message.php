@@ -41,6 +41,8 @@ class Message extends Model
 
     private $unserializedAttachments;
 
+    const MAX_LIMIT = 2000;
+
     public function getAttachments()
     {
         if ( ! is_null( $this->unserializedAttachments ) ) {
@@ -52,6 +54,34 @@ class Message extends Model
         return $this->unserializedAttachments;
     }
 
+    public function getThreadCountsByFolder( $accountId, $folderId )
+    {
+        $counts = (object) [
+            'flagged' => 0,
+            'unflagged' => 0
+        ];
+        $results = $this->db()
+            ->select([ 'thread_id', 'flagged' ])
+            ->from( 'messages' )
+            ->where( 'deleted', '=', 0 )
+            ->where( 'folder_id', '=', $folderId )
+            ->where( 'account_id', '=', $accountId )
+            ->groupBy( 'thread_id' )
+            ->execute()
+            ->fetchAll( PDO::FETCH_CLASS );
+
+        foreach ( $results as $result ) {
+            if ( $result->flagged == 1 ) {
+                $counts->flagged++;
+            }
+            else {
+                $counts->unflagged++;
+            }
+        }
+
+        return $counts;
+    }
+
     /**
      * Returns a list of messages by folder and account.
      * @param int $accountId
@@ -60,12 +90,13 @@ class Message extends Model
      */
     public function getThreadsByFolder( $accountId, $folderId )
     {
+        $threads = [];
+        $threadIds = [];
         $messages = $this->db()
             ->select([
-                'id', '`to`', 'cc', 'bcc', '`from`',
-                '`date`', 'seen', 'subject', 'flagged',
-                'substring(text_plain, 1, 260) as text_plain',
-                'count(thread_id) as thread_count'
+                'id', '`to`', 'cc', '`from`', '`date`',
+                'seen', 'subject', 'flagged', 'thread_id',
+                'substring(text_plain, 1, 260) as text_plain'
             ])
             ->from( 'messages' )
             ->where( 'deleted', '=', 0 )
@@ -73,9 +104,79 @@ class Message extends Model
             ->where( 'account_id', '=', $accountId )
             ->groupBy( 'thread_id' )
             ->orderBy( 'date', Model::DESC )
+            ->limit( self::MAX_LIMIT )
             ->execute()
             ->fetchAll( PDO::FETCH_CLASS, get_class() );
 
+        // Count all messages by thread ID and add that as a property
+        // on each message
+        foreach ( $messages as $message ) {
+            $threadIds[] = $message->thread_id;
+        }
+
+        $messageIds = [];
+        $threadMessages = $this->db()
+            ->select([
+                '`from`', 'thread_id', 'message_id',
+                'folder_id', 'subject'
+            ])
+            ->from( 'messages' )
+            ->where( 'deleted', '=', 0 )
+            ->whereIn( 'thread_id', $threadIds )
+            ->where( 'account_id', '=', $accountId )
+            ->orderBy( 'date', Model::ASC )
+            ->execute()
+            ->fetchAll( PDO::FETCH_CLASS );
+
+        foreach ( $threadMessages as $row ) {
+            if ( $row->message_id ) {
+                if ( isset( $messageIds[ $row->message_id ] ) ) {
+                    continue;
+                }
+
+                $messageIds[ $row->message_id ] = TRUE;
+            }
+
+            if ( ! isset( $threads[ $row->thread_id ] ) ) {
+                $threads[ $row->thread_id ] = (object) [
+                    'count' => 0,
+                    'names' => [],
+                    'folders' => [],
+                    'subject' => $row->subject
+                ];
+            }
+
+            $threads[ $row->thread_id ]->count++;
+            $threads[ $row->thread_id ]->folders[] = (int) $row->folder_id;
+            $threads[ $row->thread_id ]->names[] = $this->getName( $row->from );
+        }
+
+        foreach ( $messages as $message ) {
+            $message->names = [];
+            $message->folders = [];
+            $message->thread_count = 1;
+
+            if ( isset( $threads[ $message->thread_id ] ) ) {
+                $found = $threads[ $message->thread_id ];
+                $message->names = $found->names;
+                $message->subject = $found->subject;
+                $message->folders = $found->folders;
+                $message->thread_count = $found->count;
+            }
+        }
+
         return $messages ?: [];
+    }
+
+    private function getName( $from )
+    {
+        $from = trim( $from );
+        $pos = strpos( $from, '<' );
+
+        if ( $pos !== FALSE && $pos > 0 ) {
+            return trim( substr( $from, 0, $pos ) );
+        }
+
+        return trim( $from, '<> ' );
     }
 }
