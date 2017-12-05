@@ -1,7 +1,7 @@
 /**
  * Messages
  *
- * z-index range: 1-5
+ * z-index range: 6-10
  */
 
 /**
@@ -52,17 +52,28 @@ section #msg-list h5 span {
     margin-left: 0.5rem;
 }
 
-section #msg-list h5 strong {
+section #msg-list h5 a {
     float: right;
     font-size: 1.3rem;
     position: relative;
     top: 0.5rem;
     padding-right: 0.8rem;
+    color: inherit;
+    text-decoration: none;
+}
+
+section #msg-list h5 a:hover {
+    text-decoration: underline;
 }
 
 section #msg-list h5 em {
-    font-weight: normal;
     font-style: normal;
+    font-size: 1.1rem;
+}
+
+section #msg-list h5 var {
+    font-style: normal;
+    font-family: Arial, sans-serif;
 }
 
 section #msg-list .mailbox-checkbox:checked + h5 {
@@ -113,7 +124,7 @@ input[type="checkbox"].msg-checkbox {
     margin: 0;
     position: relative;
     width: 2.5rem;
-    z-index: 1;
+    z-index: 6;
 }
 
 .msg-label ~ .msg-label {
@@ -137,7 +148,7 @@ input[type="checkbox"].msg-checkbox {
 .msg-checkbox:checked + .msg-label {
     background-color: #ffda6d;
     border-color: #d6a70e;
-    z-index: 2;
+    z-index: 7;
 }
 
 .msg-checkbox:checked + .msg-label:after {
@@ -152,7 +163,7 @@ input[type="checkbox"].msg-checkbox {
 .msg-checkbox:checked + .msg-label + .msg-contents {
     background-color: #ffda6d;
     border-color: #d6a70e;
-    z-index: 2;
+    z-index: 7;
 }
 
 .msg-contents {

@@ -5,9 +5,13 @@
         <i class="fa fa-caret-right arrow"></i>
     </label>
     <span>Everything else</span>
-    <strong>
-        <?php echo $counts->start; ?><em>&#8213;</em><?php echo $counts->end; ?>&nbsp;<em>of</em>&nbsp;<?php echo $counts->total; ?>
-    </strong>
+    <a href="#">
+        <strong><?php echo $counts->start; ?></strong>
+        <var>&ndash;</var>
+        <strong><?php echo $counts->end; ?></strong>
+        <em>of</em>
+        <strong><?php echo $counts->total; ?></strong>
+    </a>
 </h5>
 <div id="mailbox-everything" class="mailbox">
     <?php

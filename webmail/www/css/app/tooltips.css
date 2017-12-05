@@ -2,7 +2,7 @@
  * Tooltips
  * Renders tooltips on an element with data-tooltip
  *
- * z-index range: 6-10
+ * z-index range: 26-30
  */
 
 [data-tooltip] {
@@ -20,7 +20,7 @@
     position: absolute;
     top: -0.9rem;
     width: 1rem;
-    z-index: 6;
+    z-index: 26;
 }
 
 [data-tooltip]:hover:after {
@@ -38,5 +38,5 @@
     text-align: center;
     top: calc(-100% + -0.4rem);
     width: 4.5rem;
-    z-index: 7;
+    z-index: 27;
 }

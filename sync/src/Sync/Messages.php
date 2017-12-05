@@ -189,7 +189,7 @@ class Messages
             $this->log->warning(
                 "Failed download for message {$messageId}: ".
                 $e->getMessage() );
-            $this->emitter->emit( Sync::EVENT_CHECK_CLOSED_CONN );
+            $this->emitter->emit( Sync::EVENT_CHECK_CLOSED_CONN, [ $e ] );
             return;
         }
 

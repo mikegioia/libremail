@@ -499,8 +499,8 @@ class Sync
             $this->gc();
         });
 
-        $this->emitter->on( self::EVENT_CHECK_CLOSED_CONN, function () {
-            $this->checkForClosedConnection();
+        $this->emitter->on( self::EVENT_CHECK_CLOSED_CONN, function ( $e ) {
+            $this->checkForClosedConnection( $e );
         });
     }
 
@@ -682,7 +682,9 @@ class Sync
 
     private function sendMessage( $message, $status = STATUS_ERROR )
     {
-        Message::send( new NotificationMessage( $status, $message ) );
+        if ( $this->daemon ) {
+            Message::send( new NotificationMessage( $status, $message ) );
+        }
     }
 
     /**

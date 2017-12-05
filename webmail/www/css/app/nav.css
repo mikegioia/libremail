@@ -1,7 +1,7 @@
 /**
  * Navigation and Header
  *
- * z-index range: 20
+ * z-index range: 1-2
  */
 
 header {
@@ -11,6 +11,10 @@ header {
     background: #f1f1f1;
     position: fixed;
     z-index: 1;
+}
+
+header:hover {
+    z-index: 2;
 }
 
 header a.icon.button {
@@ -215,6 +219,8 @@ nav li.w-sub > .folder-checkbox:checked ~ ul.sub {
  * Actions Menu
  * This is the menu above the mailboxes that allows for interactivity
  * with the messages when they're selected.
+ *
+ * z-index range: 11-15
  */
 section #msg-actions {
     border-bottom: 1px solid #ddd;
@@ -233,7 +239,7 @@ section #msg-actions a.button {
 }
 
 .menu {
-    z-index: 10;
+    z-index: 11;
 }
 
 .menu .control {
@@ -263,7 +269,7 @@ section #msg-actions a.button {
     top: calc(5rem + 4px);
     transition: right 250ms cubic-bezier(0.165, 0.84, 0.44, 1);
     width: 44%;
-    z-index: 20;
+    z-index: 15;
 }
 
 .folder-selector:target {
@@ -334,7 +340,7 @@ section #msg-actions a.button {
     border-color: #006591;
     color: #fff;
     padding-left: 3.25rem;
-    z-index: 1;
+    z-index: 11;
 }
 
 .folder-selector .list .move-to-checkbox + label:after {
