@@ -1,4 +1,7 @@
 <style type="text/css">
+    html {
+        overflow: hidden;
+    }
     body {
         margin: 0;
         padding: 0;
@@ -20,8 +23,8 @@
         outline: none;
     }
 </style>
-<div>
-    <form action="/star/<?php echo $flagged ? 'off' : 'on'; ?>" method="post">
+<div class="star-form">
+    <form action="/star" method="post">
         <button type="submit">
             <svg version="1.1" xmlns="http://www.w3.org/2000/svg"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -40,5 +43,7 @@
                 </g>
             </svg>
         </button>
+        <input type="hidden" name="id" value="<?php echo $id; ?>" />
+        <input type="hidden" name="state" value="<?php echo $flagged ? 'off' : 'on'; ?>" />
     </form>
 </div>

@@ -86,16 +86,21 @@ $router->post( '/update', function () use ( $account ) {
 });
 
 // Get the star HTML for a message
-$router->get( '/star/(\w+)', function ( $state = 'on' ) {
+$router->get( '/star/(\d+)/(\w+).html', function ( $id, $state ) {
+    header( 'Content-Type: text/html' );
+    header( 'Cache-Control: max-age=86400' ); // one day
     (new View)->render( '/star', [
+        'id' => $id,
         'flagged' => $state === 'on'
     ]);
 });
 
 // Set star flag on a message
-$router->post( '/star/(\w+)', function ( $state = 'on' ) {
+$router->post( '/star', function () {
+    // @todo update the flag
     (new View)->render( '/star', [
-        'flagged' => $state === 'on'
+        'id' => Url::postParam( 'id', 0 ),
+        'flagged' => Url::postParam( 'state', 'on' ) === 'on'
     ]);
 });
 

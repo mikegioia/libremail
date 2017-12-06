@@ -4,8 +4,7 @@ foreach ( $messages as $message ): ?>
         id="msg-checkbox-<?php echo $message->id; ?>" class="msg-checkbox" />
     <label for="msg-checkbox-<?php echo $message->id; ?>" class="msg-label"></label>
     <div class="msg-contents <?php echo $message->seen == 1 ? 'seen' : 'unseen'; ?>" id="msg-contents-<?php echo $message->id; ?>">
-        <iframe src="/star/<?php echo $message->flagged == 1 ? 'on' : 'off'; ?>"
-            class="star"></iframe>
+        <iframe src="<?php echo \App\Url::make( '/star/%s/%s.html', $message->id, $message->flagged == 1 ? 'on' : 'off' ); ?>" class="star"></iframe>
         <div class="names">
             <?php echo $message->names; ?>
         </div>

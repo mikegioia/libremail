@@ -31,9 +31,10 @@ class View
      * array unless told not to.
      * @param string $view
      * @param array $data View data
+     * @param bool $return Whether to return the string
      * @throws Exception
      */
-    public function render( $view, array $data = [] )
+    public function render( $view, array $data = [], $return = FALSE )
     {
         $viewPath = VIEWDIR . DIR . $view . VIEWEXT;
 
@@ -46,6 +47,28 @@ class View
 
         include $viewPath;
 
-        echo ob_get_clean();
+        if ( $return ) {
+            return ob_get_clean();
+        }
+        else {
+            echo ob_get_clean();
+        }
+    }
+
+    /**
+     * Prepares a data URI attribute for an element. Escapes the
+     * HTML to comply with a data:TYPE attribute.
+     * @param string $view
+     * @throws Exception
+     * @return string
+     */
+    public function dataUri( $view, array $data = [] )
+    {
+        $html = $this->render( $view, $data, TRUE );
+        $search = [ '%', '&', '#', '"', "'" ];
+        $replace = [ '%25', '%26', '%23', '%22', '%27' ];
+        $html = preg_replace( '/\s+/', ' ', $html );
+
+        return str_replace( $search, $replace, $html );
     }
 }
