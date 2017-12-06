@@ -85,6 +85,14 @@ trait Model
         }
     }
 
+    public function requireArray( $values, $name )
+    {
+        if ( ! is_array( $values ) || ! Belt::size( $values ) ) {
+            throw new ValidationException(
+                "$name needs to be an array with values." );
+        }
+    }
+
     public function requireValue( $value, $collection )
     {
         if ( ! Belt::contains( $collection, $value ) ) {

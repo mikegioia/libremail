@@ -132,10 +132,12 @@ class Threads
             }
 
             $this->currentId = $i;
+            $this->account->ping();
             $this->emitter->emit( Sync::EVENT_CHECK_HALT );
         }
 
         $this->printMemory();
+        $this->account->ping();
         $this->emitter->emit( Sync::EVENT_GARBAGE_COLLECT );
     }
 
@@ -182,6 +184,7 @@ class Threads
 
             if ( $count % self::BATCH_SIZE === 0 ) {
                 $this->printMemory();
+                $this->account->ping();
                 $this->log->debug( "{$count} of {$total} threaded" );
                 $this->emitter->emit( Sync::EVENT_CHECK_HALT );
                 $this->emitter->emit( Sync::EVENT_GARBAGE_COLLECT );
@@ -252,6 +255,9 @@ class Threads
     private function commitThreadIds()
     {
         $count = 0;
+        $updateCount = 0;
+        $transactionStarted = FALSE;
+        $messageModel = new MessageModel;
         $total = count( $this->messages );
         $this->log->debug(
             "Saving new thread IDs for {$this->account->email}" );
@@ -259,13 +265,31 @@ class Threads
         $this->startProgress( 3, $total );
 
         foreach ( $this->messages as $message ) {
-            $message->save();
+            if ( $updateCount === 0 && ! $transactionStarted ) {
+                $messageModel->db()->beginTransaction();
+                $transactionStarted = TRUE;
+            }
+
+            $updateCount += $message->save( $messageModel );
+
+            // After we get enough to make, commit them
+            if ( $updateCount > self::BATCH_SIZE ) {
+                $messageModel->db()->commit();
+                $transactionStarted = FALSE;
+                $updateCount = 0;
+            }
+
             $this->updateProgress( ++$count, $total );
 
-            if ( $count % 100 === 0 ) {
+            if ( $count % self::BATCH_SIZE === 0 ) {
+                $this->account->ping();
                 $this->emitter->emit( Sync::EVENT_CHECK_HALT );
                 $this->emitter->emit( Sync::EVENT_GARBAGE_COLLECT );
             }
+        }
+
+        if ( $updateCount && $transactionStarted ) {
+            $messageModel->db()->commit();
         }
     }
 

@@ -510,6 +510,7 @@ class Message extends Model
      * @param string $flag
      * @param bool $state On or off
      * @param bool $inverse If set, do where not in $uniqueIds query
+     * @throws DatabaseUpdateException
      */
     public function markFlag( $uniqueIds, $accountId, $folderId, $flag, $state = TRUE, $inverse = FALSE )
     {
@@ -554,17 +555,19 @@ class Message extends Model
 
     /**
      * Saves a thread ID for the given messages.
-     * @param int $id
+     * @param array $ids
      * @param int $threadId
+     * @throws DatabaseUpdateException
+     * @return int
      */
-    public function saveThreadId( $id, $threadId )
+    public function saveThreadId( $ids, $threadId )
     {
-        $this->requireInt( $id, "Message ID" );
+        $this->requireArray( $ids, "IDs" );
         $this->requireInt( $threadId, "Thread ID" );
         $updated = $this->db()
             ->update([ 'thread_id' => $threadId ])
             ->table( 'messages' )
-            ->where( 'id', '=', $id )
+            ->whereIn( 'id', $ids )
             ->execute();
 
         if ( ! Belt::isNumber( $updated ) ) {
@@ -572,6 +575,8 @@ class Message extends Model
                 MESSAGE,
                 $this->getError() );
         }
+
+        return $updated;
     }
 
     /**

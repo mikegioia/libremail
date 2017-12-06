@@ -77,19 +77,20 @@ class Message
         }
     }
 
-    public function save()
+    /**
+     * Save the thread ID for any internal IDs.
+     * @param MessageModel $model
+     * @return int Count of IDs updated
+     */
+    public function save( MessageModel $model )
     {
         if ( ! $this->dirty ) {
             return TRUE;
         }
 
-        $messageModel = new MessageModel;
-
-        foreach ( $this->ids as $id ) {
-            $messageModel->saveThreadId( (int) $id, (int) $this->threadId );
-        }
-
         $this->dirty = FALSE;
+
+        return $model->saveThreadId( $this->ids, $this->threadId );
     }
 
     /**

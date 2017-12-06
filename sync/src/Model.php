@@ -95,6 +95,11 @@ class Model
         return static::$db;
     }
 
+    public function ping()
+    {
+        $this->db()->query( 'SELECT 1;' );
+    }
+
     public function cli()
     {
         return static::$cli;
