@@ -1,0 +1,44 @@
+<style type="text/css">
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    div {
+        padding-right: 0.2rem;
+        text-align: center;
+        width: 100%;
+        box-sizing: border-box;
+        padding-top: 0.45rem;
+    }
+    svg {
+        cursor: hand;
+    }
+    button {
+        border: none;
+        background: none;
+        padding: none;
+        outline: none;
+    }
+</style>
+<div>
+    <form action="/star/<?php echo $flagged ? 'off' : 'on'; ?>" method="post">
+        <button type="submit">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                x="0" y="0" width="1.25rem" height="1.25rem" viewBox="0, 0, 64, 64">
+                <g>
+                <?php
+                if ( $flagged ): ?>
+                    <path d="M13.938,61.064 L17.483,40.395 L2.466,25.757 L23.219,22.741 L32.5,3.936 L41.781,22.741 L62.534,25.757 L47.517,40.395 L51.062,61.064 L32.5,51.306 z" fill="#D6A70E"/>
+                    <path d="M13.938,61.064 L17.483,40.395 L2.466,25.757 L23.219,22.741 L32.5,3.936 L41.781,22.741 L62.534,25.757 L47.517,40.395 L51.062,61.064 L32.5,51.306 z" fill-opacity="0" stroke="#D6A70E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <?php
+                else: ?>
+                    <path d="M13.938,61.064 L17.483,40.395 L2.466,25.757 L23.219,22.741 L32.5,3.936 L41.781,22.741 L62.534,25.757 L47.517,40.395 L51.062,61.064 L32.5,51.306 z" fill="transparent"/>
+                    <path d="M13.938,61.064 L17.483,40.395 L2.466,25.757 L23.219,22.741 L32.5,3.936 L41.781,22.741 L62.534,25.757 L47.517,40.395 L51.062,61.064 L32.5,51.306 z" fill-opacity="0" stroke="#D6A70E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <?php
+                endif; ?>
+                </g>
+            </svg>
+        </button>
+    </form>
+</div>

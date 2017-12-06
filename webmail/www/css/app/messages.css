@@ -189,6 +189,8 @@ input[type="checkbox"].msg-checkbox {
     padding-right: 0.2rem;
     text-align: center;
     width: 3rem;
+    height: 3rem;
+    border: 0;
 }
 
 .msg-contents .names {

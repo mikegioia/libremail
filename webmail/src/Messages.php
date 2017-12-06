@@ -35,7 +35,7 @@ class Messages
      * @param int $limit
      * @return [ array, array, array ] Messages, Messages, ints
      */
-    public function getThreads( $folderId, $page = 1, $limit = 50 )
+    public function getThreads( $folderId, $page = 1, $limit = 25 )
     {
         $flagged = [];
         $unflagged = [];
@@ -43,7 +43,9 @@ class Messages
         $escaper = new Escaper( self::UTF8 );
         $messages = $messageModel->getThreadsByFolder(
             $this->accountId,
-            $folderId );
+            $folderId,
+            $limit,
+            ($page - 1) * $limit );
         $messageCounts = $messageModel->getThreadCountsByFolder(
             $this->accountId,
             $folderId );
@@ -62,7 +64,6 @@ class Messages
             }
         }
 
-        // @TODO slice the flagged/unflagged arrays by page
         $counts = $this->buildCounts( $messageCounts, $page, $limit );
 
         return [ $flagged, $unflagged, $counts ];

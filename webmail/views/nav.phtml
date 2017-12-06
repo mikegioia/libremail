@@ -26,7 +26,8 @@
         <ul id="folders">
         <?php
         foreach ( $folderTree as $item ):
-            echo $render( 'nav/folder', [
+            $view->render( 'nav/folder', [
+                'view' => $view,
                 'folder' => $item[ 'folder' ],
                 'children' => $item[ 'children' ]
             ]);

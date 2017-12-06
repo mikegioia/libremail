@@ -1,10 +1,10 @@
-<input type="checkbox" id="mailbox-starred-checkbox" class="mailbox-checkbox" />
+<input type="checkbox" id="mailbox-everything-checkbox" class="mailbox-checkbox" />
 <h5>
-    <label for="mailbox-starred-checkbox">
+    <label for="mailbox-everything-checkbox">
         <i class="fa fa-caret-down arrow"></i>
         <i class="fa fa-caret-right arrow"></i>
     </label>
-    <span>Starred</span>
+    <span><?php echo $heading; ?></span>
     <a href="#">
         <strong><?php echo $counts->start; ?></strong>
         <var>&ndash;</var>
@@ -13,10 +13,11 @@
         <strong><?php echo $counts->total; ?></strong>
     </a>
 </h5>
-<div id="mailbox-starred" class="mailbox">
+<div id="<?php echo $id; ?>" class="mailbox">
     <?php
-    echo $render( 'messages/messages', [
-        'messages' => $starred
+    $view->render( 'messages/messages', [
+        'view' => $view,
+        'messages' => $messages
     ]);
-    echo $render( 'messages/actions-menu' ); ?>
+    $view->render( 'messages/actions-menu' ); ?>
 </div>

@@ -1,12 +1,12 @@
 <?php
 
+use App\Url;
 use App\View;
 use App\Model;
 use App\Router;
 use App\Folders;
 use App\Messages;
 use App\Model\Account;
-use Slim\PDO\Database;
 
 // Autoload application and vendor libraries
 require( __DIR__ .'/../vendor/autoload.php' );
@@ -29,17 +29,18 @@ define( 'VIEWDIR', BASEDIR .'/views' );
 $config = parse_ini_file( BASEDIR .'/.env' );
 
 // Set up the database connection
-Model::setDb(
-    new Database(
-        sprintf(
-            "mysql:host=%s:%s;dbname=%s;charset=%s",
-            $config[ 'DB_HOST' ],
-            $config[ 'DB_PORT' ],
-            $config[ 'DB_DATABASE' ],
-            $config[ 'DB_CHARSET' ] ),
-        $config[ 'DB_USERNAME' ],
-        $config[ 'DB_PASSWORD' ]
-    ));
+Model::initDb(
+    sprintf(
+        "mysql:host=%s:%s;dbname=%s;charset=%s",
+        $config[ 'DB_HOST' ],
+        $config[ 'DB_PORT' ],
+        $config[ 'DB_DATABASE' ],
+        $config[ 'DB_CHARSET' ] ),
+    $config[ 'DB_USERNAME' ],
+    $config[ 'DB_PASSWORD' ] );
+
+// Pass the routes into the URL service
+Url::setBase( $config[ 'APP_URL' ] );
 
 // Get the email address from the cookie (if set) and
 // fetch the account. Otherwise, load the first active
@@ -55,16 +56,20 @@ if ( ! $account ) {
     throw new \Exception( "No account found!" );
 }
 
-// Set up libraries
 $router = new Router;
-$folders = new Folders( $account );
-$messages = new Messages( $account, $folders );
 
-// Set up routes
-$router->get( '/', function () use ( $folders, $messages ) {
+// Inbox
+$router->get( '/', function () use ( $account ) {
+    // Set up libraries
+    $view = new View;
+    $folders = new Folders( $account );
+    $messages = new Messages( $account, $folders );
+    // Get the message data
     list( $starred, $messages, $counts ) = $messages->getThreads(
         $folders->getInboxId() );
-    echo (new View)->render( 'inbox', [
+    // Render the inbox
+    $view->render( 'inbox', [
+        'view' => $view,
         'counts' => $counts,
         'flagged' => $starred,
         'unflagged' => $messages,
@@ -73,16 +78,30 @@ $router->get( '/', function () use ( $folders, $messages ) {
     ]);
 });
 
-$router->get( '/demo', function () {
-    echo file_get_contents( __DIR__ .'/demo.html' );
+// Update messages
+$router->post( '/update', function () use ( $account ) {
+    print_r( $_POST );
+    exit;
+    Url::redirect( '/' );
 });
 
-$router->post( '/', function () {
-    echo file_get_contents( BASEDIR .'/demo.html' );
+// Get the star HTML for a message
+$router->get( '/star/(\w+)', function ( $state = 'on' ) {
+    (new View)->render( '/star', [
+        'flagged' => $state === 'on'
+    ]);
 });
 
-$router->match( GET, '/about', function () {
-    echo 'about';
+// Set star flag on a message
+$router->post( '/star/(\w+)', function ( $state = 'on' ) {
+    (new View)->render( '/star', [
+        'flagged' => $state === 'on'
+    ]);
+});
+
+$router->set404( function () {
+    header( 'HTTP/1.1 404 Not Found' );
+    echo '<h1>404 Page Not Found</h1>';
 });
 
 // Process route

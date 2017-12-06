@@ -7,34 +7,34 @@
         </a>
         <ul>
             <li>
-                <input type="submit" name="select_all" value="All" />
+                <input type="submit" name="select" value="all" />
             </li>
             <li>
-                <input type="submit" name="select_none" value="None" />
+                <input type="submit" name="select" value="none" />
             </li>
             <li>
-                <input type="submit" name="select_read" value="Read" />
+                <input type="submit" name="select" value="read" />
             </li>
             <li>
-                <input type="submit" name="select_unread" value="Unread" />
+                <input type="submit" name="select" value="unread" />
             </li>
             <li>
-                <input type="submit" name="select_starred" value="Starred" />
+                <input type="submit" name="select" value="flagged" />
             </li>
             <li>
-                <input type="submit" name="select_unstarred" value="Unstarred" />
+                <input type="submit" name="select" value="unflagged" />
             </li>
         </ul>
     </div>
-    <a href="#" class="icon button control" data-tooltip="Archive">
+    <button name="action" value="archive" class="icon button control" data-tooltip="Archive">
         <i class="fa fa-archive"></i>
-    </a>
-    <a href="#" class="icon button control" data-tooltip="Delete">
+    </button>
+    <button name="action" value="delete" class="icon button control" data-tooltip="Delete">
         <i class="fa fa-trash-o"></i>
-    </a>
-    <a href="#" class="icon button control">
+    </button>
+    <button name="action" value="mark_read" class="icon button control">
         <span class="normal">Mark as read</span>
-    </a>
+    </button>
     <a href="#move-messages" class="icon button control" data-tooltip="Move to">
         <i class="fa fa-folder-o"></i>
         <i class="fa fa-plus"></i>

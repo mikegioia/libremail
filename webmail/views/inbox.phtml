@@ -1,44 +1,51 @@
 <?php
-echo $render( 'header' );
+$view->render( 'header' );
 
-echo $render( 'nav', [
+$view->render( 'nav', [
+    'view' => $view,
     'folderTree' => $folderTree
 ]); ?>
 
 <section id="main">
-    <form action="#" method="post">
+    <form action="/update" method="post">
         <?php
-        echo $render( 'messages/actions' ); ?>
+        $view->render( 'messages/actions' ); ?>
 
         <section id="msg-list" class="no-select">
         <?php
         if ( $flagged ):
-            echo $render( 'messages/starred', [
-                'starred' => $flagged,
+            $view->render( 'messages/message-list', [
+                'view' => $view,
+                'heading' => 'Starred',
+                'messages' => $flagged,
+                'id' => 'mailbox-starred',
                 'counts' => $counts->flagged
             ]);
         endif;
 
-            echo $render( 'messages/everything', [
+            $view->render( 'messages/message-list', [
+                'view' => $view,
                 'messages' => $unflagged,
-                'counts' => $counts->unflagged
+                'id' => 'mailbox-everything',
+                'counts' => $counts->unflagged,
+                'heading' => 'Everything else'
             ]);
-            echo $render( 'messages/footer' ); ?>
+            $view->render( 'messages/footer' ); ?>
         </section>
 
         <?php
-        echo $render( 'messages/move-messages', [
+        $view->render( 'messages/move-messages', [
             'folders' => $folders
         ]);
-        echo $render( 'messages/apply-folder', [
+        $view->render( 'messages/apply-folder', [
             'folders' => $folders
         ]); ?>
     </form>
 </section>
 
 <?php
-echo $render( 'messages/datalist', [
+$view->render( 'messages/datalist', [
     'folders' => $folders
 ]);
 
-echo $render( 'footer' ); ?>
+$view->render( 'footer' ); ?>

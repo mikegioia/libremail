@@ -41,8 +41,6 @@ class Message extends Model
 
     private $unserializedAttachments;
 
-    const MAX_LIMIT = 2000;
-
     public function getAttachments()
     {
         if ( ! is_null( $this->unserializedAttachments ) ) {
@@ -86,27 +84,18 @@ class Message extends Model
      * Returns a list of messages by folder and account.
      * @param int $accountId
      * @param int $folderId
+     * @param int $limit
+     * @param int $offset
      * @return Message array
      */
-    public function getThreadsByFolder( $accountId, $folderId )
+    public function getThreadsByFolder( $accountId, $folderId, $limit = 50, $offset = 0 )
     {
         $threads = [];
         $threadIds = [];
-        $messages = $this->db()
-            ->select([
-                'id', '`to`', 'cc', '`from`', '`date`',
-                'seen', 'subject', 'flagged', 'thread_id',
-                'substring(text_plain, 1, 260) as text_plain'
-            ])
-            ->from( 'messages' )
-            ->where( 'deleted', '=', 0 )
-            ->where( 'folder_id', '=', $folderId )
-            ->where( 'account_id', '=', $accountId )
-            ->groupBy( 'thread_id' )
-            ->orderBy( 'date', Model::DESC )
-            ->limit( self::MAX_LIMIT )
-            ->execute()
-            ->fetchAll( PDO::FETCH_CLASS, get_class() );
+        $messageIds = [];
+        $flagged = $this->getThreads( $accountId, $folderId, TRUE, $limit, $offset );
+        $unflagged = $this->getThreads( $accountId, $folderId, FALSE, $limit, $offset );
+        $messages = array_merge( $flagged, $unflagged );
 
         // Count all messages by thread ID and add that as a property
         // on each message
@@ -114,7 +103,6 @@ class Message extends Model
             $threadIds[] = $message->thread_id;
         }
 
-        $messageIds = [];
         $threadMessages = $this->db()
             ->select([
                 '`from`', 'thread_id', 'message_id',
@@ -166,6 +154,26 @@ class Message extends Model
         }
 
         return $messages ?: [];
+    }
+
+    private function getThreads( $accountId, $folderId, $flagged, $limit, $offset )
+    {
+        return $this->db()
+            ->select([
+                'id', '`to`', 'cc', '`from`', '`date`',
+                'seen', 'subject', 'flagged', 'thread_id',
+                'substring(text_plain, 1, 260) as text_plain'
+            ])
+            ->from( 'messages' )
+            ->where( 'deleted', '=', 0 )
+            ->where( 'folder_id', '=', $folderId )
+            ->where( 'account_id', '=', $accountId )
+            ->where( 'flagged', '=', $flagged ? 1 : 0 )
+            ->groupBy( 'thread_id' )
+            ->orderBy( 'date', Model::DESC )
+            ->limit( $limit, $offset )
+            ->execute()
+            ->fetchAll( PDO::FETCH_CLASS, get_class() );
     }
 
     private function getName( $from )

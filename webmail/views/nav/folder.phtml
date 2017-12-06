@@ -19,7 +19,8 @@ if ( $folder->ignored != 1 ): ?>
         <ul class="sub">
         <?php
         foreach ( $children as $child ):
-            echo $render( 'nav/folder', [
+            $view->render( 'nav/folder', [
+                'view' => $view,
                 'folder' => $child[ 'folder' ],
                 'children' => $child[ 'children' ]
             ]);

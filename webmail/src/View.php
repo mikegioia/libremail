@@ -14,11 +14,12 @@ class View
     private $data = [];
 
     /**
-     * Add data to the internal variables. This is chainable.
+     * Add data to the internal variables. This is chainable,
+     * and it will permanently store this data across renders.
      * @param array $data
      * @return self
      */
-    public function setData( $data )
+    public function setData( array $data )
     {
         $this->data = array_merge( $this->data, $data );
 
@@ -26,15 +27,13 @@ class View
     }
 
     /**
-     * Render the requested view. This will clear the data
+     * Render the requested view via echo. This will clear the data
      * array unless told not to.
      * @param string $view
-     * @param array $data Optional, additional data to add
-     * @param bool $clearData Defaults to true
+     * @param array $data View data
      * @throws Exception
-     * @return string
      */
-    public function render( $view, $data = [], $preserveData = FALSE )
+    public function render( $view, array $data = [] )
     {
         $viewPath = VIEWDIR . DIR . $view . VIEWEXT;
 
@@ -42,31 +41,11 @@ class View
             throw new Exception( 'View not found! '. $viewPath );
         }
 
-        if ( $data ) {
-            $this->data = array_merge( $this->data, $data );
-        }
-
-        // Add helper functions to the data array
-        $this->addHelpers();
-
         ob_start();
-        extract( $this->data );
+        extract( array_merge( $this->data, $data ) );
 
         include $viewPath;
 
-        if ( ! $preserveData ) {
-            $this->data = [];
-        }
-
-        return ob_get_clean();
-    }
-
-    private function addHelpers()
-    {
-        $view = new static;
-
-        $this->data[ 'render' ] = function ( ...$params ) use ( $view ) {
-            return call_user_func_array( [ $view, 'render' ], $params );
-        };
+        echo ob_get_clean();
     }
 }

@@ -315,7 +315,7 @@ section #msg-actions a.button {
     overflow-y: auto;
     position: absolute;
     right: 0;
-    top: calc(9rem + 2px);
+    top: calc(9rem + 1px);
 }
 
 .folder-selector .list .move-to-checkbox {
@@ -333,6 +333,10 @@ section #msg-actions a.button {
     padding: 0 1rem;
     position: relative;
     transition: padding 200ms cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.folder-selector .list label:first-of-type {
+    margin-top: 0;
 }
 
 .folder-selector .list .move-to-checkbox:checked + label {
