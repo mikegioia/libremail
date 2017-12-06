@@ -25,6 +25,11 @@ define( 'BASEDIR', __DIR__ .'/..' );
 define( 'DIR', DIRECTORY_SEPARATOR );
 define( 'VIEWDIR', BASEDIR .'/views' );
 
+// Helper to load config files
+function getConfig( $file ) {
+    return include( BASEDIR .'/config/'. $file .'.php' );
+}
+
 // Load environment config
 $config = parse_ini_file( BASEDIR .'/.env' );
 
@@ -62,7 +67,8 @@ $router = new Router;
 $router->get( '/', function () use ( $account ) {
     // Set up libraries
     $view = new View;
-    $folders = new Folders( $account );
+    $colors = getConfig( 'colors' ); 
+    $folders = new Folders( $account, $colors );
     $messages = new Messages( $account, $folders );
     // Get the message data
     list( $starred, $messages, $counts ) = $messages->getThreads(

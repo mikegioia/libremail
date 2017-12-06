@@ -7,6 +7,7 @@ use App\Model\Account;
 
 class Folders
 {
+    private $colors;
     private $folders;
     private $inboxId;
     private $accountId;
@@ -18,39 +19,13 @@ class Folders
     // Mailbox constants
     const INBOX = 'inbox';
     const GMAIL = '[gmail]';
-    // Folder colors
-    const COLORS = [
-        'emerald-green' => '#00B153',
-        'process-blue' => '#0091D2',
-        'maroon' => '#B6003A',
-        'arc-yellow' => '#FFB800',
-        'aurora-pink' => '#FF4AA0',
-        'horizontal-blue' => '#00ACE6',
-        'orange' => '#FF8A00',
-        'signal-green' => '#00BE4D',
-        'warm-red' => '#FF5400',
-        'medium-yellow' => '#FFE300',
-        'fire-red' => '#FF0005',
-        'tan' => '#E1C193',
-        'rubine-red' => '#FD0057',
-        'dark-gray' => '#818286',
-        'lemon-yellow' => '#FCF700',
-        'brown' => '#564223',
-        'gold' => '#B8B300',
-        'tan' => '#E1C193',
-        'forest-green' => '#006826',
-        'blaze-orange' => '#FF9000',
-        'violet' => '#3F1994',
-        'light-grey' => '#BCBDC1',
-        'rocket-red' => '#FF524E',
-        'ultra-blue' => '#1B328F'
-    ];
 
     /**
      * @param Account $account
      */
-    public function __construct( Account $account )
+    public function __construct( Account $account, array $colors )
     {
+        $this->colors = $colors;
         $this->accountId = $account->id;
     }
 
@@ -185,8 +160,8 @@ class Folders
      */
     private function setColor( &$folder, $index )
     {
-        $count = count( self::COLORS );
-        $colors = array_values( self::COLORS );
-        $folder->color = $colors[ $index % $count ];
+        $count = count( $this->colors );
+        $color = $this->colors[ $index % $count ];
+        $folder->color = $color[ 'bg' ];
     }
 }
