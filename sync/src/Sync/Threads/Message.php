@@ -56,6 +56,16 @@ class Message
             : min( $this->ids );
     }
 
+    public function getRawThreadId()
+    {
+        return $this->threadId;
+    }
+
+    public function hasUpdate()
+    {
+        return $this->dirty && $this->ids;
+    }
+
     /**
      * Updates the internal set of references with any new
      * ones that are passed in. Returns stored set.
@@ -80,17 +90,16 @@ class Message
     /**
      * Save the thread ID for any internal IDs.
      * @param MessageModel $model
-     * @return int Count of IDs updated
      */
     public function save( MessageModel $model )
     {
         if ( ! $this->dirty ) {
-            return TRUE;
+            return;
         }
 
         $this->dirty = FALSE;
 
-        return $model->saveThreadId( $this->ids, $this->threadId );
+        $model->saveThreadId( $this->ids, $this->threadId );
     }
 
     /**
@@ -131,5 +140,11 @@ class Message
         $this->ids = array_unique(
             array_merge( $this->ids, $message->getIds() ) );
         $this->references = $this->references + $message->getReferences();
+
+        // If any message in this thread is missing a thread ID, then
+        // we want to update the whole collection
+        if ( ! $message->getRawThreadId() ) {
+            $this->dirty = TRUE;
+        }
     }
 }

@@ -70,7 +70,7 @@ $router = new Router;
 $router->get( '/', function () use ( $account ) {
     // Set up libraries
     $view = new View;
-    $colors = getConfig( 'colors' ); 
+    $colors = getConfig( 'colors' );
     $folders = new Folders( $account, $colors );
     $messages = new Messages( $account, $folders );
     // Get the message data
@@ -111,10 +111,6 @@ $router->post( '/star', function () {
         'id' => Url::postParam( 'id', 0 ),
         'flagged' => Url::postParam( 'state', 'on' ) === 'on'
     ]);
-});
-
-$router->get( '/demo', function () {
-    echo file_get_contents( 'demo.html' );
 });
 
 $router->set404( function () {

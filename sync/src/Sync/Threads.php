@@ -265,12 +265,16 @@ class Threads
         $this->startProgress( 3, $total );
 
         foreach ( $this->messages as $message ) {
+            if ( $message->hasUpdate() ) {
+                $updateCount += count( $message->getIds() );
+            }
+
             if ( $updateCount && ! $transactionStarted ) {
                 $messageModel->db()->beginTransaction();
                 $transactionStarted = TRUE;
             }
 
-            $updateCount += $message->save( $messageModel );
+            $message->save( $messageModel );
 
             // After we get enough to make, commit them
             if ( $updateCount > self::BATCH_SIZE ) {
