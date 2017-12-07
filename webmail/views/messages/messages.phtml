@@ -9,6 +9,11 @@ foreach ( $messages as $message ): ?>
             <?php echo $message->names; ?>
         </div>
         <a href="#" class="subject">
+        <?php
+        foreach ( $message->folders as $folder ): ?>
+            <mark style="background-color:<?php echo $folder->color->bg; ?>; color:<?php echo $folder->color->fg; ?>"><?php echo $folder->label; ?></mark>
+        <?php
+        endforeach; ?>
             <span><?php echo $message->subject; ?></span>&nbsp;<?php echo $message->snippet; ?>
         </a>
         <div class="date">

@@ -179,6 +179,13 @@ class Folders
             array_keys( $this->convert ),
             array_values( $this->convert ),
             $folder->name );
+
+        // Shortened label for display in the inbox
+        $parts = explode( '/', $folder->full_name );
+        $partCount = count( $parts );
+        $folder->label = ( $partCount > 2 )
+            ? $parts[ 0 ] .'/&hellip;/'. $parts[ $partCount - 1 ]
+            : $folder->full_name;
     }
 
     /**

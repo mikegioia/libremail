@@ -117,14 +117,6 @@ class Message extends Model
             ->fetchAll( PDO::FETCH_CLASS );
 
         foreach ( $threadMessages as $row ) {
-            if ( $row->message_id ) {
-                if ( isset( $messageIds[ $row->message_id ] ) ) {
-                    continue;
-                }
-
-                $messageIds[ $row->message_id ] = TRUE;
-            }
-
             if ( ! isset( $threads[ $row->thread_id ] ) ) {
                 $threads[ $row->thread_id ] = (object) [
                     'count' => 0,
@@ -134,9 +126,17 @@ class Message extends Model
                 ];
             }
 
-            $threads[ $row->thread_id ]->count++;
             $threads[ $row->thread_id ]->folders[] = (int) $row->folder_id;
             $threads[ $row->thread_id ]->names[] = $this->getName( $row->from );
+
+            if ( $row->message_id ) {
+                if ( isset( $messageIds[ $row->message_id ] ) ) {
+                    continue;
+                }
+
+                $threads[ $row->thread_id ]->count++;
+                $messageIds[ $row->message_id ] = TRUE;
+            }
         }
 
         foreach ( $messages as $message ) {

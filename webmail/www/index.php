@@ -113,6 +113,10 @@ $router->post( '/star', function () {
     ]);
 });
 
+$router->get( '/demo', function () {
+    echo file_get_contents( 'demo.html' );
+});
+
 $router->set404( function () {
     header( 'HTTP/1.1 404 Not Found' );
     echo '<h1>404 Page Not Found</h1>';

@@ -41,6 +41,7 @@ class Messages
         $unflagged = [];
         $messageModel = new Message;
         $escaper = new Escaper( self::UTF8 );
+        $folders = $this->getIndexedFolders();
         $messages = $messageModel->getThreadsByFolder(
             $this->accountId,
             $folderId,
@@ -51,10 +52,10 @@ class Messages
             $folderId );
 
         foreach ( $messages as $message ) {
-            $this->setFolders( $message );
             $this->setNameList( $message );
             $this->setDisplayDate( $message );
             $this->setSnippet( $message, $escaper );
+            $this->setFolders( $message, $folders );
 
             if ( $message->flagged == 1 ) {
                 $flagged[] = $message;
@@ -122,6 +123,12 @@ class Messages
         $firstName = trim( $firstName, '"' );
         $lastName = trim( $lastName, '"' );
 
+        // Long names? Try to get email handle.
+        if ( strlen( $firstName . $lastName ) > 20 ) {
+            $firstName = current( explode( "@", $firstName ) );
+            $lastName = current( explode( "@", $lastName ) );
+        }
+
         if ( $count === 2 ) {
             return sprintf( "%s, %s", $firstName, $lastName );
         }
@@ -151,9 +158,27 @@ class Messages
      * Prepare the folder labels for the message.
      * @param Message $message
      */
-    private function setFolders( Message &$message )
+    private function setFolders( Message &$message, array $folders )
     {
+        $message->folders = array_intersect_key(
+            $folders,
+            array_flip( $message->folders ) );
+    }
 
+    /**
+     * Returns a set of folders indexed by folder ID.
+     */
+    private function getIndexedFolders()
+    {
+        $folders = [];
+
+        foreach ( $this->folders->get() as $folder ) {
+            if ( ! $folder->is_mailbox && $folder->ignored != 1 ) {
+                $folders[ $folder->id ] = $folder;
+            }
+        }
+
+        return $folders;
     }
 
     private function buildCounts( $counts, $page, $limit )
