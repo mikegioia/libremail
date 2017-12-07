@@ -1,5 +1,5 @@
 <?php
-if ( $folder->ignored != 1 ): ?>
+if ( $folder->ignored != 1 && ! $folder->is_mailbox ): ?>
     <li class="<?php echo $children ? 'w-sub' : ''; ?>">
         <input type="checkbox" id="folder-<?php echo $folder->id; ?>-checkbox" class="folder-checkbox" />
         <a href="folder/<?php echo $folder->id; ?>" class="mailbox">
@@ -13,7 +13,7 @@ if ( $folder->ignored != 1 ): ?>
         <?php
         endif; ?>
         </label>
-        <a class="color" style="background-color: <?php echo $folder->color; ?>"></a>
+        <a class="color" style="background-color: <?php echo $folder->color->bg; ?>"></a>
     <?php
     if ( $children ): ?>
         <ul class="sub">

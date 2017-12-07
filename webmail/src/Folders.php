@@ -12,6 +12,9 @@ class Folders
     private $inboxId;
     private $accountId;
     private $folderTree;
+    private $colorCount;
+    // Storage of folder/depth
+    private $index = [];
     // Convert certain folder names
     private $convert = [
         'INBOX' => 'Inbox'
@@ -27,6 +30,7 @@ class Folders
     {
         $this->colors = $colors;
         $this->accountId = $account->id;
+        $this->colorCount = count( $colors );
     }
 
     public function get()
@@ -36,16 +40,22 @@ class Folders
         }
 
         $index = 0;
-        $folders = (new Folder)->getByAccount( $this->accountId );
+        $this->folders = (new Folder)->getByAccount( $this->accountId );
 
-        // Add the colors
-        foreach ( $folders as $folder ) {
+        // Add meta info to the folders
+        foreach ( $this->folders as $folder ) {
             $this->setIgnore( $folder );
             $this->setMailboxType( $folder );
-            $this->setColor( $folder, $index++ );
         }
 
-        $this->folders = $folders;
+        // Treeify the folders to set the depth. We need this for
+        // adding in the color info.
+        $this->getTree();
+
+        // Add in the colors now that we know the positions
+        foreach ( $this->folders as $folder ) {
+            $this->setColor( $folder );
+        }
 
         return $this->folders;
     }
@@ -68,12 +78,21 @@ class Folders
             return $this->folderTree;
         }
 
+        $index = 0;
         $this->folderTree = [];
         $folders = $this->get();
 
         foreach ( $folders as $folder ) {
             $parts = explode( '/', $folder->name );
-            $this->treeify( $this->folderTree, $parts, $folder );
+            $this->treeify( $this->folderTree, $parts, $folder, 1 );
+        }
+
+        // Update the position and depth on each folder
+        $offset = 0;
+        $parentOffset = count( $this->folderTree );
+
+        foreach ( $this->folderTree as $branch ) {
+            $this->updateTreePositions( $branch, $index, $offset, $parentOffset );
         }
 
         return $this->folderTree;
@@ -84,15 +103,17 @@ class Folders
      * @param array $tree
      * @param array $parts
      * @param Folder $folder
+     * @param int $depth
      * @return array
      */
-    private function treeify( &$tree, $parts, $folder )
+    private function treeify( &$tree, $parts, $folder, $depth )
     {
         $part = array_shift( $parts );
 
         if ( ! isset( $tree[ $part ] ) ) {
             $tree[ $part ] = [
-                'children' => []
+                'children' => [],
+                'depth' => $depth
             ];
         }
 
@@ -103,7 +124,46 @@ class Folders
         }
         // Recurse again
         else {
-            $this->treeify( $tree[ $part ][ 'children' ], $parts, $folder );
+            $this->treeify(
+                $tree[ $part ][ 'children' ],
+                $parts,
+                $folder,
+                $depth + 1 );
+        }
+    }
+
+    /**
+     * Stores positional info on the tree folders. This is used for
+     * determining the folder color.
+     * @param array $branch
+     * @param int $index
+     * @param int $offset
+     * @param int $parentOffset
+     */
+    private function updateTreePositions( $branch, &$index, $offset, $parentOffset )
+    {
+        if ( $branch[ 'folder' ]->is_mailbox ) {
+            return;
+        }
+
+        $index++;
+        $childIndex = 0;
+        $this->index[ $branch[ 'folder' ]->id ] = (object) [
+            'pos' => $index,
+            'offset' => $offset,
+            'name' => $branch[ 'folder' ]->name,
+            'depth' => $branch[ 'depth' ]
+        ];
+
+        $offset = $parentOffset;
+        $parentOffset = count( $branch[ 'children' ] );
+
+        foreach ( $branch[ 'children' ] as $child ) {
+            $this->updateTreePositions(
+                $child,
+                $childIndex,
+                $offset,
+                $parentOffset );
         }
     }
 
@@ -158,10 +218,15 @@ class Folders
      * @param Folder $folder
      * @param int $index
      */
-    private function setColor( &$folder, $index )
+    private function setColor( &$folder )
     {
-        $count = count( $this->colors );
-        $color = $this->colors[ $index % $count ];
-        $folder->color = $color[ 'bg' ];
+        if ( ! isset( $this->index[ $folder->id ] ) ) {
+            return;
+        }
+
+        $index = $this->index[ $folder->id ];
+        $position = $index->pos + $index->offset - 1;
+        $color = $this->colors[ $position % $this->colorCount ];
+        $folder->color = (object) $color;
     }
 }

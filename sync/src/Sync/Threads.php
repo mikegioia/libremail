@@ -265,7 +265,7 @@ class Threads
         $this->startProgress( 3, $total );
 
         foreach ( $this->messages as $message ) {
-            if ( $updateCount === 0 && ! $transactionStarted ) {
+            if ( $updateCount && ! $transactionStarted ) {
                 $messageModel->db()->beginTransaction();
                 $transactionStarted = TRUE;
             }
@@ -288,7 +288,7 @@ class Threads
             }
         }
 
-        if ( $updateCount && $transactionStarted ) {
+        if ( $transactionStarted ) {
             $messageModel->db()->commit();
         }
     }
