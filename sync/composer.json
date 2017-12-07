@@ -30,6 +30,7 @@
         "ext-pcntl": "*",
         "ext-pdo": "*",
         "ext-mysql": "*",
+        "ext-mbstring": "*",
         "particlebits/imap": "@dev",
         "pimple/pimple": "~3.0",
         "monolog/monolog": "^1.23",
