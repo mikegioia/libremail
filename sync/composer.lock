@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "fdf1a7cb51a88d8c3c5347e2c69a2738",
+    "content-hash": "3a6608226c4d4790c73d9afb3c301403",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -487,7 +487,7 @@
                 "docs": "https://github.com/mikegioia/Slim-PDO/blob/master/docs/README.md",
                 "source": "https://github.com/mikegioia/Slim-PDO/tree/master"
             },
-            "time": "2017-03-25 21:37:24"
+            "time": "2017-03-25T21:37:24+00:00"
         },
         {
             "name": "mkraemer/react-pcntl",
@@ -612,7 +612,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2017-06-19 01:22:40"
+            "time": "2017-06-19T01:22:40+00:00"
         },
         {
             "name": "neitanod/forceutf8",
@@ -646,7 +646,7 @@
             ],
             "description": "PHP Class Encoding featuring popular Encoding::toUTF8() function --formerly known as forceUTF8()-- that fixes mixed encoded strings.",
             "homepage": "https://github.com/neitanod/forceutf8",
-            "time": "2017-05-22 18:50:57"
+            "time": "2017-05-22T18:50:57+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -764,12 +764,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "e61d745245df701d5a7b06a0f3ad5192bbb43745"
+                "reference": "e1171ef4d9e36f1c3db50e2095efd95bbe72b4e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/e61d745245df701d5a7b06a0f3ad5192bbb43745",
-                "reference": "e61d745245df701d5a7b06a0f3ad5192bbb43745",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/e1171ef4d9e36f1c3db50e2095efd95bbe72b4e1",
+                "reference": "e1171ef4d9e36f1c3db50e2095efd95bbe72b4e1",
                 "shasum": ""
             },
             "require": {
@@ -805,7 +805,7 @@
                 "source": "https://github.com/ParticleBits/imap/tree/master",
                 "issues": "https://github.com/ParticleBits/imap/issues"
             },
-            "time": "2017-12-03 20:28:29"
+            "time": "2017-12-04T02:45:09+00:00"
         },
         {
             "name": "particlebits/zend-mail",
@@ -895,7 +895,7 @@
             "support": {
                 "source": "https://github.com/ParticleBits/zend-mail/tree/master"
             },
-            "time": "2017-12-06 21:51:14"
+            "time": "2017-12-06T21:51:14+00:00"
         },
         {
             "name": "particlebits/zend-mime",
@@ -952,7 +952,7 @@
             "support": {
                 "source": "https://github.com/ParticleBits/zend-mime/tree/master"
             },
-            "time": "2015-12-27 03:59:16"
+            "time": "2015-12-27T03:59:16+00:00"
         },
         {
             "name": "pimple/pimple",
@@ -1002,7 +1002,7 @@
                 "container",
                 "dependency injection"
             ],
-            "time": "2017-08-23 11:42:00"
+            "time": "2017-08-23T11:42:00+00:00"
         },
         {
             "name": "psr/container",
@@ -1051,7 +1051,7 @@
                 "container-interop",
                 "psr"
             ],
-            "time": "2017-06-28 15:35:32"
+            "time": "2017-06-28T15:35:32+00:00"
         },
         {
             "name": "psr/log",
@@ -1098,7 +1098,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10 12:19:37"
+            "time": "2016-10-10T12:19:37+00:00"
         },
         {
             "name": "react/child-process",
@@ -1180,7 +1180,7 @@
                 "asynchronous",
                 "event-loop"
             ],
-            "time": "2017-04-27 10:56:23"
+            "time": "2017-04-27T10:56:23+00:00"
         },
         {
             "name": "react/promise",
@@ -1226,20 +1226,20 @@
                 "promise",
                 "promises"
             ],
-            "time": "2017-09-19 13:02:44"
+            "time": "2017-09-19T13:02:44+00:00"
         },
         {
             "name": "react/socket",
-            "version": "dev-master",
+            "version": "0.4.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/socket.git",
-                "reference": "d1fec4f53f171b4214201263fb1499afb57e624b"
+                "reference": "cf074e53c974df52388ebd09710a9018894745d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket/zipball/ce015ec5879b96f5d30905f035f223aa85013fcc",
-                "reference": "d1fec4f53f171b4214201263fb1499afb57e624b",
+                "url": "https://api.github.com/repos/reactphp/socket/zipball/cf074e53c974df52388ebd09710a9018894745d2",
+                "reference": "cf074e53c974df52388ebd09710a9018894745d2",
                 "shasum": ""
             },
             "require": {
@@ -1247,14 +1247,14 @@
                 "php": ">=5.3.0",
                 "react/event-loop": "0.4.*|0.3.*",
                 "react/promise": "^2.0 || ^1.1",
-                "react/stream": "^0.6 || ^0.5 || ^0.4.5"
+                "react/stream": "^0.4.5"
+            },
+            "require-dev": {
+                "clue/block-react": "^1.1",
+                "phpunit/phpunit": "~4.8",
+                "react/socket-client": "^0.5.1"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.4-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "React\\Socket\\": "src"
@@ -1264,11 +1264,11 @@
             "license": [
                 "MIT"
             ],
-            "description": "Library for building an evented socket server.",
+            "description": "Async, streaming plaintext TCP/IP and secure TLS socket server for React PHP",
             "keywords": [
                 "Socket"
             ],
-            "time": "2016-02-29 19:54:13"
+            "time": "2017-01-26T09:23:38+00:00"
         },
         {
             "name": "react/stream",
@@ -1312,7 +1312,7 @@
                 "pipe",
                 "stream"
             ],
-            "time": "2017-01-25 14:44:14"
+            "time": "2017-01-25T14:44:14+00:00"
         },
         {
             "name": "seld/cli-prompt",
@@ -1360,7 +1360,7 @@
                 "input",
                 "prompt"
             ],
-            "time": "2017-03-18 11:32:45"
+            "time": "2017-03-18T11:32:45+00:00"
         },
         {
             "name": "symfony/event-dispatcher",
@@ -1423,7 +1423,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2017-11-09 14:14:31"
+            "time": "2017-11-09T14:14:31+00:00"
         },
         {
             "name": "symfony/http-foundation",
@@ -1431,12 +1431,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "c62265478321efbd21cf6980842aef4745257808"
+                "reference": "d9625c8abb907e0ca2d7506afd7a719a572c766f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/c62265478321efbd21cf6980842aef4745257808",
-                "reference": "c62265478321efbd21cf6980842aef4745257808",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/d9625c8abb907e0ca2d7506afd7a719a572c766f",
+                "reference": "d9625c8abb907e0ca2d7506afd7a719a572c766f",
                 "shasum": ""
             },
             "require": {
@@ -1477,7 +1477,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2017-11-13 18:20:08"
+            "time": "2017-11-30T14:56:21+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -1536,7 +1536,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2017-10-11 12:05:26"
+            "time": "2017-10-11T12:05:26+00:00"
         },
         {
             "name": "symfony/polyfill-php70",
@@ -1595,7 +1595,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2017-10-11 12:05:26"
+            "time": "2017-10-11T12:05:26+00:00"
         },
         {
             "name": "symfony/routing",
@@ -1673,7 +1673,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-11-24 14:13:49"
+            "time": "2017-11-24T14:13:49+00:00"
         },
         {
             "name": "zendframework/zend-hydrator",
@@ -1731,7 +1731,7 @@
                 "hydrator",
                 "zf2"
             ],
-            "time": "2016-02-18 22:38:26"
+            "time": "2016-02-18T22:38:26+00:00"
         },
         {
             "name": "zendframework/zend-loader",
@@ -1775,7 +1775,7 @@
                 "loader",
                 "zf2"
             ],
-            "time": "2016-05-05 14:59:09"
+            "time": "2016-05-05T14:59:09+00:00"
         },
         {
             "name": "zendframework/zend-stdlib",
@@ -1834,7 +1834,7 @@
                 "stdlib",
                 "zf2"
             ],
-            "time": "2016-04-12 21:17:31"
+            "time": "2016-04-12T21:17:31+00:00"
         },
         {
             "name": "zendframework/zend-validator",
@@ -1905,7 +1905,7 @@
                 "validator",
                 "zf2"
             ],
-            "time": "2017-08-22 14:20:08"
+            "time": "2017-08-22T14:20:08+00:00"
         }
     ],
     "packages-dev": [
@@ -1965,16 +1965,16 @@
         },
         {
             "name": "doctrine/inflector",
-            "version": "dev-master",
+            "version": "1.1.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/inflector.git",
-                "reference": "803a2ed9fea02f9ca47cd45395089fe78769a392"
+                "reference": "90b2128806bfde671b6952ab8bea493942c1fdae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/inflector/zipball/803a2ed9fea02f9ca47cd45395089fe78769a392",
-                "reference": "803a2ed9fea02f9ca47cd45395089fe78769a392",
+                "url": "https://api.github.com/repos/doctrine/inflector/zipball/90b2128806bfde671b6952ab8bea493942c1fdae",
+                "reference": "90b2128806bfde671b6952ab8bea493942c1fdae",
                 "shasum": ""
             },
             "require": {
@@ -2028,7 +2028,7 @@
                 "singularize",
                 "string"
             ],
-            "time": "2016-05-12 17:23:41"
+            "time": "2015-11-06T14:35:42+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2144,7 +2144,7 @@
             "keywords": [
                 "promise"
             ],
-            "time": "2017-10-06 12:25:00"
+            "time": "2017-10-06T12:25:00+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -2209,7 +2209,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-10-07 03:19:56"
+            "time": "2017-10-07T03:19:56+00:00"
         },
         {
             "name": "herrera-io/box",
@@ -2321,7 +2321,7 @@
                 "composer",
                 "packagist"
             ],
-            "time": "2017-06-26 16:31:40"
+            "time": "2017-06-26T16:31:40+00:00"
         },
         {
             "name": "phine/exception",
@@ -2371,7 +2371,7 @@
                 "exception"
             ],
             "abandoned": true,
-            "time": "2013-12-11 23:42:48"
+            "time": "2013-12-11T23:42:48+00:00"
         },
         {
             "name": "phine/path",
@@ -2474,7 +2474,7 @@
                 "request",
                 "response"
             ],
-            "time": "2016-08-06 14:39:51"
+            "time": "2016-08-06T14:39:51+00:00"
         },
         {
             "name": "symfony/console",
@@ -2482,12 +2482,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "41e0cb13e9ac22926dd2b34f52da419cce5199cb"
+                "reference": "46270f1ca44f08ebc134ce120fd2c2baf5fd63de"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/41e0cb13e9ac22926dd2b34f52da419cce5199cb",
-                "reference": "41e0cb13e9ac22926dd2b34f52da419cce5199cb",
+                "url": "https://api.github.com/repos/symfony/console/zipball/46270f1ca44f08ebc134ce120fd2c2baf5fd63de",
+                "reference": "46270f1ca44f08ebc134ce120fd2c2baf5fd63de",
                 "shasum": ""
             },
             "require": {
@@ -2535,7 +2535,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2017-11-19 18:39:05"
+            "time": "2017-11-29T09:33:18+00:00"
         },
         {
             "name": "symfony/debug",
@@ -2592,7 +2592,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2016-07-30 07:22:48"
+            "time": "2016-07-30T07:22:48+00:00"
         },
         {
             "name": "symfony/finder",
@@ -2641,7 +2641,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
-            "time": "2017-11-05 15:25:56"
+            "time": "2017-11-05T15:25:56+00:00"
         },
         {
             "name": "symfony/process",
@@ -2690,7 +2690,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2017-11-05 15:25:56"
+            "time": "2017-11-05T15:25:56+00:00"
         },
         {
             "name": "tedivm/jshrink",
@@ -2751,7 +2751,7 @@
         "php": "^5.6|^7.0",
         "ext-pcntl": "*",
         "ext-pdo": "*",
-        "ext-mysql": "*"
+        "ext-mbstring": "*"
     },
     "platform-dev": []
 }
