@@ -159,7 +159,7 @@ $di[ 'db_factory' ] = $di->factory( function ( $c, $config = NULL ) {
             $dsn,
             $dbConfig[ 'username' ],
             $dbConfig[ 'password' ] );
-        $db->query( 'SET SESSION wait_timeout = 30;' );
+        $db->query( 'SET SESSION wait_timeout = 28800;' );
         $db->query( 'SET NAMES '. $dbConfig[ 'charset' ] .';' );
 
         return $db;
