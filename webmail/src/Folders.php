@@ -151,7 +151,6 @@ class Folders
         $this->index[ $branch[ 'folder' ]->id ] = (object) [
             'pos' => $index,
             'offset' => $offset,
-            'name' => $branch[ 'folder' ]->name,
             'depth' => $branch[ 'depth' ]
         ];
 
