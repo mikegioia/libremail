@@ -153,7 +153,7 @@ class Message extends Model
         $threads = [];
         $messageIds = [];
         $meta = $this->getThreadCountsByFolder( $accountId, $folderId );
-        $threadIds = $meta->flaggedIds + $meta->unflaggedIds;
+        $threadIds = array_merge( $meta->flaggedIds, $meta->unflaggedIds );
         $messages = $this->getThreads( $threadIds, $accountId, $limit, $offset );
 
         // Load all messages in these threads. We need to get the names

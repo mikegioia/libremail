@@ -3,132 +3,122 @@
 return [
     [
         'name' => 'emerald-green',
-        'bg' => '#00B153',
-        'fg' => '#FFFFFF'
+        'bg' => '#00b153',
+        'fg' => '#ffffff'
     ],
     [
         'name' => 'purple',
-        'bg' => '#8E63CE',
-        'fg' => '#FFFFFF'
+        'bg' => '#8e63ce',
+        'fg' => '#ffffff'
     ],
     [
         'name' => 'orange',
-        'bg' => '#FF8A00',
-        'fg' => '#FFFFFF'
+        'bg' => '#ff8a00',
+        'fg' => '#ffffff'
     ],
     [
         'name' => 'process-blue',
-        'bg' => '#0091D2',
-        'fg' => '#FFFFFF'
+        'bg' => '#0091d2',
+        'fg' => '#ffffff'
     ],
     // [
     //     'name' => 'aurora-pink',
     //     'bg' => '#FF4AA0',
-    //     'fg' => '#FFFFFF'
+    //     'fg' => '#ffffff'
     // ],
     [
         'name' => 'pink',
-        'bg' => '#E07798',
-        'fg' => '#FFFFFF'
+        'bg' => '#e07798',
+        'fg' => '#ffffff'
     ],
     [
         'name' => 'maroon',
-        'bg' => '#B6003A',
-        'fg' => '#FFFFFF'
+        'bg' => '#b6003a',
+        'fg' => '#ffffff'
     ],
     [
         'name' => 'signal-green',
-        'bg' => '#00BE4D',
-        'fg' => '#FFFFFF'
+        'bg' => '#00be4d',
+        'fg' => '#ffffff'
     ],
     [
         'name' => 'arc-yellow',
-        'bg' => '#FFB800',
-        'fg' => '#FFFFFF'
+        'bg' => '#ffb800',
+        'fg' => '#ffffff'
     ],
     [
         'name' => 'horizontal-blue',
-        'bg' => '#00ACE6',
-        'fg' => '#FFFFFF'
-    ],
-    [
-        'name' => 'tan',
-        'bg' => '#E1C193',
-        'fg' => '#FFFFFF'
+        'bg' => '#00ace6',
+        'fg' => '#ffffff'
     ],
     [
         'name' => 'warm-red',
-        'bg' => '#FF5400',
-        'fg' => '#FFFFFF'
+        'bg' => '#ff5400',
+        'fg' => '#ffffff'
     ],
     [
         'name' => 'medium-yellow',
-        'bg' => '#FFE300',
-        'fg' => '#FFFFFF'
-    ],
-    [
-        'name' => 'fire-red',
-        'bg' => '#FF0005',
-        'fg' => '#FFFFFF'
+        'bg' => '#ffe300',
+        'fg' => '#ffffff'
     ],
     [
        'name' => 'rubine-red',
-        'bg' => '#FD0057',
-        'fg' => '#FFFFFF'
+        'bg' => '#fd0057',
+        'fg' => '#ffffff'
+    ],
+    [
+        'name' => 'lemon-yellow',
+        'bg' => '#fcd100',
+        'fg' => '#736000'
+    ],
+    // [
+    //     'name' => 'gold',
+    //     'bg' => '#B8B300',
+    //     'fg' => '#ffffff'
+    // ],
+    [
+        'name' => 'tan',
+        'bg' => '#e1c193',
+        'fg' => '#6d4000'
+    ],
+    [
+        'name' => 'forest-green',
+        'bg' => '#007d2e',
+        'fg' => '#ffffff'
+    ],
+    [
+        'name' => 'blaze-orange',
+        'bg' => '#ff9000',
+        'fg' => '#ffffff'
+    ],
+    [
+        'name' => 'violet',
+        'bg' => '#3f1994',
+        'fg' => '#ffffff'
+    ],
+    [
+        'name' => 'light-grey',
+        'bg' => '#bcbdc1',
+        'fg' => '#ffffff'
+    ],
+    [
+        'name' => 'rocket-red',
+        'bg' => '#ff524e',
+        'fg' => '#ffffff'
+    ],
+    [
+        'name' => 'ultra-blue',
+        'bg' => '#1b328f',
+        'fg' => '#ffffff'
     ],
     [
         'name' => 'dark-gray',
         'bg' => '#818286',
-        'fg' => '#FFFFFF'
-    ],
-    [
-        'name' => 'lemon-yellow',
-        'bg' => '#FCF700',
-        'fg' => '#FFFFFF'
+        'fg' => '#ffffff'
     ],
     [
         'name' => 'brown',
         'bg' => '#564223',
-        'fg' => '#FFFFFF'
-    ],
-    [
-        'name' => 'gold',
-        'bg' => '#B8B300',
-        'fg' => '#FFFFFF'
-    ],
-    [
-        'name' => 'tan',
-        'bg' => '#E1C193',
-        'fg' => '#FFFFFF'
-    ],
-    [
-        'name' => 'forest-green',
-        'bg' => '#006826',
-        'fg' => '#FFFFFF'
-    ],
-    [
-        'name' => 'blaze-orange',
-        'bg' => '#FF9000',
-        'fg' => '#FFFFFF'
-    ],
-    [
-        'name' => 'violet',
-        'bg' => '#3F1994',
-        'fg' => '#FFFFFF'
-    ],
-    [
-        'name' => 'light-grey',
-        'bg' => '#BCBDC1',
-        'fg' => '#FFFFFF'
-    ],
-    [
-        'name' => 'rocket-red',
-        'bg' => '#FF524E',
-        'fg' => '#FFFFFF'
-    ],
-    [
-        'name' => 'ultra-blue',
-        'bg' => '#1B328F',
-        'fg' => '#FFFFFF'
+        'fg' => '#ffffff'
     ]
 ];
