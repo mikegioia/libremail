@@ -154,7 +154,9 @@ class Message extends Model
         $messageIds = [];
         $meta = $this->getThreadCountsByFolder( $accountId, $folderId );
         $threadIds = array_merge( $meta->flaggedIds, $meta->unflaggedIds );
-        $messages = $this->getThreads( $threadIds, $accountId, $limit, $offset );
+        $flagged = $this->getThreads( $meta->flaggedIds, $accountId, $limit, $offset );
+        $unflagged = $this->getThreads( $meta->unflaggedIds, $accountId, $limit, $offset );
+        $messages = array_merge( $flagged, $unflagged );
 
         // Load all messages in these threads. We need to get the names
         // of anyone involved in the thread, any folders, and the subject
