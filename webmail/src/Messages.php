@@ -37,6 +37,7 @@ class Messages
      */
     public function getThreads( $folderId, $page = 1, $limit = 25 )
     {
+$limit = 50;
         $flagged = [];
         $unflagged = [];
         $messageModel = new Message;

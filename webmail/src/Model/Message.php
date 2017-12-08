@@ -38,7 +38,9 @@ class Message extends Model
     public $attachments;
     // Computed properties
     public $thread_count;
-
+    // Cache for threading info
+    private $threadCache = [];
+    // Cache for attachments
     private $unserializedAttachments;
 
     public function getAttachments()
@@ -52,32 +54,90 @@ class Message extends Model
         return $this->unserializedAttachments;
     }
 
+    public function getByIds( array $ids )
+    {
+        return $this->db()
+            ->select()
+            ->from( 'messages' )
+            ->whereIn( 'id', $ids )
+            ->execute()
+            ->fetchAll( PDO::FETCH_CLASS, get_class() );
+    }
+
+    /**
+     * Returns two counts of messages, by flagged and un-flagged.
+     * @param int $accountId
+     * @param int $folderId
+     * @return object
+     */
     public function getThreadCountsByFolder( $accountId, $folderId )
     {
+        if ( $this->threadCache( $accountId, $folderId ) ) {
+            return $this->threadCache( $accountId, $folderId );
+        }
+
         $counts = (object) [
             'flagged' => 0,
-            'unflagged' => 0
+            'unflagged' => 0,
+            'flaggedIds' => [],
+            'unflaggedIds' => []
         ];
+
+        // First get all of the thread IDs for this folder
+        $threadIds = $this->getThreadIdsByFolder( $accountId, $folderId );
+
+        // Now fetch all messages in any of these threads. Any message
+        // in the thread could be starred.
         $results = $this->db()
-            ->select([ 'thread_id', 'flagged' ])
+            ->select([ 'thread_id', 'sum(flagged) as flagged_count' ])
             ->from( 'messages' )
             ->where( 'deleted', '=', 0 )
-            ->where( 'folder_id', '=', $folderId )
             ->where( 'account_id', '=', $accountId )
+            ->whereIn( 'thread_id', $threadIds )
             ->groupBy( 'thread_id' )
             ->execute()
             ->fetchAll( PDO::FETCH_CLASS );
 
         foreach ( $results as $result ) {
-            if ( $result->flagged == 1 ) {
+            if ( $result->flagged_count > 0 ) {
                 $counts->flagged++;
+                $counts->flaggedIds[] = $result->thread_id;
             }
             else {
                 $counts->unflagged++;
+                $counts->unflaggedIds[] = $result->thread_id;
             }
         }
 
+        $this->setThreadCache( $accountId, $folderId, $counts );
+
         return $counts;
+    }
+
+    /**
+     * Load the thread IDs for a given folder.
+     * @param int $accountId
+     * @param int $folderId
+     * @return array
+     */
+    private function getThreadIdsByFolder( $accountId, $folderId )
+    {
+        $threadIds = [];
+        $results = $this->db()
+            ->select([ 'thread_id' ])
+            ->distinct()
+            ->from( 'messages' )
+            ->where( 'deleted', '=', 0 )
+            ->where( 'folder_id', '=', $folderId )
+            ->where( 'account_id', '=', $accountId )
+            ->execute()
+            ->fetchAll( PDO::FETCH_CLASS );
+
+        foreach ( $results as $result ) {
+            $threadIds[] = $result->thread_id;
+        }
+
+        return $threadIds;
     }
 
     /**
@@ -91,18 +151,14 @@ class Message extends Model
     public function getThreadsByFolder( $accountId, $folderId, $limit = 50, $offset = 0 )
     {
         $threads = [];
-        $threadIds = [];
         $messageIds = [];
-        $flagged = $this->getThreads( $accountId, $folderId, TRUE, $limit, $offset );
-        $unflagged = $this->getThreads( $accountId, $folderId, FALSE, $limit, $offset );
-        $messages = array_merge( $flagged, $unflagged );
+        $meta = $this->getThreadCountsByFolder( $accountId, $folderId );
+        $threadIds = $meta->flaggedIds + $meta->unflaggedIds;
+        $messages = $this->getThreads( $threadIds, $accountId, $limit, $offset );
 
-        // Count all messages by thread ID and add that as a property
-        // on each message
-        foreach ( $messages as $message ) {
-            $threadIds[] = $message->thread_id;
-        }
-
+        // Load all messages in these threads. We need to get the names
+        // of anyone involved in the thread, any folders, and the subject
+        // from the first message in the thread.
         $threadMessages = $this->db()
             ->select([
                 '`from`', 'thread_id', 'message_id',
@@ -151,13 +207,29 @@ class Message extends Model
                 $message->folders = $found->folders;
                 $message->thread_count = $found->count;
             }
+
+            if ( in_array( $message->thread_id, $meta->flaggedIds ) ) {
+                $message->flagged = 1;
+            }
         }
 
         return $messages ?: [];
     }
 
-    private function getThreads( $accountId, $folderId, $flagged, $limit, $offset )
+    /**
+     * Load the messages for threading.
+     * @param array $threadIds
+     * @param int $accountId
+     * @param int $limit
+     * @param int $offset
+     * @return array Messages
+     */
+    private function getThreads( array $threadIds, $accountId, $limit, $offset )
     {
+        if ( ! count( $threadIds) ) {
+            return [];
+        }
+
         return $this->db()
             ->select([
                 'id', '`to`', 'cc', '`from`', '`date`',
@@ -166,9 +238,8 @@ class Message extends Model
             ])
             ->from( 'messages' )
             ->where( 'deleted', '=', 0 )
-            ->where( 'folder_id', '=', $folderId )
             ->where( 'account_id', '=', $accountId )
-            ->where( 'flagged', '=', $flagged ? 1 : 0 )
+            ->whereIn( 'thread_id', $threadIds )
             ->groupBy( 'thread_id' )
             ->orderBy( 'date', Model::DESC )
             ->limit( $limit, $offset )
@@ -186,5 +257,33 @@ class Message extends Model
         }
 
         return trim( $from, '<> ' );
+    }
+
+    /**
+     * Store a computed thread count object in the cache.
+     * @param int $accountId
+     * @param int $folderId
+     * @param object $counts
+     */
+    private function setThreadCache( $accountId, $folderId, $counts )
+    {
+        $this->threadsCache[ $accountId .':'. $folderId ] = $counts;
+    }
+
+    /**
+     * Checks the cache and returns (if set) the counts object.
+     * @param int $accountId
+     * @param int $folderId
+     * @return bool | object
+     */
+    private function threadCache( $accountId, $folderId )
+    {
+        $key = $accountId .':'. $folderId;
+
+        if ( ! isset( $this->threadCache[ $key ] ) ) {
+            return FALSE;
+        }
+
+        return $this->threadCache[ $key ];
     }
 }

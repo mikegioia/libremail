@@ -11,9 +11,10 @@ class Url
         self::$base = $base;
     }
 
-    static public function get( $path )
+    static public function get( $path, $params = [] )
     {
-        return self::$base . $path;
+        return self::$base . $path
+            . ( $params ? '?'. http_build_query( $params ) : '' );
     }
 
     static public function make( $path, ...$parts )
@@ -21,9 +22,9 @@ class Url
         return self::$base . vsprintf( $path, $parts );
     }
 
-    static public function redirect( $path, $code = 303 )
+    static public function redirect( $path, $params = [], $code = 303 )
     {
-        header( 'Location: '. self::get( $path ), $code );
+        header( 'Location: '. self::get( $path, $params ), $code );
         die();
     }
 

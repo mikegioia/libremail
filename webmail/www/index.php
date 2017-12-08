@@ -5,6 +5,7 @@ use App\View;
 use App\Model;
 use App\Router;
 use App\Folders;
+use App\Actions;
 use App\Messages;
 use App\Model\Account;
 
@@ -89,9 +90,7 @@ $router->get( '/', function () use ( $account ) {
 
 // Update messages
 $router->post( '/update', function () use ( $account ) {
-    print_r( $_POST );
-    exit;
-    Url::redirect( '/' );
+    (new Actions)->run();
 });
 
 // Get the star HTML for a message
