@@ -2,9 +2,11 @@
 
 namespace App\Actions;
 
-use App\Model\MessageModel;
+use Exception;
+use App\Model\Task as TaskModel;
+use App\Model\Message as MessageModel;
 
-class Base
+abstract class Base
 {
     /**
      * Iterates over the messages and calls subclass method.
@@ -12,7 +14,7 @@ class Base
     public function run( array $messageIds )
     {
         if ( ! $messageIds
-            || ! ( $messages = (new MessageModel)->getByIds() ) )
+            || ! ( $messages = (new MessageModel)->getByIds( $messageIds ) ) )
         {
             return;
         }
@@ -25,6 +27,7 @@ class Base
     /**
      * Implemented by sub-classes.
      */
+    abstract protected function getType();
     abstract protected function update( MessageModel $message );
 
     /**
@@ -38,13 +41,24 @@ class Base
      */
     protected function setFlag( MessageModel $message, $flag, $state )
     {
+        $taskModel = new TaskModel;
         $oldValue = $message->{$flag};
         $message->db()->beginTransaction();
+        // We need to update this flag for all messsages with
+        // the same message-id within the thread.
+        $messageIds = $message->getSiblingIds();
 
         try {
-
+            foreach ( $messageIds as $messageId ) {
+                $taskModel->create(
+                    $messageId,
+                    $message->account_id,
+                    $this->getType(),
+                    $oldValue,
+                    NULL );
+            }
         }
-        catch ( \Exception $e ) {
+        catch ( Exception $e ) {
             $message->db()->rollBack();
             throw $e;
         }

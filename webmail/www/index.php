@@ -28,6 +28,7 @@ define( 'VIEWEXT', '.phtml' );
 define( 'BASEDIR', __DIR__ .'/..' );
 define( 'DIR', DIRECTORY_SEPARATOR );
 define( 'VIEWDIR', BASEDIR .'/views' );
+define( 'DATE_DATABASE', 'Y-m-d h:i:s' );
 
 // Helper to load config files
 function getConfig( $file ) {

@@ -4,6 +4,7 @@ namespace App\Model;
 
 use PDO;
 use DateTime;
+use Exception;
 use App\Model;
 
 class Task extends Model
@@ -28,20 +29,28 @@ class Task extends Model
     const TYPE_DELETE = 'delete';
     const TYPE_UNFLAG = 'unflag';
     const TYPE_UNREAD = 'unread';
+    const TYPE_ARCHIVE = 'archive';
+    const TYPE_UNDELETE = 'undelete';
 
     /**
      * Create a new task.
+     * @param int $messageId
+     * @param int $accountId
+     * @param string $type
+     * @param string $oldValue
+     * @param string | null $folders
+     * @return Task
      */
-    public function create( MessageModel $message, $type, $oldValue, $folders = NULL )
+    public function create( $messageId, $accountId, $type, $oldValue, $folders )
     {
         $data = [
             'type' => $type,
             'folders' => $folders,
             'old_value' => $oldValue,
+            'message_id' => $messageId,
+            'account_id' => $accountId,
             'status' => self::STATUS_NEW,
-            'message_id' => $message->id,
-            'account_id' => $message->account_id,
-            'created_at' => (new DateTime)->->format( DATE_DATABASE );
+            'created_at' => (new DateTime)->format( DATE_DATABASE )
         ];
 
         $newTaskId = $this->db()
@@ -51,9 +60,7 @@ class Task extends Model
             ->execute();
 
         if ( ! $newTaskId ) {
-            throw new DatabaseInsertException(
-                ACCOUNT,
-                $this->getError() );
+            throw new Exception( "Failed adding task" );
         }
 
         $data[ 'id' ] = $newTaskId;

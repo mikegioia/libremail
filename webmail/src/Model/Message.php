@@ -42,6 +42,9 @@ class Message extends Model
     private $threadCache = [];
     // Cache for attachments
     private $unserializedAttachments;
+    // Flags
+    const FLAG_SEEN = 'seen';
+    const FLAG_FLAGGED = 'flagged';
 
     public function getAttachments()
     {
@@ -287,5 +290,33 @@ class Message extends Model
         }
 
         return $this->threadCache[ $key ];
+    }
+
+    /**
+     * Returns any message with the same message ID and thread ID.
+     * @return array of ints
+     */
+    public function getSiblingIds()
+    {
+        $ids = [ $this->id ];
+
+        if ( ! $this->message_id ) {
+            return $ids;
+        }
+
+        $results = $this->db()
+            ->select([ 'id' ])
+            ->from( 'messages' )
+            ->where( 'thread_id', '=', $this->thread_id )
+            ->where( 'account_id', '=', $this->account_id )
+            ->where( 'message_id', '=', $this->message_id )
+            ->execute()
+            ->fetchAll( PDO::FETCH_CLASS );
+
+        foreach ( $results as $result ) {
+            $ids[] = $result->id;
+        }
+
+        return array_values( array_unique( $ids ) );
     }
 }

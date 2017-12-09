@@ -73,31 +73,41 @@ class Actions
         }
 
         // If an action came in, route it to the child class
-        switch ( $action ) {
-            case self::FLAG:
-                (new FlagAction( $messages ))->run();
-                break;
-            case self::UNFLAG:
-                (new UnflagAction( $messages ))->run();
-                break;
-            case self::DELETE:
-                (new DeleteAction( $messageIds ))->run();
-                break;
-            case self::RESTORE:
-                (new RestoreAction( $messageIds ))->run();
-                break;
-            case self::ARCHIVE:
-                (new ArchiveAction( $messageIds ))->run();
-                break;
-            case self::MARK_READ:
-                (new MarkReadAction( $messageIds ))->run();
-                break;
-            case self::MARK_UNREAD:
-                (new MarkUnreadAction( $messageIds ))->run();
-                break;
-        }
+        $this->handleAction( $action, $messageIds );
 
         // If we got here, redirect
         Url::redirect( '/' );
+    }
+
+    /**
+     * Processes a requested action.
+     * @param string $action
+     * @param array $messageIds
+     */
+    private function handleAction( $action, array $messageIds )
+    {
+        switch ( $action ) {
+            case self::FLAG:
+                (new FlagAction)->run( $messageIds );
+                break;
+            case self::UNFLAG:
+                (new UnflagAction)->run( $messageIds );
+                break;
+            case self::DELETE:
+                (new DeleteAction)->run( $messageIds );
+                break;
+            case self::RESTORE:
+                (new RestoreAction)->run( $messageIds );
+                break;
+            case self::ARCHIVE:
+                (new ArchiveAction)->run( $messageIds );
+                break;
+            case self::MARK_READ:
+                (new MarkReadAction)->run( $messageIds );
+                break;
+            case self::MARK_UNREAD:
+                (new MarkUnreadAction)->run( $messageIds );
+                break;
+        }
     }
 }
