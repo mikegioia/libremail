@@ -319,4 +319,23 @@ class Message extends Model
 
         return array_values( array_unique( $ids ) );
     }
+
+    /**
+     * Updates a flag on the message.
+     * @param int $messageId
+     * @param string $flag
+     * @param bool $state
+     */
+    public function setFlag( $messageId, $flag, $state )
+    {
+        $updated = $this->db()
+            ->update([
+                $flag => $state ? 1 : 0
+            ])
+            ->table( 'messages' )
+            ->where( 'id', '=', $messageId )
+            ->execute();
+
+        return is_numeric( $updated );
+    }
 }

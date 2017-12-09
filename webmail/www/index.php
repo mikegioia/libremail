@@ -73,6 +73,7 @@ $router->get( '/', function () use ( $account ) {
     // Set up libraries
     $view = new View;
     $colors = getConfig( 'colors' );
+    $select = Url::getParam( 'select' );
     $folders = new Folders( $account, $colors );
     $messages = new Messages( $account, $folders );
     // Get the message data
@@ -82,6 +83,7 @@ $router->get( '/', function () use ( $account ) {
     $view->render( 'inbox', [
         'view' => $view,
         'counts' => $counts,
+        'select' => $select,
         'flagged' => $starred,
         'unflagged' => $messages,
         'folders' => $folders->get(),
@@ -106,17 +108,32 @@ $router->get( '/star/(\d+)/(\w+).html', function ( $id, $state ) {
 
 // Set star flag on a message
 $router->post( '/star', function () {
-    // @todo update the flag
+    (new Actions)->handleAction(
+        ( Url::postParam( 'state', 'on' ) === 'on' )
+            ? Actions::FLAG
+            : Actions::UNFLAG,
+        [
+            Url::postParam( 'id', 0 )
+        ],
+        [] );
     (new View)->render( '/star', [
         'id' => Url::postParam( 'id', 0 ),
         'flagged' => Url::postParam( 'state', 'on' ) === 'on'
     ]);
 });
 
+// Handle 404s
 $router->set404( function () {
     header( 'HTTP/1.1 404 Not Found' );
     echo '<h1>404 Page Not Found</h1>';
 });
 
 // Process route
-$router->run();
+try {
+    $router->run();
+}
+catch ( Exception $e ) {
+    header( 'HTTP/1.1 500 Server Error' );
+    echo '<h1>500 Server Error</h1>';
+    echo '<p>'. $e->getMessage() .'</p>';
+}

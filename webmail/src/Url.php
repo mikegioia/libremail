@@ -38,7 +38,7 @@ class Url
     static public function getParam( $key, $default = NULL )
     {
         return ( isset( $_GET[ $key ] ) )
-            ? $_POST[ $key ]
+            ? $_GET[ $key ]
             : $default;
     }
 }

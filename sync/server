@@ -8,25 +8,25 @@
  * connect to. This process can be run standalone, manually
  * or (more commonly) it's invoked via the daemon script.
  */
-use App\Log
-  , App\Model
-  , App\Daemon
-  , App\Message
-  , App\Startup
-  , App\Constants
-  , App\RatchetApp
-  , App\Diagnostics
-  , Pimple\Container
-  , Slim\PDO\Database
-  , App\Server\WebServer
-  , App\Server\StatsServer
-  , Exception as Exception
-  , React\EventLoop\Factory
-  , App\Console\ServerConsole
-  , MKraemer\ReactPCNTL\PCNTL
-  , PDOException as PDOException
-  , Symfony\Component\Routing\Route
-  , App\Exceptions\Terminate as TerminateException;
+use App\Log;
+use App\Model;
+use App\Daemon;
+use App\Message;
+use App\Startup;
+use App\Constants;
+use App\RatchetApp;
+use App\Diagnostics;
+use Pimple\Container;
+use Slim\PDO\Database;
+use App\Server\WebServer;
+use App\Server\StatsServer;
+use Exception as Exception;
+use React\EventLoop\Factory;
+use App\Console\ServerConsole;
+use MKraemer\ReactPCNTL\PCNTL;
+use PDOException as PDOException;
+use Symfony\Component\Routing\Route;
+use App\Exceptions\Terminate as TerminateException;
 
 // Set up paths and constants
 set_time_limit( 0 );

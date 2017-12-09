@@ -8,21 +8,21 @@
  * Call this script to run "forever" and manage the possibly-memory
  * abusive sync and server scripts.
  */
-use App\Log
-  , App\Daemon
-  , App\Command
-  , App\Message
-  , App\Constants
-  , Pimple\Container
-  , Exception as Exception
-  , React\EventLoop\Factory
-  , App\Console\DaemonConsole
-  , MKraemer\ReactPCNTL\PCNTL
-  , React\ChildProcess\Process
-  , Symfony\Component\EventDispatcher\Event
-  , App\Exceptions\Terminate as TerminateException
-  , App\Exceptions\BadCommand as BadCommandException
-  , Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
+use App\Log;
+use App\Daemon;
+use App\Command;
+use App\Message;
+use App\Constants;
+use Pimple\Container;
+use Exception as Exception;
+use React\EventLoop\Factory;
+use App\Console\DaemonConsole;
+use MKraemer\ReactPCNTL\PCNTL;
+use React\ChildProcess\Process;
+use Symfony\Component\EventDispatcher\Event;
+use App\Exceptions\Terminate as TerminateException;
+use App\Exceptions\BadCommand as BadCommandException;
+use Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 
 // Set up paths and constants
 set_time_limit( 0 );
@@ -44,7 +44,7 @@ unset( $constants );
 ini_set( 'memory_limit', $config[ 'app' ][ 'memory' ] );
 
 // Set up dependency container and register all services
-$di = new Container();
+$di = new Container;
 
 // Store the configuration as a service
 $di[ 'config' ] = $config;

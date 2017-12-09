@@ -41,8 +41,15 @@ abstract class Base
      */
     protected function setFlag( MessageModel $message, $flag, $state )
     {
-        $taskModel = new TaskModel;
         $oldValue = $message->{$flag};
+        $newValue = ( $state ) ? 1 : 0;
+
+        // If the value has not changed, do nothing
+        if ( (int) $oldValue === $newValue ) {
+            return;
+        }
+
+        $taskModel = new TaskModel;
         $message->db()->beginTransaction();
         // We need to update this flag for all messsages with
         // the same message-id within the thread.
@@ -56,6 +63,7 @@ abstract class Base
                     $this->getType(),
                     $oldValue,
                     NULL );
+                $message->setFlag( $messageId, $flag, $state );
             }
         }
         catch ( Exception $e ) {

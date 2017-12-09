@@ -1,7 +1,17 @@
 <?php
-foreach ( $messages as $message ): ?>
+
+use App\Actions;
+
+foreach ( $messages as $message ):
+    // Figure out if the message should be selected
+    $selected = $select === Actions::SELECT_ALL
+        || ( $select === Actions::SELECT_READ && $message->seen == 1 )
+        || ( $select === Actions::SELECT_UNREAD && $message->seen != 1 )
+        || ( $select === Actions::SELECT_FLAGGED && $message->flagged == 1 )
+        || ( $select === Actions::SELECT_UNFLAGGED && $message->flagged != 1 ); ?>
     <input type="checkbox" name="message[]" value="<?php echo $message->id; ?>"
-        id="msg-checkbox-<?php echo $message->id; ?>" class="msg-checkbox" />
+        id="msg-checkbox-<?php echo $message->id; ?>" class="msg-checkbox"
+        <?php echo $selected ? ' checked="checked"' : ''; ?>/>
     <label for="msg-checkbox-<?php echo $message->id; ?>" class="msg-label"></label>
     <div class="msg-contents <?php echo $message->seen == 1 ? 'seen' : 'unseen'; ?>" id="msg-contents-<?php echo $message->id; ?>">
         <iframe src="<?php echo \App\Url::make( '/star/%s/%s.html', $message->id, $message->flagged == 1 ? 'on' : 'off' ); ?>" class="star"></iframe>
@@ -20,6 +30,7 @@ foreach ( $messages as $message ): ?>
             <?php echo $message->display_date; ?>
         </div>
     </div>
+    <input type="hidden" name="message_all[]" value="<?php echo $message->id; ?>" />
     <div class="u-cf"></div>
 <?php
 endforeach; ?>

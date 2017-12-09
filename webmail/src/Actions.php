@@ -28,6 +28,8 @@ class Actions
     const RESTORE = 'restore';
     const ARCHIVE = 'archive';
     const MARK_READ = 'mark_read';
+    const MARK_UNREAD = 'mark_unread';
+    const MARK_ALL_READ = 'mark_all_read';
     // Selections
     const SELECT_ALL = 'all';
     const SELECT_NONE = 'none';
@@ -35,6 +37,13 @@ class Actions
     const SELECT_UNREAD = 'unread';
     const SELECT_FLAGGED = 'starred';
     const SELECT_UNFLAGGED = 'unstarred';
+    // Convert these action names
+    const ACTION_CONVERSIONS = [
+        'Add star' => 'flag',
+        'Remove star' => 'unflag',
+        'Mark as unread' => 'mark_unread',
+        'Mark all as read' => 'mark_all_read'
+    ];
 
     public function __construct()
     {
@@ -62,9 +71,13 @@ class Actions
     {
         $action = $this->param( 'action' );
         $select = $this->param( 'select' );
-        $messageIds = $this->param( 'message' );
+        $messageIds = $this->param( 'message', [] );
+        $allMessageIds = $this->param( 'message_all', [] );
         $moveTo = array_filter( $this->param( 'move_to', [] ) );
         $copyTo = array_filter( $this->param( 'copy_to', [] ) );
+
+        // Some actions have names that need to be converted
+        $action = $this->convertAction( $action );
 
         // If a selection was made, return to the previous page
         // with the key in the query params.
@@ -73,7 +86,7 @@ class Actions
         }
 
         // If an action came in, route it to the child class
-        $this->handleAction( $action, $messageIds );
+        $this->handleAction( $action, $messageIds, $allMessageIds );
 
         // If we got here, redirect
         Url::redirect( '/' );
@@ -83,8 +96,9 @@ class Actions
      * Processes a requested action.
      * @param string $action
      * @param array $messageIds
+     * @param array $allMessageIds
      */
-    private function handleAction( $action, array $messageIds )
+    public function handleAction( $action, array $messageIds, array $allMessageIds )
     {
         switch ( $action ) {
             case self::FLAG:
@@ -108,6 +122,17 @@ class Actions
             case self::MARK_UNREAD:
                 (new MarkUnreadAction)->run( $messageIds );
                 break;
+            case self::MARK_ALL_READ:
+                (new MarkReadAction)->run( $allMessageIds );
+                break;
         }
+    }
+
+    private function convertAction( $action )
+    {
+        return str_replace(
+            array_keys( self::ACTION_CONVERSIONS ),
+            array_values( self::ACTION_CONVERSIONS ),
+            $action );
     }
 }

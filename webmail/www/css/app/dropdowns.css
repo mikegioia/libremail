@@ -10,6 +10,7 @@
 .dropdown > a {
     background-color: #fff;
     position: relative;
+    z-index: 22;
 }
 
 .dropdown ul {
@@ -39,15 +40,10 @@
     width: 25rem;
 }
 
-.dropdown ul:focus {
-    background-color: red;
-}
-
 .dropdown > a:focus {
     border-bottom: none;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
-    z-index: 22;
 }
 
 .dropdown > a:focus + ul,

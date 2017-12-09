@@ -16,6 +16,7 @@ $view->render( 'nav', [
         if ( $flagged ):
             $view->render( 'messages/message-list', [
                 'view' => $view,
+                'select' => $select,
                 'heading' => 'Starred',
                 'messages' => $flagged,
                 'id' => 'mailbox-starred',
@@ -25,6 +26,7 @@ $view->render( 'nav', [
 
             $view->render( 'messages/message-list', [
                 'view' => $view,
+                'select' => $select,
                 'messages' => $unflagged,
                 'id' => 'mailbox-everything',
                 'counts' => $counts->unflagged,
