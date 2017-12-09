@@ -51,6 +51,18 @@ class Startup
         }
     }
 
+    public function runInbox()
+    {
+        $this->log->debug( "Starting inbox engine" );
+        $this->log->info( "Process ID: ". getmypid() );
+
+        if ( $this->console->daemon ) {
+            Message::send( new PidMessage( getmypid() ) );
+        }
+
+        $this->checkIfAccountsExist();
+    }
+
     /**
      * Check if any accounts exist in the database. If not, and
      * if we're in interactive mode, then prompt the user to add

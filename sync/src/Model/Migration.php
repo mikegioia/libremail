@@ -10,11 +10,11 @@
 
 namespace App\Model;
 
-use Fn
-  , DateTime
-  , App\Model
-  , Slim\PDO\Database
-  , App\Traits\Model as ModelTrait;
+use Fn;
+use DateTime;
+use App\Model;
+use Slim\PDO\Database;
+use App\Traits\Model as ModelTrait;
 
 class Migration extends Model
 {

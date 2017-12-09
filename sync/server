@@ -184,3 +184,7 @@ catch ( TerminateException $e ) {
     $di[ 'log' ]->getLogger()->addInfo( $e->getMessage() );
     exit( 0 );
 }
+// Unhandled exceptions
+catch ( Exception $e ) {
+    $di[ 'log' ]->displayError( $e );
+}

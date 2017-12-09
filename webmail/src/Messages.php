@@ -79,7 +79,7 @@ class Messages
     {
         $text = strip_tags( $message->text_plain );
         $text = trim( $escaper->escapeHtml( $text ) );
-        $message->snippet = ltrim( $text, "-_" );
+        $message->snippet = ltrim( $text, "-_=" );
     }
 
     /**

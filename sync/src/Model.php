@@ -16,6 +16,9 @@ class Model
     static protected $log;
     static protected $config;
 
+    const ASC = 'asc';
+    const DESC = 'desc';
+
     /**
      * @var bool Mode for returning new DB instance.
      */

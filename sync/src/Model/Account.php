@@ -2,15 +2,15 @@
 
 namespace App\Model;
 
-use PDO
-  , DateTime
-  , App\Model
-  , Particle\Validator\Validator
-  , App\Traits\Model as ModelTrait
-  , App\Exceptions\Validation as ValidationException
-  , App\Exceptions\AccountExists as AccountExistsException
-  , App\Exceptions\DatabaseInsert as DatabaseInsertException
-  , App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
+use PDO;
+use DateTime;
+use App\Model;
+use Particle\Validator\Validator;
+use App\Traits\Model as ModelTrait;
+use App\Exceptions\Validation as ValidationException;
+use App\Exceptions\AccountExists as AccountExistsException;
+use App\Exceptions\DatabaseInsert as DatabaseInsertException;
+use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 
 class Account extends Model
 {

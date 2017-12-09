@@ -42,7 +42,8 @@
         "react/event-loop": "^0.4.3",
         "cboden/ratchet": "^0.3.6",
         "react/child-process": "^0.4.3",
-        "mkraemer/react-pcntl": "^3.0"
+        "mkraemer/react-pcntl": "^3.0",
+        "evenement/evenement": "2.1.0"
     },
     "suggest": {
         "ext-ev": "*"

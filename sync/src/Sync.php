@@ -30,6 +30,7 @@ use App\Exceptions\Fatal as FatalException;
 use App\Exceptions\Terminate as TerminateException;
 use App\Exceptions\FolderSync as FolderSyncException;
 use App\Exceptions\MessagesSync as MessagesSyncException;
+use App\Traits\GarbageCollection as GarbageCollectionTrait;
 use App\Exceptions\MissingIMAPConfig as MissingIMAPConfigException;
 use App\Exceptions\AttachmentsPathNotWriteable as AttachmentsPathNotWriteableException;
 
@@ -57,8 +58,6 @@ class Sync
     private $maxRetries = 5;
     private $retriesFolders;
     private $retriesMessages;
-    private $gcEnabled = FALSE;
-    private $gcMemEnabled = FALSE;
 
     // Options
     const OPT_SKIP_DOWNLOAD = 'skip_download';
@@ -67,6 +66,8 @@ class Sync
     const EVENT_CHECK_HALT = 'check_halt';
     const EVENT_GARBAGE_COLLECT = 'garbage_collect';
     const EVENT_CHECK_CLOSED_CONN = 'check_closed_connection';
+
+    use GarbageCollectionTrait;
 
     /**
      * Constructor can either take a dependency container or have
@@ -97,10 +98,7 @@ class Sync
             $this->interactive = $di[ 'console' ]->interactive;
         }
 
-        // Enable garbage collection
-        gc_enable();
-        $this->gcEnabled = gc_enabled();
-        $this->gcMemEnabled = function_exists( 'gc_mem_caches' );
+        $this->initGc();
     }
 
     /**
@@ -731,19 +729,6 @@ class Sync
                 "system will sleep for a bit before re-trying.",
                 STATUS_ERROR );
             throw new StopException;
-        }
-    }
-
-    private function gc()
-    {
-        pcntl_signal_dispatch();
-
-        if ( $this->gcEnabled ) {
-            gc_collect_cycles();
-
-            if ( $this->gcMemEnabled ) {
-                gc_mem_caches();
-            }
         }
     }
 }

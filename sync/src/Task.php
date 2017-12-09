@@ -2,11 +2,11 @@
 
 namespace App;
 
-use Fn
-  , Exception
-  , App\Task\SaveAccountTask
-  , App\Task\AccountInfoTask
-  , App\Task\RemoveAccountTask;
+use Fn;
+use Exception;
+use App\Task\SaveAccountTask;
+use App\Task\AccountInfoTask;
+use App\Task\RemoveAccountTask;
 
 class Task
 {

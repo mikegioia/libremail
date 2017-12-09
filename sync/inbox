@@ -2,16 +2,16 @@
 <?php
 
 /**
- * Sync Engine
+ * Inbox and Task Engine
  *
- * This is the bootstrap file for the email syncing engine, called
- * from the CLI or managed via a supervisor. It works by checking
- * a list of saved IMAP credentials and runs through a flow of tasks.
+ * This is the bootstrap file for processing all local actions
+ * and committing them to the IMAP server. It also syncs the
+ * main Inbox folder more frequently than the full sync.
  */
 use App\Log;
 use App\Sync;
 use App\Model;
-use App\Stats;
+use App\Inbox;
 use App\Message;
 use App\Startup;
 use App\Constants;
@@ -19,11 +19,13 @@ use App\Diagnostics;
 use Pimple\Container;
 use Slim\PDO\Database;
 use Exception as Exception;
-use App\Console\SyncConsole;
+use React\EventLoop\Factory;
+use App\Console\InboxConsole;
+use MKraemer\ReactPCNTL\PCNTL;
 use PDOException as PDOException;
-use App\Sync\Threads as ThreadSync;
 use App\Exceptions\Stop as StopException;
 use App\Exceptions\Terminate as TerminateException;
+use Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 
 // Set up paths and constants
 set_time_limit( 0 );
@@ -58,92 +60,59 @@ $di = new Container;
 $di[ 'config' ] = $config;
 
 // Console/CLI service
-$di[ 'console' ] = new SyncConsole( $config );
+$di[ 'console' ] = new InboxConsole( $config );
 $di[ 'cli' ] = function ( $c ) {
     return $c[ 'console' ]->getCLI();
 };
+
+// Set up the event dispatcher
+$di[ 'emitter' ] = new Emitter;
 
 // Diagnostic test service
 $di[ 'diagnostics' ] = function ( $c ) {
     return new Diagnostics( $c );
 };
 
-// Statistics logging and printing service
-$di[ 'stats' ] = function ( $c ) {
-    return new Stats( $c[ 'console' ] );
-};
-
 // Logging service
 $di[ 'log' ] = function ( $c ) {
     return new Log(
         $c[ 'cli' ],
-        $c[ 'config' ][ 'log' ],
+        $c[ 'config' ][ 'inboxlog' ],
         $c[ 'console' ]->interactive === TRUE );
 };
 
 // Initialize the error and exception handlers
 $di[ 'log' ]->init();
 
-// Store a static reference to the threading system. This should be
-// saved in the container because the threading operation needs to
-// query and organize a large amount of data during the first pass.
-$di[ 'threader' ] = function ( $c ) {
-    return new ThreadSync(
-        $c[ 'log' ]->getLogger(),
-        $c[ 'cli' ],
-        $c[ 'console' ]->interactive === TRUE );
-};
+// React event loop
+$di[ 'loop' ] = Factory::create();
 
 // Set up the signal handler to shutdown
-$HALT = function ( $signo ) use ( $di ) {
-    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ) {
-        $di[ 'sync' ]->halt();
-    }
-    else {
-        throw new TerminateException;
+$TERMINATE = function () {
+    throw new TerminateException;
+};
+
+// Graceful shutdown
+$HALT = function () use ( $di ) {
+    if ( isset( $di[ 'inbox' ] ) && $di[ 'inbox' ] ) {
+        $di[ 'inbox' ]->halt();
     }
 };
 
-pcntl_signal( SIGHUP, $HALT );
-pcntl_signal( SIGINT, $HALT );
-pcntl_signal( SIGTERM, $HALT );
-pcntl_signal( SIGQUIT, $HALT );
+// Set up process handler bindings for React
+$pcntl = new PCNTL( $di[ 'loop' ] );
+$pcntl->on( SIGHUP, $TERMINATE );
+$pcntl->on( SIGINT, $TERMINATE );
+$pcntl->on( SIGTERM, $TERMINATE );
+$pcntl->on( SIGQUIT, $TERMINATE );
 
-// No-op, continue sync if asleep
-pcntl_signal( SIGCONT, function ( $signo ) use ( $di ) {
-    $di[ 'log' ]->getLogger()->addInfo(
-        "SIGCONT received, restarting sync" );
-    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ):
-        $di[ 'sync' ]->wake();
-    endif;
-});
-
-// Return back statistics on the current sync
-pcntl_signal( SIGUSR1, function ( $signo ) use ( $di ) {
-    $di[ 'log' ]->getLogger()->addDebug(
-        "SIGUSR1 received, printing text stats" );
-    if ( isset( $di[ 'stats' ] ) && $di[ 'stats' ] ):
-        $di[ 'stats' ]->text();
-    endif;
-});
-
-// SIGUSR2 returns JSON
-pcntl_signal( SIGUSR2, function ( $signo ) use ( $di ) {
-    $di[ 'log' ]->getLogger()->addDebug(
-        "SIGUSR2 received, printing JSON stats" );
-    if ( isset( $di[ 'stats' ] ) && $di[ 'stats' ] ):
-        $di[ 'stats' ]->json();
-    endif;
-});
-
-// SIGURG stops the syncing
-pcntl_signal( SIGURG, function ( $signo ) use ( $di ) {
-    $di[ 'log' ]->getLogger()->addInfo(
-        "SIGURG received, stopping sync" );
-    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ):
-        $di[ 'sync' ]->stop();
-    endif;
-});
+// Inbox processes tasks and syncs the inbox
+$di[ 'inbox' ] = new Inbox(
+    $di[ 'log' ]->getLogger(),
+    $di[ 'cli' ],
+    $di[ 'loop' ],
+    $di[ 'console' ],
+    $config[ 'inbox' ] );
 
 // PDO factory, this uses Slim-PDO as a wrapper
 $di[ 'db_factory' ] = $di->factory( function ( $c, $config = NULL ) {
@@ -174,7 +143,7 @@ $di[ 'db_factory' ] = $di->factory( function ( $c, $config = NULL ) {
 
 // Run the diagnostic tests. If specified from the CLI, then
 // output the results to the console and exit.
-$di[ 'diagnostics' ]->run();
+$di[ 'diagnostics' ]->runInbox();
 
 // PDO connection. This attempts to connect to the database.
 // If it fails here, the script will halt.
@@ -197,27 +166,20 @@ $di[ 'console' ]->init();
 // if we're running in interactive mode.
 try {
     $startup = new Startup( $di );
-    $startup->run();
+    $startup->runInbox();
+    $di[ 'inbox' ]->run();
 
-    runSyncLoop: {
-        $di[ 'sync' ] = new Sync( $di );
-        $di[ 'sync' ]->loop();
+    runLoop: {
+        $di[ 'loop' ]->stop();
+        $di[ 'loop' ]->run();
     }
 }
 // If the database connection dropped, kill the database service and
 // try to reconnect. Otherwise terminate.
 catch ( PDOException $e ) {
-    $di[ 'sync' ]->disconnect( TRUE );
-    $di[ 'sync' ] = NULL;
     $sec = $config[ 'app' ][ 'db' ][ 'sleep_minutes' ] * 60;
     Diagnostics::checkDatabaseException( $di, $e, TRUE, $sec );
-    goto runSyncLoop;
-}
-// Stop the current sync and re-run it
-catch ( StopException $e ) {
-    $di[ 'sync' ] = NULL;
-    sleep( 5 );
-    goto runSyncLoop;
+    goto runLoop;
 }
 // Gracefully exit if we're terminated
 catch ( TerminateException $e ) {

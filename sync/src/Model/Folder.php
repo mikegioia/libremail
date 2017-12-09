@@ -2,15 +2,15 @@
 
 namespace App\Model;
 
-use Fn
-  , PDO
-  , DateTime
-  , App\Model
-  , Particle\Validator\Validator
-  , App\Traits\Model as ModelTrait
-  , App\Exceptions\Validation as ValidationException
-  , App\Exceptions\DatabaseUpdate as DatabaseUpdateException
-  , App\Exceptions\DatabaseInsert as DatabaseInsertException;
+use Fn;
+use PDO;
+use DateTime;
+use App\Model;
+use Particle\Validator\Validator;
+use App\Traits\Model as ModelTrait;
+use App\Exceptions\Validation as ValidationException;
+use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
+use App\Exceptions\DatabaseInsert as DatabaseInsertException;
 
 class Folder extends Model
 {

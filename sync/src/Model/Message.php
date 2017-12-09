@@ -554,6 +554,41 @@ class Message extends Model
     }
 
     /**
+     * Saves a flag value for a message by ID.
+     * @param int $id
+     * @param string $flag
+     * @param string $value
+     * @throws ValidationException
+     * @throws DatabaseUpdateException
+     */
+    public function setFlag( $id, $flag, $value )
+    {
+        $this->requireInt( $id, 'Message ID' );
+        $this->requireValue( $flag, [
+            self::FLAG_SEEN, self::FLAG_FLAGGED
+        ]);
+
+        if ( ! $this->isValidFlag( $value ) ) {
+            throw new ValidationException(
+                "Invalid flag value '$value' for $flag" );
+        }
+
+        $updated = $this->db()
+            ->update([
+                $flag => $value
+            ])
+            ->table( 'messages' )
+            ->where( 'id', '=', $id )
+            ->execute();
+
+        if ( ! Belt::isNumber( $updated ) ) {
+            throw new DatabaseUpdateException(
+                MESSAGE,
+                $this->db()->getError() );
+        }
+    }
+
+    /**
      * Saves a thread ID for the given messages.
      * @param array $ids
      * @param int $threadId

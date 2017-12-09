@@ -4,11 +4,12 @@ namespace App\Console;
 
 use App\Console;
 
-class ServerConsole extends Console
+class InboxConsole extends Console
 {
     // Command line arguments
     public $help;
     public $daemon;
+    public $rollback;
     public $background;
     public $interactive;
 
@@ -48,6 +49,12 @@ class ServerConsole extends Console
                 'description' => 'Interact with the CLI; ignored if background set',
                 'defaultValue' => TRUE,
                 'noValue' => TRUE
+            ],
+            'rollback' => [
+                'prefix' => 'r',
+                'longPrefix' => 'rollback',
+                'description' => 'Reverts all local changes that were made',
+                'noValue' => TRUE
             ]
         ]);
     }
@@ -60,11 +67,12 @@ class ServerConsole extends Console
         $this->cli->arguments->parse();
         $this->help = $this->cli->arguments->get( 'help' );
         $this->daemon = $this->cli->arguments->get( 'daemon' );
+        $this->rollback = $this->cli->arguments->get( 'rollback' );
         $this->background = $this->cli->arguments->get( 'background' );
         $this->interactive = $this->cli->arguments->get( 'interactive' );
 
         // If background is set, turn off interactive
-        if ( $this->background === TRUE ) {
+        if ( $this->background === TRUE || $this->rollback === TRUE ) {
             $this->interactive = FALSE;
         }
     }
@@ -83,6 +91,12 @@ class ServerConsole extends Console
         // If we're in interactive mode, sent the sync message
         if ( $this->interactive === TRUE ) {
             $this->cli->info( "Starting socket server in interactive mode" );
+        }
+
+        // If we're in rolling back changes
+        if ( $this->rollback === TRUE ) {
+            $this->cli->warning(
+                "Rollback mode enabled. This script will halt when finished." );
         }
     }
 }

@@ -7,6 +7,8 @@ use App\Console;
 class DaemonConsole extends Console
 {
     // Command line arguments
+    public $help;
+    public $sync;
     public $webServer;
 
     public function __construct()
@@ -21,6 +23,11 @@ class DaemonConsole extends Console
     protected function setupArgs()
     {
         $this->cli->arguments->add([
+            'disable-sync' => [
+                'longPrefix' => 'disable-sync',
+                'description' => 'Start without the sync enabled',
+                'noValue' => TRUE
+            ],
             'disable-webserver' => [
                 'longPrefix' => 'disable-webserver',
                 'description' => 'Start without the webserver enabled',
@@ -42,6 +49,7 @@ class DaemonConsole extends Console
     {
         $this->cli->arguments->parse();
         $this->help = $this->cli->arguments->get( 'help' );
+        $this->sync = ! $this->cli->arguments->get( 'disable-sync' );
         $this->webServer = ! $this->cli->arguments->get( 'disable-webserver' );
     }
 

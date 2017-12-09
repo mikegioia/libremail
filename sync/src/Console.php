@@ -8,6 +8,8 @@ abstract class Console
 {
     // CLImate instance
     protected $cli;
+    // Used in child classes
+    public $diagnostics;
 
     public function __construct()
     {

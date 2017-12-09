@@ -2,20 +2,20 @@
 
 namespace App;
 
-use App\Log
-  , Exception
-  , App\Command
-  , App\Message
-  , App\Events\MessageEvent
-  , App\Console\DaemonConsole
-  , App\Message\HealthMessage
-  , React\ChildProcess\Process
-  , App\Message\AbstractMessage
-  , React\EventLoop\LoopInterface
-  , App\Traits\JsonMessage as JsonMessageTrait
-  , App\Exceptions\Terminate as TerminateException
-  , App\Exceptions\BadCommand as BadCommandException
-  , Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
+use App\Log;
+use Exception;
+use App\Command;
+use App\Message;
+use App\Events\MessageEvent;
+use App\Console\DaemonConsole;
+use App\Message\HealthMessage;
+use React\ChildProcess\Process;
+use App\Message\AbstractMessage;
+use React\EventLoop\LoopInterface;
+use App\Traits\JsonMessage as JsonMessageTrait;
+use App\Exceptions\Terminate as TerminateException;
+use App\Exceptions\BadCommand as BadCommandException;
+use Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 
 class Daemon
 {
@@ -74,6 +74,10 @@ class Daemon
     public function startSync()
     {
         if ( $this->halt === TRUE ) {
+            return;
+        }
+
+        if ( ! $this->console->sync ) {
             return;
         }
 
