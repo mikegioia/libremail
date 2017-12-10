@@ -75,7 +75,7 @@ class Threads
         }
 
         $this->emitter = $emitter;
-        $this->storeMaxMessageId();
+        $this->storeMessageIdBounds();
         $this->storeTotalMessageIds();
 
         // Pass 1
@@ -92,9 +92,11 @@ class Threads
     /**
      * Finds the last message ID to store and update.
      */
-    private function storeMaxMessageId()
+    private function storeMessageIdBounds()
     {
-        $this->maxId = (new MessageModel)->getMaxMessageId( $this->account->id );
+        $model = new MessageModel;
+        $this->maxId = $model->getMaxMessageId( $this->account->id );
+        $this->currentId = $model->getMinMessageId( $this->account->id );
     }
 
     private function storeTotalMessageIds()

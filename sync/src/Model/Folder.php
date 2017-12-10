@@ -78,6 +78,7 @@ class Folder extends Model
     {
         $val = new Validator;
         $val->optional( 'count', 'Count' )->integer();
+        $val->optional( 'ignored', 'Ignored' )->numeric();
         $val->optional( 'synced', 'Synced count' )->numeric();
         $val->required( 'account_id', 'Account ID' )->numeric();
         $val->required( 'name', 'Name' )->lengthBetween( 0, 255 );
@@ -127,7 +128,6 @@ class Folder extends Model
         $createdAt = new DateTime;
         unset( $data[ 'id' ] );
         $data[ 'deleted' ] = 0;
-        $data[ 'ignored' ] = 0;
         $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
         $newFolderId = $this->db()
             ->insert( array_keys( $data ) )

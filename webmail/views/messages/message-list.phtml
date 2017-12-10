@@ -1,11 +1,11 @@
-<input type="checkbox" id="mailbox-everything-checkbox" class="mailbox-checkbox" />
+<input type="checkbox" id="<?php echo $id; ?>-checkbox" class="mailbox-checkbox" />
 <h5>
-    <label for="mailbox-everything-checkbox">
+    <label for="<?php echo $id; ?>-checkbox">
         <i class="fa fa-caret-down arrow"></i>
         <i class="fa fa-caret-right arrow"></i>
     </label>
     <span><?php echo $heading; ?></span>
-    <a href="#">
+    <a href="<?php echo App\Url::make( '/folder/%s', $folderId ); ?>">
         <strong><?php echo $counts->start; ?></strong>
         <var>&ndash;</var>
         <strong><?php echo $counts->end; ?></strong>

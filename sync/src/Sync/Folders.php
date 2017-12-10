@@ -21,6 +21,10 @@ class Folders
     private $emitter;
     private $interactive;
 
+    const IGNORED_LIST = [
+        '[Gmail]'
+    ];
+
     /**
      * @param Logger $log
      * @param CLImate $cli
@@ -62,7 +66,7 @@ class Folders
 
         foreach ( $folderList as $folderName ) {
             if ( ! array_key_exists( (string) $folderName, $savedFolders ) ) {
-                $toAdd[] = $folderName;
+                $toAdd[] = (string) $folderName;
             }
         }
 
@@ -84,7 +88,8 @@ class Folders
         foreach ( $toAdd as $folderName ) {
             $folder = new FolderModel([
                 'name' => $folderName,
-                'account_id' => $account->getId()
+                'account_id' => $account->getId(),
+                'ignored' => $this->getIgnored( $folderName )
             ]);
             $folder->save();
             $folders[ $folder->getId() ] = $folder;
@@ -128,5 +133,17 @@ class Folders
         foreach ( $toRemove as $folder ) {
             $folder->delete();
         }
+    }
+
+    /**
+     * Certain folders should be automatically ignored.
+     * @param string $folderName
+     * @return int
+     */
+    private function getIgnored( $folderName )
+    {
+        return ( in_array( $folderName, self::IGNORED_LIST ) )
+            ? 1
+            : 0;
     }
 }

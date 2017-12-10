@@ -3,29 +3,29 @@
     <div id="nav-wrapper">
         <ul id="mailboxes">
             <li class="active">
-                <a href="inbox" class="mailbox">Inbox</a>
+                <a href="<?php echo App\Url::folder( $folders->getInboxId() ); ?>" class="mailbox">Inbox</a>
                 <label class="folder-label"></label>
             </li>
             <li>
-                <a href="starred" class="mailbox">Starred</a>
+                <a href="<?php echo App\Url::folder( $folders->getStarredId() ); ?>" class="mailbox">Starred</a>
                 <label class="folder-label"></label>
             </li>
             <li>
-                <a href="sent" class="mailbox">Sent</a>
+                <a href="<?php echo App\Url::folder( $folders->getSentId() ); ?>" class="mailbox">Sent</a>
                 <label class="folder-label"></label>
             </li>
             <li>
-                <a href="drafts" class="mailbox">Drafts</a>
+                <a href="<?php echo App\Url::folder( $folders->getDraftsId() ); ?>" class="mailbox">Drafts</a>
                 <label class="folder-label"></label>
             </li>
             <li>
-                <a href="all" class="mailbox">All Mail</a>
+                <a href="<?php echo App\Url::folder( $folders->getAllId() ); ?>" class="mailbox">All Mail</a>
                 <label class="folder-label"></label>
             </li>
         </ul>
         <ul id="folders">
         <?php
-        foreach ( $folderTree as $item ):
+        foreach ( $folders->getTree() as $item ):
             $view->render( 'nav/folder', [
                 'view' => $view,
                 'folder' => $item[ 'folder' ],

@@ -1,9 +1,10 @@
 <?php
+
 $view->render( 'header' );
 
 $view->render( 'nav', [
     'view' => $view,
-    'folderTree' => $folderTree
+    'folders' => $folders
 ]); ?>
 
 <section id="main">
@@ -20,7 +21,8 @@ $view->render( 'nav', [
                 'heading' => 'Starred',
                 'messages' => $flagged,
                 'id' => 'mailbox-starred',
-                'counts' => $counts->flagged
+                'counts' => $counts->flagged,
+                'folderId' => $folders->getInboxId()
             ]);
         endif;
 
@@ -30,24 +32,25 @@ $view->render( 'nav', [
                 'messages' => $unflagged,
                 'id' => 'mailbox-everything',
                 'counts' => $counts->unflagged,
-                'heading' => 'Everything else'
+                'heading' => 'Everything else',
+                'folderId' => $folders->getInboxId()
             ]);
             $view->render( 'messages/footer' ); ?>
         </section>
 
         <?php
         $view->render( 'messages/move-messages', [
-            'folders' => $folders
+            'folders' => $folders->get()
         ]);
         $view->render( 'messages/apply-folder', [
-            'folders' => $folders
+            'folders' => $folders->get()
         ]); ?>
     </form>
 </section>
 
 <?php
 $view->render( 'messages/datalist', [
-    'folders' => $folders
+    'folders' => $folders->get()
 ]);
 
 $view->render( 'footer' ); ?>

@@ -1,22 +1,18 @@
 <?php
 
-namespace App\Inbox;
+namespace App\Sync;
 
-use App\Inbox;
 use League\CLImate\CLImate;
 use App\Model\Task as TaskModel;
 use App\Model\Message as MessageModel;
-use Evenement\EventEmitter as Emitter;
 
 class Rollback
 {
     private $cli;
-    private $emitter;
 
-    public function __construct( CLImate $cli, Emitter $emitter )
+    public function __construct( CLImate $cli )
     {
         $this->cli = $cli;
-        $this->emitter = $emitter;
     }
 
     /**
@@ -47,8 +43,6 @@ class Rollback
             catch ( DatabaseUpdateException $e ) {
                 throw PDOException( $e );
             }
-
-            $this->emitter->emit( Inbox::EVENT_CHECK_HALT );
         }
 
         $this->cli->info(

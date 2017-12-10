@@ -7,9 +7,15 @@ use App\Model\Account;
 
 class Folders
 {
+    private $inbox;
+    private $allId;
     private $colors;
+    private $sentId;
     private $folders;
     private $inboxId;
+    private $trashId;
+    private $draftsId;
+    private $starredId;
     private $accountId;
     private $folderTree;
     private $colorCount;
@@ -22,6 +28,21 @@ class Folders
     // Mailbox constants
     const INBOX = 'inbox';
     const GMAIL = '[gmail]';
+    const DRAFTS = [
+        '[Gmail]/Drafts'
+    ];
+    const TRASH = [
+        '[Gmail]/Trash'
+    ];
+    const STARRED = [
+        '[Gmail]/Starred'
+    ];
+    const ALL = [
+        '[Gmail]/All Mail'
+    ];
+    const SENT = [
+        '[Gmail]/Sent Mail'
+    ];
 
     /**
      * @param Account $account
@@ -60,16 +81,40 @@ class Folders
         return $this->folders;
     }
 
+    public function getAllId()
+    {
+        return $this->getMailboxId( 'allId' );
+    }
+
+    public function getSentId()
+    {
+        return $this->getMailboxId( 'sentId' );
+    }
+
     public function getInboxId()
     {
-        if ( $this->inboxId ) {
-            return $this->inboxId;
+        return $this->getMailboxId( 'inboxId' );
+    }
+
+    public function getDraftsId()
+    {
+        return $this->getMailboxId( 'draftsId' );
+    }
+
+    public function getStarredId()
+    {
+        return $this->getMailboxId( 'starredId' );
+    }
+
+    private function getMailboxId( $mailbox )
+    {
+        if ( isset( $this->{$mailbox} ) ) {
+            return $this->{$mailbox};
         }
 
-        // Sets inbox ID
         $this->get();
 
-        return $this->inboxId;
+        return $this->{$mailbox};
     }
 
     public function getTree()
@@ -195,16 +240,40 @@ class Folders
      */
     private function setMailboxType( &$folder )
     {
-        if ( strtolower( $folder->name ) === self::INBOX ) {
+        $name = $folder->name;
+
+        if ( strtolower( $name ) === self::INBOX
+            && ! $this->inboxId )
+        {
+            $this->inbox =& $folder;
             $folder->is_mailbox = TRUE;
             $this->inboxId = $folder->id;
         }
         // Special case for GMail
-        elseif ( strpos( strtolower( $folder->name ), self::GMAIL ) === 0 ) {
+        elseif ( strpos( strtolower( $name ), self::GMAIL ) === 0 ) {
             $folder->is_mailbox = TRUE;
         }
         else {
             $folder->is_mailbox = FALSE;
+        }
+
+        // Set special IDs for certain mailboxes
+        if ( $folder->is_mailbox ) {
+            if ( ! $this->allId && in_array( $name, self::ALL ) ) {
+                $this->allId = $folder->id;
+            }
+            elseif ( ! $this->sentId && in_array( $name, self::SENT ) ) {
+                $this->sentId = $folder->id;
+            }
+            elseif ( ! $this->trashId && in_array( $name, self::TRASH ) ) {
+                $this->trashId = $folder->id;
+            }
+            elseif ( ! $this->draftsId && in_array( $name, self::DRAFTS ) ) {
+                $this->draftsId = $folder->id;
+            }
+            elseif ( ! $this->starredId && in_array( $name, self::STARRED ) ) {
+                $this->starredId = $folder->id;
+            }
         }
     }
 

@@ -22,6 +22,11 @@ class Url
         return self::$base . vsprintf( $path, $parts );
     }
 
+    static public function folder( $folderId )
+    {
+        return self::make( '/folder/%s', $folderId );
+    }
+
     static public function redirect( $path, $params = [], $code = 303 )
     {
         header( 'Location: '. self::get( $path, $params ), $code );

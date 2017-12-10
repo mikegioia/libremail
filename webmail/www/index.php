@@ -85,9 +85,8 @@ $router->get( '/', function () use ( $account ) {
         'counts' => $counts,
         'select' => $select,
         'flagged' => $starred,
-        'unflagged' => $messages,
-        'folders' => $folders->get(),
-        'folderTree' => $folders->getTree()
+        'folders' => $folders,
+        'unflagged' => $messages
     ]);
 });
 

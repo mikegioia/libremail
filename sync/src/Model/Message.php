@@ -184,6 +184,23 @@ class Message extends Model
     }
 
     /**
+     * Finds the lowest ID for an account.
+     * @param int $accountId
+     * @return int
+     */
+    public function getMinMessageId( $accountId )
+    {
+        $row = $this->db()
+            ->select([ 'min(id) as min' ])
+            ->from( 'messages' )
+            ->where( 'account_id', '=', $accountId )
+            ->execute()
+            ->fetch();
+
+        return $row ? $row[ 'min' ] : 0;
+    }
+
+    /**
      * Returns a list of integer unique IDs given an account ID
      * and a folder ID to search. This fetches IDs in pages to
      * not exceed any memory limits on the query response.

@@ -2,11 +2,12 @@
 
 namespace App\Console;
 
-use Exception
-  , App\Console
-  , App\Diagnostics
-  , App\Model\Account as AccountModel
-  , App\Model\Migration as MigrationModel;
+use Exception;
+use App\Console;
+use App\Diagnostics;
+use App\Sync\Rollback;
+use App\Model\Account as AccountModel;
+use App\Model\Migration as MigrationModel;
 
 class SyncConsole extends Console
 {
@@ -22,6 +23,7 @@ class SyncConsole extends Console
     public $daemon;
     public $verbose;
     public $updatedb;
+    public $rollback;
     public $threading;
     public $background;
     public $diagnostics;
@@ -89,6 +91,12 @@ class SyncConsole extends Console
                 'description' => 'Skips downloading attachments and message content',
                 'noValue' => TRUE
             ],
+            'rollback' => [
+                'prefix' => 'r',
+                'longPrefix' => 'rollback',
+                'description' => 'Reverts all local changes that were made',
+                'noValue' => TRUE
+            ],
             'sleep' => [
                 'prefix' => 's',
                 'longPrefix' => 'sleep',
@@ -124,6 +132,7 @@ class SyncConsole extends Console
         $this->daemon = $this->cli->arguments->get( 'daemon' );
         $this->verbose = $this->cli->arguments->get( 'verbose' );
         $this->updatedb = $this->cli->arguments->get( 'updatedb' );
+        $this->rollback = $this->cli->arguments->get( 'rollback' );
         $this->threading = $this->cli->arguments->get( 'threading' );
         $this->background = $this->cli->arguments->get( 'background' );
         $this->diagnostics = $this->cli->arguments->get( 'diagnostics' );
@@ -138,6 +147,7 @@ class SyncConsole extends Console
         if ( $this->sleep === TRUE
             || $this->create === TRUE
             || $this->updatedb === TRUE
+            || $this->rollback === TRUE
             || $this->threading === TRUE
             || $this->diagnostics === TRUE )
         {
@@ -167,6 +177,15 @@ class SyncConsole extends Console
         if ( $this->updatedb === TRUE ) {
             $migrate = new MigrationModel;
             $migrate->run();
+            exit( 0 );
+        }
+
+        // If we're in rolling back changes, run it now
+        if ( $this->rollback === TRUE ) {
+            $this->cli->warning(
+                "Rollback mode enabled. This script will halt when finished." );
+            $rollback = new Rollback( $this->cli );
+            $rollback->run();
             exit( 0 );
         }
 
@@ -224,7 +243,7 @@ class SyncConsole extends Console
             // Test connection before adding
             $this->testConnection( $newAccount );
             $accountModel = new AccountModel( $newAccount );
-            $accountModel->save();
+            $accountModel->save( [], TRUE );
         }
         catch ( Exception $e ) {
             $this->cli->boldRedBackgroundBlack( $e->getMessage() );
@@ -283,12 +302,14 @@ class SyncConsole extends Console
     private function promptEmail()
     {
         $input = $this->cli->input( 'Email address:' );
+
         return $input->prompt();
     }
 
     private function promptPassword()
     {
         $input = $this->cli->password( 'Password:' );
+
         return $input->prompt();
     }
 
