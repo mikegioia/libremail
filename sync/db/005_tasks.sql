@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `type` varchar(8) COLLATE utf8_unicode_ci NOT NULL,
   `status` tinyint(1) unsigned NOT NULL,
   `old_value` tinyint(1) unsigned DEFAULT NULL,
-  `folders` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `folder_id` int(10) unsigned DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   INDEX (`status`),

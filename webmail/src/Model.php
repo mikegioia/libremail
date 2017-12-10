@@ -46,6 +46,11 @@ class Model
      */
     public function db()
     {
+        return self::getDb();
+    }
+
+    static public function getDb()
+    {
         if ( isset( self::$db ) ) {
             return self::$db;
         }

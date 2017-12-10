@@ -13,6 +13,7 @@ use App\Daemon;
 use App\Message;
 use PDOException;
 use Monolog\Logger;
+use App\Diagnostics;
 use Pb\Imap\Mailbox;
 use Pimple\Container;
 use League\CLImate\CLImate;
@@ -32,7 +33,6 @@ use App\Exceptions\FolderSync as FolderSyncException;
 use App\Exceptions\MessagesSync as MessagesSyncException;
 use App\Traits\GarbageCollection as GarbageCollectionTrait;
 use App\Exceptions\MissingIMAPConfig as MissingIMAPConfigException;
-use App\Exceptions\AttachmentsPathNotWriteable as AttachmentsPathNotWriteableException;
 
 class Sync
 {
@@ -367,7 +367,7 @@ class Sync
     public function connect( $host, $port, $email, $password, $folder = NULL, $setRunning = TRUE )
     {
         // Check the attachment directory is writeable
-        $attachmentsPath = $this->checkAttachmentsPath( $email );
+        $attachmentsPath = Diagnostics::checkAttachmentsPath( $email );
 
         // If the connection is active, then just select the folder
         if ( $this->mailbox ) {
@@ -444,38 +444,6 @@ class Sync
     {
         $this->wake = TRUE;
         $this->halt = FALSE;
-    }
-
-    /**
-     * Checks if the attachments path is writeable by the user.
-     * @param string $email
-     * @throws AttachmentsPathNotWriteableException
-     * @return boolean
-     */
-    public function checkAttachmentsPath( $email, $createEmailDir = TRUE )
-    {
-        $slash = DIRECTORY_SEPARATOR;
-        $configPath = $this->config[ 'email' ][ 'attachments' ][ 'path' ];
-        $attachmentsDir = ( substr( $configPath, 0, 1 ) !== $slash )
-            ? BASEPATH
-            : $configPath;
-
-        if ( ! is_writeable( $attachmentsDir ) ) {
-            throw new AttachmentsPathNotWriteableException( $attachmentsDir );
-        }
-
-        if ( ! $createEmailDir ) {
-            return TRUE;
-        }
-
-        $attachmentsPath = ( substr( $configPath, 0, 1 ) !== $slash )
-            ? BASEPATH ."$slash$configPath"
-            : $configPath;
-        $attachmentsPath .= "$slash$email";
-
-        @mkdir( $attachmentsPath, 0755, TRUE );
-
-        return $attachmentsPath;
     }
 
     /**

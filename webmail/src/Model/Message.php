@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use PDO;
+use Exception;
 use App\Model;
 
 class Message extends Model
@@ -27,6 +28,7 @@ class Message extends Model
     public $date_str;
     public $unique_id;
     public $folder_id;
+    public $thread_id;
     public $text_html;
     public $account_id;
     public $message_id;
@@ -45,6 +47,43 @@ class Message extends Model
     // Flags
     const FLAG_SEEN = 'seen';
     const FLAG_FLAGGED = 'flagged';
+    const FLAG_DELETED = 'deleted';
+
+    public function getData()
+    {
+        return [
+            'id' => $this->id,
+            'to' => $this->to,
+            'cc' => $this->cc,
+            'bcc' => $this->bcc,
+            'from' => $this->from,
+            'date' => $this->date,
+            'size' => $this->size,
+            'seen' => $this->seen,
+            'draft' => $this->draft,
+            'synced' => $this->synced,
+            'recent' => $this->recent,
+            'flagged' => $this->flagged,
+            'deleted' => $this->deleted,
+            'subject' => $this->subject,
+            'charset' => $this->charset,
+            'answered' => $this->answered,
+            'reply_to' => $this->reply_to,
+            'date_str' => $this->date_str,
+            'unique_id' => $this->unique_id,
+            'folder_id' => $this->folder_id,
+            'thread_id' => $this->thread_id,
+            'text_html' => $this->text_html,
+            'account_id' => $this->account_id,
+            'message_id' => $this->message_id,
+            'message_no' => $this->message_no,
+            'text_plain' => $this->text_plain,
+            'references' => $this->references,
+            'created_at' => $this->created_at,
+            'in_reply_to' => $this->in_reply_to,
+            'attachments' => $this->attachments
+        ];
+    }
 
     public function getAttachments()
     {
@@ -294,24 +333,43 @@ class Message extends Model
 
     /**
      * Returns any message with the same message ID and thread ID.
+     * @param array $filters
      * @return array of ints
      */
-    public function getSiblingIds()
+    public function getSiblingIds( $filters = [] )
     {
-        $ids = [ $this->id ];
+        $ids = [];
+        $addSelf = TRUE;
+
+        // If there are any filters, first check this message
+        foreach ( $filters as $key => $value ) {
+            if ( $this->$key != $value ) {
+                $addSelf = FALSE;
+                break;
+            }
+        }
+
+        if ( $addSelf ) {
+            $ids[] = $this->id;
+        }
 
         if ( ! $this->message_id ) {
             return $ids;
         }
 
-        $results = $this->db()
+        $query = $this->db()
             ->select([ 'id' ])
             ->from( 'messages' )
+            ->where( 'deleted', '=', 0 )
             ->where( 'thread_id', '=', $this->thread_id )
             ->where( 'account_id', '=', $this->account_id )
-            ->where( 'message_id', '=', $this->message_id )
-            ->execute()
-            ->fetchAll( PDO::FETCH_CLASS );
+            ->where( 'message_id', '=', $this->message_id );
+
+        foreach ( $filters as $key => $value ) {
+            $query->where( $key, '=', $value );
+        }
+
+        $results = $query->execute()->fetchAll( PDO::FETCH_CLASS );
 
         foreach ( $results as $result ) {
             $ids[] = $result->id;
@@ -337,5 +395,52 @@ class Message extends Model
             ->execute();
 
         return is_numeric( $updated );
+    }
+
+    /**
+     * Create a new message in the specified folder.
+     * @param int $folderId
+     * @return Message
+     * @throws Exception
+     */
+    public function copyTo( $folderId )
+    {
+        // If this message exists in the folder and is not deleted,
+        // then skip the operation.
+        $existingMessage = $this->db()
+            ->select([ 'id' ])
+            ->from( 'messages' )
+            ->where( 'deleted', '=', 0 )
+            ->where( 'folder_id', '=', $folderId )
+            ->where( 'thread_id', '=', $this->thread_id )
+            ->where( 'message_id', '=', $this->message_id )
+            ->where( 'account_id', '=', $this->account_id )
+            ->execute()
+            ->fetchObject();
+
+        if ( $existingMessage && $existingMessage->id ) {
+            return TRUE;
+        }
+
+        $data = $this->getData();
+        unset( $data[ 'id' ] );
+        $data[ 'unique_id' ] = NULL;
+        $data[ 'message_no' ] = NULL;
+        $data[ 'folder_id' ] = $folderId;
+
+        $newMessageId = $this->db()
+            ->insert( array_keys( $data ) )
+            ->into( 'messages' )
+            ->values( array_values( $data ) )
+            ->execute();
+
+        if ( ! $newMessageId ) {
+            throw new Exception(
+                "Failed copying message {$this->id} to Folder #{$folderId}" );
+        }
+
+        $data[ 'id' ] = $newMessageId;
+
+        return new static( $data );
     }
 }

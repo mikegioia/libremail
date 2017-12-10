@@ -2,6 +2,7 @@
 
 namespace App\Sync;
 
+use App\Model;
 use League\CLImate\CLImate;
 use App\Model\Task as TaskModel;
 use App\Model\Message as MessageModel;
@@ -33,17 +34,24 @@ class Rollback
             return;
         }
 
-        foreach ( $tasks as $task ) {
-            try {
-                if ( $this->revertMessage( $task, $messageModel ) ) {
+        Model::getDb()->beginTransaction();
+
+        try {
+            foreach ( $tasks as $task ) {
+                if ( $this->revertAction( $task, $messageModel ) ) {
                     $task->revert();
                     $count++;
                 }
             }
-            catch ( DatabaseUpdateException $e ) {
-                throw PDOException( $e );
-            }
         }
+        catch ( Exception $e ) {
+            $this->cli->whisper(
+                "Problem during rollback, rolling back the rollback :P" );
+            Model::getDb()->rollBack();
+            throw new PDOException( $e );
+        }
+
+        Model::getDb()->commit();
 
         $this->cli->info(
             "Finished rolling back $count task".
@@ -55,7 +63,7 @@ class Rollback
      * @param TaskModel $task
      * @param MessageModel $message
      */
-    private function revertMessage( TaskModel $task, MessageModel $message )
+    private function revertAction( TaskModel $task, MessageModel $message )
     {
         switch ( $task->type ) {
             case TaskModel::TYPE_READ:
@@ -72,6 +80,23 @@ class Rollback
                     $task->message_id,
                     MessageModel::FLAG_FLAGGED,
                     $task->old_value );
+                return TRUE;
+
+            case TaskModel::TYPE_DELETE:
+            case TaskModel::TYPE_UNDELETE:
+                $message->setFlag(
+                    $task->message_id,
+                    MessageModel::FLAG_DELETED,
+                    $task->old_value );
+                return TRUE;
+
+            case TaskModel::TYPE_COPY:
+                // Mark as deleted any messages with this message-id
+                // that are in the specified folder and that do not have
+                // a unique ID field.
+                $message->deleteCopiedMessages(
+                    $task->message_id,
+                    $task->folder_id );
                 return TRUE;
         }
     }

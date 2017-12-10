@@ -309,7 +309,7 @@ section #msg-actions a.button {
 }
 
 .folder-selector .list {
-    bottom: 4.5rem;
+    bottom: 5.5rem;
     box-sizing: border-box;
     left: 0;
     overflow-y: auto;
@@ -369,8 +369,8 @@ section #msg-actions a.button {
     border-top: 1px solid #ddd;
     bottom: 0;
     box-sizing: border-box;
-    height: 4.5rem;
-    padding: 0.5rem 1rem;
+    height: 5.5rem;
+    padding: 1rem;
     position: absolute;
     width: 100%;
 }

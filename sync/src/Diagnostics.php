@@ -2,23 +2,23 @@
 
 namespace App;
 
-use Fn
-  , App\Log
-  , App\Sync
-  , Exception
-  , App\Daemon
-  , App\Message
-  , PDOException
-  , Pimple\Container
-  , League\CLImate\CLImate
-  , App\Message\ErrorMessage
-  , App\Message\DiagnosticsMessage
-  , App\Model\Migration as MigrationModel
-  , App\Exceptions\Fatal as FatalException
-  , App\Exceptions\Terminate as TerminateException
-  , App\Exceptions\MaxAllowedPacket as MaxAllowedPacketException
-  , App\Exceptions\LogPathNotWriteable as LogPathNotWriteableException
-  , App\Exceptions\AttachmentsPathNotWriteable as AttachmentsPathNotWriteableException;
+use Fn;
+use App\Log;
+use App\Sync;
+use Exception;
+use App\Daemon;
+use App\Message;
+use PDOException;
+use Pimple\Container;
+use League\CLImate\CLImate;
+use App\Message\ErrorMessage;
+use App\Message\DiagnosticsMessage;
+use App\Model\Migration as MigrationModel;
+use App\Exceptions\Fatal as FatalException;
+use App\Exceptions\Terminate as TerminateException;
+use App\Exceptions\MaxAllowedPacket as MaxAllowedPacketException;
+use App\Exceptions\LogPathNotWriteable as LogPathNotWriteableException;
+use App\Exceptions\AttachmentsPathNotWriteable as AttachmentsPathNotWriteableException;
 
 class Diagnostics
 {
@@ -237,8 +237,7 @@ class Diagnostics
         $this->startTest( self::TEST_ATTACH_PATH );
 
         try {
-            $sync = new Sync( $this->di );
-            $attachmentPath = $sync->checkAttachmentsPath(
+            $attachmentPath = self::checkAttachmentsPath(
                 'test@example.org',
                 FALSE ); // don't create the directory
             $this->endTest( STATUS_SUCCESS, self::TEST_ATTACH_PATH );
@@ -400,6 +399,38 @@ class Diagnostics
             $account[ 'password' ],
             $folder = NULL,
             $setRunning = FALSE );
+    }
+
+    /**
+     * Checks if the attachments path is writeable by the user.
+     * @param string $email
+     * @throws AttachmentsPathNotWriteableException
+     * @return boolean
+     */
+    static public function checkAttachmentsPath( $email, $createEmailDir = TRUE )
+    {
+        $slash = DIRECTORY_SEPARATOR;
+        $configPath = self::$config[ 'email' ][ 'attachments' ][ 'path' ];
+        $attachmentsDir = ( substr( $configPath, 0, 1 ) !== $slash )
+            ? BASEPATH
+            : $configPath;
+
+        if ( ! is_writeable( $attachmentsDir ) ) {
+            throw new AttachmentsPathNotWriteableException( $attachmentsDir );
+        }
+
+        if ( ! $createEmailDir ) {
+            return TRUE;
+        }
+
+        $attachmentsPath = ( substr( $configPath, 0, 1 ) !== $slash )
+            ? BASEPATH ."$slash$configPath"
+            : $configPath;
+        $attachmentsPath .= "$slash$email";
+
+        @mkdir( $attachmentsPath, 0755, TRUE );
+
+        return $attachmentsPath;
     }
 
     /**

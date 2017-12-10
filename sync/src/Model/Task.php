@@ -16,8 +16,8 @@ class Task extends Model
     public $id;
     public $type;
     public $status;
-    public $folders;
     public $old_value;
+    public $folder_id;
     public $account_id;
     public $message_id;
     public $created_at;
@@ -28,13 +28,11 @@ class Task extends Model
     const STATUS_REVERTED = 3;
 
     const TYPE_COPY = 'copy';
-    const TYPE_MOVE = 'move';
     const TYPE_READ = 'read';
     const TYPE_FLAG = 'flag';
     const TYPE_DELETE = 'delete';
     const TYPE_UNFLAG = 'unflag';
     const TYPE_UNREAD = 'unread';
-    const TYPE_ARCHIVE = 'archive';
     const TYPE_UNDELETE = 'undelete';
 
     use ModelTrait;
@@ -45,8 +43,8 @@ class Task extends Model
             'id' => $this->id,
             'type' => $this->type,
             'status' => $this->status,
-            'folders' => $this->folders,
             'old_value' => $this->old_value,
+            'folder_id' => $this->folder_id,
             'account_id' => $this->account_id,
             'message_id' => $this->message_id,
             'created_at' => $this->created_at

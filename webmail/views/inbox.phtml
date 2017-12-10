@@ -40,11 +40,13 @@ $view->render( 'nav', [
 
         <?php
         $view->render( 'messages/move-messages', [
-            'folders' => $folders->get()
+            'folders' => $folders->getList()
         ]);
         $view->render( 'messages/apply-folder', [
-            'folders' => $folders->get()
+            'folders' => $folders->getList()
         ]); ?>
+
+        <input type="hidden" name="folder_id" value="<?php echo $folders->getInboxId(); ?>" />
     </form>
 </section>
 

@@ -19,6 +19,8 @@ class Folders
     private $accountId;
     private $folderTree;
     private $colorCount;
+    private $nameLookup;
+    private $listFolders;
     // Storage of folder/depth
     private $index = [];
     // Convert certain folder names
@@ -52,33 +54,6 @@ class Folders
         $this->colors = $colors;
         $this->accountId = $account->id;
         $this->colorCount = count( $colors );
-    }
-
-    public function get()
-    {
-        if ( $this->folders ) {
-            return $this->folders;
-        }
-
-        $index = 0;
-        $this->folders = (new Folder)->getByAccount( $this->accountId );
-
-        // Add meta info to the folders
-        foreach ( $this->folders as $folder ) {
-            $this->setIgnore( $folder );
-            $this->setMailboxType( $folder );
-        }
-
-        // Treeify the folders to set the depth. We need this for
-        // adding in the color info.
-        $this->getTree();
-
-        // Add in the colors now that we know the positions
-        foreach ( $this->folders as $folder ) {
-            $this->setColor( $folder );
-        }
-
-        return $this->folders;
     }
 
     public function getAllId()
@@ -117,6 +92,33 @@ class Folders
         return $this->{$mailbox};
     }
 
+    public function get()
+    {
+        if ( $this->folders ) {
+            return $this->folders;
+        }
+
+        $index = 0;
+        $this->folders = (new Folder)->getByAccount( $this->accountId );
+
+        // Add meta info to the folders
+        foreach ( $this->folders as $folder ) {
+            $this->setIgnore( $folder );
+            $this->setMailboxType( $folder );
+        }
+
+        // Treeify the folders to set the depth. We need this for
+        // adding in the color info.
+        $this->getTree();
+
+        // Add in the colors now that we know the positions
+        foreach ( $this->folders as $folder ) {
+            $this->setColor( $folder );
+        }
+
+        return $this->folders;
+    }
+
     public function getTree()
     {
         if ( $this->folderTree ) {
@@ -141,6 +143,50 @@ class Folders
         }
 
         return $this->folderTree;
+    }
+
+    /**
+     * Returns a list of folders for the apply labels / move forms.
+     * @return array
+     */
+    public function getList()
+    {
+        if ( $this->listFolders ) {
+            return $this->listFolders;
+        }
+
+        $this->listFolders = array_filter(
+            $this->get(),
+            function ( $folder ) {
+                return $folder->ignored != 1
+                    && $folder->is_mailbox === FALSE;
+            });
+
+        return $this->listFolders;
+    }
+
+    /**
+     * Returns a folder ID by full name.
+     * @param string $name
+     * @return int $folderId
+     */
+    public function findIdByName( $name )
+    {
+        if ( $this->nameLookup ) {
+            return ( isset( $this->nameLookup[ $name ] ) )
+                ? $this->nameLookup[ $name ]
+                : NULL;
+        }
+
+        $folders = $this->get();
+
+        foreach ( $folders as $folder ) {
+            $this->nameLookup[ $folder->full_name ] = $folder->id;
+        }
+
+        return ( isset( $this->nameLookup[ $name ] ) )
+            ? $this->nameLookup[ $name ]
+            : NULL;
     }
 
     /**

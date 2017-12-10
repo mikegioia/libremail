@@ -12,7 +12,7 @@ class Task extends Model
     public $id;
     public $type;
     public $status;
-    public $folders;
+    public $folder_id;
     public $old_value;
     public $account_id;
     public $message_id;
@@ -23,13 +23,11 @@ class Task extends Model
     const STATUS_ERROR = 2;
 
     const TYPE_COPY = 'copy';
-    const TYPE_MOVE = 'move';
     const TYPE_READ = 'read';
     const TYPE_FLAG = 'flag';
     const TYPE_DELETE = 'delete';
     const TYPE_UNFLAG = 'unflag';
     const TYPE_UNREAD = 'unread';
-    const TYPE_ARCHIVE = 'archive';
     const TYPE_UNDELETE = 'undelete';
 
     /**
@@ -38,15 +36,15 @@ class Task extends Model
      * @param int $accountId
      * @param string $type
      * @param string $oldValue
-     * @param string | null $folders
+     * @param int | null $folderId
      * @return Task
      */
-    public function create( $messageId, $accountId, $type, $oldValue, $folders )
+    public function create( $messageId, $accountId, $type, $oldValue, $folderId = NULL )
     {
         $data = [
             'type' => $type,
-            'folders' => $folders,
             'old_value' => $oldValue,
+            'folder_id' => $folderId,
             'message_id' => $messageId,
             'account_id' => $accountId,
             'status' => self::STATUS_NEW,

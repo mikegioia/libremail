@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use Exception;
+use App\Folders;
 use App\Model\Task as TaskModel;
 use App\Model\Message as MessageModel;
 
@@ -10,8 +11,11 @@ abstract class Base
 {
     /**
      * Iterates over the messages and calls subclass method.
+     * @param array $messageIds
+     * @param Folders $folders
+     * @param array $options
      */
-    public function run( array $messageIds )
+    public function run( array $messageIds, Folders $folders, array $options = [] )
     {
         if ( ! $messageIds
             || ! ( $messages = (new MessageModel)->getByIds( $messageIds ) ) )
@@ -20,7 +24,7 @@ abstract class Base
         }
 
         foreach ( $messages as $message ) {
-            $this->update( $message );
+            $this->update( $message, $folders, $options );
         }
     }
 
@@ -28,7 +32,11 @@ abstract class Base
      * Implemented by sub-classes.
      */
     abstract protected function getType();
-    abstract protected function update( MessageModel $message );
+
+    abstract protected function update(
+        MessageModel $message,
+        Folders $folders,
+        array $options = [] );
 
     /**
      * Updates the flag for a message. Stores a row in the
@@ -37,9 +45,9 @@ abstract class Base
      * @param MessageModel $message
      * @param string $flag
      * @param bool $state
-     * @throws Exception
+     * @param array $filters Optional filters to limit siblings
      */
-    protected function setFlag( MessageModel $message, $flag, $state )
+    protected function setFlag( MessageModel $message, $flag, $state, $filters = [] )
     {
         $oldValue = $message->{$flag};
         $newValue = ( $state ) ? 1 : 0;
@@ -50,27 +58,18 @@ abstract class Base
         }
 
         $taskModel = new TaskModel;
-        $message->db()->beginTransaction();
         // We need to update this flag for all messsages with
         // the same message-id within the thread.
-        $messageIds = $message->getSiblingIds();
+        $messageIds = $message->getSiblingIds( $filters );
 
-        try {
-            foreach ( $messageIds as $messageId ) {
-                $taskModel->create(
-                    $messageId,
-                    $message->account_id,
-                    $this->getType(),
-                    $oldValue,
-                    NULL );
-                $message->setFlag( $messageId, $flag, $state );
-            }
+        foreach ( $messageIds as $messageId ) {
+            $taskModel->create(
+                $messageId,
+                $message->account_id,
+                $this->getType(),
+                $oldValue,
+                NULL );
+            $message->setFlag( $messageId, $flag, $state );
         }
-        catch ( Exception $e ) {
-            $message->db()->rollBack();
-            throw $e;
-        }
-
-        $message->db()->commit();
     }
 }

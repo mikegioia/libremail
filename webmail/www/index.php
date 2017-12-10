@@ -92,7 +92,10 @@ $router->get( '/', function () use ( $account ) {
 
 // Update messages
 $router->post( '/update', function () use ( $account ) {
-    (new Actions)->run();
+    $colors = getConfig( 'colors' );
+    $folders = new Folders( $account, $colors );
+    $actions = new Actions( $folders, $_POST + $_GET );
+    $actions->run();
 });
 
 // Get the star HTML for a message
@@ -106,8 +109,10 @@ $router->get( '/star/(\d+)/(\w+).html', function ( $id, $state ) {
 });
 
 // Set star flag on a message
-$router->post( '/star', function () {
-    (new Actions)->handleAction(
+$router->post( '/star', function () use ( $account ) {
+    $folders = new Folders( $account, [] );
+    $actions = new Actions( $folders, $_POST + $_GET );
+    $actions->handleAction(
         ( Url::postParam( 'state', 'on' ) === 'on' )
             ? Actions::FLAG
             : Actions::UNFLAG,

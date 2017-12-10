@@ -27,7 +27,7 @@ class Model
     /**
      * @var Database Local reference if in factory mode.
      */
-    protected $localDb;
+    static protected $localDb;
 
     public function __construct( $data = NULL )
     {
@@ -59,43 +59,48 @@ class Model
      */
     static function setDb( Database $db )
     {
-        static::$db = $db;
+        self::$db = $db;
     }
 
     static function setCLI( CLImate $cli )
     {
-        static::$cli = $cli;
+        self::$cli = $cli;
     }
 
     static function setLog( Logger $log )
     {
-        static::$log = $log;
+        self::$log = $log;
     }
 
     static function setConfig( array $config )
     {
-        static::$config = $config;
+        self::$config = $config;
     }
 
     static function setDbFactory( Container $di )
     {
-        static::$di = $di;
-        static::$factoryMode = TRUE;
+        self::$di = $di;
+        self::$factoryMode = TRUE;
     }
 
     public function db()
     {
-        if ( static::$factoryMode === TRUE ) {
-            if ( isset( $this->localDb ) ) {
-                return $this->localDb;
+        return self::getDb();
+    }
+
+    static public function getDb()
+    {
+        if ( self::$factoryMode === TRUE ) {
+            if ( isset( self::$localDb ) ) {
+                return self::$localDb;
             }
 
-            $this->localDb = static::$di[ 'db_factory' ];
+            self::$localDb = self::$di[ 'db_factory' ];
 
-            return $this->localDb;
+            return self::$localDb;
         }
 
-        return static::$db;
+        return self::$db;
     }
 
     public function ping()
@@ -105,12 +110,12 @@ class Model
 
     public function cli()
     {
-        return static::$cli;
+        return self::$cli;
     }
 
     public function log()
     {
-        return static::$log;
+        return self::$log;
     }
 
     /**
@@ -122,10 +127,10 @@ class Model
     public function config( $key = '' )
     {
         if ( ! $key ) {
-            return static::$config;
+            return self::$config;
         }
 
-        $lookup = static::$config;
+        $lookup = self::$config;
 
         foreach ( explode( '.', $key ) as $part ) {
             if ( ! isset( $lookup[ $part ] ) ) {

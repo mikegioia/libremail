@@ -38,6 +38,7 @@ class Message extends Model
     public $date_str;
     public $unique_id;
     public $folder_id;
+    public $thread_id;
     public $text_html;
     public $account_id;
     public $message_id;
@@ -57,6 +58,7 @@ class Message extends Model
     // Flags
     const FLAG_SEEN = 'seen';
     const FLAG_FLAGGED = 'flagged';
+    const FLAG_DELETED = 'deleted';
 
     use ModelTrait;
 
@@ -83,6 +85,7 @@ class Message extends Model
             'date_str' => $this->date_str,
             'unique_id' => $this->unique_id,
             'folder_id' => $this->folder_id,
+            'thread_id' => $this->thread_id,
             'text_html' => $this->text_html,
             'account_id' => $this->account_id,
             'message_id' => $this->message_id,
@@ -129,6 +132,16 @@ class Message extends Model
         $this->unserializedAttachments = @unserialize( $this->attachments );
 
         return $this->unserializedAttachments;
+    }
+
+    public function getById( $id )
+    {
+        return $this->db()
+            ->select()
+            ->from( 'messages' )
+            ->where( 'id', '=', $id )
+            ->execute()
+            ->fetch( PDO::FETCH_OBJ );
     }
 
     public function getByIds( $ids )
@@ -582,7 +595,8 @@ class Message extends Model
     {
         $this->requireInt( $id, 'Message ID' );
         $this->requireValue( $flag, [
-            self::FLAG_SEEN, self::FLAG_FLAGGED
+            self::FLAG_SEEN, self::FLAG_FLAGGED,
+            self::FLAG_DELETED
         ]);
 
         if ( ! $this->isValidFlag( $value ) ) {
@@ -603,6 +617,39 @@ class Message extends Model
                 MESSAGE,
                 $this->db()->getError() );
         }
+    }
+
+    /**
+     * Removes any message from the specified folder that is missing
+     * a message_no and unique_id. These messages were copied by the
+     * client and not synced yet.
+     * @param int $messageId
+     * @param int $folderId
+     * @throws ValidationException
+     */
+    public function deleteCopiedMessages( $messageId, $folderId )
+    {
+        $this->requireInt( $folderId, 'Folder ID' );
+        $this->requireInt( $messageId, 'Message ID' );
+
+        $message = $this->getById( $messageId );
+
+        if ( ! $message ) {
+            throw new ValidationException(
+                "No message found when deleting copies" );
+        }
+
+        $deleted = $this->db()
+            ->delete()
+            ->from( 'messages' )
+            ->whereNull( 'unique_id' )
+            ->where( 'folder_id', '=', $folderId )
+            ->where( 'thread_id', '=', $message->thread_id )
+            ->where( 'message_id', '=', $message->message_id )
+            ->where( 'account_id', '=', $message->account_id )
+            ->execute();
+
+        return is_numeric( $deleted );
     }
 
     /**
