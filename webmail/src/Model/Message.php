@@ -106,13 +106,6 @@ class Message extends Model
             ->fetchAll( PDO::FETCH_CLASS, get_class() );
     }
 
-    public function getUnreadThreadCounts( $accountId )
-    {
-        /*
-        SELECT folder_id, thread_id from messages where thread_id in ( select thread_id from messages where account_id = 2 and deleted=0 and seen=0 ) group by folder_id, thread_id order by folder_id
-        */
-    }
-
     /**
      * Returns two counts of messages, by flagged and un-flagged.
      * @param int $accountId
@@ -314,6 +307,55 @@ class Message extends Model
             ->limit( $limit, $offset )
             ->execute()
             ->fetchAll( PDO::FETCH_CLASS, get_class() );
+    }
+
+    public function getUnreadCounts( $accountId )
+    {
+        $indexed = [];
+        $unseenThreadIds = (new Message)->getUnseenThreads( $accountId );
+
+        if ( $unseenThreadIds ) {
+            $folderThreads = $this->db()
+                ->select([ 'folder_id', 'thread_id' ])
+                ->from( 'messages' )
+                ->whereIn( 'thread_id', $unseenThreadIds )
+                ->groupBy( 'folder_id, thread_id' )
+                ->execute()
+                ->fetchAll( PDO::FETCH_CLASS );
+
+            foreach ( $folderThreads as $thread ) {
+                if ( ! isset( $indexed[ $thread->folder_id ] ) ) {
+                    $indexed[ $thread->folder_id ] = 0;
+                }
+
+                $indexed[ $thread->folder_id ] += 1;
+            }
+        }
+
+        return $indexed;
+    }
+
+    public function getUnseenThreads( $accountId )
+    {
+        $threads = [];
+        $threadIds = $this->db()
+            ->select([ 'thread_id' ])
+            ->from( 'messages' )
+            ->where( 'seen', '=', 0 )
+            ->where( 'deleted', '=', 0 )
+            ->where( 'account_id', '=', $accountId )
+            ->execute()
+            ->fetchAll( PDO::FETCH_CLASS );
+
+        if ( ! $threadIds ) {
+            return [];
+        }
+
+        foreach ( $threadIds as $row ) {
+            $threads[] = $row->thread_id;
+        }
+
+        return $threads;
     }
 
     private function getName( $from )

@@ -222,6 +222,10 @@ nav li.w-sub > .folder-checkbox:checked ~ ul.sub {
     display: block;
 }
 
+nav li.w-unread {
+    font-weight: bold;
+}
+
 /**
  * Actions Menu
  * This is the menu above the mailboxes that allows for interactivity

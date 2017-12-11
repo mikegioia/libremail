@@ -4,6 +4,7 @@ namespace App;
 
 use App\Model\Folder;
 use App\Model\Account;
+use App\Model\Message;
 
 class Folders
 {
@@ -114,11 +115,13 @@ class Folders
 
         $index = 0;
         $this->folders = (new Folder)->getByAccount( $this->accountId );
+        $this->folderCounts = (new Message)->getUnreadCounts( $this->accountId );
 
         // Add meta info to the folders
         foreach ( $this->folders as $folder ) {
             $this->setIgnore( $folder );
             $this->setMailboxType( $folder );
+            $this->addUnreadCount( $folder );
         }
 
         // Treeify the folders to set the depth. We need this for
@@ -201,6 +204,27 @@ class Folders
         return ( isset( $this->nameLookup[ $name ] ) )
             ? $this->nameLookup[ $name ]
             : NULL;
+    }
+
+    /**
+     * Returns the count of unread messages for a folder.
+     * @param int $folderId
+     * @param bool $returnString If true, returns a formatted string
+     * @return int | string
+     */
+    public function getUnreadCount( $folderId, $returnString = FALSE )
+    {
+        if ( ! is_array( $this->folderCounts ) ) {
+            $this->get();
+        }
+
+        $count = ( isset( $this->folderCounts[ $folderId ] ) )
+            ? $this->folderCounts[ $folderId ]
+            : 0;
+
+        return ( $returnString )
+            ? ( $count ? " ($count)" : "" )
+            : ( $count ?: 0 );
     }
 
     /**
@@ -337,6 +361,16 @@ class Folders
             elseif ( ! $this->starredId && in_array( $name, self::STARRED ) ) {
                 $this->starredId = $folder->id;
             }
+        }
+    }
+
+    private function addUnreadCount( &$folder )
+    {
+        if ( isset( $this->folderCounts[ $folder->id ] ) ) {
+            $folder->unread_count = $this->folderCounts[ $folder->id ];
+        }
+        else {
+            $folder->unread_count = 0;
         }
     }
 
