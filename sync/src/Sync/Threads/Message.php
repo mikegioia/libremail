@@ -2,6 +2,7 @@
 
 namespace App\Sync\Threads;
 
+use App\Sync\Threads;
 use App\Model\Message as MessageModel;
 
 class Message

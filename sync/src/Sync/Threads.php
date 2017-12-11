@@ -32,6 +32,8 @@ class Threads
     private $progress;
     private $interactive;
 
+    const EVENT_MESSAGE_DIRTY = 'message_dirty';
+
     // Index of the most recent message known
     private $maxId;
     // Total IDs to fetch
@@ -40,12 +42,16 @@ class Threads
     private $currentId;
     // Master index of messages and references
     private $messages = [];
+    // Index of new, unthreaded messages
+    private $unthreaded = [];
     // Index of all threads for subject matching
     private $threadMeta = [];
     // Index of subject hashes => thread IDs
     private $subjectHashes = [];
     // Index of all threads related by subject
     private $subjectThreads = [];
+    // List of dirty message IDs to update
+    private $dirtyMessageIds = [];
 
     // How many messages to fetch at once
     const BATCH_SIZE = 1000;
@@ -82,6 +88,7 @@ class Threads
         }
 
         $this->emitter = $emitter;
+        $this->updateEmitter();
         $this->storeMessageIdBounds();
         $this->storeTotalMessageIds();
 
@@ -103,12 +110,22 @@ class Threads
     {
         $model = new MessageModel;
         $this->maxId = $model->getMaxMessageId( $this->account->id );
-        $this->currentId = $model->getMinMessageId( $this->account->id );
+
+        if ( ! $this->currentId ) {
+            $this->currentId = $model->getMinMessageId( $this->account->id );
+        }
     }
 
     private function storeTotalMessageIds()
     {
         $this->totalIds = (new MessageModel)->countByAccount( $this->account->id );
+    }
+
+    private function updateEmitter()
+    {
+        $this->emitter->on( self::EVENT_MESSAGE_DIRTY, function ( $id ) {
+            $this->dirtyMessageIds[ $id ] = TRUE;
+        });
     }
 
     /**
@@ -120,29 +137,31 @@ class Threads
     private function storeMessages()
     {
         $count = 0;
-        $i = $this->currentId;
-        $total = $this->maxId - $i;
+        $minId = $this->currentId;
+        $currentId = $this->currentId;
+        $total = $this->maxId - $minId;
         $messageModel = new MessageModel;
         $this->log->debug(
             "Storing messages for threading for {$this->account->email}" );
         $this->printMemory();
         $this->startProgress( 1, $total );
 
-        for ( $i; $i < $this->maxId; $i += self::BATCH_SIZE ) {
+        for ( $minId; $minId < $this->maxId; $minId += self::BATCH_SIZE ) {
             $messages = $messageModel->getRangeForThreading(
                 $this->account->id,
-                $i,
+                $minId,
                 $this->maxId,
                 self::BATCH_SIZE );
 
             foreach ( $messages as $message ) {
+                $currentId++;
                 $this->storeMessage( $message );
                 $this->updateProgress( ++$count, $total );
             }
 
-            $this->currentId = $i;
-            $this->account->ping();
+            $this->currentId = $currentId - 1;
             $this->emitter->emit( Sync::EVENT_CHECK_HALT );
+            $this->account->ping();
         }
 
         $this->printMemory();
@@ -165,6 +184,7 @@ class Threads
             $this->messages[ $messageId ] = $existingMessage;
         }
         else {
+            $this->unthreaded[] = $messageId;
             $this->messages[ $messageId ] = $threadMessage;
         }
     }
@@ -185,11 +205,12 @@ class Threads
             $this->cli->whisper( "Threading Pass 2" );
         }
 
-        foreach ( $this->messages as $message ) {
+        foreach ( $this->unthreaded as $unthreadedId ) {
             $count++;
             $refs = [];
             $processed = [];
             $threadId = NULL;
+            $message = $this->messages[ $unthreadedId ];
             $this->updateMessageThread( $message, $refs, $processed, $threadId );
 
             if ( $count % self::BATCH_SIZE === 0 ) {
@@ -226,6 +247,9 @@ class Threads
             //     $this->subjectHashes[ $hash ][ $key ] = $threadId;
             // }
         }
+
+        // Clear the unthreaded array
+        $this->unthreaded = [];
     }
 
     /**
@@ -316,7 +340,6 @@ class Threads
             $this->updateProgress( ++$count, $total );
 
             if ( $count % self::BATCH_SIZE === 0 ) {
-                $this->account->ping();
                 $this->emitter->emit( Sync::EVENT_CHECK_HALT );
                 $this->emitter->emit( Sync::EVENT_GARBAGE_COLLECT );
             }
