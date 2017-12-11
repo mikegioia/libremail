@@ -2,26 +2,42 @@
     <a id="compose" class="button button-primary" tabindex="3">Compose</a>
     <div id="nav-wrapper">
         <ul id="mailboxes">
+        <?php
+        if ( $folders->getInboxId() ): ?>
             <li class="active">
                 <a href="<?php echo App\Url::folder( $folders->getInboxId() ); ?>" class="mailbox">Inbox</a>
                 <label class="folder-label"></label>
             </li>
+        <?php
+        endif;
+        if ( $folders->getStarredId() ): ?>
             <li>
                 <a href="<?php echo App\Url::folder( $folders->getStarredId() ); ?>" class="mailbox">Starred</a>
                 <label class="folder-label"></label>
             </li>
+        <?php
+        endif;
+        if ( $folders->getSentId() ): ?>
             <li>
                 <a href="<?php echo App\Url::folder( $folders->getSentId() ); ?>" class="mailbox">Sent</a>
                 <label class="folder-label"></label>
             </li>
+        <?php
+        endif;
+        if ( $folders->getDraftsId() ): ?>
             <li>
                 <a href="<?php echo App\Url::folder( $folders->getDraftsId() ); ?>" class="mailbox">Drafts</a>
                 <label class="folder-label"></label>
             </li>
+        <?php
+        endif;
+        if ( $folders->getAllId() ): ?>
             <li>
                 <a href="<?php echo App\Url::folder( $folders->getAllId() ); ?>" class="mailbox">All Mail</a>
                 <label class="folder-label"></label>
             </li>
+        <?php
+        endif; ?>
         </ul>
         <ul id="folders">
         <?php
@@ -33,5 +49,27 @@
             ]);
         endforeach; ?>
         </ul>
+    <?php
+    if ( $folders->getSpamId() || $folders->getTrashId() ): ?>
+        <div id="mailboxes-divider"></div>
+        <ul id="mailboxes-more">
+        <?php
+        if ( $folders->getSpamId() ): ?>
+            <li>
+                <a href="<?php echo App\Url::folder( $folders->getSpamId() ); ?>" class="mailbox">Spam</a>
+                <label class="folder-label"></label>
+            </li>
+        <?php
+        endif;
+        if ( $folders->getTrashId() ): ?>
+            <li>
+                <a href="<?php echo App\Url::folder( $folders->getTrashId() ); ?>" class="mailbox">Trash</a>
+                <label class="folder-label"></label>
+            </li>
+        <?php
+        endif; ?>
+        </ul>
+    <?php
+    endif; ?>
     </div>
 </nav>

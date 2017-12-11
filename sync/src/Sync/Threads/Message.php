@@ -7,21 +7,30 @@ use App\Model\Message as MessageModel;
 class Message
 {
     // Storage of all SQL IDs with this message ID
-    private $ids = [];
+    public $ids = [];
     // Lowest SQL ID of all messages in the thread
-    private $threadId;
+    public $threadId;
     // Message ID header from the IMAP message
-    private $messageId;
+    public $messageId;
+    // Unix time for the message
+    public $timestamp;
+    // Unique hash of the simplified subject line
+    public $subjectHash;
     // Indexed by message ID to be used as a set
-    private $references = [];
+    public $references = [];
     // Dirty flag, for updating database
     private $dirty = FALSE;
 
     public function __construct( MessageModel $message )
     {
-        $this->ids[] = $message->id;
         $this->threadId = $message->thread_id;
+        $this->timestamp = strtotime( $message->date );
         $this->messageId = trim( $message->message_id );
+        $this->subjectHash = $message->getSubjectHash();
+
+        if ( $message->id ) {
+            $this->ids[] = $message->id;
+        }
 
         // If there's no message ID, then we need to give it one.
         // Even if it's a random ID we still need it in case this
@@ -34,31 +43,11 @@ class Message
         $this->storeReferences( $message );
     }
 
-    public function getIds()
-    {
-        return $this->ids;
-    }
-
-    public function getMessageId()
-    {
-        return $this->messageId;
-    }
-
-    public function getReferences()
-    {
-        return $this->references;
-    }
-
     public function getThreadId()
     {
         return ( $this->threadId )
             ? $this->threadId
-            : min( $this->ids );
-    }
-
-    public function getRawThreadId()
-    {
-        return $this->threadId;
+            : min( $this->ids ?: [ 0 ] );
     }
 
     public function hasUpdate()
@@ -99,7 +88,9 @@ class Message
 
         $this->dirty = FALSE;
 
-        $model->saveThreadId( $this->ids, $this->threadId );
+        if ( $this->ids ) {
+            $model->saveThreadId( $this->ids, $this->threadId );
+        }
     }
 
     /**
@@ -109,7 +100,7 @@ class Message
     private function storeReferences( MessageModel $message )
     {
         $this->references = [];
-        $this->references[] = $this->getMessageId();
+        $this->references[] = $this->messageId;
         $replyTo = trim( $message->in_reply_to );
 
         if ( $replyTo ) {
@@ -138,12 +129,12 @@ class Message
     public function merge( Message $message )
     {
         $this->ids = array_unique(
-            array_merge( $this->ids, $message->getIds() ) );
-        $this->references = $this->references + $message->getReferences();
+            array_merge( $this->ids, $message->ids ) );
+        $this->references = $this->references + $message->references;
 
         // If any message in this thread is missing a thread ID, then
         // we want to update the whole collection
-        if ( ! $message->getRawThreadId() ) {
+        if ( ! $message->threadId ) {
             $this->dirty = TRUE;
         }
     }

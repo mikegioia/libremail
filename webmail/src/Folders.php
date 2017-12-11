@@ -11,6 +11,7 @@ class Folders
     private $allId;
     private $colors;
     private $sentId;
+    private $spamId;
     private $folders;
     private $inboxId;
     private $trashId;
@@ -32,6 +33,9 @@ class Folders
     const GMAIL = '[gmail]';
     const DRAFTS = [
         '[Gmail]/Drafts'
+    ];
+    const SPAM = [
+        '[Gmail]/Spam'
     ];
     const TRASH = [
         '[Gmail]/Trash'
@@ -66,9 +70,19 @@ class Folders
         return $this->getMailboxId( 'sentId' );
     }
 
+    public function getSpamId()
+    {
+        return $this->getMailboxId( 'spamId' );
+    }
+
     public function getInboxId()
     {
         return $this->getMailboxId( 'inboxId' );
+    }
+
+    public function getTrashId()
+    {
+        return $this->getMailboxId( 'trashId' );
     }
 
     public function getDraftsId()
@@ -310,6 +324,9 @@ class Folders
             }
             elseif ( ! $this->sentId && in_array( $name, self::SENT ) ) {
                 $this->sentId = $folder->id;
+            }
+            elseif ( ! $this->spamId && in_array( $name, self::SPAM ) ) {
+                $this->spamId = $folder->id;
             }
             elseif ( ! $this->trashId && in_array( $name, self::TRASH ) ) {
                 $this->trashId = $folder->id;

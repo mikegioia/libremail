@@ -131,16 +131,23 @@ nav #nav-wrapper {
     width: 16.5rem;
 }
 
-nav #mailboxes {
+nav #mailboxes,
+nav #mailboxes-more {
     list-style-type: none;
     margin-bottom: 0;
     padding: 0;
 }
 
-nav #mailboxes li {
+nav #mailboxes li,
+nav #mailboxes-more li {
     margin-bottom: 0rem;
     padding-left: 2rem;
     position: relative;
+}
+
+nav #mailboxes-divider {
+    border-top: 2px solid #eee;
+    margin: 0.25rem 0 0.25rem 2rem;
 }
 
 nav #folders,

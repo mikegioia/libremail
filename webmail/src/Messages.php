@@ -50,6 +50,9 @@ class Messages
         $messageCounts = $messageModel->getThreadCountsByFolder(
             $this->accountId,
             $folderId );
+        usort( $messages, function ($a, $b) {
+            return strcmp( $b->date, $a->date );
+        });
 
         foreach ( $messages as $message ) {
             $this->setNameList( $message );
@@ -99,7 +102,10 @@ class Messages
             $message->names = trim( $unique[ 0 ], '"' );
         }
         elseif ( $uniqueCount ) {
-            $message->names = $this->getNames( $unique, $uniqueCount );
+            $message->names = $this->getNames(
+                $message->names,
+                $message->seens,
+                $uniqueCount );
         }
         else {
             $message->names = trim( $message->from );
@@ -113,13 +119,25 @@ class Messages
     /**
      * Prepare the name strings for the message.
      * @param array $list List of all names on the message
+     * @param array $seens List of seen flags for all names
      * @param int $count Number of unique names in the set
      * @return string
      */
-    private function getNames( $list, $count )
+    private function getNames( array $list, array $seens, $count )
     {
-        $firstName = current( explode( " ", current( $list ) ) );
-        $lastName = current( explode( " ", end( $list ) ) );
+        $i = 0;
+        $first = array_shift( $list );
+
+        do {
+            $last = ( $list ) ? array_pop( $list ) : NULL;
+
+            if ( $last != $first ) {
+                break;
+            }
+        } while ( $list );
+
+        $firstName = current( explode( " ", $first ) );
+        $lastName = current( explode( " ", $last ?: [] ) );
         $firstName = trim( $firstName, '"' );
         $lastName = trim( $lastName, '"' );
 
@@ -127,6 +145,10 @@ class Messages
         if ( strlen( $firstName . $lastName ) > 20 ) {
             $firstName = current( explode( "@", $firstName ) );
             $lastName = current( explode( "@", $lastName ) );
+        }
+
+        if ( ! $lastName ) {
+            return $firstName;
         }
 
         if ( $count === 2 ) {

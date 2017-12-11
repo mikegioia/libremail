@@ -106,6 +106,13 @@ class Message extends Model
             ->fetchAll( PDO::FETCH_CLASS, get_class() );
     }
 
+    public function getUnreadThreadCounts( $accountId )
+    {
+        /*
+        SELECT folder_id, thread_id from messages where thread_id in ( select thread_id from messages where account_id = 2 and deleted=0 and seen=0 ) group by folder_id, thread_id order by folder_id
+        */
+    }
+
     /**
      * Returns two counts of messages, by flagged and un-flagged.
      * @param int $accountId
@@ -202,11 +209,13 @@ class Message extends Model
 
         // Load all messages in these threads. We need to get the names
         // of anyone involved in the thread, any folders, and the subject
-        // from the first message in the thread.
+        // from the first message in the thread, and the date from the
+        // last message in the thread.
         $threadMessages = $this->db()
             ->select([
                 '`from`', 'thread_id', 'message_id',
-                'folder_id', 'subject'
+                'folder_id', 'subject', '`date`',
+                'seen'
             ])
             ->from( 'messages' )
             ->where( 'deleted', '=', 0 )
@@ -221,35 +230,51 @@ class Message extends Model
                 $threads[ $row->thread_id ] = (object) [
                     'count' => 0,
                     'names' => [],
+                    'seens' => [],
                     'folders' => [],
+                    'unseen' => FALSE,
                     'subject' => $row->subject
                 ];
             }
 
-            $threads[ $row->thread_id ]->folders[] = (int) $row->folder_id;
-            $threads[ $row->thread_id ]->names[] = $this->getName( $row->from );
+            $threads[ $row->thread_id ]->folders[ $row->folder_id ] = TRUE;
 
             if ( $row->message_id ) {
                 if ( isset( $messageIds[ $row->message_id ] ) ) {
                     continue;
                 }
 
+                if ( $row->seen != 1 ) {
+                    $threads[ $row->thread_id ]->unseen = TRUE;
+                }
+
+                $name = $this->getName( $row->from );
                 $threads[ $row->thread_id ]->count++;
+                $threads[ $row->thread_id ]->names[] = $name;
+                $threads[ $row->thread_id ]->date = $row->date;
+                $threads[ $row->thread_id ]->seens[] = $row->seen;
                 $messageIds[ $row->message_id ] = TRUE;
             }
         }
 
         foreach ( $messages as $message ) {
             $message->names = [];
+            $message->seens = [];
             $message->folders = [];
             $message->thread_count = 1;
 
             if ( isset( $threads[ $message->thread_id ] ) ) {
                 $found = $threads[ $message->thread_id ];
+                $message->date = $found->date;
                 $message->names = $found->names;
+                $message->seens = $found->seens;
                 $message->subject = $found->subject;
-                $message->folders = $found->folders;
                 $message->thread_count = $found->count;
+                $message->folders = array_keys( $found->folders );
+
+                if ( $found->unseen ) {
+                    $message->seen = 0;
+                }
             }
 
             if ( in_array( $message->thread_id, $meta->flaggedIds ) ) {

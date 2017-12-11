@@ -154,6 +154,11 @@ class Message extends Model
             ->fetchAll( PDO::FETCH_CLASS, $this->getClass() );
     }
 
+    public function getSubjectHash()
+    {
+        return self::makeSubjectHash( $this->subject );
+    }
+
     /**
      * Fetches a range of messages for an account. Used during the
      * threading computation.
@@ -167,8 +172,8 @@ class Message extends Model
     {
         return $this->db()
             ->select([
-                'id', 'thread_id', 'message_id',
-                'in_reply_to', '`references`'
+                'id', 'thread_id', 'message_id', '`date`',
+                'in_reply_to', '`references`', 'subject'
             ])
             ->from( 'messages' )
             ->where( 'id', '>=', $minId )
@@ -542,7 +547,13 @@ class Message extends Model
      * @param bool $inverse If set, do where not in $uniqueIds query
      * @throws DatabaseUpdateException
      */
-    public function markFlag( $uniqueIds, $accountId, $folderId, $flag, $state = TRUE, $inverse = FALSE )
+    public function markFlag(
+        $uniqueIds,
+        $accountId,
+        $folderId,
+        $flag,
+        $state = TRUE,
+        $inverse = FALSE )
     {
         if ( $inverse === FALSE
             && ( ! is_array( $uniqueIds ) || ! count( $uniqueIds ) ) )
@@ -719,5 +730,22 @@ class Message extends Model
         }
 
         return json_encode( $formatted, JSON_UNESCAPED_SLASHES );
+    }
+
+    /**
+     * Creates a hash of the simplified subject line.
+     * @param string $subject
+     * @return string
+     */
+    static private function makeSubjectHash( $subject )
+    {
+        $subject = trim(
+            preg_replace(
+                "/Re\:|re\:|RE\:|Fwd\:|fwd\:|FWD\:/i",
+                '',
+                $subject
+            ));
+
+        return md5( trim( $subject, '[]()' ) );
     }
 }

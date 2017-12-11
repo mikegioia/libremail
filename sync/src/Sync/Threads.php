@@ -20,6 +20,7 @@ use League\CLImate\CLImate;
 use App\Model\Account as AccountModel;
 use App\Model\Message as MessageModel;
 use Evenement\EventEmitter as Emitter;
+use App\Sync\Threads\Meta as ThreadMeta;
 use App\Sync\Threads\Message as ThreadMessage;
 
 class Threads
@@ -39,6 +40,12 @@ class Threads
     private $currentId;
     // Master index of messages and references
     private $messages = [];
+    // Index of all threads for subject matching
+    private $threadMeta = [];
+    // Index of subject hashes => thread IDs
+    private $subjectHashes = [];
+    // Index of all threads related by subject
+    private $subjectThreads = [];
 
     // How many messages to fetch at once
     const BATCH_SIZE = 1000;
@@ -150,11 +157,12 @@ class Threads
     private function storeMessage( MessageModel $message )
     {
         $threadMessage = new ThreadMessage( $message );
-        $messageId = $threadMessage->getMessageId();
+        $messageId = $threadMessage->messageId;
 
         if ( isset( $this->messages[ $messageId ] ) ) {
             $existingMessage = $this->messages[ $messageId ];
             $existingMessage->merge( $threadMessage );
+            $this->messages[ $messageId ] = $existingMessage;
         }
         else {
             $this->messages[ $messageId ] = $threadMessage;
@@ -192,11 +200,31 @@ class Threads
                 $this->emitter->emit( Sync::EVENT_GARBAGE_COLLECT );
             }
 
-            // Update all processed messages with this set of references
+            if ( ! $threadId && ! $refs ) {
+                continue;
+            }
+
+            // Use this for subject threading (not done)
+            // $threadMeta = new ThreadMeta( $threadId );
+
+            // Update all processed messages with this set of references,
+            // and store an index with information about each thread. This
+            // index will be used for the final thread pass (subject line).
             foreach ( $refs as $messageId => $index ) {
                 $message = $this->messages[ $messageId ];
                 $message->setThreadId( $threadId );
+                // Un-comment for subject threading
+                // $threadMeta->addMessage( $message );
             }
+
+            // Set the indexes with this thread meta info
+            // Uncomment form subject threading
+            // if ( $threadMeta->exists() ) {
+            //     $key = $threadMeta->getKey();
+            //     $hash = $threadMeta->subjectHash;
+            //     $this->threadMeta[ $threadId ] = $threadMeta;
+            //     $this->subjectHashes[ $hash ][ $key ] = $threadId;
+            // }
         }
     }
 
@@ -214,14 +242,6 @@ class Threads
         array &$processed,
         &$threadId )
     {
-        if ( isset( $this->allProcessed[ $message->getMessageId() ] ) ) {
-            return;
-        }
-
-        $refs = $message->addReferences( $refs );
-        $processed[ $message->getMessageId() ] = TRUE;
-        $this->allProcessed[ $message->getMessageId() ] = TRUE;
-
         if ( ! $threadId
             || ( $message->getThreadId()
                 && $message->getThreadId() < $threadId ) )
@@ -229,9 +249,17 @@ class Threads
             $threadId = $message->getThreadId();
         }
 
+        if ( isset( $this->allProcessed[ $message->messageId ] ) ) {
+            return;
+        }
+
+        $refs = $message->addReferences( $refs );
+        $processed[ $message->messageId ] = TRUE;
+        $this->allProcessed[ $message->messageId ] = TRUE;
+
         // For each reference, add it's references to our set
         // and then recursively process it.
-        foreach ( $message->getReferences() as $refId => $index ) {
+        foreach ( $message->references as $refId => $index ) {
             if ( ! isset( $this->messages[ $refId ] ) ) {
                 $this->messages[ $refId ] = new ThreadMessage(
                     new MessageModel([
@@ -268,7 +296,7 @@ class Threads
 
         foreach ( $this->messages as $message ) {
             if ( $message->hasUpdate() ) {
-                $updateCount += count( $message->getIds() );
+                $updateCount += count( $message->ids );
             }
 
             if ( $updateCount && ! $transactionStarted ) {
