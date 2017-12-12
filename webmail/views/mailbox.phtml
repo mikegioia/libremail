@@ -4,7 +4,8 @@ $view->render( 'header' );
 
 $view->render( 'nav', [
     'view' => $view,
-    'folders' => $folders
+    'folders' => $folders,
+    'activeId' => $folderId
 ]); ?>
 
 <section id="main">
@@ -17,41 +18,48 @@ $view->render( 'nav', [
         if ( $flagged ):
             $view->render( 'messages/message-list', [
                 'view' => $view,
+                'urlId' => STARRED,
                 'select' => $select,
                 'heading' => 'Starred',
                 'messages' => $flagged,
+                'folderId' => $folderId,
                 'id' => 'mailbox-starred',
-                'counts' => $counts->flagged,
-                'folderId' => $folders->getInboxId()
+                'showPaging' => $showPaging,
+                'counts' => $counts->flagged
             ]);
         endif;
 
             $view->render( 'messages/message-list', [
                 'view' => $view,
+                'urlId' => $urlId,
                 'select' => $select,
+                'folderId' => $folderId,
                 'messages' => $unflagged,
+                'heading' => $mainHeading,
+                'showPaging' => $showPaging,
                 'id' => 'mailbox-everything',
-                'counts' => $counts->unflagged,
-                'heading' => 'Everything else',
-                'folderId' => $folders->getInboxId()
+                'counts' => $counts->unflagged
             ]);
             $view->render( 'messages/footer' ); ?>
         </section>
 
         <?php
         $view->render( 'messages/move-messages', [
+            'view' => $view,
             'folders' => $folders->getList()
         ]);
         $view->render( 'messages/apply-folder', [
+            'view' => $view,
             'folders' => $folders->getList()
         ]); ?>
 
-        <input type="hidden" name="folder_id" value="<?php echo $folders->getInboxId(); ?>" />
+        <input type="hidden" name="folder_id" value="<?php echo $folderId; ?>" />
     </form>
 </section>
 
 <?php
 $view->render( 'messages/datalist', [
+    'view' => $view,
     'folders' => $folders->get()
 ]);
 

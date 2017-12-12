@@ -35,8 +35,8 @@ section #msg-list h5 label {
 
 section #msg-list h5 .fa-caret-right,
 section #msg-list h5 .fa-caret-down {
-    display: inline-block;
     cursor: pointer;
+    display: inline-block;
     font-size: 1.5rem;
     position: relative;
     top: -0.1rem;
@@ -52,14 +52,37 @@ section #msg-list h5 span {
     margin-left: 0.5rem;
 }
 
-section #msg-list h5 a {
+section #msg-list h5 .paging-counts {
+    color: inherit;
     float: right;
     font-size: 1.3rem;
-    position: relative;
-    top: 0.5rem;
     padding-right: 0.8rem;
-    color: inherit;
+    position: relative;
     text-decoration: none;
+    top: 0.5rem;
+}
+
+section #msg-list h5 .paging-counts a.page {
+    color: #333;
+    font-weight: 400;
+    text-decoration: none;
+}
+
+section #msg-list h5 .paging-counts a.page.prev {
+    margin-right: 1rem;
+}
+
+section #msg-list h5 .paging-counts a.page.next {
+    margin-left: 1rem;
+}
+
+section #msg-list h5 .paging-counts a.page i.fa {
+    font-size: 1rem;
+    transform: translateY(-0.0625rem);
+}
+
+section #msg-list h5 .paging-counts a.page:hover {
+    text-decoration: underline;
 }
 
 section #msg-list h5 a:hover {
@@ -178,29 +201,36 @@ input[type="checkbox"].msg-checkbox {
     width: calc(100% - 3.5rem);
 }
 
+.msg-contents.no-messages {
+    float: none;
+    font-size: 1.25rem;
+    text-align: center;
+    width: 100%;
+}
+
 .msg-contents ~ .msg-contents {
     margin-top: -1px;
 }
 
 .msg-contents .star {
+    border: 0;
     color: #d6a70e;
     float: left;
+    height: 3rem;
     line-height: 3rem;
     padding-right: 0.2rem;
     text-align: center;
     width: 3rem;
-    height: 3rem;
-    border: 0;
 }
 
 .msg-contents .names {
     font-size: 1.3rem;
     float: left;
     overflow: hidden;
+    padding-right: 1rem;
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 19rem;
-    padding-right: 1rem;
 }
 
 .msg-contents .subject {
@@ -224,10 +254,6 @@ input[type="checkbox"].msg-checkbox {
 }
 
 .msg-contents .subject mark {
-    /* Temporary */
-    background-color: #F2B2A8;
-    color: #8A1C0A;
-
     border-radius: 1px;
     font-size: 1rem;
     padding: 0.1rem 0.4rem;

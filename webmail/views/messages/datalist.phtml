@@ -2,7 +2,7 @@
 <datalist id="folder-list">
 <?php
 foreach ( $folders as $folder ): ?>
-    <option value="<?php echo $folder->name; ?>"><?php echo $folder->full_name; ?></option>
+    <option value="<?php $view->clean( $folder->name ); ?>"><?php $view->clean( $folder->full_name ); ?></option>
 <?php
 endforeach; ?>
 </datalist>

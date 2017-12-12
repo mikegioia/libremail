@@ -42,8 +42,8 @@
 
 .dropdown > a:focus {
     border-bottom: none;
-    border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .dropdown > a:focus + ul,

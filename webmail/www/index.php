@@ -8,6 +8,8 @@ use App\Folders;
 use App\Actions;
 use App\Messages;
 use App\Model\Account;
+use App\Model\Message;
+use App\Exceptions\ClientException;
 
 // Autoload application and vendor libraries
 require( __DIR__ .'/../vendor/autoload.php' );
@@ -24,7 +26,9 @@ mb_internal_encoding( 'UTF-8' );
 // Set up constants
 define( 'GET', 'GET' );
 define( 'POST', 'POST' );
+define( 'INBOX', 'inbox' );
 define( 'VIEWEXT', '.phtml' );
+define( 'STARRED', 'starred' );
 define( 'BASEDIR', __DIR__ .'/..' );
 define( 'DIR', DIRECTORY_SEPARATOR );
 define( 'VIEWDIR', BASEDIR .'/views' );
@@ -68,26 +72,68 @@ if ( ! $account ) {
 
 $router = new Router;
 
-// Inbox
-$router->get( '/', function () use ( $account ) {
+// Helper function to render a mailbox
+$renderMailbox = function ( $id, $page = 1, $limit = 25 ) use ( $account ) {
     // Set up libraries
     $view = new View;
     $colors = getConfig( 'colors' );
     $select = Url::getParam( 'select' );
     $folders = new Folders( $account, $colors );
     $messages = new Messages( $account, $folders );
+    $folderId = ( $id === INBOX || $id === STARRED )
+        ? $folders->getInboxId()
+        : $id;
+    $folder = $folders->getById( $folderId );
+
+    if ( ! $folder ) {
+        throw new ClientException( "Folder #$id not found!" );
+    }
+
     // Get the message data
-    list( $starred, $messages, $counts ) = $messages->getThreads(
-        $folders->getInboxId() );
+    list( $flagged, $unflagged, $counts ) = $messages->getThreads(
+        $folderId,
+        $page,
+        $limit, [
+            Message::SPLIT_FLAGGED => $id === INBOX,
+            Message::ONLY_FLAGGED => $id === STARRED
+        ]);
+
     // Render the inbox
-    $view->render( 'inbox', [
+    $view->render( 'mailbox', [
+        'urlId' => $id,
         'view' => $view,
+        'page' => $page,
         'counts' => $counts,
         'select' => $select,
-        'flagged' => $starred,
+        'flagged' => $flagged,
         'folders' => $folders,
-        'unflagged' => $messages
+        'folderId' => $folderId,
+        'unflagged' => $unflagged,
+        'showPaging' => $id !== INBOX,
+        'mainHeading' => ( $id === INBOX )
+            ? 'Everything else'
+            : $folder->name
     ]);
+};
+
+// Inbox
+$router->get( '/', function () use ( $renderMailbox ) {
+    $renderMailbox( INBOX );
+});
+
+// Folder
+$router->get( '/folder/(\d+)', function ( $id ) use ( $renderMailbox ) {
+    $renderMailbox( $id, 1, 5 );
+});
+
+// Starred messages in the inbox
+$router->get( '/starred/(\d+)', function ( $page ) use ( $renderMailbox ) {
+    $renderMailbox( STARRED, $page );
+});
+
+// Folder page
+$router->get( '/folder/(\d+)/(\d+)', function ( $id, $page ) use ( $renderMailbox ) {
+    $renderMailbox( $id, $page, 5 );
 });
 
 // Update messages
@@ -136,8 +182,13 @@ $router->set404( function () {
 try {
     $router->run();
 }
-catch ( Exception $e ) {
-    header( 'HTTP/1.1 500 Server Error' );
-    echo '<h1>500 Server Error</h1>';
+catch ( ClientException $e ) {
+    header( 'HTTP/1.1 400 Bad Request' );
+    echo '<h1>400 Bad Request</h1>';
     echo '<p>'. $e->getMessage() .'</p>';
 }
+// catch ( Exception $e ) {
+//     header( 'HTTP/1.1 500 Server Error' );
+//     echo '<h1>500 Server Error</h1>';
+//     echo '<p>'. $e->getMessage() .'</p>';
+// }

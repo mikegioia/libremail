@@ -183,6 +183,23 @@ class Folders
     }
 
     /**
+     * Returns a folder by ID.
+     * @param int $id
+     * @return Folder | null
+     */
+    public function getById( $id )
+    {
+        // Load folders if not set
+        $this->get();
+
+        foreach ( $this->folders as $folder ) {
+            if ( $folder->id == $id ) {
+                return $folder;
+            }
+        }
+    }
+
+    /**
      * Returns a folder ID by full name.
      * @param string $name
      * @return int $folderId
@@ -225,6 +242,32 @@ class Folders
         return ( $returnString )
             ? ( $count ? " ($count)" : "" )
             : ( $count ?: 0 );
+    }
+
+    /**
+     * Returns a string of HTML classes for the folders in the nav.
+     * @param int $folderId
+     * @param int $activeId
+     * @param bool $children If the folder has children
+     * @return string
+     */
+    public function getNavClassString( $folderId, $activeId, $children = FALSE )
+    {
+        $classes = [];
+
+        if ( $folderId == $activeId ) {
+            $classes[] = 'active';
+        }
+
+        if ( $this->getUnreadCount( $folderId ) ) {
+            $classes[] = 'w-unread';
+        }
+
+        if ( $children ) {
+            $classes[] = 'w-sub';
+        }
+
+        return implode( ' ', $classes );
     }
 
     /**

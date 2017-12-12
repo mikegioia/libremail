@@ -33,9 +33,10 @@ class Messages
      * @param int $folderId
      * @param int $page
      * @param int $limit
+     * @param array $options
      * @return [ array, array, array ] Messages, Messages, ints
      */
-    public function getThreads( $folderId, $page = 1, $limit = 25 )
+    public function getThreads( $folderId, $page = 1, $limit = 25, array $options = [] )
     {
         $flagged = [];
         $unflagged = [];
@@ -46,10 +47,13 @@ class Messages
             $this->accountId,
             $folderId,
             $limit,
-            ($page - 1) * $limit );
+            ($page - 1) * $limit,
+            $options );
         $messageCounts = $messageModel->getThreadCountsByFolder(
             $this->accountId,
             $folderId );
+        $splitFlagged = isset( $options[ Message::SPLIT_FLAGGED ] )
+            && $options[ Message::SPLIT_FLAGGED ] === TRUE;
         usort( $messages, function ($a, $b) {
             return strcmp( $b->date, $a->date );
         });
@@ -60,7 +64,7 @@ class Messages
             $this->setSnippet( $message, $escaper );
             $this->setFolders( $message, $folders );
 
-            if ( $message->flagged == 1 ) {
+            if ( $message->flagged == 1 && $splitFlagged ) {
                 $flagged[] = $message;
             }
             else {
@@ -68,7 +72,11 @@ class Messages
             }
         }
 
-        $counts = $this->buildCounts( $messageCounts, $page, $limit );
+        $counts = $this->buildCounts(
+            $messageCounts,
+            $page,
+            $limit,
+            $splitFlagged );
 
         return [ $flagged, $unflagged, $counts ];
     }
@@ -81,8 +89,8 @@ class Messages
     private function setSnippet( Message &$message, Escaper $escaper )
     {
         $text = strip_tags( $message->text_plain );
-        $text = trim( $escaper->escapeHtml( $text ) );
-        $message->snippet = ltrim( $text, "-_=" );
+        $text = $escaper->escapeHtml( trim( $text ) );
+        $message->snippet = ltrim( $text, "<>-_=" );
     }
 
     /**
@@ -203,24 +211,48 @@ class Messages
         return $folders;
     }
 
-    private function buildCounts( $counts, $page, $limit )
+    /**
+     * Prepare the counts and paging info for the folders.
+     * @param array $counts
+     * @param int $page
+     * @param int $limit
+     * @param bool $splitFlagged
+     * @return object
+     */
+    private function buildCounts( $counts, $page, $limit, $splitFlagged )
     {
-        $start = $page + (($page - 1) * $limit);
+        $start = 1 + (($page - 1) * $limit);
 
         return (object) [
             'flagged' => (object) [
+                'page' => $page,
                 'start' => $start,
+                'prevPage' => ( $page > 1 )
+                    ? $page - 1
+                    : NULL,
                 'total' => $counts->flagged,
-                'end' => ( $counts->flagged < $limit )
+                'end' => ( $start + $limit - 1 > $counts->flagged )
                     ? $counts->flagged
-                    : $limit
+                    : $start + $limit - 1,
+                'totalPages' => ceil( $counts->flagged / $limit ),
+                'nextPage' => ( $page >= ceil( $counts->flagged / $limit ) )
+                    ? NULL
+                    : $page + 1,
             ],
             'unflagged' => (object) [
+                'page' => $page,
                 'start' => $start,
+                'prevPage' => ( $page > 1 )
+                    ? $page - 1
+                    : NULL,
                 'total' => $counts->unflagged,
-                'end' => ( $counts->unflagged < $limit )
+                'end' => ( $start + $limit - 1 > $counts->unflagged )
                     ? $counts->unflagged
-                    : $limit
+                    : $start + $limit - 1,
+                'totalPages' => ceil( $counts->unflagged / $limit ),
+                'nextPage' => ( $page >= ceil( $counts->unflagged / $limit ) )
+                    ? NULL
+                    : $page + 1
             ]
         ];
     }

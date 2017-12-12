@@ -10,10 +10,10 @@
     <div class="list">
     <?php
     foreach ( $folders as $folder ): ?>
-        <input type="checkbox" value="<?php echo $folder->full_name; ?>" name="copy_to[]"
+        <input type="checkbox" value="<?php $view->clean( $folder->full_name ); ?>" name="copy_to[]"
             class="move-to-checkbox" id="label-checkbox-<?php echo $folder->id; ?>" />
         <label for="label-checkbox-<?php echo $folder->id; ?>">
-            <?php echo $folder->full_name; ?>
+            <?php $view->clean( $folder->full_name ); ?>
         </label>
     <?php
     endforeach; ?>

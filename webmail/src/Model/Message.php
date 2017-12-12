@@ -48,6 +48,14 @@ class Message extends Model
     const FLAG_SEEN = 'seen';
     const FLAG_FLAGGED = 'flagged';
     const FLAG_DELETED = 'deleted';
+    // Options
+    const ONLY_FLAGGED = 'only_flagged';
+    const SPLIT_FLAGGED = 'split_flagged';
+    // Default options
+    const DEFAULTS = [
+        'only_flagged' => FALSE,
+        'split_flagged' => FALSE
+    ];
 
     public function getData()
     {
@@ -128,6 +136,10 @@ class Message extends Model
         // First get all of the thread IDs for this folder
         $threadIds = $this->getThreadIdsByFolder( $accountId, $folderId );
 
+        if ( ! $threadIds ) {
+            return $counts;
+        }
+
         // Now fetch all messages in any of these threads. Any message
         // in the thread could be starred.
         $results = $this->db()
@@ -188,17 +200,32 @@ class Message extends Model
      * @param int $folderId
      * @param int $limit
      * @param int $offset
+     * @param array $options
      * @return Message array
      */
-    public function getThreadsByFolder( $accountId, $folderId, $limit = 50, $offset = 0 )
+    public function getThreadsByFolder( $accountId, $folderId, $limit = 50, $offset = 0, $options = [] )
     {
         $threads = [];
         $messageIds = [];
         $meta = $this->getThreadCountsByFolder( $accountId, $folderId );
         $threadIds = array_merge( $meta->flaggedIds, $meta->unflaggedIds );
-        $flagged = $this->getThreads( $meta->flaggedIds, $accountId, $limit, $offset );
-        $unflagged = $this->getThreads( $meta->unflaggedIds, $accountId, $limit, $offset );
-        $messages = array_merge( $flagged, $unflagged );
+        $options = array_merge( self::DEFAULTS, $options );
+
+        if ( ! $threadIds ) {
+            return [];
+        }
+
+        if ( $options[ self::SPLIT_FLAGGED ] === TRUE ) {
+            $flagged = $this->getThreads( $meta->flaggedIds, $accountId, $limit, $offset );
+            $unflagged = $this->getThreads( $meta->unflaggedIds, $accountId, $limit, $offset );
+            $messages = array_merge( $flagged, $unflagged );
+        }
+        elseif ( $options[ self::ONLY_FLAGGED ] === TRUE ) {
+            $messages = $this->getThreads( $meta->flaggedIds, $accountId, $limit, $offset );
+        }
+        else {
+            $messages = $this->getThreads( $threadIds, $accountId, $limit, $offset );
+        }
 
         // Load all messages in these threads. We need to get the names
         // of anyone involved in the thread, any folders, and the subject

@@ -56,6 +56,15 @@ class View
     }
 
     /**
+     * Sanitizes and prints a value for a view.
+     * @param string $value
+     */
+    public function clean( $value )
+    {
+        echo htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
+    }
+
+    /**
      * Prepares a data URI attribute for an element. Escapes the
      * HTML to comply with a data:TYPE attribute.
      * @param string $view

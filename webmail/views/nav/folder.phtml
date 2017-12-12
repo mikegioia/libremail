@@ -1,9 +1,9 @@
 <?php
 if ( $folder->ignored != 1 && ! $folder->is_mailbox ): ?>
-    <li class="<?php echo $children ? 'w-sub' : ''; ?><?php echo $folder->unread_count ? ' w-unread' : ''; ?>">
+    <li class="<?php echo $folders->getNavClassString( $folder->id, $activeId, $children ); ?>">
         <input type="checkbox" id="folder-<?php echo $folder->id; ?>-checkbox" class="folder-checkbox" />
         <a href="<?php echo App\Url::folder( $folder->id ); ?>" class="mailbox">
-            <?php echo $folder->name; ?><?php echo $folder->unread_count ? ' ('. $folder->unread_count .')' : ''; ?>
+            <?php $view->clean( $folder->name ); ?><?php echo $folder->unread_count ? ' ('. $folder->unread_count .')' : ''; ?>
         </a>
         <label for="folder-<?php echo $folder->id; ?>-checkbox" class="folder-label">
         <?php

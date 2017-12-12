@@ -14,18 +14,18 @@ foreach ( $messages as $message ):
     <div class="msg-contents <?php echo $message->seen == 1 ? 'seen' : 'unseen'; ?>" id="msg-contents-<?php echo $message->id; ?>">
         <iframe src="<?php echo \App\Url::make( '/star/%s/%s.html', $message->id, $message->flagged == 1 ? 'on' : 'off' ); ?>" class="star"></iframe>
         <div class="names">
-            <?php echo $message->names; ?>
+            <?php $view->clean( $message->names ); ?>
         </div>
         <a href="#" class="subject">
         <?php
         foreach ( $message->folders as $folder ): ?>
-            <mark style="background-color:<?php echo $folder->color->bg; ?>; color:<?php echo $folder->color->fg; ?>"><?php echo $folder->label; ?></mark>
+            <mark style="background-color:<?php echo $folder->color->bg; ?>; color:<?php echo $folder->color->fg; ?>"><?php $view->clean( $folder->label ); ?></mark>
         <?php
         endforeach; ?>
-            <span><?php echo $message->subject; ?></span>&nbsp;<?php echo $message->snippet; ?>
+            <span><?php $view->clean( $message->subject ); ?></span>&nbsp;<?php echo $message->snippet; // cleaned already ?>
         </a>
         <div class="date">
-            <?php echo $message->display_date; ?>
+            <?php $view->clean( $message->display_date ); ?>
         </div>
     </div>
     <input type="hidden" name="message_all[]" value="<?php echo $message->id; ?>" />

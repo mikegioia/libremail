@@ -1,24 +1,66 @@
 <input type="checkbox" id="<?php echo $id; ?>-checkbox" class="mailbox-checkbox" />
 <h5>
+<?php
+if ( ! $showPaging ): ?>
     <label for="<?php echo $id; ?>-checkbox">
         <i class="fa fa-caret-down arrow"></i>
         <i class="fa fa-caret-right arrow"></i>
     </label>
-    <span><?php echo $heading; ?></span>
-    <a href="<?php echo App\Url::make( '/folder/%s', $folderId ); ?>">
+    <span><?php $view->clean( $heading ); ?></span>
+<?php
+else: ?>
+    <?php $view->clean( $heading ); ?><?php if ( $urlId === STARRED ): ?>&nbsp;&mdash;&nbsp;Starred<?php endif; ?>
+<?php
+endif;
+if ( $showPaging ): ?>
+    <span class="paging-counts">
+    <?php
+    if ( $counts->prevPage ):
+        $url = ( $urlId === STARRED )
+            ? App\Url::make( '/starred/%s', $counts->prevPage )
+            : App\Url::make( '/folder/%s/%s', $folderId, $counts->prevPage ); ?>
+        <a class="page prev" href="<?php echo $url; ?>"><i class="fa fa-chevron-left"></i>&nbsp;Prev</a>
+    <?php
+    endif; ?>
+        <strong><?php echo $counts->start; ?></strong>
+        <var>&ndash;</var>
+        <strong><?php echo $counts->end; ?></strong>
+        <em>of</em>
+        <strong><?php echo $counts->total; ?></strong>
+    <?php
+    if ( $counts->nextPage ):
+        $url = ( $urlId === STARRED )
+            ? App\Url::make( '/starred/%s', $counts->nextPage )
+            : App\Url::make( '/folder/%s/%s', $folderId, $counts->nextPage ); ?>
+        <a class="page next" href="<?php echo $url; ?>">Next&nbsp;<i class="fa fa-chevron-right"></i></a>
+    <?php
+    endif; ?>
+    </span>
+<?php
+elseif ( $counts->total ):
+    $url = ( $urlId === STARRED )
+        ? App\Url::make( '/starred/%s', $counts->page )
+        : App\Url::make( '/folder/%s/%s', $folderId, $counts->page ); ?>
+    <a class="paging-counts" href="<?php echo $url; ?>">
         <strong><?php echo $counts->start; ?></strong>
         <var>&ndash;</var>
         <strong><?php echo $counts->end; ?></strong>
         <em>of</em>
         <strong><?php echo $counts->total; ?></strong>
     </a>
+<?php
+endif; ?>
 </h5>
 <div id="<?php echo $id; ?>" class="mailbox">
-    <?php
+<?php
+if ( $messages ):
     $view->render( 'messages/messages', [
         'view' => $view,
         'select' => $select,
         'messages' => $messages
     ]);
-    $view->render( 'messages/actions-menu' ); ?>
+    $view->render( 'messages/actions-menu' );
+else:
+    $view->render( 'messages/no-messages' );
+endif; ?>
 </div>
