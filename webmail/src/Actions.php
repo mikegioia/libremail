@@ -12,6 +12,7 @@ use App\Url;
 use App\Folders;
 use App\Actions\Copy as CopyAction;
 use App\Actions\Delete as DeleteAction;
+use App\Actions\MarkRead as MarkReadAction;
 
 class Actions
 {
@@ -125,7 +126,11 @@ class Actions
      */
     public function handleAction( $action, array $messageIds, array $allMessageIds )
     {
-        if ( ! array_key_exists( $action, self::ACTION_CLASSES ) ) {
+        if ( $action === self::MARK_ALL_READ ) {
+            (new MarkReadAction)->run( $allMessageIds, $this->folders );
+            return;
+        }
+        elseif ( ! array_key_exists( $action, self::ACTION_CLASSES ) ) {
             return;
         }
 

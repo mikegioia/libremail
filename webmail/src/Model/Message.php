@@ -49,10 +49,12 @@ class Message extends Model
     const FLAG_FLAGGED = 'flagged';
     const FLAG_DELETED = 'deleted';
     // Options
+    const ALL_SIBLINGS = 'all_siblings';
     const ONLY_FLAGGED = 'only_flagged';
     const SPLIT_FLAGGED = 'split_flagged';
     // Default options
     const DEFAULTS = [
+        'all_siblings' => FALSE,
         'only_flagged' => FALSE,
         'split_flagged' => FALSE
     ];
@@ -323,7 +325,7 @@ class Message extends Model
             ->select([
                 'id', '`to`', 'cc', '`from`', '`date`',
                 'seen', 'subject', 'flagged', 'thread_id',
-                'substring(text_plain, 1, 260) as text_plain'
+                'text_plain', 'charset'
             ])
             ->from( 'messages' )
             ->where( 'deleted', '=', 0 )
@@ -428,12 +430,14 @@ class Message extends Model
     /**
      * Returns any message with the same message ID and thread ID.
      * @param array $filters
+     * @param array $options
      * @return array of ints
      */
-    public function getSiblingIds( $filters = [] )
+    public function getSiblingIds( $filters = [], $options = [] )
     {
         $ids = [];
         $addSelf = TRUE;
+        $options = array_merge( self::DEFAULTS, $options );
 
         // If there are any filters, first check this message
         foreach ( $filters as $key => $value ) {
@@ -456,8 +460,11 @@ class Message extends Model
             ->from( 'messages' )
             ->where( 'deleted', '=', 0 )
             ->where( 'thread_id', '=', $this->thread_id )
-            ->where( 'account_id', '=', $this->account_id )
-            ->where( 'message_id', '=', $this->message_id );
+            ->where( 'account_id', '=', $this->account_id );
+
+        if ( ! $options[ self::ALL_SIBLINGS ] ) {
+            $query->where( 'message_id', '=', $this->message_id );
+        }
 
         foreach ( $filters as $key => $value ) {
             $query->where( $key, '=', $value );
@@ -486,9 +493,10 @@ class Message extends Model
             ])
             ->table( 'messages' )
             ->where( 'id', '=', $messageId )
+            ->where( $flag, '!=', $state ? 1 : 0 )
             ->execute();
 
-        return is_numeric( $updated );
+        return is_numeric( $updated ) ? $updated : FALSE;
     }
 
     /**

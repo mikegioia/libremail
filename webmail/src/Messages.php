@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\View;
 use App\Folders;
 use App\Model\Account;
 use App\Model\Message;
@@ -88,8 +89,20 @@ class Messages
      */
     private function setSnippet( Message &$message, Escaper $escaper )
     {
-        $text = strip_tags( $message->text_plain );
-        $text = $escaper->escapeHtml( trim( $text ) );
+        $snippet = "";
+        $separator = "\r\n";
+        $text = trim( strip_tags( $message->text_plain ) );
+        $line = strtok( $text, $separator );
+
+        while ( $line !== FALSE ) {
+            if ( strncmp( '>', $line, 1 ) !== 0 ) {
+                $snippet .= $line;
+            }
+
+            $line = strtok( $separator );
+        }
+
+        $snippet = $escaper->escapeHtml( $snippet );
         $message->snippet = ltrim( $text, "<>-_=" );
     }
 
@@ -104,20 +117,9 @@ class Messages
     {
         $count = count( $message->names );
         $unique = array_values( array_unique( $message->names ) );
-        $uniqueCount = count( $unique );
-
-        if ( $uniqueCount === 1 ) {
-            $message->names = trim( $unique[ 0 ], '"' );
-        }
-        elseif ( $uniqueCount ) {
-            $message->names = $this->getNames(
-                $message->names,
-                $message->seens,
-                $uniqueCount );
-        }
-        else {
-            $message->names = trim( $message->from );
-        }
+        $message->names = $this->getNames(
+            $message->names,
+            $message->seens );
 
         if ( $message->thread_count > 1 ) {
             $message->names .= " (". $message->thread_count .")";
@@ -126,44 +128,131 @@ class Messages
 
     /**
      * Prepare the name strings for the message.
-     * @param array $list List of all names on the message
+     * @param array $names List of all names on the message
      * @param array $seens List of seen flags for all names
      * @param int $count Number of unique names in the set
      * @return string
      */
-    private function getNames( array $list, array $seens, $count )
+    private function getNames( array $names, array $seens )
     {
-        $i = 0;
-        $first = array_shift( $list );
+        $view = new View;
+        $i = count( $names );
+        $getRow = function ( $name, $seen, $index ) {
+            $short = trim( current( explode( " ", $name ) ), ' "' );
 
-        do {
-            $last = ( $list ) ? array_pop( $list ) : NULL;
+            return (object) [
+                'name' => $name,
+                'index' => $index,
+                'seen' => $seen == 1,
+                'short' => current( explode( "@", $short ) )
+            ];
+        };
+        // Final set will have at most three, and at least two
+        $final = [
+            1 => $getRow( array_shift( $names ), array_shift( $seens ), 1 ),
+            2 => NULL,
+            3 => $getRow( array_pop( $names ), array_pop( $seens ), $i )
+        ];
 
-            if ( $last != $first ) {
-                break;
+        if ( $i === 1 ) {
+            return sprintf(
+                '<%s>%s</%s>',
+                $final[ 1 ]->seen ? 'span' : 'strong',
+                $view->clean( $final[ 1 ]->short, TRUE ),
+                $final[ 1 ]->seen ? 'span' : 'strong' );
+        }
+
+        while ( $names ) {
+            $i--;
+            $lastName = array_pop( $names );
+            $lastSeen = array_pop( $seens );
+
+            // Don't show author twice, even if author is most recent,
+            // but only if the final message has been seen
+            if ( $final[ 3 ]->seen
+                && $final[ 3 ]->name == $final[ 1 ]->name )
+            {
+                $final[ 3 ] = $getRow( $lastName, $lastSeen, $i );
             }
-        } while ( $list );
+            elseif ( $lastSeen != 1 ) {
+                if ( $final[ 2 ]
+                    && $final[ 3 ]->seen && ! $final[ 2 ]->seen )
+                {
+                    $final[ 3 ] = $final[ 2 ];
+                }
 
-        $firstName = current( explode( " ", $first ) );
-        $lastName = current( explode( " ", $last ?: [] ) );
-        $firstName = trim( $firstName, '"' );
-        $lastName = trim( $lastName, '"' );
-
-        // Long names? Try to get email handle.
-        if ( strlen( $firstName . $lastName ) > 20 ) {
-            $firstName = current( explode( "@", $firstName ) );
-            $lastName = current( explode( "@", $lastName ) );
+                $final[ 2 ] = $getRow( $lastName, $lastSeen, $i );
+            }
         }
 
-        if ( ! $lastName ) {
-            return $firstName;
+        // Clean up instances of the same name adjacent to itself
+        if ( $final[ 2 ] && $final[ 1 ]->name == $final[ 2 ]->name ) {
+            if ( $final[ 1 ]->seen && $final[ 2 ]->seen ) {
+                unset( $final[ 2 ] );
+            }
+            elseif ( ! $final[ 1 ]->seen && $final[ 2 ]->seen ) {
+                $final[ 1 ] = $final[ 2 ];
+                unset( $final[ 2 ] );
+            }
         }
 
-        if ( $count === 2 ) {
-            return sprintf( "%s, %s", $firstName, $lastName );
+        if ( ! $final[ 2 ] && $final[ 1 ]->name == $final[ 3 ]->name ) {
+            if ( $final[ 1 ]->seen && $final[ 3 ]->seen ) {
+                unset( $final[ 3 ] );
+            }
+            elseif ( ! $final[ 1 ]->seen && $final[ 3 ]->seen ) {
+                $final[ 1 ] = $final[ 3 ];
+                unset( $final[ 3 ] );
+            }
         }
 
-        return sprintf( "%s .. %s", $firstName, $lastName );
+        $i = 0;
+        $raw = '';
+        $return = '';
+        $final = array_filter( $final );
+
+        // Finally, we need to combine the names in the most
+        // space efficient way possible
+        if ( count( $final ) === 1 ) {
+            return sprintf(
+                '<%s>%s</%s>',
+                $final[ 1 ]->seen ? 'span' : 'strong',
+                $view->clean( $final[ 1 ]->short, TRUE ),
+                $final[ 1 ]->seen ? 'span' : 'strong' );
+        }
+
+        foreach ( $final as $item ) {
+            $raw .= $item->short;
+
+            if ( ! $return ) {
+                $i = $item->index;
+                $return = sprintf(
+                    '<%s>%s</%s>',
+                    $item->seen ? 'span' : 'strong',
+                    $view->clean( $item->short, TRUE ),
+                    $item->seen ? 'span' : 'strong' );
+                continue;
+            }
+
+            if ( strlen( $raw . $item->short ) > 20 ) {
+                if ( $item->index - $i > 1 ) {
+                    return $return .'&nbsp;..';
+                }
+
+                return $return;
+            }
+
+            $return .= ( $item->index - $i > 1 )
+                ? ' .. '
+                : ', ';
+            $return .= sprintf(
+                '<%s>%s</%s>',
+                $item->seen ? 'span' : 'strong',
+                $view->clean( $item->short, TRUE ),
+                $item->seen ? 'span' : 'strong' );
+        }
+
+        return $return;
     }
 
     /**

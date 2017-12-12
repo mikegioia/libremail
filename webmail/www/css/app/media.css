@@ -12,22 +12,8 @@
   }
 }
 
-/* Very large desktop screens */
-@media (min-width: 400px) {
-  .msg-contents .subject mark {
-    padding-bottom: 0.2rem;
-  }
-}
-
 /* Large desktop screens */
 @media (max-width: 1399px) {
-  html {
-    font-size: 85%;
-  }
-}
-
-/* Large devices (laptops) */
-@media (max-width: 1199px) {
   html {
     font-size: 80%;
   }
@@ -36,10 +22,20 @@
   }
 }
 
+/* Large devices (laptops) */
+@media (max-width: 1199px) {
+  html {
+    font-size: 80%;
+  }
+}
+
 /* Medium devices (laptops) */
 @media (max-width: 991px) {
   html {
     font-size: 75%;
+  }
+  #search .icon.button {
+    top: 0.1rem;
   }
 }
 

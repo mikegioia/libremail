@@ -15,7 +15,9 @@ class MarkRead extends Base
      */
     public function update( MessageModel $message, Folders $folders, array $options = [] )
     {
-        $this->setFlag( $message, MessageModel::FLAG_SEEN, TRUE );
+        $this->setFlag( $message, MessageModel::FLAG_SEEN, TRUE, [], [
+            MessageModel::ALL_SIBLINGS => TRUE
+        ]);
     }
 
     public function getType()

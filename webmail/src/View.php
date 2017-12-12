@@ -59,8 +59,12 @@ class View
      * Sanitizes and prints a value for a view.
      * @param string $value
      */
-    public function clean( $value )
+    public function clean( $value, $return = FALSE )
     {
+        if ( $return ) {
+            return htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
+        }
+
         echo htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
     }
 

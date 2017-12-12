@@ -1,6 +1,8 @@
 <?php
 
 foreach ( $messages as $message ):
+    // URL goes to the first un-read message in the thread
+    $url = App\Url::make( '/thread/%s#current', $message->thread_id );
     // Figure out if the message should be selected
     $selected = $select === App\Actions::SELECT_ALL
         || ( $select === App\Actions::SELECT_READ && $message->seen == 1 )
@@ -10,13 +12,14 @@ foreach ( $messages as $message ):
     <input type="checkbox" name="message[]" value="<?php echo $message->id; ?>"
         id="msg-checkbox-<?php echo $message->id; ?>" class="msg-checkbox"
         <?php echo $selected ? ' checked="checked"' : ''; ?>/>
-    <label for="msg-checkbox-<?php echo $message->id; ?>" class="msg-label"></label>
+    <label for="msg-checkbox-<?php echo $message->id; ?>"
+        class="msg-label <?php echo $message->seen == 1 ? 'seen' : 'unseen'; ?>"></label>
     <div class="msg-contents <?php echo $message->seen == 1 ? 'seen' : 'unseen'; ?>" id="msg-contents-<?php echo $message->id; ?>">
         <iframe src="<?php echo \App\Url::make( '/star/%s/%s.html', $message->id, $message->flagged == 1 ? 'on' : 'off' ); ?>" class="star"></iframe>
-        <div class="names">
-            <?php $view->clean( $message->names ); ?>
-        </div>
-        <a href="#" class="subject">
+        <a href="<?php echo $url; ?>" class="names">
+            <?php echo $message->names; // cleaned already ?>
+        </a>
+        <a href="<?php echo $url; ?>" class="subject">
         <?php
         foreach ( $message->folders as $folder ): ?>
             <mark style="background-color:<?php echo $folder->color->bg; ?>; color:<?php echo $folder->color->fg; ?>"><?php $view->clean( $folder->label ); ?></mark>
@@ -24,9 +27,9 @@ foreach ( $messages as $message ):
         endforeach; ?>
             <span><?php $view->clean( $message->subject ); ?></span>&nbsp;<?php echo $message->snippet; // cleaned already ?>
         </a>
-        <div class="date">
+        <a href="<?php echo $url; ?>" class="date">
             <?php $view->clean( $message->display_date ); ?>
-        </div>
+        </a>
     </div>
     <input type="hidden" name="message_all[]" value="<?php echo $message->id; ?>" />
     <div class="u-cf"></div>
