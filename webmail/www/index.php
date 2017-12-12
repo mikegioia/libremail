@@ -123,7 +123,7 @@ $router->get( '/', function () use ( $renderMailbox ) {
 
 // Folder
 $router->get( '/folder/(\d+)', function ( $id ) use ( $renderMailbox ) {
-    $renderMailbox( $id, 1, 5 );
+    $renderMailbox( $id );
 });
 
 // Starred messages in the inbox
@@ -133,7 +133,7 @@ $router->get( '/starred/(\d+)', function ( $page ) use ( $renderMailbox ) {
 
 // Folder page
 $router->get( '/folder/(\d+)/(\d+)', function ( $id, $page ) use ( $renderMailbox ) {
-    $renderMailbox( $id, $page, 5 );
+    $renderMailbox( $id, $page );
 });
 
 // Update messages

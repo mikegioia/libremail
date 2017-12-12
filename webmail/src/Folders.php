@@ -439,6 +439,11 @@ class Folders
             return;
         }
 
+        if ( ! $this->colorCount ) {
+            $folder->color = NULL;
+            return;
+        }
+
         $index = $this->index[ $folder->id ];
         $position = $index->pos + $index->offset - 1;
         $color = $this->colors[ $position % $this->colorCount ];

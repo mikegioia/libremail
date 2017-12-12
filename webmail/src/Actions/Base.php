@@ -46,8 +46,9 @@ abstract class Base
      * @param string $flag
      * @param bool $state
      * @param array $filters Optional filters to limit siblings
+     * @param string $type Override
      */
-    protected function setFlag( MessageModel $message, $flag, $state, $filters = [] )
+    protected function setFlag( MessageModel $message, $flag, $state, $filters = [], $type = NULL )
     {
         $oldValue = $message->{$flag};
         $newValue = ( $state ) ? 1 : 0;
@@ -66,7 +67,7 @@ abstract class Base
             $taskModel->create(
                 $messageId,
                 $message->account_id,
-                $this->getType(),
+                $type ?: $this->getType(),
                 $oldValue,
                 NULL );
             $message->setFlag( $messageId, $flag, $state );

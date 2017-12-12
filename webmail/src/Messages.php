@@ -226,11 +226,13 @@ class Messages
         return (object) [
             'flagged' => (object) [
                 'page' => $page,
-                'start' => $start,
                 'prevPage' => ( $page > 1 )
                     ? $page - 1
                     : NULL,
                 'total' => $counts->flagged,
+                'start' => ( $counts->flagged )
+                    ? $start
+                    : 0,
                 'end' => ( $start + $limit - 1 > $counts->flagged )
                     ? $counts->flagged
                     : $start + $limit - 1,
@@ -241,11 +243,13 @@ class Messages
             ],
             'unflagged' => (object) [
                 'page' => $page,
-                'start' => $start,
                 'prevPage' => ( $page > 1 )
                     ? $page - 1
                     : NULL,
                 'total' => $counts->unflagged,
+                'start' => ( $counts->unflagged )
+                    ? $start
+                    : 0,
                 'end' => ( $start + $limit - 1 > $counts->unflagged )
                     ? $counts->unflagged
                     : $start + $limit - 1,

@@ -21,13 +21,15 @@ if ( $showPaging ): ?>
             : App\Url::make( '/folder/%s/%s', $folderId, $counts->prevPage ); ?>
         <a class="page prev" href="<?php echo $url; ?>"><i class="fa fa-chevron-left"></i>&nbsp;Prev</a>
     <?php
-    endif; ?>
+    endif;
+    if ( $counts->total ): ?>
         <strong><?php echo $counts->start; ?></strong>
         <var>&ndash;</var>
         <strong><?php echo $counts->end; ?></strong>
         <em>of</em>
         <strong><?php echo $counts->total; ?></strong>
     <?php
+    endif;
     if ( $counts->nextPage ):
         $url = ( $urlId === STARRED )
             ? App\Url::make( '/starred/%s', $counts->nextPage )
