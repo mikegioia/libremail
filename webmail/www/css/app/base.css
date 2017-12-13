@@ -24,6 +24,12 @@ a:focus {
     color: #007db6;
 }
 
+/* Alert notifications */
+aside {
+    right: 1rem;
+    position: fixed;
+}
+
 /* Helpers */
 .align-right {
     text-align: right;

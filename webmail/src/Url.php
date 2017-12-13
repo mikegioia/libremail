@@ -22,14 +22,27 @@ class Url
         return self::$base . vsprintf( $path, $parts );
     }
 
-    static public function folder( $folderId )
+    static public function starred( $page )
     {
-        return self::make( '/folder/%s', $folderId );
+        return self::make( '/starred/%s', $page );
+    }
+
+    static public function folder( $folderId, $page = NULL )
+    {
+        return ( $page )
+            ? self::make( '/folder/%s/%s', $folderId, $page )
+            : self::make( '/folder/%s', $folderId );
     }
 
     static public function redirect( $path, $params = [], $code = 303 )
     {
         header( 'Location: '. self::get( $path, $params ), $code );
+        die();
+    }
+
+    static public function redirectRaw( $url, $code = 303 )
+    {
+        header( 'Location: '. $url, $code );
         die();
     }
 
@@ -45,5 +58,18 @@ class Url
         return ( isset( $_GET[ $key ] ) )
             ? $_GET[ $key ]
             : $default;
+    }
+
+    static public function actionRedirect( $urlId, $folderId, $page )
+    {
+        if ( $urlId === INBOX ) {
+            self::redirect( '/' );
+        }
+
+        if ( $urlId === STARRED ) {
+            self::redirectRaw( self::starred( $page ?: 1 ) );
+        }
+
+        self::redirectRaw( self::folder( $folderId, $page ) );
     }
 }

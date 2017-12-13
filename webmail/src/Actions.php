@@ -80,6 +80,8 @@ class Actions
      */
     public function run()
     {
+        $page = $this->param( 'page' );
+        $urlId = $this->param( 'url_id' );
         $action = $this->param( 'action' );
         $select = $this->param( 'select' );
         $folderId = $this->param( 'folder_id' );
@@ -114,7 +116,7 @@ class Actions
         Model::getDb()->commit();
 
         // If we got here, redirect
-        Url::redirect( '/' );
+        Url::actionRedirect( $urlId, $folderId, $page );
     }
 
     /**

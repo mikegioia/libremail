@@ -4,7 +4,7 @@
         <ul id="mailboxes">
         <?php
         if ( $folders->getInboxId() ): ?>
-            <li class="<?php echo $activeId == $folders->getInboxId() ? 'active' : ''; ?>">
+            <li class="<?php echo $folders->getNavClassString( $folders->getInboxId(), $activeId ); ?>">
                 <a href="/" class="mailbox">
                     Inbox<?php echo $folders->getUnreadCount( $folders->getInboxId(), TRUE ); ?>
                 </a>
