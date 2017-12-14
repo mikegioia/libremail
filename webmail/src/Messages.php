@@ -14,9 +14,7 @@ class Messages
     private $accountId;
 
     const UTF8 = 'utf-8';
-    const TIME = 'g:i a';
-    const DATE_SHORT = 'M j';
-    const DATE_FULL = 'Y-m-d';
+    const NAMES_MAX = 20;
 
     /**
      * @param Account $account
@@ -132,9 +130,11 @@ class Messages
      * @param array $seens List of seen flags for all names
      * @param int $count Number of unique names in the set
      * @return string
+     * @todo Move this to App\Messages\Names
      */
     private function getNames( array $names, array $seens )
     {
+        $prevName = NULL;
         $view = new View;
         $i = count( $names );
         $getRow = function ( $name, $seen, $index ) {
@@ -158,14 +158,19 @@ class Messages
             return sprintf(
                 '<%s>%s</%s>',
                 $final[ 1 ]->seen ? 'span' : 'strong',
-                $view->clean( $final[ 1 ]->short, TRUE ),
+                $view->clean( $final[ 1 ]->name, TRUE ),
                 $final[ 1 ]->seen ? 'span' : 'strong' );
         }
 
         while ( $names ) {
-            $i--;
             $lastName = array_pop( $names );
             $lastSeen = array_pop( $seens );
+
+            if ( ! $prevName || $prevName != $lastName ) {
+                $i--;
+            }
+
+            $prevName = $lastName;
 
             // Don't show author twice, even if author is most recent,
             // but only if the final message has been seen
@@ -174,14 +179,30 @@ class Messages
             {
                 $final[ 3 ] = $getRow( $lastName, $lastSeen, $i );
             }
+            // If the message is unread
             elseif ( $lastSeen != 1 ) {
+                // and if we have something in the middle
                 if ( $final[ 2 ]
-                    && $final[ 3 ]->seen && ! $final[ 2 ]->seen )
+                    // and if the final message is read
+                    && $final[ 3 ]->seen
+                    // and finally if the middle message is unread
+                    && ! $final[ 2 ]->seen )
                 {
+                    // Move the middle message to the end
                     $final[ 3 ] = $final[ 2 ];
                 }
 
-                $final[ 2 ] = $getRow( $lastName, $lastSeen, $i );
+                // Middle message becomes most oldest unread message
+                // in the chain, but only if there's nothing in the
+                // middle or the name is different.
+                if ( ! $final[ 2 ]
+                    || ( $final[ 2 ]
+                        && $final[ 2 ]->name != $lastName ) )
+                {
+                    if ( $lastName !== $final[ 3 ]->name ) {
+                        $final[ 2 ] = $getRow( $lastName, $lastSeen, $i );
+                    }
+                }
             }
         }
 
@@ -217,13 +238,11 @@ class Messages
             return sprintf(
                 '<%s>%s</%s>',
                 $final[ 1 ]->seen ? 'span' : 'strong',
-                $view->clean( $final[ 1 ]->short, TRUE ),
+                $view->clean( $final[ 1 ]->name, TRUE ),
                 $final[ 1 ]->seen ? 'span' : 'strong' );
         }
 
         foreach ( $final as $item ) {
-            $raw .= $item->short;
-
             if ( ! $return ) {
                 $i = $item->index;
                 $return = sprintf(
@@ -234,22 +253,32 @@ class Messages
                 continue;
             }
 
-            if ( strlen( $raw . $item->short ) > 20 ) {
-                if ( $item->index - $i > 1 ) {
-                    return $return .'&nbsp;..';
-                }
+            $return .= ( $item->index - $i > 1 )
+                ? '&nbsp;..&nbsp;'
+                : ',&nbsp;';
+
+            if ( strlen( $raw . $item->short ) > self::NAMES_MAX ) {
+                $return .= sprintf(
+                    '<%s>%s</%s>',
+                    $item->seen ? 'span' : 'strong',
+                    $view->clean(
+                        substr(
+                            $item->short,
+                            0,
+                            self::NAMES_MAX - strlen( $raw ) ),
+                        TRUE ),
+                    $item->seen ? 'span' : 'strong' );
 
                 return $return;
             }
-
-            $return .= ( $item->index - $i > 1 )
-                ? ' .. '
-                : ', ';
-            $return .= sprintf(
-                '<%s>%s</%s>',
-                $item->seen ? 'span' : 'strong',
-                $view->clean( $item->short, TRUE ),
-                $item->seen ? 'span' : 'strong' );
+            else {
+                $raw .= $item->short;
+                $return .= sprintf(
+                    '<%s>%s</%s>',
+                    $item->seen ? 'span' : 'strong',
+                    $view->clean( $item->short, TRUE ),
+                    $item->seen ? 'span' : 'strong' );
+            }
         }
 
         return $return;
@@ -261,15 +290,17 @@ class Messages
      */
     private function setDisplayDate( Message &$message )
     {
-        $today = date( self::DATE_FULL );
-        $messageTime = strtotime( $message->date );
-        $messageDate = date( self::DATE_FULL, $messageTime );
+        $today = View::getDate( NULL, View::DATE_FULL );
+        $messageTime = ( $message->date_recv )
+            ? strtotime( $message->date_recv )
+            : strtotime( $message->date );
+        $messageDate = View::getDate( $message->date, View::DATE_FULL );
 
         if ( $today === $messageDate ) {
-            $message->display_date = date( self::TIME, $messageTime );
+            $message->display_date = View::getDate( $message->date, View::TIME );
         }
         else {
-            $message->display_date = date( self::DATE_SHORT, $messageTime );
+            $message->display_date = View::getDate( $message->date, View::DATE_SHORT );
         }
     }
 

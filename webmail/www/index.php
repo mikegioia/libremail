@@ -4,12 +4,15 @@ use App\Url;
 use App\View;
 use App\Model;
 use App\Router;
+use App\Thread;
 use App\Folders;
 use App\Actions;
 use App\Messages;
 use App\Model\Account;
 use App\Model\Message;
 use App\Exceptions\ClientException;
+use App\Exceptions\NotFoundException;
+use App\Actions\MarkRead as MarkReadAction;
 
 // Autoload application and vendor libraries
 require( __DIR__ .'/../vendor/autoload.php' );
@@ -41,6 +44,8 @@ function getConfig( $file ) {
 
 // Load environment config
 $config = parse_ini_file( BASEDIR .'/.env' );
+// Set the timezone now
+date_default_timezone_set( $config[ 'APP_TIMEZONE' ] );
 
 // Set up the database connection
 Model::initDb(
@@ -55,6 +60,8 @@ Model::initDb(
 
 // Pass the routes into the URL service
 Url::setBase( $config[ 'APP_URL' ] );
+// Save the timezone to the view library
+View::setTimezone( $config[ 'APP_TIMEZONE' ] );
 
 // Get the email address from the cookie (if set) and
 // fetch the account. Otherwise, load the first active
@@ -172,15 +179,40 @@ $router->post( '/star', function () use ( $account ) {
     ]);
 });
 
+// Message thread
+$router->get( '/thread/(\d+)/(\d+)', function ( $folderId, $threadId ) use ( $account ) {
+    // Set up libraries
+    $view = new View;
+    $colors = getConfig( 'colors' );
+    $select = Url::getParam( 'select' );
+    $folders = new Folders( $account, $colors );
+    // Mark this thread as read
+    (new MarkReadAction)->run( [ $threadId ], $folders );
+    // Load the thread object, this will throw an exception if
+    // the thread is not found
+    $thread = new Thread( $account, $folders, $threadId );
+
+    // Render the message thread
+    $view->render( 'thread', [
+        'view' => $view,
+        'thread' => $thread,
+        'folders' => $folders,
+        'folderId' => $folderId
+    ]);
+});
+
 // Handle 404s
 $router->set404( function () {
-    header( 'HTTP/1.1 404 Not Found' );
-    echo '<h1>404 Page Not Found</h1>';
+    throw new NotFoundException;
 });
 
 // Process route
 try {
     $router->run();
+}
+catch ( NotFoundException $e ) {
+    header( 'HTTP/1.1 404 Not Found' );
+    echo '<h1>404 Page Not Found</h1>';
 }
 catch ( ClientException $e ) {
     header( 'HTTP/1.1 400 Bad Request' );

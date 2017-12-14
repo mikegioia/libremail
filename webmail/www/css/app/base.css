@@ -60,3 +60,13 @@ aside {
 .size-md {
     font-size: 1.2rem;
 }
+
+.strong {
+    font-weight: 600;
+}
+
+/* Z-Index layers */
+.top-layer {
+    position: relative;
+    z-index: 30;
+}

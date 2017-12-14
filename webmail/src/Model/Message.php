@@ -26,6 +26,8 @@ class Message extends Model
     public $answered;
     public $reply_to;
     public $date_str;
+    public $recv_str;
+    public $date_recv;
     public $unique_id;
     public $folder_id;
     public $thread_id;
@@ -80,6 +82,8 @@ class Message extends Model
             'answered' => $this->answered,
             'reply_to' => $this->reply_to,
             'date_str' => $this->date_str,
+            'recv_str' => $this->recv_str,
+            'date_recv' => $this->date_recv,
             'unique_id' => $this->unique_id,
             'folder_id' => $this->folder_id,
             'thread_id' => $this->thread_id,
@@ -112,6 +116,22 @@ class Message extends Model
             ->select()
             ->from( 'messages' )
             ->whereIn( 'id', $ids )
+            ->execute()
+            ->fetchAll( PDO::FETCH_CLASS, get_class() );
+    }
+
+    /**
+     * Returns the data for an entire thread.
+     */
+    public function getThread( $accountId, $threadId )
+    {
+        return $this->db()
+            ->select()
+            ->from( 'messages' )
+            ->where( 'deleted', '=', 0 )
+            ->where( 'thread_id', '=', $threadId )
+            ->where( 'account_id', '=', $accountId )
+            ->orderBy( 'date', Model::ASC )
             ->execute()
             ->fetchAll( PDO::FETCH_CLASS, get_class() );
     }
@@ -237,13 +257,13 @@ class Message extends Model
             ->select([
                 '`from`', 'thread_id', 'message_id',
                 'folder_id', 'subject', '`date`',
-                'seen'
+                'seen', 'date_recv'
             ])
             ->from( 'messages' )
             ->where( 'deleted', '=', 0 )
             ->whereIn( 'thread_id', $threadIds )
             ->where( 'account_id', '=', $accountId )
-            ->orderBy( 'date', Model::ASC )
+            ->orderBy( '`date`', Model::ASC )
             ->execute()
             ->fetchAll( PDO::FETCH_CLASS );
 
@@ -273,8 +293,8 @@ class Message extends Model
                 $name = $this->getName( $row->from );
                 $threads[ $row->thread_id ]->count++;
                 $threads[ $row->thread_id ]->names[] = $name;
-                $threads[ $row->thread_id ]->date = $row->date;
                 $threads[ $row->thread_id ]->seens[] = $row->seen;
+                $threads[ $row->thread_id ]->date = $row->date_recv ?: $row->date;
                 $messageIds[ $row->message_id ] = TRUE;
             }
         }

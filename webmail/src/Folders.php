@@ -25,6 +25,8 @@ class Folders
     private $listFolders;
     // Storage of folder/depth
     private $index = [];
+    // Flag if the folders are fully loaded
+    private $loaded = FALSE;
     // Convert certain folder names
     private $convert = [
         'INBOX' => 'Inbox'
@@ -102,36 +104,18 @@ class Folders
             return $this->{$mailbox};
         }
 
-        $this->get();
+        $this->loadFolders();
 
         return $this->{$mailbox};
     }
 
     public function get()
     {
-        if ( $this->folders ) {
+        if ( $this->loaded ) {
             return $this->folders;
         }
 
-        $index = 0;
-        $this->folders = (new Folder)->getByAccount( $this->accountId );
-        $this->folderCounts = (new Message)->getUnreadCounts( $this->accountId );
-
-        // Add meta info to the folders
-        foreach ( $this->folders as $folder ) {
-            $this->setIgnore( $folder );
-            $this->setMailboxType( $folder );
-            $this->addUnreadCount( $folder );
-        }
-
-        // Treeify the folders to set the depth. We need this for
-        // adding in the color info.
-        $this->getTree();
-
-        // Add in the colors now that we know the positions
-        foreach ( $this->folders as $folder ) {
-            $this->setColor( $folder );
-        }
+        $this->loadMetaTree();
 
         return $this->folders;
     }
@@ -142,22 +126,7 @@ class Folders
             return $this->folderTree;
         }
 
-        $index = 0;
-        $this->folderTree = [];
-        $folders = $this->get();
-
-        foreach ( $folders as $folder ) {
-            $parts = explode( '/', $folder->name );
-            $this->treeify( $this->folderTree, $parts, $folder, 1 );
-        }
-
-        // Update the position and depth on each folder
-        $offset = 0;
-        $parentOffset = count( $this->folderTree );
-
-        foreach ( $this->folderTree as $branch ) {
-            $this->updateTreePositions( $branch, $index, $offset, $parentOffset );
-        }
+        $this->loadMetaTree();
 
         return $this->folderTree;
     }
@@ -268,6 +237,72 @@ class Folders
         }
 
         return implode( ' ', $classes );
+    }
+
+    /**
+     * Fetches the folders from SQL and adds basic indexing info.
+     */
+    private function loadFolders()
+    {
+        if ( $this->folders ) {
+            return;
+        }
+
+        $this->folders = (new Folder)->getByAccount( $this->accountId );
+
+        // Add meta info to the folders
+        foreach ( $this->folders as $folder ) {
+            $this->setIgnore( $folder );
+            $this->setMailboxType( $folder );
+        }
+    }
+
+    /**
+     * Fetches all of the counts and meta info for the folders,
+     * and builds a separate storage of the folders as a tree.
+     */
+    private function loadMetaTree()
+    {
+        $this->loadFolders();
+        $this->folderCounts = (new Message)->getUnreadCounts( $this->accountId );
+
+        // Add meta info to the folders
+        foreach ( $this->folders as $folder ) {
+            $this->addUnreadCount( $folder );
+        }
+
+        // Treeify the folders to set the depth. We need this for
+        // adding in the color info.
+        $this->loadTree();
+
+        // Add in the colors now that we know the positions
+        foreach ( $this->folders as $folder ) {
+            $this->setColor( $folder );
+        }
+
+        $this->loaded = TRUE;
+    }
+
+    /**
+     * Builds the folderTree object.
+     */
+    private function loadTree()
+    {
+        $index = 0;
+        $offset = 0;
+        $this->folderTree = [];
+
+        foreach ( $this->folders as $folder ) {
+            $parts = explode( '/', $folder->name );
+            $this->treeify( $this->folderTree, $parts, $folder, 1 );
+        }
+
+        // Update the position and depth on each folder
+        $parentOffset = count( $this->folderTree );
+
+        foreach ( $this->folderTree as $branch ) {
+            $this->updateTreePositions( $branch, $index, $offset, $parentOffset );
+        }
     }
 
     /**

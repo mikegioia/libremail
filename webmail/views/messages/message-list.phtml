@@ -59,9 +59,10 @@ if ( $messages ):
     $view->render( 'messages/messages', [
         'view' => $view,
         'select' => $select,
+        'folderId' => $folderId,
         'messages' => $messages
     ]);
-    $view->render( 'messages/actions-menu' );
+    $view->render( 'nav/actions-menu' );
 else:
     $view->render( 'messages/no-messages' );
 endif; ?>

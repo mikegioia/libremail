@@ -13,10 +13,6 @@ header {
     z-index: 1;
 }
 
-header:hover {
-    z-index: 2;
-}
-
 header a.icon.button {
     margin-bottom: 0;
 }
@@ -66,6 +62,12 @@ header a.icon.button {
     padding: 0.75rem 1rem 0.75rem 0;
     text-align: right;
     width: 19rem;
+}
+
+#topnav-actions {
+    position: fixed;
+    right: 1rem;
+    top: 0.75rem;
 }
 
 #compose {
@@ -146,7 +148,7 @@ nav #mailboxes-more li {
 }
 
 nav #mailboxes-divider {
-    border-top: 2px solid #eee;
+    border-top: 0.125rem solid #eee;
     margin: 0.25rem 0 0.25rem 2rem;
 }
 
@@ -268,6 +270,10 @@ section #msg-actions a.button {
     display: none;
     position: fixed;
     top: calc(6.75rem);
+}
+
+.menu.actions.sticky {
+    display: block;
 }
 
 .folder-selector {

@@ -12,8 +12,10 @@
     ],
     "require": {
         "php": "^5.6|^7.0",
+        "ext-pdo": "*",
         "ext-mbstring": "*",
         "mikegioia/pdo": "@dev",
+        "erusev/parsedown": "^1.6",
         "ezyang/htmlpurifier": "dev-master",
         "zendframework/zend-escaper": "^2.5"
     }

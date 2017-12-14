@@ -161,7 +161,7 @@ input[type="checkbox"].msg-checkbox {
 .msg-label:after {
     background: #f9f9f9;
     border: 1px solid #bbb;
-    border-radius: 2px;
+    border-radius: 0.125rem;
     color: #999;
     content: ' ';
     display: block;
@@ -265,7 +265,7 @@ input[type="checkbox"].msg-checkbox {
 }
 
 .msg-contents .subject mark {
-    border-radius: 1px;
+    border-radius: 0.125rem;
     font-size: 1rem;
     padding: 0.1rem 0.4rem 0.2rem;
     position: relative;

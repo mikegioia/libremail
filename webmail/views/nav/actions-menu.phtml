@@ -1,5 +1,12 @@
 <!-- Contextual menu for selected messages -->
-<div id="actions-menu" class="actions menu">
+<div class="actions menu<?php echo isset( $sticky ) ? ' sticky' : ''; ?>">
+<?php
+if ( isset( $threadView ) ): ?>
+    <a href="<?php echo App\Url::getRefUrl(); ?>" class="icon button control" data-tooltip="Back">
+        <i class="fa fa-arrow-left"></i>
+    </a>
+<?php
+else: ?>
     <div class="dropdown inline-blocked control">
         <a href="#" class="icon button" data-tooltip="Select">
             <i class="fa fa-minus-square-o"></i>
@@ -26,6 +33,8 @@
             </li>
         </ul>
     </div>
+<?php
+endif; ?>
     <button name="action" value="archive" class="icon button control" data-tooltip="Archive">
         <i class="fa fa-archive"></i>
     </button>

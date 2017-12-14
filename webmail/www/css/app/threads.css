@@ -1,0 +1,29 @@
+/**
+ * Thread page
+ */
+
+.thread-msg {
+    border-bottom: 0.25rem solid #eee;
+    font-size: 1.33rem;
+    margin: 2rem 1rem 2rem 0.5rem;
+    padding-bottom: 2rem;
+}
+
+.thread-msg .message {
+    max-width: 60rem;
+}
+
+h5.thread-title {
+    border-bottom: 0.25rem solid #eee;
+    margin-bottom: 1rem;
+    padding: 0 0 1rem;
+}
+
+h5.thread-title mark {
+    border-radius: 0.125rem;
+    font-size: 1.125rem;
+    margin-left: 0.25rem;
+    padding: 0.25rem 0.6rem 0.3rem;
+    position: relative;
+    top: -0.2rem;
+}
