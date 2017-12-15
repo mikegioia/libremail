@@ -75,7 +75,9 @@ class Url
 
     static public function getRefUrl( $default = '/' )
     {
-        $ref = $_SERVER[ 'HTTP_REFERER' ];
+        $ref = ( isset( $_SERVER[ 'HTTP_REFERER' ] ) )
+            ? $_SERVER[ 'HTTP_REFERER' ]
+            : '';
 
         // Only use this if we're on the same domain
         $len = strlen( self::$base );

@@ -1,21 +1,21 @@
 /**
- * Thread page
+ * Message Threads
  */
 
-.thread-msg {
-    border-bottom: 0.25rem solid #eee;
+article.thread-msg {
+    border-bottom: 0.25rem solid #e1e1e1;
+    display: none;
     font-size: 1.33rem;
-    margin: 2rem 1rem 2rem 0.5rem;
+    margin: 0 1rem 0 0;
     padding-bottom: 2rem;
 }
 
-.thread-msg .message {
-    max-width: 60rem;
-}
-
-h5.thread-title {
-    border-bottom: 0.25rem solid #eee;
-    margin-bottom: 1rem;
+/**
+ * Subject line
+ */
+section #msg-list h5.thread-title {
+    border-bottom: 0.125rem solid #e3e3e3;
+    margin: 0.75rem 1rem 0 0;
     padding: 0 0 1rem;
 }
 
@@ -26,4 +26,71 @@ h5.thread-title mark {
     padding: 0.25rem 0.6rem 0.3rem;
     position: relative;
     top: -0.2rem;
+}
+
+/**
+ * Collapsed messages
+ */
+input[type="checkbox"].thread-msg-checkbox {
+    display: none;
+}
+
+.thread-msg-checkbox:checked + label {
+    display: none;
+}
+
+.thread-msg-checkbox:checked + label + article {
+    display: block;
+}
+
+label.thread-msg-label {
+    background-color: #f1f1f1;
+    border-bottom: 0.0625rem solid #e1e1e1;
+    box-sizing: border-box;
+    display: block;
+    font-size: 1.33rem;
+    height: 3.5rem;
+    margin: 0 1rem 0 0;
+    line-height: 3.5rem;
+    padding: 0 1rem;
+    width: calc(100% - 1rem);
+}
+
+label.thread-msg-label .snippet {
+    color: #888;
+    display: block;
+    float: left;
+    overflow: hidden;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: calc(100% - 8rem);
+}
+
+label.thread-msg-label .snippet strong {
+    color: #333;
+    margin-right: 0.5rem;
+}
+
+label.thread-msg-label .snippet span {
+    font-weight: 400;
+}
+
+label.thread-msg-label .date {
+    box-sizing: border-box;
+    color: #333;
+    display: block;
+    float: right;
+    font-size: 1.33rem;
+    font-weight: 400;
+    text-align: right;
+    text-decoration: none;
+    width: 8rem;
+}
+
+/**
+ * Message body
+ */
+.thread-msg .message {
+    max-width: 60rem;
 }

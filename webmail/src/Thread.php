@@ -4,6 +4,7 @@ namespace App;
 
 use App\Model\Account;
 use App\Model\Message;
+use Zend\Escaper\Escaper;
 use App\Exceptions\NotFoundException;
 
 class Thread
@@ -13,7 +14,12 @@ class Thread
     private $messages;
     private $folderIds;
     private $accountId;
+    private $messageCount;
+    private $unreadIds = [];
     private $threadFolders = [];
+
+    const UTF8 = 'utf-8';
+    const SNIPPET_LENGTH = 160;
 
     /**
      * @param Account $account
@@ -42,6 +48,7 @@ class Thread
         $folders = [];
         $messages = [];
         $messageIds = [];
+        $escaper = new Escaper( self::UTF8 );
         $allMessages = (new Message)->getThread(
             $this->accountId,
             $this->threadId );
@@ -60,6 +67,13 @@ class Thread
             $messages[] = $message;
             $folders[] = $message->folder_id;
             $messageIds[] = $message->message_id;
+
+            if ( $message->seen != 1 ) {
+                $unreadIds[] = $message->id;
+            }
+
+            $this->setFrom( $message );
+            $this->setSnippet( $message, $escaper );
         }
 
         $this->messages = $messages;
@@ -73,6 +87,8 @@ class Thread
                 $this->threadFolders[] = $folder;
             }
         }
+
+        $this->messageCount = count( $messages );
     }
 
     public function get()
@@ -80,19 +96,48 @@ class Thread
         return $this->message;
     }
 
-    public function getDate()
-    {
-        return $this->message->date;
-    }
-
     public function getSubject()
     {
         return $this->message->subject;
     }
 
+    public function getMessages()
+    {
+        return $this->messages;
+    }
+
     public function getFolders()
     {
         return $this->threadFolders;
+    }
+
+    public function getMessageCount()
+    {
+        return $this->messageCount;
+    }
+
+    public function isUnread( $id )
+    {
+        return in_array( $id, $this->unreadIds );
+    }
+
+    /**
+     * Adds two new properties, from_name and from_email.
+     * @param Message $message
+     */
+    private function setFrom( Message &$message )
+    {
+        $parts = explode( '<', $message->from, 2 );
+        $count = count( $parts );
+
+        if ( $count === 1 ) {
+            $message->from_email = '';
+            $message->from_name = trim( $parts[ 0 ], ' >' );
+        }
+        else {
+            $message->from_name = trim( $parts[ 0 ] );
+            $message->from_email = trim( $parts[ 1 ], ' >' );
+        }
     }
 
     /**
@@ -116,6 +161,9 @@ class Thread
         }
 
         $snippet = $escaper->escapeHtml( $snippet );
-        $message->snippet = ltrim( $text, "<>-_=" );
+        $message->snippet = substr(
+            ltrim( $text, "<>-_=" ),
+            0,
+            self::SNIPPET_LENGTH );
     }
 }

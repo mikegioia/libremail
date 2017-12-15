@@ -15,6 +15,7 @@ class Messages
 
     const UTF8 = 'utf-8';
     const NAMES_MAX = 20;
+    const SNIPPET_LENGTH = 160;
 
     /**
      * @param Account $account
@@ -101,7 +102,10 @@ class Messages
         }
 
         $snippet = $escaper->escapeHtml( $snippet );
-        $message->snippet = ltrim( $text, "<>-_=" );
+        $message->snippet = substr(
+            ltrim( $text, "<>-_=" ),
+            0,
+            self::SNIPPET_LENGTH );
     }
 
     /**

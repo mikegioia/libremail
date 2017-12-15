@@ -37,6 +37,10 @@
   #search .icon.button {
     top: 0.1rem;
   }
+  .dropdown ul.more-actions {
+    right: 0;
+    border-radius: 4px 0 4px 4px;
+  }
 }
 
 /* Medium devices (tablets) */

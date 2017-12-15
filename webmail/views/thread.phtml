@@ -21,6 +21,7 @@ $view->render( 'nav', [
         <section id="msg-list" class="no-select">
             <?php
             $view->render( 'threads/message-list', [
+                'i' => 0,
                 'view' => $view,
                 'thread' => $thread
             ]);
