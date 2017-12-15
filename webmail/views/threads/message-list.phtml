@@ -19,9 +19,14 @@ foreach ( $thread->getMessages() as $message ): ?>
         <span class="date">1:05 pm</span>
     </label>
     <article id="message-<?php echo $message->id; ?>" class="thread-msg">
-        <div class="from"><?php $view->clean( $message->from ); ?></div>
-        <div class="snippet">
-            <?php echo substr( $message->text_plain, 0, 150 ); ?>
+        <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-header">
+            <span class="from">
+                <strong><?php $view->clean( $message->from_name ); ?></strong>
+                <span><?php $view->clean( $message->from_email ); ?></span>
+            </span>
+        </label>
+        <div class="message">
+            <?php echo nl2br( $view->clean( $message->text_plain, TRUE ) ); ?>
         </div>
     </article>
 <?php

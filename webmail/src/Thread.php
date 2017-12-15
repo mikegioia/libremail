@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Parsedown;
 use App\Model\Account;
 use App\Model\Message;
 use Zend\Escaper\Escaper;
@@ -48,6 +49,8 @@ class Thread
         $folders = [];
         $messages = [];
         $messageIds = [];
+        $parsedown = new Parsedown;
+        $parsedown->setMarkupEscaped( TRUE );
         $escaper = new Escaper( self::UTF8 );
         $allMessages = (new Message)->getThread(
             $this->accountId,
@@ -74,6 +77,7 @@ class Thread
 
             $this->setFrom( $message );
             $this->setSnippet( $message, $escaper );
+            $this->setContent( $message, $parsedown );
         }
 
         $this->messages = $messages;
@@ -136,7 +140,7 @@ class Thread
         }
         else {
             $message->from_name = trim( $parts[ 0 ] );
-            $message->from_email = trim( $parts[ 1 ], ' >' );
+            $message->from_email = '<'. trim( $parts[ 1 ], ' <>' ) .'>';
         }
     }
 
@@ -165,5 +169,16 @@ class Thread
             ltrim( $text, "<>-_=" ),
             0,
             self::SNIPPET_LENGTH );
+    }
+
+    /**
+     * Creates a markdown version of the plain text part.
+     * @param Message $message
+     * @param Parsedown $parsedown
+     * @todo Escape this with HTMLPurifier
+     */
+    private function setContent( Message &$message, Parsedown $parsedown )
+    {
+        $message->text_markdown = $parsedown->text( $message->text_plain );
     }
 }

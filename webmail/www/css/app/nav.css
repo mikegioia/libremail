@@ -4,7 +4,7 @@
  * z-index range: 1-2
  */
 
-header {
+body > header {
     background: #f1f1f1;
     border-bottom: 4px solid #c56bde;
     height: 5rem;
@@ -13,7 +13,7 @@ header {
     z-index: 1;
 }
 
-header a.icon.button {
+body > header a.icon.button {
     margin-bottom: 0;
 }
 

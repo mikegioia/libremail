@@ -3,11 +3,11 @@
  */
 
 article.thread-msg {
-    border-bottom: 0.25rem solid #e1e1e1;
+    border-bottom: 0.125rem solid #e1e1e1;
     display: none;
     font-size: 1.33rem;
     margin: 0 1rem 0 0;
-    padding-bottom: 2rem;
+    padding-bottom: 1rem;
 }
 
 /**
@@ -47,6 +47,7 @@ label.thread-msg-label {
     background-color: #f1f1f1;
     border-bottom: 0.0625rem solid #e1e1e1;
     box-sizing: border-box;
+    cursor: pointer;
     display: block;
     font-size: 1.33rem;
     height: 3.5rem;
@@ -91,6 +92,29 @@ label.thread-msg-label .date {
 /**
  * Message body
  */
+.thread-msg label.thread-msg-header {
+    box-sizing: border-box;
+    cursor: pointer;
+    display: block;
+    font-size: 1.33rem;
+    min-height: 3.5rem;
+    margin: 0 1rem 1rem 0;
+    line-height: 3.5rem;
+    padding: 0 1rem;
+    width: calc(100% - 1rem);
+}
+
+.thread-msg label.thread-msg-header .from strong {
+    color: #333;
+    margin-right: 0.5rem;
+}
+
+.thread-msg label.thread-msg-header .from span {
+    color: #888;
+    font-weight: 400;
+}
+
 .thread-msg .message {
     max-width: 60rem;
+    padding: 0 1rem;
 }
