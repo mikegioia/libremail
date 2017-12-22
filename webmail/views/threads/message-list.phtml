@@ -26,7 +26,7 @@ foreach ( $thread->getMessages() as $message ): ?>
             </span>
         </label>
         <div class="message">
-            <?php echo nl2br( $view->clean( $message->text_plain, TRUE ) ); ?>
+            <?php echo nl2br( trim( $view->clean( $message->text_plain, TRUE ) ) ); ?>
         </div>
     </article>
 <?php

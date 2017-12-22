@@ -51,22 +51,25 @@ abstract class Base
     protected function setFlag( MessageModel $message, $flag, $state, $filters = [], $options = [] )
     {
         $taskModel = new TaskModel;
-        $oldValue = $message->{$flag};
         $newValue = ( $state ) ? 1 : 0;
+        $oldValue = ( $state ) ? 0 : 1;
         // We need to update this flag for all messsages with
         // the same message-id within the thread.
-        $messageIds = $message->getSiblingIds( $filters, $options );
+        $messages = $message->getSiblings( $filters, $options );
 
-        foreach ( $messageIds as $messageId ) {
-            // Returns false if the flag is already the desired state
-            if ( $message->setFlag( $messageId, $flag, $state ) ) {
-                $taskModel->create(
-                    $messageId,
-                    $message->account_id,
-                    $this->getType(),
-                    $oldValue,
-                    NULL );
+        foreach ( $messages as $sibling ) {
+            // Skip the message if it's the same
+            if ( $sibling->{$flag} == $newValue ) {
+                continue;
             }
+
+            $sibling->setFlag( $flag, $state );
+            $taskModel->create(
+                $sibling->id,
+                $sibling->account_id,
+                $this->getType(),
+                $oldValue,
+                NULL );
         }
     }
 }

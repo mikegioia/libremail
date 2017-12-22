@@ -451,9 +451,9 @@ class Message extends Model
      * Returns any message with the same message ID and thread ID.
      * @param array $filters
      * @param array $options
-     * @return array of ints
+     * @return array of Messages
      */
-    public function getSiblingIds( $filters = [], $options = [] )
+    public function getSiblings( $filters = [], $options = [] )
     {
         $ids = [];
         $addSelf = TRUE;
@@ -476,7 +476,7 @@ class Message extends Model
         }
 
         $query = $this->db()
-            ->select([ 'id' ])
+            ->select()
             ->from( 'messages' )
             ->where( 'deleted', '=', 0 )
             ->where( 'thread_id', '=', $this->thread_id )
@@ -490,13 +490,7 @@ class Message extends Model
             $query->where( $key, '=', $value );
         }
 
-        $results = $query->execute()->fetchAll( PDO::FETCH_CLASS );
-
-        foreach ( $results as $result ) {
-            $ids[] = $result->id;
-        }
-
-        return array_values( array_unique( $ids ) );
+        return $query->execute()->fetchAll( PDO::FETCH_CLASS, get_class() );
     }
 
     /**
@@ -505,15 +499,14 @@ class Message extends Model
      * @param string $flag
      * @param bool $state
      */
-    public function setFlag( $messageId, $flag, $state )
+    public function setFlag( $flag, $state )
     {
         $updated = $this->db()
             ->update([
                 $flag => $state ? 1 : 0
             ])
             ->table( 'messages' )
-            ->where( 'id', '=', $messageId )
-            ->where( $flag, '!=', $state ? 1 : 0 )
+            ->where( 'id', '=', $this->id )
             ->execute();
 
         return is_numeric( $updated ) ? $updated : FALSE;
