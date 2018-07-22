@@ -1,4 +1,4 @@
-#!/usr/bin/env php
+#!/usr/bin/env php7.0
 <?php
 
 /**
@@ -113,36 +113,40 @@ pcntl_signal( SIGQUIT, $HALT );
 pcntl_signal( SIGCONT, function ( $signo ) use ( $di ) {
     $di[ 'log' ]->getLogger()->addInfo(
         "SIGCONT received, restarting sync" );
-    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ):
+
+    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ) {
         $di[ 'sync' ]->wake();
-    endif;
+    }
 });
 
 // Return back statistics on the current sync
 pcntl_signal( SIGUSR1, function ( $signo ) use ( $di ) {
     $di[ 'log' ]->getLogger()->addDebug(
         "SIGUSR1 received, printing text stats" );
-    if ( isset( $di[ 'stats' ] ) && $di[ 'stats' ] ):
+
+    if ( isset( $di[ 'stats' ] ) && $di[ 'stats' ] ) {
         $di[ 'stats' ]->text();
-    endif;
+    }
 });
 
 // SIGUSR2 returns JSON
 pcntl_signal( SIGUSR2, function ( $signo ) use ( $di ) {
     $di[ 'log' ]->getLogger()->addDebug(
         "SIGUSR2 received, printing JSON stats" );
-    if ( isset( $di[ 'stats' ] ) && $di[ 'stats' ] ):
+
+    if ( isset( $di[ 'stats' ] ) && $di[ 'stats' ] ) {
         $di[ 'stats' ]->json();
-    endif;
+    }
 });
 
 // SIGURG stops the syncing
 pcntl_signal( SIGURG, function ( $signo ) use ( $di ) {
     $di[ 'log' ]->getLogger()->addInfo(
         "SIGURG received, stopping sync" );
-    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ):
+
+    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ) {
         $di[ 'sync' ]->stop();
-    endif;
+    }
 });
 
 // PDO factory, this uses Slim-PDO as a wrapper

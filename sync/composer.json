@@ -26,32 +26,29 @@
         }
     ],
     "require": {
-        "php": "^5.6|^7.0",
-        "ext-pcntl": "*",
+        "php": "^7.0",
         "ext-pdo": "*",
+        "ext-iconv": "*",
         "ext-mbstring": "*",
         "particlebits/imap": "@dev",
-        "pimple/pimple": "~3.0",
-        "monolog/monolog": "^1.23",
+        "pimple/pimple": "~3.2.3",
+        "monolog/monolog": "~1.23",
         "league/climate": "~3.2",
         "particle/validator": "~2.3",
         "ilya/belt": "~2.1",
-        "mikegioia/pdo": "@dev",
         "neitanod/forceutf8": "^2.0",
-        "symfony/event-dispatcher": "^3.0",
-        "react/event-loop": "^0.4.3",
-        "cboden/ratchet": "^0.3.6",
-        "react/child-process": "^0.4.3",
+        "react/event-loop": "@dev",
+        "cboden/ratchet": "^0.4.1",
+        "evenement/evenement": "^3.0",
+        "symfony/event-dispatcher": "^3.4",
+        "react/child-process": "^0.5.2",
         "mkraemer/react-pcntl": "^3.0",
-        "evenement/evenement": "2.1.0"
+        "mikegioia/pdo": "@dev"
     },
     "suggest": {
-        "ext-ev": "*"
+        "ext-intl": "Handle IDN in AddressList hostnames"
     },
     "minimum-stability": "dev",
-    "require-dev": {
-        "clue/phar-composer": "^1.0"
-    },
     "bin": [
         "sync",
         "server",
