@@ -46,6 +46,7 @@
         "mikegioia/pdo": "@dev"
     },
     "suggest": {
+        "ext-mysqlnd": "MySQL Native Driver",
         "ext-intl": "Handle IDN in AddressList hostnames"
     },
     "minimum-stability": "dev",
