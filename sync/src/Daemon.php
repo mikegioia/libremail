@@ -236,12 +236,10 @@ class Daemon
 
         // Resume the stdin stream, send the message and then pause
         // it again.
-        $this->webServerProcess->stdin->resume();
         $this->webServerProcess->stdin->write(
             Message::packJson(
                 $message->toArray()
             ));
-        $this->webServerProcess->stdin->pause();
     }
 
     /**
@@ -252,12 +250,8 @@ class Daemon
         $this->broadcast(
             new HealthMessage(
                 $this->diagnostics, [
-                    PROC_SYNC => ( isset( $this->processPids[ PROC_SYNC ] ) )
-                        ? TRUE
-                        : FALSE,
-                    PROC_SERVER => ( isset( $this->processPids[ PROC_SERVER ] ) )
-                        ? TRUE
-                        : FALSE
+                    PROC_SYNC => isset( $this->processPids[ PROC_SYNC ] ),
+                    PROC_SERVER => isset( $this->processPids[ PROC_SERVER ] )
                 ],
                 $this->noAccounts
             ));
@@ -319,9 +313,9 @@ class Daemon
                 $this->processPids[ $process ] = $message->pid;
                 break;
             case Message::STATS:
-                if ( $message->accounts ):
+                if ( $message->accounts ) {
                     $this->noAccounts = false;
-                endif;
+                }
                 // no break, broadcast
             case Message::ERROR:
             case Message::ACCOUNT:

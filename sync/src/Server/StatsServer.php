@@ -2,19 +2,20 @@
 
 namespace App\Server;
 
-use App\Log
-  , App\Task
-  , Exception
-  , App\Command
-  , App\Message
-  , PDOException
-  , SplObjectStorage
-  , React\Stream\Stream
-  , Ratchet\ConnectionInterface
-  , React\EventLoop\LoopInterface
-  , Ratchet\MessageComponentInterface
-  , App\Traits\JsonMessage as JsonMessageTrait
-  , App\Exceptions\Terminate as TerminateException;
+use App\Log;
+use App\Task;
+use Exception;
+use App\Command;
+use App\Message;
+use PDOException;
+use SplObjectStorage;
+use Ratchet\ConnectionInterface;
+use React\EventLoop\LoopInterface;
+use Ratchet\MessageComponentInterface;
+use React\Stream\ReadableResourceStream;
+use React\Stream\WritableResourceStream;
+use App\Traits\JsonMessage as JsonMessageTrait;
+use App\Exceptions\Terminate as TerminateException;
 
 class StatsServer implements MessageComponentInterface
 {
@@ -99,7 +100,7 @@ class StatsServer implements MessageComponentInterface
 
     private function setupInputStreams()
     {
-        $this->read = new Stream( STDIN, $this->loop );
+        $this->read = new ReadableResourceStream( STDIN, $this->loop );
 
         // The data can come in JSON encoded. If so, we want to
         // detect this format and keep reading until we reach the
@@ -108,7 +109,7 @@ class StatsServer implements MessageComponentInterface
             $this->processMessage( $data, NULL );
         });
 
-        $this->write = new Stream( STDOUT, $this->loop );
+        $this->write = new WritableResourceStream( STDOUT, $this->loop );
     }
 
     private function processMessage( $message, $key )

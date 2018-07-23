@@ -689,12 +689,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/zend-mail.git",
-                "reference": "9f3bc986df41a07061cd3e3b59c18c620b018a63"
+                "reference": "403da5836cded37684b2d912476af29eaf9d1951"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/zend-mail/zipball/9f3bc986df41a07061cd3e3b59c18c620b018a63",
-                "reference": "9f3bc986df41a07061cd3e3b59c18c620b018a63",
+                "url": "https://api.github.com/repos/ParticleBits/zend-mail/zipball/403da5836cded37684b2d912476af29eaf9d1951",
+                "reference": "403da5836cded37684b2d912476af29eaf9d1951",
                 "shasum": ""
             },
             "require": {
@@ -773,7 +773,7 @@
                 "chat": "https://zendframework-slack.herokuapp.com",
                 "forum": "https://discourse.zendframework.com/c/questions/components"
             },
-            "time": "2018-07-22T21:55:30+00:00"
+            "time": "2018-07-23T01:13:15+00:00"
         },
         {
             "name": "particlebits/zend-mime",
