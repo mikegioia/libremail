@@ -17,7 +17,7 @@ is meant to run forever with almost zero maintenance :D
 ## Contents
 
 - [Dependencies](https://github.com/mikegioia/libremail/tree/master/sync#dependencies)
-    1. [Support for PHP 5.6]()
+    1. [Support for PHP 5.6](https://github.com/mikegioia/libremail/tree/master/sync#1-support-for-php-56)
 - [Installation](https://github.com/mikegioia/libremail/tree/master/sync#installation)
     1. [Create Database](https://github.com/mikegioia/libremail/tree/master/sync#1-create-database)
     2. [Configure the Application](https://github.com/mikegioia/libremail/tree/master/sync#2-configure-the-application)
