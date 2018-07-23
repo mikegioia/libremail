@@ -2,15 +2,14 @@
 
 namespace App\Message;
 
-use App\Message
-  , App\Message\AbstractMessage;
+use App\Message;
 
 class PidMessage extends AbstractMessage
 {
     public $pid;
     protected $type = Message::PID;
 
-    public function __construct( $pid )
+    public function __construct($pid)
     {
         $this->pid = $pid;
     }

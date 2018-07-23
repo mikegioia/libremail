@@ -3,10 +3,6 @@
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__.'/src')
     ->exclude([
-        'Events',
-        'Exceptions',
-        'Log',
-        'Message',
         'Model',
         'Server',
         'Sync',

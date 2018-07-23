@@ -2,8 +2,7 @@
 
 namespace App\Message;
 
-use App\Message
-  , App\Message\AbstractMessage;
+use App\Message;
 
 class NoAccountsMessage extends AbstractMessage
 {

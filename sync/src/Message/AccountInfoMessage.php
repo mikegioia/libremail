@@ -2,9 +2,8 @@
 
 namespace App\Message;
 
-use App\Message
-  , App\Message\AbstractMessage
-  , App\Model\Account as AccountModel;
+use App\Message;
+use App\Model\Account as AccountModel;
 
 class AccountInfoMessage extends AbstractMessage
 {
@@ -14,7 +13,7 @@ class AccountInfoMessage extends AbstractMessage
     public $password;
     protected $type = Message::ACCOUNT_INFO;
 
-    public function __construct( AccountModel $account )
+    public function __construct(AccountModel $account)
     {
         $this->email = $account->email;
         $this->host = $account->imap_host;

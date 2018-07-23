@@ -2,8 +2,7 @@
 
 namespace App\Message;
 
-use App\Message
-  , App\Message\AbstractMessage;
+use App\Message;
 
 class NotificationMessage extends AbstractMessage
 {
@@ -11,7 +10,7 @@ class NotificationMessage extends AbstractMessage
     public $message;
     protected $type = Message::NOTIFICATION;
 
-    public function __construct( $status, $message )
+    public function __construct($status, $message)
     {
         $this->status = $status;
         $this->message = $message;
