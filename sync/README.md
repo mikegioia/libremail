@@ -16,6 +16,8 @@ is meant to run forever with almost zero maintenance :D
 
 ## Contents
 
+- [Dependencies](https://github.com/mikegioia/libremail/tree/master/sync#dependencies)
+    1. [Support for PHP 5.6]()
 - [Installation](https://github.com/mikegioia/libremail/tree/master/sync#installation)
     1. [Create Database](https://github.com/mikegioia/libremail/tree/master/sync#1-create-database)
     2. [Configure the Application](https://github.com/mikegioia/libremail/tree/master/sync#2-configure-the-application)
@@ -25,6 +27,34 @@ is meant to run forever with almost zero maintenance :D
 - [Run the IMAP Sync](https://github.com/mikegioia/libremail/tree/master/sync#run-the-sync)
 - [Using an Init Script or Supervisor](https://github.com/mikegioia/libremail/tree/master/sync#using-an-init-script-or-supervisor)
 - [Submitting Bugs](https://github.com/mikegioia/libremail/tree/master/sync#submitting-bugs)
+
+## Dependencies
+
+At a glance, this application requires the following:
+
+* PHP 7.0
+* MySQL / MariaDB
+* `ext-pdo`, `ext-iconv`, and `ext-mbstring`
+
+It's recommented to install `ext-mysqlnd` as well. `php7.0-common` should already
+be installed on your system.
+
+Versions 7.1 and 7.2 will soon be supported as I test everything out with them,
+but right now I have PHP 7.0 as the only currently supported version. See below
+for info about PHP 5.6.
+
+### 1. Support for PHP 5.6
+
+Version 1.0.0 of this application supports PHP 5.6, with compatibility for all
+of the composer dependencies at that snapshot.
+
+If you like to use that, run the following command:
+
+```
+$> git checkout 1.0.0
+```
+
+All current and future updates will only support PHP 7.0 and higher!
 
 ## Installation
 
