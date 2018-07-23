@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a4b230e4a504bf33f887c233df9c6a0e",
+    "content-hash": "c2898a2cc19d74f8a198bb8033c8742c",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -313,12 +313,12 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mikegioia/Slim-PDO.git",
+                "url": "https://github.com/mikegioia/pdo.git",
                 "reference": "5832e46a625e01763a9af41b3df83cd99206ae43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikegioia/Slim-PDO/zipball/5832e46a625e01763a9af41b3df83cd99206ae43",
+                "url": "https://api.github.com/repos/mikegioia/pdo/zipball/5832e46a625e01763a9af41b3df83cd99206ae43",
                 "reference": "5832e46a625e01763a9af41b3df83cd99206ae43",
                 "shasum": ""
             },
