@@ -26,18 +26,18 @@ class DaemonConsole extends Console
             'disable-sync' => [
                 'longPrefix' => 'disable-sync',
                 'description' => 'Start without the sync enabled',
-                'noValue' => TRUE
+                'noValue' => true
             ],
             'disable-webserver' => [
                 'longPrefix' => 'disable-webserver',
                 'description' => 'Start without the webserver enabled',
-                'noValue' => TRUE
+                'noValue' => true
             ],
             'help' => [
                 'prefix' => 'h',
                 'longPrefix' => 'help',
                 'description' => 'Prints a usage statement',
-                'noValue' => TRUE
+                'noValue' => true
             ]
         ]);
     }
@@ -48,9 +48,9 @@ class DaemonConsole extends Console
     protected function parseArgs()
     {
         $this->cli->arguments->parse();
-        $this->help = $this->cli->arguments->get( 'help' );
-        $this->sync = ! $this->cli->arguments->get( 'disable-sync' );
-        $this->webServer = ! $this->cli->arguments->get( 'disable-webserver' );
+        $this->help = $this->cli->arguments->get('help');
+        $this->sync = ! $this->cli->arguments->get('disable-sync');
+        $this->webServer = ! $this->cli->arguments->get('disable-webserver');
     }
 
     /**
@@ -59,9 +59,9 @@ class DaemonConsole extends Console
     protected function processArgs()
     {
         // If help is set, show the usage and exit
-        if ( $this->help === TRUE ) {
+        if (true === $this->help) {
             $this->cli->usage();
-            exit( 0 );
+            exit(0);
         }
     }
 }

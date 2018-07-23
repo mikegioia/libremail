@@ -54,5 +54,10 @@
         "sync",
         "server",
         "libremail"
-    ]
+    ],
+    "scripts": {
+        "fix": "php-cs-fixer fix",
+        "test": "./vendor/bin/phpunit",
+        "lint": "php-cs-fixer fix --dry-run --diff"
+    }
 }
