@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "248f1c49eab2fc36cdb3b9f2e212c178",
+    "content-hash": "7b05604d5abbed0e08eb755623673aac",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ezyang/htmlpurifier.git",
-                "reference": "5988f2958346b0f8f3acee0de36ff8954594c64b"
+                "reference": "b81690c17eae5dbea7557d1f359af8dd17e9beef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/5988f2958346b0f8f3acee0de36ff8954594c64b",
-                "reference": "5988f2958346b0f8f3acee0de36ff8954594c64b",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/b81690c17eae5dbea7557d1f359af8dd17e9beef",
+                "reference": "b81690c17eae5dbea7557d1f359af8dd17e9beef",
                 "shasum": ""
             },
             "require": {
@@ -37,7 +37,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL"
+                "LGPL-2.1-or-later"
             ],
             "authors": [
                 {
@@ -51,20 +51,20 @@
             "keywords": [
                 "html"
             ],
-            "time": "2017-10-08T23:52:05+00:00"
+            "time": "2018-06-10T02:48:13+00:00"
         },
         {
             "name": "mikegioia/pdo",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mikegioia/Slim-PDO.git",
-                "reference": "d0aea81ead68dfb074d68fe4c0017ad5a0ee2499"
+                "url": "https://github.com/mikegioia/pdo.git",
+                "reference": "5832e46a625e01763a9af41b3df83cd99206ae43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikegioia/Slim-PDO/zipball/d0aea81ead68dfb074d68fe4c0017ad5a0ee2499",
-                "reference": "d0aea81ead68dfb074d68fe4c0017ad5a0ee2499",
+                "url": "https://api.github.com/repos/mikegioia/pdo/zipball/5832e46a625e01763a9af41b3df83cd99206ae43",
+                "reference": "5832e46a625e01763a9af41b3df83cd99206ae43",
                 "shasum": ""
             },
             "require": {
@@ -104,36 +104,36 @@
             "support": {
                 "issues": "https://github.com/mikegioia/Slim-PDO/issues",
                 "docs": "https://github.com/mikegioia/Slim-PDO/blob/master/docs/README.md",
-                "source": "https://github.com/mikegioia/Slim-PDO/tree/master"
+                "source": "https://github.com/mikegioia/pdo/tree/master"
             },
-            "time": "2017-03-25T21:37:24+00:00"
+            "time": "2018-07-22T23:29:12+00:00"
         },
         {
             "name": "zendframework/zend-escaper",
-            "version": "2.5.2",
+            "version": "2.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-escaper.git",
-                "reference": "2dcd14b61a72d8b8e27d579c6344e12c26141d4e"
+                "reference": "31d8aafae982f9568287cb4dce987e6aff8fd074"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-escaper/zipball/2dcd14b61a72d8b8e27d579c6344e12c26141d4e",
-                "reference": "2dcd14b61a72d8b8e27d579c6344e12c26141d4e",
+                "url": "https://api.github.com/repos/zendframework/zend-escaper/zipball/31d8aafae982f9568287cb4dce987e6aff8fd074",
+                "reference": "31d8aafae982f9568287cb4dce987e6aff8fd074",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.5"
+                "php": "^5.6 || ^7.0"
             },
             "require-dev": {
-                "fabpot/php-cs-fixer": "1.7.*",
-                "phpunit/phpunit": "~4.0"
+                "phpunit/phpunit": "^5.7.27 || ^6.5.8 || ^7.1.2",
+                "zendframework/zend-coding-standard": "~1.0.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev",
-                    "dev-develop": "2.6-dev"
+                    "dev-master": "2.6.x-dev",
+                    "dev-develop": "2.7.x-dev"
                 }
             },
             "autoload": {
@@ -145,12 +145,13 @@
             "license": [
                 "BSD-3-Clause"
             ],
-            "homepage": "https://github.com/zendframework/zend-escaper",
+            "description": "Securely and safely escape HTML, HTML attributes, JavaScript, CSS, and URLs",
             "keywords": [
+                "ZendFramework",
                 "escaper",
-                "zf2"
+                "zf"
             ],
-            "time": "2016-06-30T19:48:38+00:00"
+            "time": "2018-04-25T15:48:53+00:00"
         }
     ],
     "packages-dev": [],

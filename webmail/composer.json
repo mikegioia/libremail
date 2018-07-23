@@ -7,7 +7,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/mikegioia/Slim-PDO"
+            "url": "https://github.com/mikegioia/pdo"
         }
     ],
     "require": {

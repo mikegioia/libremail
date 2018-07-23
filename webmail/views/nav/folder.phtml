@@ -21,6 +21,7 @@ if ( $folder->ignored != 1 && ! $folder->is_mailbox ): ?>
         foreach ( $children as $child ):
             $view->render( 'nav/folder', [
                 'view' => $view,
+                'folders' => $folders,
                 'folder' => $child[ 'folder' ],
                 'children' => $child[ 'children' ]
             ]);

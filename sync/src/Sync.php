@@ -550,9 +550,10 @@ class Sync
                 $this->log->error( $e->getMessage() );
             }
 
-            $this->stats->unsetActiveFolder();
             $this->checkForHalt();
         }
+
+        $this->stats->unsetActiveFolder();
     }
 
     /**

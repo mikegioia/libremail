@@ -1,3 +1,4 @@
 .env
-vendor
+.orig
 .DS_Store
+vendor
