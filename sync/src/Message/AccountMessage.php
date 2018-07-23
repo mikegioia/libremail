@@ -2,8 +2,7 @@
 
 namespace App\Message;
 
-use App\Message
-  , App\Message\AbstractMessage;
+use App\Message;
 
 class AccountMessage extends AbstractMessage
 {
@@ -11,7 +10,7 @@ class AccountMessage extends AbstractMessage
     public $updated;
     protected $type = Message::ACCOUNT;
 
-    public function __construct( $updated, $email )
+    public function __construct($updated, $email)
     {
         $this->email = $email;
         $this->updated = (bool) $updated;

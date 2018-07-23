@@ -28,26 +28,26 @@ class ServerConsole extends Console
                 'prefix' => 'b',
                 'longPrefix' => 'background',
                 'description' => 'Run as a background service',
-                'noValue' => TRUE
+                'noValue' => true
             ],
             'daemon' => [
                 'prefix' => 'e',
                 'longPrefix' => 'daemon',
                 'description' => 'Runs server in daemon mode',
-                'noValue' => TRUE
+                'noValue' => true
             ],
             'help' => [
                 'prefix' => 'h',
                 'longPrefix' => 'help',
                 'description' => 'Prints a usage statement',
-                'noValue' => TRUE
+                'noValue' => true
             ],
             'interactive' => [
                 'prefix' => 'i',
                 'longPrefix' => 'interactive',
                 'description' => 'Interact with the CLI; ignored if background set',
-                'defaultValue' => TRUE,
-                'noValue' => TRUE
+                'defaultValue' => true,
+                'noValue' => true
             ]
         ]);
     }
@@ -58,14 +58,14 @@ class ServerConsole extends Console
     protected function parseArgs()
     {
         $this->cli->arguments->parse();
-        $this->help = $this->cli->arguments->get( 'help' );
-        $this->daemon = $this->cli->arguments->get( 'daemon' );
-        $this->background = $this->cli->arguments->get( 'background' );
-        $this->interactive = $this->cli->arguments->get( 'interactive' );
+        $this->help = $this->cli->arguments->get('help');
+        $this->daemon = $this->cli->arguments->get('daemon');
+        $this->background = $this->cli->arguments->get('background');
+        $this->interactive = $this->cli->arguments->get('interactive');
 
         // If background is set, turn off interactive
-        if ( $this->background === TRUE ) {
-            $this->interactive = FALSE;
+        if (true === $this->background) {
+            $this->interactive = false;
         }
     }
 
@@ -75,14 +75,14 @@ class ServerConsole extends Console
     protected function processArgs()
     {
         // If help is set, show the usage and exit
-        if ( $this->help === TRUE ) {
+        if (true === $this->help) {
             $this->cli->usage();
-            exit( 0 );
+            exit(0);
         }
 
         // If we're in interactive mode, sent the sync message
-        if ( $this->interactive === TRUE ) {
-            $this->cli->info( "Starting socket server in interactive mode" );
+        if (true === $this->interactive) {
+            $this->cli->info('Starting socket server in interactive mode');
         }
     }
 }

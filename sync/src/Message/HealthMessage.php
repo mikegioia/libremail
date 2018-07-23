@@ -2,8 +2,7 @@
 
 namespace App\Message;
 
-use App\Message
-  , App\Message\AbstractMessage;
+use App\Message;
 
 class HealthMessage extends AbstractMessage
 {
@@ -12,7 +11,7 @@ class HealthMessage extends AbstractMessage
     public $no_accounts;
     protected $type = Message::HEALTH;
 
-    public function __construct( $tests, $procs, $noAccounts )
+    public function __construct($tests, $procs, $noAccounts)
     {
         $this->tests = $tests ?: [];
         $this->procs = $procs ?: [];

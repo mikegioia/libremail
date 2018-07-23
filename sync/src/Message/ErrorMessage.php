@@ -2,8 +2,7 @@
 
 namespace App\Message;
 
-use App\Message
-  , App\Message\AbstractMessage;
+use App\Message;
 
 class ErrorMessage extends AbstractMessage
 {
@@ -12,7 +11,7 @@ class ErrorMessage extends AbstractMessage
     public $suggestion;
     protected $type = Message::ERROR;
 
-    public function __construct( $errorType, $message, $suggestion = "" )
+    public function __construct($errorType, $message, $suggestion = '')
     {
         $this->message = $message;
         $this->error_type = $errorType;

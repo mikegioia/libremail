@@ -9,11 +9,8 @@ namespace App;
 use Fn;
 use DateTime;
 use Exception;
-use App\Daemon;
-use App\Message;
 use PDOException;
 use Monolog\Logger;
-use App\Diagnostics;
 use Pb\Imap\Mailbox;
 use Pimple\Container;
 use League\CLImate\CLImate;
@@ -553,9 +550,10 @@ class Sync
                 $this->log->error( $e->getMessage() );
             }
 
-            $this->stats->unsetActiveFolder();
             $this->checkForHalt();
         }
+
+        $this->stats->unsetActiveFolder();
     }
 
     /**

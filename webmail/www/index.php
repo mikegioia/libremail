@@ -66,10 +66,10 @@ View::setTimezone( $config[ 'APP_TIMEZONE' ] );
 // Get the email address from the cookie (if set) and
 // fetch the account. Otherwise, load the first active
 // account in the database.
-$email = ( isset( $_COOKIE[ 'email' ] ) )
+$email = isset( $_COOKIE[ 'email' ] )
     ? $_COOKIE[ 'email' ]
     : NULL;
-$account = ( $email )
+$account = $email
     ? (new Account)->getByEmail( $email )
     : (new Account)->getFirstActive();
 
@@ -87,7 +87,7 @@ $renderMailbox = function ( $id, $page = 1, $limit = 25 ) use ( $account ) {
     $select = Url::getParam( 'select' );
     $folders = new Folders( $account, $colors );
     $messages = new Messages( $account, $folders );
-    $folderId = ( $id === INBOX || $id === STARRED )
+    $folderId = $id === INBOX || $id === STARRED
         ? $folders->getInboxId()
         : $id;
     $folder = $folders->getById( $folderId );
@@ -166,7 +166,7 @@ $router->post( '/star', function () use ( $account ) {
     $folders = new Folders( $account, [] );
     $actions = new Actions( $folders, $_POST + $_GET );
     $actions->handleAction(
-        ( Url::postParam( 'state', 'on' ) === 'on' )
+        Url::postParam( 'state', 'on' ) === 'on'
             ? Actions::FLAG
             : Actions::UNFLAG,
         [

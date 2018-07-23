@@ -5,9 +5,8 @@ namespace App\Server;
 use App\Log;
 use Exception;
 use Ratchet\ConnectionInterface;
-use Guzzle\Http\Message\Response;
 use Ratchet\Http\HttpServerInterface;
-use Guzzle\Http\Message\RequestInterface;
+use Psr\Http\Message\RequestInterface;
 
 class WebServer implements HttpServerInterface
 {
@@ -32,7 +31,8 @@ class WebServer implements HttpServerInterface
     {
         $this->log->debug(
             "New web connection opened from #". $conn->resourceId );
-        $path = $request->getPath();
+        $uri = $request->getUri();
+        $path = $uri->getPath();
 
         // Check if the file exists in our client directory. If the path
         // is just "/" then serve the index.html file.

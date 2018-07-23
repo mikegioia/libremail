@@ -15,14 +15,14 @@ abstract class AbstractMessage
 
     public function toArray()
     {
-        $refClass = new ReflectionClass( $this );
+        $refClass = new ReflectionClass($this);
         $response = [
             'type' => $this->getType()
         ];
 
-        foreach ( $refClass->getProperties() as $property ) {
+        foreach ($refClass->getProperties() as $property) {
             $name = $property->name;
-            $response[ $name ] = $this->$name;
+            $response[$name] = $this->$name;
         }
 
         return $response;

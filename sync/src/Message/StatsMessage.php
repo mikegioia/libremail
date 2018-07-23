@@ -2,8 +2,7 @@
 
 namespace App\Message;
 
-use App\Message
-  , App\Message\AbstractMessage;
+use App\Message;
 
 class StatsMessage extends AbstractMessage
 {
@@ -15,7 +14,7 @@ class StatsMessage extends AbstractMessage
     public $accounts;
     protected $type = Message::STATS;
 
-    public function __construct( $active, $asleep, $account, $running, $uptime, $accounts )
+    public function __construct($active, $asleep, $account, $running, $uptime, $accounts)
     {
         $this->active = $active;
         $this->uptime = $uptime;

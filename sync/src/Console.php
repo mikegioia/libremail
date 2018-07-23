@@ -6,15 +6,19 @@ use League\CLImate\CLImate as CLI;
 
 abstract class Console
 {
-    // CLImate instance
-    protected $cli;
     // Used in child classes
     public $diagnostics;
+
+    // CLImate instance
+    protected $cli;
+
+    const DESCRIPTION = 'LibreMail IMAP to SQL sync engine';
 
     public function __construct()
     {
         $this->cli = new CLI;
-        $this->cli->description( "LibreMail IMAP to SQL sync engine" );
+        $this->cli->description( self::DESCRIPTION );
+
         $this->setupArgs();
         $this->parseArgs();
     }
