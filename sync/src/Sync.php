@@ -179,8 +179,7 @@ class Sync
 
         if ($account) {
             $accounts = [$account];
-        }
-        else {
+        } else {
             $accountModel = new AccountModel;
             $accounts = $accountModel->getActive();
         }

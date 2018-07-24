@@ -2,7 +2,6 @@
 
 namespace App\Model;
 
-use PDO;
 use DateTime;
 use Exception;
 use App\Model;
@@ -32,14 +31,16 @@ class Task extends Model
 
     /**
      * Create a new task.
+     *
      * @param int $messageId
      * @param int $accountId
      * @param string $type
      * @param string $oldValue
      * @param int | null $folderId
+     *
      * @return Task
      */
-    public function create( $messageId, $accountId, $type, $oldValue, $folderId = NULL )
+    public function create($messageId, $accountId, $type, $oldValue, $folderId = null)
     {
         $data = [
             'type' => $type,
@@ -48,21 +49,21 @@ class Task extends Model
             'message_id' => $messageId,
             'account_id' => $accountId,
             'status' => self::STATUS_NEW,
-            'created_at' => (new DateTime)->format( DATE_DATABASE )
+            'created_at' => (new DateTime)->format(DATE_DATABASE)
         ];
 
         $newTaskId = $this->db()
-            ->insert( array_keys( $data ) )
-            ->into( 'tasks' )
-            ->values( array_values( $data ) )
+            ->insert(array_keys($data))
+            ->into('tasks')
+            ->values(array_values($data))
             ->execute();
 
-        if ( ! $newTaskId ) {
-            throw new Exception( "Failed adding task" );
+        if (! $newTaskId) {
+            throw new Exception('Failed adding task');
         }
 
-        $data[ 'id' ] = $newTaskId;
+        $data['id'] = $newTaskId;
 
-        return new static( $data );
+        return new static($data);
     }
 }

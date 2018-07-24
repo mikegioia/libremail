@@ -21,32 +21,32 @@ class Account extends Model
     {
         return $this->db()
             ->select()
-            ->from( 'accounts' )
-            ->where( 'is_active', '=', 1 )
+            ->from('accounts')
+            ->where('is_active', '=', 1)
             ->execute()
-            ->fetchAll( PDO::FETCH_CLASS, get_class() );
+            ->fetchAll(PDO::FETCH_CLASS, get_class());
     }
 
     public function getFirstActive()
     {
         $active = $this->getActive();
 
-        return ( $active )
-            ? new self( current( $active ) )
-            : NULL;
+        return $active
+            ? new self(current($active))
+            : null;
     }
 
-    public function getByEmail( $email )
+    public function getByEmail($email)
     {
         $account = $this->db()
             ->select()
-            ->from( 'accounts' )
-            ->where( 'email', '=', $email )
+            ->from('accounts')
+            ->where('email', '=', $email)
             ->execute()
             ->fetchObject();
 
-        return ( $account )
-            ? new self( $account )
-            : NULL;
+        return $account
+            ? new self($account)
+            : null;
     }
 }

@@ -26,7 +26,7 @@ class Folders
     // Storage of folder/depth
     private $index = [];
     // Flag if the folders are fully loaded
-    private $loaded = FALSE;
+    private $loaded = false;
     // Convert certain folder names
     private $convert = [
         'INBOX' => 'Inbox'
@@ -61,51 +61,51 @@ class Folders
     /**
      * @param Account $account
      */
-    public function __construct( Account $account, array $colors )
+    public function __construct(Account $account, array $colors)
     {
         $this->colors = $colors;
         $this->accountId = $account->id;
-        $this->colorCount = count( $colors );
+        $this->colorCount = count($colors);
     }
 
     public function getAllId()
     {
-        return $this->getMailboxId( 'allId' );
+        return $this->getMailboxId('allId');
     }
 
     public function getSentId()
     {
-        return $this->getMailboxId( 'sentId' );
+        return $this->getMailboxId('sentId');
     }
 
     public function getSpamId()
     {
-        return $this->getMailboxId( 'spamId' );
+        return $this->getMailboxId('spamId');
     }
 
     public function getInboxId()
     {
-        return $this->getMailboxId( 'inboxId' );
+        return $this->getMailboxId('inboxId');
     }
 
     public function getTrashId()
     {
-        return $this->getMailboxId( 'trashId' );
+        return $this->getMailboxId('trashId');
     }
 
     public function getDraftsId()
     {
-        return $this->getMailboxId( 'draftsId' );
+        return $this->getMailboxId('draftsId');
     }
 
     public function getStarredId()
     {
-        return $this->getMailboxId( 'starredId' );
+        return $this->getMailboxId('starredId');
     }
 
-    private function getMailboxId( $mailbox )
+    private function getMailboxId($mailbox)
     {
-        if ( isset( $this->{$mailbox} ) ) {
+        if (isset($this->{$mailbox})) {
             return $this->{$mailbox};
         }
 
@@ -116,7 +116,7 @@ class Folders
 
     public function get()
     {
-        if ( $this->loaded ) {
+        if ($this->loaded) {
             return $this->folders;
         }
 
@@ -127,7 +127,7 @@ class Folders
 
     public function getTree()
     {
-        if ( $this->folderTree ) {
+        if ($this->folderTree) {
             return $this->folderTree;
         }
 
@@ -138,19 +138,20 @@ class Folders
 
     /**
      * Returns a list of folders for the apply labels / move forms.
+     *
      * @return array
      */
     public function getList()
     {
-        if ( $this->listFolders ) {
+        if ($this->listFolders) {
             return $this->listFolders;
         }
 
         $this->listFolders = array_filter(
             $this->get(),
-            function ( $folder ) {
-                return $folder->ignored != 1
-                    && $folder->is_mailbox === FALSE;
+            function ($folder) {
+                return 1 != $folder->ignored
+                    && false === $folder->is_mailbox;
             });
 
         return $this->listFolders;
@@ -158,16 +159,18 @@ class Folders
 
     /**
      * Returns a folder by ID.
+     *
      * @param int $id
+     *
      * @return Folder | null
      */
-    public function getById( $id )
+    public function getById($id)
     {
         // Load folders if not set
         $this->get();
 
-        foreach ( $this->folders as $folder ) {
-            if ( $folder->id == $id ) {
+        foreach ($this->folders as $folder) {
+            if ($folder->id == $id) {
                 return $folder;
             }
         }
@@ -175,73 +178,79 @@ class Folders
 
     /**
      * Returns a folder ID by full name.
+     *
      * @param string $name
+     *
      * @return int $folderId
      */
-    public function findIdByName( $name )
+    public function findIdByName($name)
     {
-        if ( $this->nameLookup ) {
-            return ( isset( $this->nameLookup[ $name ] ) )
-                ? $this->nameLookup[ $name ]
-                : NULL;
+        if ($this->nameLookup) {
+            return isset($this->nameLookup[$name])
+                ? $this->nameLookup[$name]
+                : null;
         }
 
         $folders = $this->get();
 
-        foreach ( $folders as $folder ) {
-            $this->nameLookup[ $folder->full_name ] = $folder->id;
+        foreach ($folders as $folder) {
+            $this->nameLookup[$folder->full_name] = $folder->id;
         }
 
-        return ( isset( $this->nameLookup[ $name ] ) )
-            ? $this->nameLookup[ $name ]
-            : NULL;
+        return isset($this->nameLookup[$name])
+            ? $this->nameLookup[$name]
+            : null;
     }
 
     /**
      * Returns the count of unread messages for a folder.
+     *
      * @param int $folderId
      * @param bool $returnString If true, returns a formatted string
+     *
      * @return int | string
      */
-    public function getUnreadCount( $folderId, $returnString = FALSE )
+    public function getUnreadCount($folderId, $returnString = false)
     {
-        if ( ! is_array( $this->folderCounts ) ) {
+        if (! is_array($this->folderCounts)) {
             $this->get();
         }
 
-        $count = ( isset( $this->folderCounts[ $folderId ] ) )
-            ? $this->folderCounts[ $folderId ]
+        $count = isset($this->folderCounts[$folderId])
+            ? $this->folderCounts[$folderId]
             : 0;
 
-        return ( $returnString )
-            ? ( $count ? " ($count)" : "" )
-            : ( $count ?: 0 );
+        return ($returnString)
+            ? ($count ? " ($count)" : '')
+            : ($count ?: 0);
     }
 
     /**
      * Returns a string of HTML classes for the folders in the nav.
+     *
      * @param int $folderId
      * @param int $activeId
      * @param bool $children If the folder has children
+     *
      * @return string
      */
-    public function getNavClassString( $folderId, $activeId, $children = FALSE )
+    public function getNavClassString($folderId, $activeId, $children = false)
     {
         $classes = [];
 
-        if ( $folderId == $activeId ) {
+        if ($folderId == $activeId) {
             $classes[] = 'active';
         }
 
-        if ( $this->getUnreadCount( $folderId ) ) {
+        if ($this->getUnreadCount($folderId)) {
             $classes[] = 'w-unread';
         }
 
-        if ( $children ) {
+        if ($children) {
             $classes[] = 'w-sub';
         }
 
-        return implode( ' ', $classes );
+        return implode(' ', $classes);
     }
 
     /**
@@ -249,16 +258,16 @@ class Folders
      */
     private function loadFolders()
     {
-        if ( $this->folders ) {
+        if ($this->folders) {
             return;
         }
 
-        $this->folders = (new Folder)->getByAccount( $this->accountId );
+        $this->folders = (new Folder)->getByAccount($this->accountId);
 
         // Add meta info to the folders
-        foreach ( $this->folders as $folder ) {
-            $this->setIgnore( $folder );
-            $this->setMailboxType( $folder );
+        foreach ($this->folders as $folder) {
+            $this->setIgnore($folder);
+            $this->setMailboxType($folder);
         }
     }
 
@@ -269,11 +278,11 @@ class Folders
     private function loadMetaTree()
     {
         $this->loadFolders();
-        $this->folderCounts = (new Message)->getUnreadCounts( $this->accountId );
+        $this->folderCounts = (new Message)->getUnreadCounts($this->accountId);
 
         // Add meta info to the folders
-        foreach ( $this->folders as $folder ) {
-            $this->addUnreadCount( $folder );
+        foreach ($this->folders as $folder) {
+            $this->addUnreadCount($folder);
         }
 
         // Treeify the folders to set the depth. We need this for
@@ -281,11 +290,11 @@ class Folders
         $this->loadTree();
 
         // Add in the colors now that we know the positions
-        foreach ( $this->folders as $folder ) {
-            $this->setColor( $folder );
+        foreach ($this->folders as $folder) {
+            $this->setColor($folder);
         }
 
-        $this->loaded = TRUE;
+        $this->loaded = true;
     }
 
     /**
@@ -297,194 +306,201 @@ class Folders
         $offset = 0;
         $this->folderTree = [];
 
-        foreach ( $this->folders as $folder ) {
-            $parts = explode( '/', $folder->name );
-            $this->treeify( $this->folderTree, $parts, $folder, 1 );
+        foreach ($this->folders as $folder) {
+            $parts = explode('/', $folder->name);
+            $this->treeify($this->folderTree, $parts, $folder, 1);
         }
 
         // Update the position and depth on each folder
-        $parentOffset = count( $this->folderTree );
+        $parentOffset = count($this->folderTree);
 
-        foreach ( $this->folderTree as $branch ) {
-            $this->updateTreePositions( $branch, $index, $offset, $parentOffset );
+        foreach ($this->folderTree as $branch) {
+            $this->updateTreePositions($branch, $index, $offset, $parentOffset);
         }
     }
 
     /**
      * Recursive function to build the folder tree.
+     *
      * @param array $tree
      * @param array $parts
      * @param Folder $folder
      * @param int $depth
+     *
      * @return array
      */
-    private function treeify( &$tree, $parts, $folder, $depth )
+    private function treeify(&$tree, $parts, $folder, $depth)
     {
-        $part = array_shift( $parts );
+        $part = array_shift($parts);
 
-        if ( ! isset( $tree[ $part ] ) ) {
-            $tree[ $part ] = [
+        if (! isset($tree[$part])) {
+            $tree[$part] = [
                 'children' => [],
                 'depth' => $depth
             ];
         }
 
         // No more parts left
-        if ( ! $parts ) {
-            $this->fixName( $folder, $part );
-            $tree[ $part ][ 'folder' ] = $folder;
+        if (! $parts) {
+            $this->fixName($folder, $part);
+            $tree[$part]['folder'] = $folder;
         }
         // Recurse again
         else {
             $this->treeify(
-                $tree[ $part ][ 'children' ],
+                $tree[$part]['children'],
                 $parts,
                 $folder,
-                $depth + 1 );
+                $depth + 1);
         }
     }
 
     /**
      * Stores positional info on the tree folders. This is used for
      * determining the folder color.
+     *
      * @param array $branch
      * @param int $index
      * @param int $offset
      * @param int $parentOffset
      */
-    private function updateTreePositions( $branch, &$index, $offset, $parentOffset )
+    private function updateTreePositions($branch, &$index, $offset, $parentOffset)
     {
-        if ( $branch[ 'folder' ]->is_mailbox ) {
+        if ($branch['folder']->is_mailbox) {
             return;
         }
 
-        $index++;
+        ++$index;
         $childIndex = 0;
-        $this->index[ $branch[ 'folder' ]->id ] = (object) [
+        $this->index[$branch['folder']->id] = (object) [
             'pos' => $index,
             'offset' => $offset,
-            'depth' => $branch[ 'depth' ]
+            'depth' => $branch['depth']
         ];
 
         $offset = $parentOffset;
-        $parentOffset = count( $branch[ 'children' ] );
+        $parentOffset = count($branch['children']);
 
-        foreach ( $branch[ 'children' ] as $child ) {
+        foreach ($branch['children'] as $child) {
             $this->updateTreePositions(
                 $child,
                 $childIndex,
                 $offset,
-                $parentOffset );
+                $parentOffset);
         }
     }
 
     /**
      * Convert certain folder names for better readability.
+     *
      * @param Folder $folder
      * @param string $finalPart
      */
-    private function fixName( &$folder, $finalPart )
+    private function fixName(&$folder, $finalPart)
     {
         $folder->full_name = $folder->name;
         $folder->name = $finalPart;
         $folder->name = str_replace(
-            array_keys( $this->convert ),
-            array_values( $this->convert ),
-            $folder->name );
+            array_keys($this->convert),
+            array_values($this->convert),
+            $folder->name);
 
         // Shortened label for display in the inbox
-        $parts = explode( '/', $folder->full_name );
-        $partCount = count( $parts );
+        $parts = explode('/', $folder->full_name);
+        $partCount = count($parts);
         $folder->label = $partCount > 2
-            ? $parts[ 0 ] .'/&hellip;/'. $parts[ $partCount - 1 ]
+            ? $parts[0].'/&hellip;/'.$parts[$partCount - 1]
             : $folder->full_name;
     }
 
     /**
      * Determines if the folder is a mailbox or a regular folder.
      * Adds a property to the folder 'is_mailbox'.
+     *
      * @param Folder $folder
      */
-    private function setMailboxType( &$folder )
+    private function setMailboxType(&$folder)
     {
         $name = $folder->name;
 
-        if ( strtolower( $name ) === self::INBOX && ! $this->inboxId ) {
-            $this->inbox =& $folder;
-            $folder->is_mailbox = TRUE;
+        if (self::INBOX === strtolower($name) && ! $this->inboxId) {
+            $this->inbox = &$folder;
+            $folder->is_mailbox = true;
             $this->inboxId = $folder->id;
         }
         // Special case for GMail
-        elseif ( strpos( strtolower( $name ), self::GMAIL ) === 0 ) {
-            $folder->is_mailbox = TRUE;
+        elseif (0 === strpos(strtolower($name), self::GMAIL)) {
+            $folder->is_mailbox = true;
         }
         else {
-            $folder->is_mailbox = FALSE;
+            $folder->is_mailbox = false;
         }
 
         // Set special IDs for certain mailboxes
-        if ( $folder->is_mailbox ) {
-            if ( ! $this->allId && in_array( $name, self::ALL ) ) {
+        if ($folder->is_mailbox) {
+            if (! $this->allId && in_array($name, self::ALL)) {
                 $this->allId = $folder->id;
             }
-            elseif ( ! $this->sentId && in_array( $name, self::SENT ) ) {
+            elseif (! $this->sentId && in_array($name, self::SENT)) {
                 $this->sentId = $folder->id;
             }
-            elseif ( ! $this->spamId && in_array( $name, self::SPAM ) ) {
+            elseif (! $this->spamId && in_array($name, self::SPAM)) {
                 $this->spamId = $folder->id;
             }
-            elseif ( ! $this->trashId && in_array( $name, self::TRASH ) ) {
+            elseif (! $this->trashId && in_array($name, self::TRASH)) {
                 $this->trashId = $folder->id;
             }
-            elseif ( ! $this->draftsId && in_array( $name, self::DRAFTS ) ) {
+            elseif (! $this->draftsId && in_array($name, self::DRAFTS)) {
                 $this->draftsId = $folder->id;
             }
-            elseif ( ! $this->starredId && in_array( $name, self::STARRED ) ) {
+            elseif (! $this->starredId && in_array($name, self::STARRED)) {
                 $this->starredId = $folder->id;
             }
         }
     }
 
-    private function addUnreadCount( &$folder )
+    private function addUnreadCount(&$folder)
     {
-        if ( isset( $this->folderCounts[ $folder->id ] ) ) {
-            $folder->unread_count = $this->folderCounts[ $folder->id ];
-        }
-        else {
+        if (isset($this->folderCounts[$folder->id])) {
+            $folder->unread_count = $this->folderCounts[$folder->id];
+        } else {
             $folder->unread_count = 0;
         }
     }
 
     /**
      * Ignores certain folders that shouldn't display.
+     *
      * @param Folder $folder
      */
-    private function setIgnore( &$folder )
+    private function setIgnore(&$folder)
     {
-        if ( strtolower( $folder->name ) === self::GMAIL ) {
+        if (self::GMAIL === strtolower($folder->name)) {
             $folder->ignored = 1;
         }
     }
 
     /**
      * Adds a default color for the folder.
+     *
      * @param Folder $folder
      * @param int $index
      */
-    private function setColor( &$folder )
+    private function setColor(&$folder)
     {
-        if ( ! isset( $this->index[ $folder->id ] ) ) {
+        if (! isset($this->index[$folder->id])) {
             return;
         }
 
-        if ( ! $this->colorCount ) {
-            $folder->color = NULL;
+        if (! $this->colorCount) {
+            $folder->color = null;
+
             return;
         }
 
-        $index = $this->index[ $folder->id ];
+        $index = $this->index[$folder->id];
         $position = $index->pos + $index->offset - 1;
-        $color = $this->colors[ $position % $this->colorCount ];
+        $color = $this->colors[$position % $this->colorCount];
         $folder->color = (object) $color;
     }
 }

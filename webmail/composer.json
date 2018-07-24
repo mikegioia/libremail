@@ -17,5 +17,10 @@
         "mikegioia/pdo": "@dev",
         "ezyang/htmlpurifier": "dev-master",
         "zendframework/zend-escaper": "^2.5"
+    },
+    "scripts": {
+        "fix": "php-cs-fixer fix",
+        "test": "./vendor/bin/phpunit",
+        "lint": "php-cs-fixer fix --dry-run --diff"
     }
 }

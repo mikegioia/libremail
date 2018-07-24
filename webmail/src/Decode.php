@@ -24,20 +24,20 @@ class Decode
         'iso646-US' => 'ASCII'
     ];
 
-    static public function decode( $string, $charset )
+    public static function decode($string, $charset)
     {
         // If we have one, try to match it
-        if ( $charset ) {
-            foreach ( self::REPLACEMENTS as $find => $replace ) {
-                if ( strncasecmp( $find, $charset, strlen( $find ) ) === 0 ) {
+        if ($charset) {
+            foreach (self::REPLACEMENTS as $find => $replace) {
+                if (0 === strncasecmp($find, $charset, strlen($find))) {
                     $charset = $replace;
                     break;
                 }
             }
 
-            return mb_convert_encoding( $string, self::UTF8, $charset );
+            return mb_convert_encoding($string, self::UTF8, $charset);
         }
 
-        return mb_convert_encoding( $string, self::UTF8 );
+        return mb_convert_encoding($string, self::UTF8);
     }
 }

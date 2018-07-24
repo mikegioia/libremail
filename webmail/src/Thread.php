@@ -29,19 +29,20 @@ class Thread
      * @param bool $load If true, loads the thread data from SQL. This
      *   will throw an exception if no thread is found.
      */
-    public function __construct( Account $account, Folders $folders, $threadId, $load = TRUE )
+    public function __construct(Account $account, Folders $folders, $threadId, $load = true)
     {
         $this->folders = $folders;
         $this->threadId = $threadId;
         $this->accountId = $account->id;
 
-        if ( $load ) {
+        if ($load) {
             $this->load();
         }
     }
 
     /**
-     * Load the thread data
+     * Load the thread data.
+     *
      * @throws NotFoundException
      */
     public function load()
@@ -49,18 +50,18 @@ class Thread
         $folders = [];
         $messages = [];
         $messageIds = [];
-        $escaper = new Escaper( self::UTF8 );
+        $escaper = new Escaper(self::UTF8);
         $allMessages = (new Message)->getThread(
             $this->accountId,
-            $this->threadId );
+            $this->threadId);
 
-        if ( ! $allMessages ) {
+        if (! $allMessages) {
             throw new NotFoundException;
         }
 
         // Remove all duplicate messages (message-id)
-        foreach ( $allMessages as $message ) {
-            if ( in_array( $message->message_id, $messageIds ) ) {
+        foreach ($allMessages as $message) {
+            if (in_array($message->message_id, $messageIds)) {
                 $folders[] = $message->folder_id;
                 continue;
             }
@@ -69,28 +70,28 @@ class Thread
             $folders[] = $message->folder_id;
             $messageIds[] = $message->message_id;
 
-            if ( $message->seen != 1 ) {
+            if (1 != $message->seen) {
                 $unreadIds[] = $message->id;
             }
 
-            $this->setFrom( $message );
-            $this->setContent( $message );
-            $this->setSnippet( $message, $escaper );
+            $this->setFrom($message);
+            $this->setContent($message);
+            $this->setSnippet($message, $escaper);
         }
 
         $this->messages = $messages;
-        $this->message = reset( $messages );
-        $folders = array_unique( $folders );
+        $this->message = reset($messages);
+        $folders = array_unique($folders);
 
-        foreach ( $this->folders->get() as $folder ) {
-            if ( in_array( $folder->id, $folders )
-                && ! $folder->is_mailbox )
+        foreach ($this->folders->get() as $folder) {
+            if (in_array($folder->id, $folders)
+                && ! $folder->is_mailbox)
             {
                 $this->threadFolders[] = $folder;
             }
         }
 
-        $this->messageCount = count( $messages );
+        $this->messageCount = count($messages);
     }
 
     public function get()
@@ -118,75 +119,78 @@ class Thread
         return $this->messageCount;
     }
 
-    public function isUnread( $id )
+    public function isUnread($id)
     {
-        return in_array( $id, $this->unreadIds );
+        return in_array($id, $this->unreadIds);
     }
 
     /**
      * Adds two new properties, from_name and from_email.
+     *
      * @param Message $message
      */
-    private function setFrom( Message &$message )
+    private function setFrom(Message &$message)
     {
-        $parts = explode( '<', $message->from, 2 );
-        $count = count( $parts );
+        $parts = explode('<', $message->from, 2);
+        $count = count($parts);
 
-        if ( $count === 1 ) {
+        if (1 === $count) {
             $message->from_email = '';
-            $message->from_name = trim( $parts[ 0 ], ' >' );
-        }
-        else {
-            $message->from_name = trim( $parts[ 0 ] );
-            $message->from_email = '<'. trim( $parts[ 1 ], ' <>' ) .'>';
+            $message->from_name = trim($parts[0], ' >');
+        } else {
+            $message->from_name = trim($parts[0]);
+            $message->from_email = '<'.trim($parts[1], ' <>').'>';
         }
     }
 
     /**
      * Prepares an HTML-safe snippet to display in the message line.
+     *
      * @param Message $message
      * @param Escaper $escaper
      */
-    private function setSnippet( Message &$message, Escaper $escaper )
+    private function setSnippet(Message &$message, Escaper $escaper)
     {
-        $snippet = "";
+        $snippet = '';
         $separator = "\r\n";
-        $text = trim( strip_tags( $message->text_plain ) );
-        $line = strtok( $text, $separator );
+        $text = trim(strip_tags($message->text_plain));
+        $line = strtok($text, $separator);
 
-        while ( $line !== FALSE ) {
-            if ( strncmp( '>', $line, 1 ) !== 0 ) {
+        while (false !== $line) {
+            if (0 !== strncmp('>', $line, 1)) {
                 $snippet .= $line;
             }
 
-            $line = strtok( $separator );
+            $line = strtok($separator);
         }
 
-        $snippet = $escaper->escapeHtml( $snippet );
+        $snippet = $escaper->escapeHtml($snippet);
         $message->snippet = substr(
-            ltrim( $text, "<>-_=" ),
+            ltrim($text, '<>-_='),
             0,
-            self::SNIPPET_LENGTH );
+            self::SNIPPET_LENGTH);
     }
 
     /**
      * Parses the text/plain content into escaped HTML.
+     *
      * @param Message $message
+     *
      * @todo
      */
-    private function setContent( Message &$message )
+    private function setContent(Message &$message)
     {
         // @TODO
         //$message->text_markdown = $message->text_plain;
 
         // Cleanse it
-        $body = htmlspecialchars( $message->text_plain, ENT_QUOTES, 'UTF-8' );
+        $body = htmlspecialchars($message->text_plain, ENT_QUOTES, 'UTF-8');
         // Convert any links
         $body = preg_replace(
             self::EMAIL_REGEX,
             '<a href="http$2://$4" target="_blank" title="$0">$0</a>',
             $body);
 
-        $message->body = nl2br( trim( $body ) );
+        $message->body = nl2br(trim($body));
     }
 }

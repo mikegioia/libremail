@@ -6,32 +6,33 @@ use Slim\PDO\Database;
 
 class Model
 {
-    static private $db;
-    static private $dsn;
-    static private $username;
-    static private $password;
+    private static $db;
+    private static $dsn;
+    private static $username;
+    private static $password;
 
     const ASC = 'asc';
     const DESC = 'desc';
 
-    public function __construct( $data = NULL )
+    public function __construct($data = null)
     {
-        if ( ! $data ) {
+        if (! $data) {
             return;
         }
 
-        foreach ( $data as $key => $value ) {
+        foreach ($data as $key => $value) {
             $this->$key = $value;
         }
     }
 
     /**
      * Store the connection info statically.
+     *
      * @param string $dsn
      * @param string $username
      * @param string $password
      */
-    static function initDb( $dsn, $username, $password )
+    public static function initDb($dsn, $username, $password)
     {
         self::$dsn = $dsn;
         self::$username = $username;
@@ -42,6 +43,7 @@ class Model
      * Sets the internal database connection statically for all
      * models to use. The database connection is only loaded the
      * first time it's referenced.
+     *
      * @return Database
      */
     public function db()
@@ -49,16 +51,16 @@ class Model
         return self::getDb();
     }
 
-    static public function getDb()
+    public static function getDb()
     {
-        if ( isset( self::$db ) ) {
+        if (isset(self::$db)) {
             return self::$db;
         }
 
         self::$db = new Database(
             self::$dsn,
             self::$username,
-            self::$password );
+            self::$password);
 
         return self::$db;
     }

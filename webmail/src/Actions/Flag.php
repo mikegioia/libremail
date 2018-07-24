@@ -14,14 +14,15 @@ class Flag extends BaseAction
     /**
      * Marks messages as flagged. This needs to add it to the
      * starred folder if set.
+     *
      * @see Base for params
      */
-    public function update( MessageModel $message, Folders $folders, array $options = [] )
+    public function update(MessageModel $message, Folders $folders, array $options = [])
     {
-        $this->setFlag( $message, MessageModel::FLAG_FLAGGED, TRUE );
+        $this->setFlag($message, MessageModel::FLAG_FLAGGED, true);
 
-        if ( $folders->getStarredId() ) {
-            (new CopyAction)->update( $message, $folders, [
+        if ($folders->getStarredId()) {
+            (new CopyAction)->update($message, $folders, [
                 Actions::TO_FOLDER_ID => $folders->getStarredId()
             ]);
         }

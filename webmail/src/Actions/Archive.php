@@ -4,18 +4,18 @@ namespace App\Actions;
 
 use App\Folders;
 use App\Model\Task as TaskModel;
-use App\Actions\Base as BaseAction;
 use App\Model\Message as MessageModel;
 
 class Archive extends Base
 {
     /**
      * Marks deleted any messages in the Inbox folder.
+     *
      * @see Base for params
      */
-    public function update( MessageModel $message, Folders $folders, array $options = [] )
+    public function update(MessageModel $message, Folders $folders, array $options = [])
     {
-        $this->setFlag( $message, MessageModel::FLAG_DELETED, TRUE, [
+        $this->setFlag($message, MessageModel::FLAG_DELETED, true, [
             'folder_id' => $folders->getInboxId()
         ]);
     }
