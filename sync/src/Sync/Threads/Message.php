@@ -45,7 +45,7 @@ class Message
 
     public function getThreadId()
     {
-        return ($this->threadId)
+        return $this->threadId
             ? $this->threadId
             : min($this->ids ?: [0]);
     }

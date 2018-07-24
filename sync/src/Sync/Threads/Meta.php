@@ -8,10 +8,15 @@ class Meta
     public $start;
     public $threadId;
     public $subjectHash;
+    public $familyThreadIds = [];
+
+    const FIVE_DAYS = 432000;
+    const THREE_DAYS = 259200;
 
     public function __construct($threadId)
     {
         $this->threadId = $threadId;
+        $this->familyThreadIds[] = $threadId;
     }
 
     public function exists()
@@ -34,13 +39,37 @@ class Meta
             return;
         }
 
-        if ($message->timestamp - $this->end) {
+        if ($message->timestamp > $this->end) {
             $this->end = $message->timestamp;
         }
 
-        if ($message->timestamp - $this->end) {
+        if ($message->timestamp < $this->start) {
             $this->start = $message->timestamp;
-            $this->subjectHash = $message->subjectHash;
         }
+    }
+
+    public function merge(Meta $meta)
+    {
+        if ($meta->end > $this->end) {
+            $this->end = $meta->end;
+        }
+
+        if ($meta->start < $this->start) {
+            $this->start = $meta->start;
+        }
+
+        $this->familyThreadIds = array_unique(
+            array_merge(
+                $this->familyThreadIds,
+                $meta->familyThreadIds
+            ));
+    }
+
+    public function isCloseTo(Meta $meta)
+    {
+        return $meta->start < $this->end
+            || $meta->end > $this->start
+            || $meta->start - $this->end < self::FIVE_DAYS
+            || $this->start - $meta->end < self::FIVE_DAYS;
     }
 }

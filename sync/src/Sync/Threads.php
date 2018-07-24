@@ -53,8 +53,8 @@ class Threads
     private $threadMeta = [];
     // Index of subject hashes => thread IDs
     private $subjectHashes = [];
-    // Index of all threads related by subject
-    private $subjectThreads = [];
+    // Index of thread IDs and their new thread ID
+    private $groupedThreads = [];
     // List of dirty message IDs to update
     private $dirtyMessageIds = [];
 
@@ -102,8 +102,8 @@ class Threads
             $this->storeMessages();
         }
 
-        $this->updateThreadIds();
-        //$this->combineThreads();
+        $this->setThreadIds();
+        $this->combineThreads();
         $this->commitThreadIds();
     }
 
@@ -198,7 +198,7 @@ class Threads
     /**
      * Runs the thread ID computation across all messages.
      */
-    private function updateThreadIds()
+    private function setThreadIds()
     {
         $count = 0;
         $total = count($this->messages);
@@ -243,7 +243,9 @@ class Threads
                 $threadMeta->addMessage($message);
             }
 
-            // Set the indexes with this thread meta info
+            // Set the indexes with this thread meta info. Also build the
+            // index arrays for the subject => thread ID lookup, and the
+            // the thread ID => thread meta lookup.
             if ($threadMeta->exists()) {
                 $key = $threadMeta->getKey();
                 $hash = $threadMeta->subjectHash;
@@ -251,8 +253,7 @@ class Threads
                 $this->subjectHashes[$hash][$key] = $threadId;
             }
         }
-print_r($this->threadMeta);
-        // Clear the unthreaded array
+
         $this->unthreaded = [];
     }
 
@@ -309,6 +310,55 @@ print_r($this->threadMeta);
     }
 
     /**
+     * Look at the thread subjects and try to combine any threads
+     * that share a subject and are within a time window.
+     */
+    private function combineThreads()
+    {
+        $this->log->debug(
+            "Combining threads by subject for {$this->account->email}");
+        $this->printMemory();
+
+        if ($this->interactive) {
+            $this->cli->whisper('Threading Pass 3');
+        }
+
+        foreach ($this->subjectHashes as $hash => $threads) {
+            $master = null;
+            // Sort the thread keys (dates) oldest to newest
+            ksort($threads);
+
+            foreach ($threads as $threadId) {
+                if (is_null($master)) {
+                    $master = $this->threadMeta[$threadId];
+                    continue;
+                }
+
+                $meta = $this->threadMeta[$threadId];
+
+                // Two threads share a subject line and are within
+                // a certain number of days of each other
+                if ($master->isCloseTo($meta)) {
+                    if ($master->threadId < $meta->threadId) {
+                        $master->merge($meta);
+                    } else {
+                        $meta->merge($master);
+                        $master = $meta;
+                    }
+                }
+            }
+
+            if (count($master->familyThreadIds) > 1) {
+                $this->groupedThreads += array_fill_keys(
+                    $master->familyThreadIds,
+                    $master->threadId);
+            }
+        }
+
+        $this->subjectHashes = [];
+    }
+
+    /**
      * Update all dirty messages with a new thread ID.
      */
     private function commitThreadIds()
@@ -321,9 +371,14 @@ print_r($this->threadMeta);
         $this->log->debug(
             "Saving new thread IDs for {$this->account->email}");
         $this->printMemory();
-        $this->startProgress(3, $total);
+        $this->startProgress(4, $total);
 
         foreach ($this->messages as $message) {
+            if (isset($this->groupedThreads[$message->getThreadId()])) {
+                $message->setThreadId(
+                    $this->groupedThreads[$message->getThreadId()]);
+            }
+
             if ($message->hasUpdate()) {
                 $updateCount += count($message->ids);
             }
@@ -353,6 +408,8 @@ print_r($this->threadMeta);
         if ($transactionStarted) {
             $messageModel->db()->commit();
         }
+
+        $this->groupedThreads = [];
     }
 
     private function startProgress($pass, $total)
