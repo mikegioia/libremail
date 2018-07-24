@@ -2,17 +2,15 @@
 
 namespace App\Task;
 
-use App\Task
-  , Exception
-  , App\Command
-  , App\Message
-  , App\Diagnostics
-  , App\Task\AbstractTask
-  , App\Server\StatsServer
-  , App\Message\AccountMessage
-  , App\Message\NotificationMessage
-  , App\Model\Account as AccountModel
-  , App\Exceptions\Validation as ValidationException;
+use App\Task;
+use Exception;
+use App\Message;
+use App\Diagnostics;
+use App\Server\StatsServer;
+use App\Message\AccountMessage;
+use App\Message\NotificationMessage;
+use App\Model\Account as AccountModel;
+use App\Exceptions\Validation as ValidationException;
 
 class SaveAccountTask extends AbstractTask
 {
@@ -24,10 +22,11 @@ class SaveAccountTask extends AbstractTask
 
     /**
      * Add or update the email account in the database.
-     * @param StatsServer $server Optional server interface to
-     *   broadcast messages to.
+     *
+     * @param StatsServer $server optional server interface to
+     *   broadcast messages to
      */
-    public function run( StatsServer $server = NULL )
+    public function run(StatsServer $server = null)
     {
         $account = [
             'is_active' => 1,
@@ -39,56 +38,56 @@ class SaveAccountTask extends AbstractTask
 
         // Depending on the email hostname, try to infer the host
         // and port from our services config.
-        $accountModel = new AccountModel( $account );
+        $accountModel = new AccountModel($account);
         $accountModel->loadServiceFromEmail();
 
         try {
             $accountModel->validate();
         }
-        catch ( ValidationException $e ) {
-            return $this->fail( $e->getMessage(), $server );
+        catch (ValidationException $e) {
+            return $this->fail($e->getMessage(), $server);
         }
 
         // Check if the connection works
         try {
-            Diagnostics::testImapConnection( $accountModel->getData() );
+            Diagnostics::testImapConnection($accountModel->getData());
         }
-        catch ( Exception $e ) {
+        catch (Exception $e) {
             return $this->fail(
-                "There was a problem testing the IMAP connection: ".
-                $e->getMessage() .".",
-                $server );
+                'There was a problem testing the IMAP connection: '.
+                $e->getMessage().'.',
+                $server);
         }
 
         // Save the account
         try {
-            $accountModel->save( [], TRUE );
+            $accountModel->save([], true);
         }
-        catch ( Exception $e ) {
-            return $this->fail( $e->getMessage(), $server );
+        catch (Exception $e) {
+            return $this->fail($e->getMessage(), $server);
         }
 
         Message::send(
             new NotificationMessage(
                 STATUS_SUCCESS,
-                "Your account has been saved!" ),
-            $server );
+                'Your account has been saved!'),
+            $server);
         Message::send(
-            new AccountMessage( TRUE, $this->email ),
-            $server );
+            new AccountMessage(true, $this->email),
+            $server);
 
-        return TRUE;
+        return true;
     }
 
-    private function fail( $message, $server )
+    private function fail($message, $server)
     {
         Message::send(
-            new NotificationMessage( STATUS_ERROR, $message ),
-            $server );
+            new NotificationMessage(STATUS_ERROR, $message),
+            $server);
         Message::send(
-            new AccountMessage( FALSE, $this->email ),
-            $server );
+            new AccountMessage(false, $this->email),
+            $server);
 
-        return FALSE;
+        return false;
     }
 }

@@ -2,14 +2,13 @@
 
 namespace App\Task;
 
-use App\Task
-  , App\Message
-  , App\Command
-  , App\Task\AbstractTask
-  , App\Server\StatsServer
-  , App\Message\AccountInfoMessage
-  , App\Message\NotificationMessage
-  , App\Model\Account as AccountModel;
+use App\Task;
+use App\Message;
+use App\Command;
+use App\Server\StatsServer;
+use App\Message\AccountInfoMessage;
+use App\Message\NotificationMessage;
+use App\Model\Account as AccountModel;
 
 class RemoveAccountTask extends AbstractTask
 {
@@ -18,40 +17,43 @@ class RemoveAccountTask extends AbstractTask
 
     /**
      * Marks the account as inactive.
-     * @param StatsServer $server Optional server interface to
-     *   broadcast messages to.
+     *
+     * @param StatsServer $server optional server interface to
+     *   broadcast messages to
+     *
+     * @return bool
      */
-    public function run( StatsServer $server = NULL )
+    public function run(StatsServer $server = null)
     {
-        $account = (new AccountModel)->getByEmail( $this->email );
+        $account = (new AccountModel)->getByEmail($this->email);
 
-        if ( ! $account ) {
+        if (! $account) {
             Message::send(
                 new NotificationMessage(
                     STATUS_ERROR,
-                    "That account could not be found." ),
-                $server );
+                    'That account could not be found.'),
+                $server);
 
-            return FALSE;
+            return false;
         }
 
         // Save the account
         try {
             $account->save([
                 'is_active' => 0
-            ], TRUE );
+            ], true);
         }
-        catch ( Exception $e ) {
+        catch (Exception $e) {
             Message::send(
-                new NotificationMessage( STATUS_ERROR, $e->getMessage() ),
-                $server );
+                new NotificationMessage(STATUS_ERROR, $e->getMessage()),
+                $server);
 
-            return FALSE;
+            return false;
         }
 
-        Command::send( Command::make( Command::STOP ) );
-        Message::send( new AccountInfoMessage( $account ), $server );
+        Command::send(Command::make(Command::STOP));
+        Message::send(new AccountInfoMessage($account), $server);
 
-        return TRUE;
+        return true;
     }
 }

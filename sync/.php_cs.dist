@@ -1,16 +1,17 @@
 <?php
 
 $finder = PhpCsFixer\Finder::create()
-    ->in(__DIR__.'/src')
     ->exclude([
-        'Model',
-        'Server',
-        'Sync',
-        'Task',
-        'Traits',
-        'Groups',
+        'attachments',
+        'client',
+        'config',
+        'db',
+        'doc',
+        'logs',
+        'vendor'
     ])
-    ->depth(1);
+    ->notPath('src/Sync.php')
+    ->in(__DIR__);
 
 return PhpCsFixer\Config::create()
     ->setRules([

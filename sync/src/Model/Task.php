@@ -2,12 +2,9 @@
 
 namespace App\Model;
 
-use Fn;
 use PDO;
-use DateTime;
 use App\Model;
 use Belt\Belt;
-use Slim\PDO\Database;
 use App\Traits\Model as ModelTrait;
 use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 
@@ -56,44 +53,47 @@ class Task extends Model
      */
     public function revert()
     {
-        $this->updateStatus( self::STATUS_REVERTED );
+        $this->updateStatus(self::STATUS_REVERTED);
     }
 
     /**
      * Updates the status of the message.
+     *
      * @param string $status
+     *
      * @throws DatabaseUpdateException
      */
-    private function updateStatus( $status )
+    private function updateStatus($status)
     {
         $updated = $this->db()
             ->update([
                 'status' => $status
             ])
-            ->table( 'tasks' )
-            ->where( 'id', '=', $this->id )
+            ->table('tasks')
+            ->where('id', '=', $this->id)
             ->execute();
 
-        if ( ! Belt::isNumber( $updated ) ) {
+        if (! Belt::isNumber($updated)) {
             throw new DatabaseUpdateException(
                 TASK,
-                $this->db()->getError() );
+                $this->db()->getError());
         }
     }
 
     /**
      * Returns the last un-synced task to be rolled back.
      * If there are none, this returns false.
+     *
      * @return array | bool
      */
     public function getTasksForRollback()
     {
         return $this->db()
             ->select()
-            ->from( 'tasks' )
-            ->where( 'status', '=', self::STATUS_NEW )
-            ->orderBy( 'id', Model::DESC )
+            ->from('tasks')
+            ->where('status', '=', self::STATUS_NEW)
+            ->orderBy('id', Model::DESC)
             ->execute()
-            ->fetchAll( PDO::FETCH_CLASS, $this->getClass() );
+            ->fetchAll(PDO::FETCH_CLASS, $this->getClass());
     }
 }

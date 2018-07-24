@@ -2,14 +2,13 @@
 
 namespace App;
 
-use Exception
-  , Monolog\Logger
-  , App\Log\CLIHandler
-  , League\CLImate\CLImate
-  , Monolog\Handler\StreamHandler
-  , Monolog\Formatter\LineFormatter
-  , Monolog\Handler\RotatingFileHandler
-  , App\Exceptions\LogPathNotWriteable as LogPathNotWriteableException;
+use Exception;
+use Monolog\Logger;
+use App\Log\CLIHandler;
+use League\CLImate\CLImate;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\RotatingFileHandler;
+use App\Exceptions\LogPathNotWriteable as LogPathNotWriteableException;
 
 class Log
 {
@@ -28,22 +27,22 @@ class Log
     // If we're running in interative mode
     private $interactive;
 
-    public function __construct( CLImate $cli, Array $config, $interactive = FALSE )
+    public function __construct(CLImate $cli, array $config, $interactive = false)
     {
         $this->cli = $cli;
         $this->config = $config;
         $this->interactive = $interactive;
-        $this->parseConfig( $config, $interactive );
+        $this->parseConfig($config, $interactive);
     }
 
     public function init()
     {
         // Set the error and exception handler here
-        @set_error_handler([ $this, 'errorHandler' ]);
-        @set_exception_handler([ $this, 'exceptionHandler' ]);
+        @set_error_handler([$this, 'errorHandler']);
+        @set_exception_handler([$this, 'exceptionHandler']);
 
-        $this->checkLogPath( $this->interactive, $this->path );
-        $this->createLog( $this->config, $this->interactive );
+        $this->checkLogPath($this->interactive, $this->path);
+        $this->createLog($this->config, $this->interactive);
     }
 
     public function getLogger()
@@ -51,26 +50,26 @@ class Log
         return $this->logger;
     }
 
-    public function exceptionHandler( $exception )
+    public function exceptionHandler($exception)
     {
-        if ( $this->stackTrace ) {
+        if ($this->stackTrace) {
             $this->getLogger()->critical(
-                $exception->getMessage() .
-                PHP_EOL .
-                $exception->getTraceAsString() );
+                $exception->getMessage().
+                PHP_EOL.
+                $exception->getTraceAsString());
         }
         else {
-            $this->getLogger()->critical( $exception->getMessage() );
+            $this->getLogger()->critical($exception->getMessage());
         }
     }
 
-    public function errorHandler( $severity, $message, $filename, $lineNo )
+    public function errorHandler($severity, $message, $filename, $lineNo)
     {
-        if ( ! ( error_reporting() & $severity ) ) {
+        if (! (error_reporting() & $severity)) {
             return;
         }
 
-        switch ( $severity ) {
+        switch ($severity) {
             case E_USER_ERROR:
             case E_USER_WARNING:
             case E_WARNING:
@@ -87,48 +86,49 @@ class Log
                 break;
         }
 
-        if ( $this->isSuppressed( $message ) ) {
+        if ($this->isSuppressed($message)) {
             return;
         }
 
-        $e = new Exception( "$message on line $lineNo of $filename" );
+        $e = new Exception("$message on line $lineNo of $filename");
 
-        if ( $this->stackTrace ) {
+        if ($this->stackTrace) {
             $this->getLogger()->$logMethod(
-                $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
+                $e->getMessage().PHP_EOL.$e->getTraceAsString());
         }
         else {
-            $this->getLogger()->$logMethod( $e->getMessage() );
+            $this->getLogger()->$logMethod($e->getMessage());
         }
     }
 
     /**
      * Write an error exception to the console or log depending
      * on the environment.
+     *
      * @param Exception $e
      */
-    public function displayError( Exception $e )
+    public function displayError(Exception $e)
     {
-        if ( $this->interactive === TRUE ) {
-            $this->cli->boldRedBackgroundBlack( $e->getMessage() );
-            $this->cli->dim( "[Err#". $e->getCode() ."]" );
+        if (true === $this->interactive) {
+            $this->cli->boldRedBackgroundBlack($e->getMessage());
+            $this->cli->dim('[Err#'.$e->getCode().']');
 
-            if ( $this->config[ 'stacktrace' ] ) {
-                $this->cli->br()->comment( $e->getTraceAsString() )->br();
+            if ($this->config['stacktrace']) {
+                $this->cli->br()->comment($e->getTraceAsString())->br();
             }
         }
         else {
-            if ( $this->config[ 'stacktrace' ] ) {
+            if ($this->config['stacktrace']) {
                 $this->getLogger()->addError(
-                    $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
+                    $e->getMessage().PHP_EOL.$e->getTraceAsString());
             }
             else {
-                $this->getLogger()->addError( $e->getMessage() );
+                $this->getLogger()->addError($e->getMessage());
             }
         }
     }
 
-    private function parseConfig( array $config, $interactive )
+    private function parseConfig(array $config, $interactive)
     {
         // Set up lookup table for log levels
         $levels = [
@@ -142,66 +142,69 @@ class Log
             7 => Logger::DEBUG //debug-level messages
         ];
 
-        $this->path = ( $interactive === TRUE )
-            ? NULL
-            : $this->preparePath( $config[ 'path' ] );
-        $level = ( $interactive === TRUE )
-            ? $config[ 'level' ][ 'cli' ]
-            : $config[ 'level' ][ 'file' ];
-        $this->level = ( isset( $levels[ $level ] ) )
-            ? $levels[ $level ]
+        $this->path = (true === $interactive)
+            ? null
+            : $this->preparePath($config['path']);
+        $level = (true === $interactive)
+            ? $config['level']['cli']
+            : $config['level']['file'];
+        $this->level = (isset($levels[$level]))
+            ? $levels[$level]
             : Logger::WARNING;
-        $this->stackTrace = $config[ 'stacktrace' ];
+        $this->stackTrace = $config['stacktrace'];
     }
 
     /**
      * Checks if the log path is writeable by the user.
+     *
      * @throws LogPathNotWriteableException
-     * @return boolean
+     *
+     * @return bool
      */
-    static public function checkLogPath( $interactive, $path )
+    public static function checkLogPath($interactive, $path)
     {
-        if ( $interactive ) {
-            return TRUE;
+        if ($interactive) {
+            return true;
         }
 
-        $logPath = ( substr( $path, 0, 1 ) === DIRECTORY_SEPARATOR )
-            ? dirname( $path )
+        $logPath = (DIRECTORY_SEPARATOR === substr($path, 0, 1))
+            ? dirname($path)
             : BASEPATH;
 
-        if ( ! is_writeable( $logPath ) ) {
-            throw new LogPathNotWriteableException( $logPath );
+        if (! is_writeable($logPath)) {
+            throw new LogPathNotWriteableException($logPath);
         }
     }
 
     /**
      * Returns an absolute URL from a possible relative one.
+     *
      * @param string $path
+     *
      * @return string
      */
-    static public function preparePath( $path )
+    public static function preparePath($path)
     {
-        if ( substr( $path, 0, 1 ) === DIRECTORY_SEPARATOR ) {
+        if (DIRECTORY_SEPARATOR === substr($path, 0, 1)) {
             return $path;
         }
 
-        return BASEPATH . DIRECTORY_SEPARATOR . $path;
+        return BASEPATH.DIRECTORY_SEPARATOR.$path;
     }
 
-    private function createLog( array $config, $interactive )
+    private function createLog(array $config, $interactive)
     {
         // Create and configure a new logger
-        $log = new Logger( $config[ 'name' ] );
+        $log = new Logger($config['name']);
 
-        if ( $interactive === TRUE ) {
-            $handler = new CLIHandler( $this->cli, $this->level );
-        }
-        else {
+        if (true === $interactive) {
+            $handler = new CLIHandler($this->cli, $this->level);
+        } else {
             $handler = new RotatingFileHandler(
                 $this->path,
                 $maxFiles = 0,
                 $this->level,
-                $bubble = TRUE );
+                $bubble = true);
         }
 
         // Allow line breaks and stack traces, and don't show
@@ -210,8 +213,8 @@ class Log
         $formatter->includeStacktraces();
         $formatter->allowInlineLineBreaks();
         $formatter->ignoreEmptyContextAndExtra();
-        $handler->setFormatter( $formatter );
-        $log->pushHandler( $handler );
+        $handler->setFormatter($formatter);
+        $log->pushHandler($handler);
 
         // Store the log internally
         $this->logger = $log;
@@ -220,10 +223,12 @@ class Log
     /**
      * There are certain notices that are raised during the mail
      * header parsing that need to be suppressed.
+     *
      * @param string $message Message to check against
-     * @return boolean
+     *
+     * @return bool
      */
-    private function isSuppressed( $message )
+    private function isSuppressed($message)
     {
         $suppressList = [
             'Error while sending STMT_',
@@ -231,12 +236,12 @@ class Log
             'Unknown: Unexpected characters at end of address'
         ];
 
-        foreach ( $suppressList as $string ) {
-            if ( strpos( $message, $string ) === 0 ) {
-                return TRUE;
+        foreach ($suppressList as $string) {
+            if (0 === strpos($message, $string)) {
+                return true;
             }
         }
 
-        return FALSE;
+        return false;
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App;
 
-use App\Exceptions\Error as ErrorException
-  , App\Exceptions\BadCommand as BadCommandException
-  , Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
+use App\Exceptions\Error as ErrorException;
+use App\Exceptions\BadCommand as BadCommandException;
+use Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 
 class Command
 {
@@ -13,13 +13,13 @@ class Command
     private $regexMatch = '/^(!{1}[A-Z]+\n{1})$/';
     private $regexExtract = '/^(?:!{1})([A-Z]+)(?:\n{1})$/';
     // Valid commands
-    const STOP  = 'STOP';
+    const STOP = 'STOP';
     const STATS = 'STATS';
     const START = 'START';
     const HEALTH = 'HEALTH';
     const RESTART = 'RESTART';
 
-    public function __construct( Emitter $emitter = NULL )
+    public function __construct(Emitter $emitter = null)
     {
         $this->emitter = $emitter;
     }
@@ -29,21 +29,25 @@ class Command
      * A command has a special format. It needs a header that
      * conforms with our spec: !COMMAND\n
      * Each command starts with a !, be all caps, and end with
-     * a newline. As an example, restart would be: "!RESTART\n"
+     * a newline. As an example, restart would be: "!RESTART\n".
+     *
      * @param string $message
-     * @return boolean
+     *
+     * @return bool
      */
-    public function isValid( $message )
+    public function isValid($message)
     {
-        return preg_match( $this->regexMatch, $message );
+        return preg_match($this->regexMatch, $message);
     }
 
     /**
      * Makes a new command string from a constant.
+     *
      * @param string $command One of the command constants
+     *
      * @return string
      */
-    public function make( $command )
+    public function make($command)
     {
         return "!$command\n";
     }
@@ -51,60 +55,62 @@ class Command
     /**
      * Runs the given command. If the message is not a valid command
      * this will throw an exception.
+     *
      * @param string $message
+     *
      * @throws ErrorException
      * @throws BadCommandException
      */
-    public function run( $message )
+    public function run($message)
     {
-        if ( ! $this->emitter ) {
+        if (! $this->emitter) {
             throw new ErrorException(
-                "A command was attempted to be run in a context ".
-                "without an Event Emitter." );
+                'A command was attempted to be run in a context '.
+                'without an Event Emitter.');
         }
 
-        $matched = preg_match_all( $this->regexExtract, $message, $results );
+        $matched = preg_match_all($this->regexExtract, $message, $results);
 
-        if ( ! $matched
-            || count( $results ) !== 2
-            || count( $results[ 1 ] ) !== 1
-            || ! strlen( $results[ 1 ][ 0 ] ) )
+        if (! $matched
+            || 2 !== count($results)
+            || 1 !== count($results[1])
+            || ! strlen($results[1][0]))
         {
-            throw new BadCommandException( $message );
+            throw new BadCommandException($message);
         }
 
-        switch ( $results[ 1 ][ 0 ] ) {
+        switch ($results[1][0]) {
             case self::STOP:
-                $this->emitter->dispatch( EV_STOP_SYNC );
+                $this->emitter->dispatch(EV_STOP_SYNC);
                 break;
             case self::STATS:
-                $this->emitter->dispatch( EV_POLL_STATS );
+                $this->emitter->dispatch(EV_POLL_STATS);
                 break;
             case self::START:
-                $this->emitter->dispatch( EV_START_SYNC );
+                $this->emitter->dispatch(EV_START_SYNC);
                 break;
             case self::RESTART:
-                $this->emitter->dispatch( EV_CONTINUE_SYNC );
+                $this->emitter->dispatch(EV_CONTINUE_SYNC);
                 break;
             case self::HEALTH:
-                $this->emitter->dispatch( EV_POLL_DAEMON );
+                $this->emitter->dispatch(EV_POLL_DAEMON);
                 break;
             default:
-                throw new BadCommandException( $message );
+                throw new BadCommandException($message);
         }
     }
 
-    static public function getMessage( $command )
+    public static function getMessage($command)
     {
-        return sprintf( "!%s\n", $command );
+        return sprintf("!%s\n", $command);
     }
 
     /**
      * Sends the command to the Daemon.
      */
-    static public function send( $command )
+    public static function send($command)
     {
-        fwrite( STDOUT, $command );
+        fwrite(STDOUT, $command);
         flush();
     }
 }

@@ -15,7 +15,7 @@ class Response extends Psr7Response
     }
 
     /**
-     * Get the entire response as a string
+     * Get the entire response as a string.
      *
      * @return string
      */
@@ -33,7 +33,7 @@ class Response extends Psr7Response
     }
 
     /**
-     * Get the the raw message headers as a string
+     * Get the the raw message headers as a string.
      *
      * @return string
      */
@@ -46,10 +46,10 @@ class Response extends Psr7Response
             $this->getReasonPhrase());
 
         if (! empty($lines)) {
-            $headers .= implode("\r\n", $lines) . "\r\n";
+            $headers .= implode("\r\n", $lines)."\r\n";
         }
 
-        return $headers . "\r\n";
+        return $headers."\r\n";
     }
 
     /**

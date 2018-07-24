@@ -30,7 +30,7 @@ class StatsServer implements MessageComponentInterface
     // For JSON message handling
     use JsonMessageTrait;
 
-    public function __construct ( Log $log, LoopInterface $loop )
+    public function __construct(Log $log, LoopInterface $loop)
     {
         $this->loop = $loop;
         $this->log = $log->getLogger();
@@ -42,80 +42,81 @@ class StatsServer implements MessageComponentInterface
 
     /**
      * Send a message to all connected clients.
+     *
      * @param string $message JSON encoded message
      */
-    public function broadcast( $message )
+    public function broadcast($message)
     {
-        $obj = @json_decode( $message );
+        $obj = @json_decode($message);
 
-        if ( ! $this->lastMessage
-            || ( isset( $obj->type )
-                && $obj->type === Message::STATS ) )
+        if (! $this->lastMessage
+            || (isset($obj->type)
+                && Message::STATS === $obj->type))
         {
             $this->lastMessage = $message;
         }
 
-        foreach ( $this->clients as $client ) {
-            $client->send( $message );
+        foreach ($this->clients as $client) {
+            $client->send($message);
         }
     }
 
-    public function onOpen( ConnectionInterface $conn )
+    public function onOpen(ConnectionInterface $conn)
     {
-        $this->log->debug( "New socket connection opened from #". $conn->resourceId );
-        $this->clients->attach( $conn );
+        $this->log->debug('New socket connection opened from #'.$conn->resourceId);
+        $this->clients->attach($conn);
 
-        if ( $this->lastMessage ) {
-            $conn->send( $this->lastMessage );
+        if ($this->lastMessage) {
+            $conn->send($this->lastMessage);
         }
 
         // Send a command to return the status of the sync script.
         // If the daemon gets this and the sync script isn't running,
         // then it'll trigger an event to broadcast an offline message.
-        $this->write->write( Command::getMessage( Command::HEALTH ) );
+        $this->write->write(Command::getMessage(Command::HEALTH));
     }
 
-    public function onClose( ConnectionInterface $conn )
+    public function onClose(ConnectionInterface $conn)
     {
-        $this->log->debug( "Closing socket connection to #". $conn->resourceId );
-        $this->clients->detach( $conn );
+        $this->log->debug('Closing socket connection to #'.$conn->resourceId);
+        $this->clients->detach($conn);
     }
 
-    public function onError( ConnectionInterface $conn, Exception $e )
+    public function onError(ConnectionInterface $conn, Exception $e)
     {
         $this->log->notice(
-            "Error encountered from socket connection: ". $e->getMessage() );
-        $this->clients->detach( $conn );
+            'Error encountered from socket connection: '.$e->getMessage());
+        $this->clients->detach($conn);
         $conn->close();
 
         // Forward the error
         throw $e;
     }
 
-    public function onMessage( ConnectionInterface $from, $message )
+    public function onMessage(ConnectionInterface $from, $message)
     {
-        $this->log->debug( "New socket message from #{$from->resourceId}: $message" );
-        $this->processMessage( $message, NULL );
+        $this->log->debug("New socket message from #{$from->resourceId}: $message");
+        $this->processMessage($message, null);
     }
 
     private function setupInputStreams()
     {
-        $this->read = new ReadableResourceStream( STDIN, $this->loop );
+        $this->read = new ReadableResourceStream(STDIN, $this->loop);
 
         // The data can come in JSON encoded. If so, we want to
         // detect this format and keep reading until we reach the
         // end of the JSON stream.
-        $this->read->on( 'data', function ( $data ) {
-            $this->processMessage( $data, NULL );
+        $this->read->on('data', function ($data) {
+            $this->processMessage($data, null);
         });
 
-        $this->write = new WritableResourceStream( STDOUT, $this->loop );
+        $this->write = new WritableResourceStream(STDOUT, $this->loop);
     }
 
-    private function processMessage( $message, $key )
+    private function processMessage($message, $key)
     {
-        if ( ! $this->write 
-            || ! ($parsed = $this->parseMessage( $message )) )
+        if (! $this->write
+            || ! ($parsed = $this->parseMessage($message)))
         {
             return;
         }
@@ -124,42 +125,42 @@ class StatsServer implements MessageComponentInterface
         // restart the sync (wake up), force-fetch the stats,
         // shutdown the sync, etc. Send this to the daemon. If it's
         // a valid command, then send it to STDOUT.
-        if ( (new Command)->isValid( $parsed ) ) {
-            $this->write->write( $parsed );
+        if ((new Command)->isValid($parsed)) {
+            $this->write->write($parsed);
         }
 
         // If it's a message of type 'task', execute that task
-        if ( Message::isValid( $parsed ) ) {
+        if (Message::isValid($parsed)) {
             try {
-                $message = Message::make( $parsed );
+                $message = Message::make($parsed);
 
-                if ( $message->getType() == Message::TASK ) {
-                    $task = Task::make( $message->task, $message->data );
-                    $response = $task->run( $this );
+                if (Message::TASK == $message->getType()) {
+                    $task = Task::make($message->task, $message->data);
+                    $response = $task->run($this);
 
                     // The response itself can be a command. If it
                     // is, send it to the Daemon.
-                    if ( (new Command)->isValid( $response ) ) {
-                        $this->write->write( $response );
+                    if ((new Command)->isValid($response)) {
+                        $this->write->write($response);
                     }
                 }
             }
             // Keep throwing these
-            catch ( PDOException $e ) {
+            catch (PDOException $e) {
                 throw $e;
             }
-            catch ( TerminateException $e ) {
+            catch (TerminateException $e) {
                 throw $e;
             }
             // Otherwise just log and move on
-            catch ( Exception $e ) {
-                $this->log->notice( $e->getMessage() );
+            catch (Exception $e) {
+                $this->log->notice($e->getMessage());
             }
         }
     }
 
-    private function handleMessage( $json, $key )
+    private function handleMessage($json, $key)
     {
-        $this->broadcast( $json );
+        $this->broadcast($json);
     }
 }

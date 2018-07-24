@@ -11,7 +11,7 @@ class Rollback
 {
     private $cli;
 
-    public function __construct( CLImate $cli )
+    public function __construct(CLImate $cli)
     {
         $this->cli = $cli;
     }
@@ -19,6 +19,7 @@ class Rollback
     /**
      * Rolls all current logged tasks in the tasks table. Start
      * from the end and revert each one.
+     *
      * @throws PDOException
      */
     public function run()
@@ -26,69 +27,75 @@ class Rollback
         $count = 0;
         $taskModel = new TaskModel;
         $messageModel = new MessageModel;
-        $this->cli->info( "Starting rollback" );
+        $this->cli->info('Starting rollback');
         $tasks = $taskModel->getTasksForRollback();
 
-        if ( ! $tasks ) {
-            $this->cli->whisper( "No tasks to roll back" );
+        if (! $tasks) {
+            $this->cli->whisper('No tasks to roll back');
+
             return;
         }
 
         Model::getDb()->beginTransaction();
 
         try {
-            foreach ( $tasks as $task ) {
-                if ( $this->revertAction( $task, $messageModel ) ) {
+            foreach ($tasks as $task) {
+                if ($this->revertAction($task, $messageModel)) {
                     $task->revert();
-                    $count++;
+                    ++$count;
                 }
             }
         }
-        catch ( Exception $e ) {
+        catch (Exception $e) {
             $this->cli->whisper(
-                "Problem during rollback, rolling back the rollback :P" );
+                'Problem during rollback, rolling back the rollback :P');
             Model::getDb()->rollBack();
-            throw new PDOException( $e );
+
+            throw new PDOException($e);
         }
 
         Model::getDb()->commit();
 
         $this->cli->info(
             "Finished rolling back $count task".
-            ($count === 1 ? '' : 's') );
+            (1 === $count ? '' : 's'));
     }
 
     /**
      * Reverts a message to it's previous state.
+     *
      * @param TaskModel $task
      * @param MessageModel $message
      */
-    private function revertAction( TaskModel $task, MessageModel $message )
+    private function revertAction(TaskModel $task, MessageModel $message)
     {
-        switch ( $task->type ) {
+        switch ($task->type) {
             case TaskModel::TYPE_READ:
             case TaskModel::TYPE_UNREAD:
                 $message->setFlag(
                     $task->message_id,
                     MessageModel::FLAG_SEEN,
-                    $task->old_value );
-                return TRUE;
+                    $task->old_value);
+
+                return true;
 
             case TaskModel::TYPE_FLAG:
             case TaskModel::TYPE_UNFLAG:
                 $message->setFlag(
                     $task->message_id,
                     MessageModel::FLAG_FLAGGED,
-                    $task->old_value );
-                return TRUE;
+                    $task->old_value);
+
+                return true;
 
             case TaskModel::TYPE_DELETE:
             case TaskModel::TYPE_UNDELETE:
                 $message->setFlag(
                     $task->message_id,
                     MessageModel::FLAG_DELETED,
-                    $task->old_value );
-                return TRUE;
+                    $task->old_value);
+
+                return true;
 
             case TaskModel::TYPE_COPY:
                 // Mark as deleted any messages with this message-id
@@ -96,8 +103,9 @@ class Rollback
                 // a unique ID field.
                 $message->deleteCopiedMessages(
                     $task->message_id,
-                    $task->folder_id );
-                return TRUE;
+                    $task->folder_id);
+
+                return true;
         }
     }
 }

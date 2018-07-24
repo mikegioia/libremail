@@ -48,62 +48,64 @@ class Account extends Model
 
     /**
      * Create a new account record.
+     *
      * @param array $data
+     *
      * @throws AccountExistsException
      * @throws DatabaseInsertException
      * @throws DatabaseUpdateException
      */
-    public function save( $data = [], $updateIfExists = FALSE )
+    public function save($data = [], $updateIfExists = false)
     {
-        $this->setData( $data );
+        $this->setData($data);
         $this->validate();
         $data = $this->getData();
 
         // Check if this email exists
         $exists = $this->db()
             ->select()
-            ->from( 'accounts' )
-            ->where( 'email', '=', $data[ 'email' ] )
+            ->from('accounts')
+            ->where('email', '=', $data['email'])
             ->execute()
             ->fetchObject();
 
-        if ( $exists ) {
-            if ( ! $updateIfExists ) {
-                throw new AccountExistsException( $data[ 'email' ] );
+        if ($exists) {
+            if (! $updateIfExists) {
+                throw new AccountExistsException($data['email']);
             }
 
             $this->id = $exists->id;
-            unset( $data[ 'id' ] );
-            unset( $data[ 'created_at' ] );
+            unset($data['id']);
+            unset($data['created_at']);
             $updated = $this->db()
-                ->update( $data )
-                ->table( 'accounts' )
-                ->where( 'id', '=', $exists->id )
+                ->update($data)
+                ->table('accounts')
+                ->where('id', '=', $exists->id)
                 ->execute();
 
-            if ( $updated === FALSE ) {
-                throw new DatabaseUpdateException( FOLDER );
+            if (false === $updated) {
+                throw new DatabaseUpdateException(FOLDER);
             }
 
             return;
         }
 
         $createdAt = new DateTime;
-        unset( $data[ 'id' ] );
-        $data[ 'is_active' ] = 1;
-        $data[ 'service' ] = strtolower( $data[ 'service' ] );
-        $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
+        unset($data['id']);
+        $data['is_active'] = 1;
+        $data['service'] = strtolower($data['service']);
+        $data['created_at'] = $createdAt->format(DATE_DATABASE);
 
         $newAccountId = $this->db()
-            ->insert( array_keys( $data ) )
-            ->into( 'accounts' )
-            ->values( array_values( $data ) )
+            ->insert(array_keys($data))
+            ->into('accounts')
+            ->values(array_values($data))
             ->execute();
 
-        if ( ! $newAccountId ) {
+        if (! $newAccountId) {
             throw new DatabaseInsertException(
                 ACCOUNT,
-                $this->getError() );
+                $this->getError());
         }
 
         $this->id = $newAccountId;
@@ -111,28 +113,29 @@ class Account extends Model
 
     /**
      * Validate the account data.
+     *
      * @throws ValidationException
      */
     public function validate()
     {
         $val = new Validator;
-        $val->required( 'email', 'Email' )->lengthBetween( 0, 100 );
-        $val->required( 'service', 'Service type' )
+        $val->required('email', 'Email')->lengthBetween(0, 100);
+        $val->required('service', 'Service type')
             ->inArray(
                 array_map(
                     'strtolower',
-                    $this->config( 'email.services' )
+                    $this->config('email.services')
                 ));
-        $val->required( 'password', 'Password' )->lengthBetween( 0, 100 );
-        $val->optional( 'imap_host', 'IMAP host' )->lengthBetween( 0, 50 );
-        $val->optional( 'imap_port', 'IMAP port' )->lengthBetween( 0, 5 );
-        $val->optional( 'imap_flags', 'IMAP flags' )->lengthBetween( 0, 50 );
+        $val->required('password', 'Password')->lengthBetween(0, 100);
+        $val->optional('imap_host', 'IMAP host')->lengthBetween(0, 50);
+        $val->optional('imap_port', 'IMAP port')->lengthBetween(0, 5);
+        $val->optional('imap_flags', 'IMAP flags')->lengthBetween(0, 50);
 
-        if ( ! $val->validate( $this->getData() ) ) {
+        if (! $val->validate($this->getData())) {
             throw new ValidationException(
                 $this->getErrorString(
                     $val,
-                    "There was a problem creating this account."
+                    'There was a problem creating this account.'
                 ));
         }
     }
@@ -141,23 +144,23 @@ class Account extends Model
     {
         return $this->db()
             ->select()
-            ->from( 'accounts' )
-            ->where( 'is_active', '=', 1 )
+            ->from('accounts')
+            ->where('is_active', '=', 1)
             ->execute()
-            ->fetchAll( PDO::FETCH_CLASS, $this->getClass() );
+            ->fetchAll(PDO::FETCH_CLASS, $this->getClass());
     }
 
-    public function getByEmail( $email )
+    public function getByEmail($email)
     {
         $account = $this->db()
             ->select()
-            ->from( 'accounts' )
-            ->where( 'email', '=', $email )
+            ->from('accounts')
+            ->where('email', '=', $email)
             ->execute()
             ->fetchObject();
 
-        return ( $account )
-            ? new self( $account )
+        return ($account)
+            ? new self($account)
             : $account;
     }
 
@@ -168,38 +171,38 @@ class Account extends Model
     {
         // Build the array of services
         $config = [];
-        $services = $this->config( 'email.services' );
+        $services = $this->config('email.services');
 
-        foreach ( $services as $serviceName ) {
-            $key = strtolower( $serviceName );
-            $service = $this->config( "email.$key" );
+        foreach ($services as $serviceName) {
+            $key = strtolower($serviceName);
+            $service = $this->config("email.$key");
 
-            if ( isset( $service[ 'domain' ] ) ) {
-                $config[ $service[ 'domain' ] ] = $service;
-                $config[ $service[ 'domain' ] ][ 'key' ] = $key;
+            if (isset($service['domain'])) {
+                $config[$service['domain']] = $service;
+                $config[$service['domain']]['key'] = $key;
             }
         }
 
         // Get the domain from the email
-        $emailParts = explode( '@', $this->email );
+        $emailParts = explode('@', $this->email);
 
-        if ( count( $emailParts ) !== 2 ) {
+        if (2 !== count($emailParts)) {
             return;
         }
 
-        if ( ! isset( $config[ $emailParts[ 1 ] ] ) ) {
+        if (! isset($config[$emailParts[1]])) {
             $this->service = DEFAULT_SERVICE;
-            $other = $this->config( 'email.other' );
+            $other = $this->config('email.other');
 
-            if ( ! $this->imap_port ) {
-                $this->imap_port = $other[ 'port' ];
+            if (! $this->imap_port) {
+                $this->imap_port = $other['port'];
             }
 
             return;
         }
 
-        $this->service = $config[ $emailParts[ 1 ] ][ 'key' ];
-        $this->imap_host = $config[ $emailParts[ 1 ] ][ 'host' ];
-        $this->imap_port = $config[ $emailParts[ 1 ] ][ 'port' ];
+        $this->service = $config[$emailParts[1]]['key'];
+        $this->imap_host = $config[$emailParts[1]]['host'];
+        $this->imap_port = $config[$emailParts[1]]['port'];
     }
 }

@@ -119,124 +119,132 @@ class Message extends Model
 
     public function isSynced()
     {
-        return Fn\intEq( $this->synced, 1 );
+        return Fn\intEq($this->synced, 1);
     }
 
     public function isDeleted()
     {
-        return Fn\intEq( $this->deleted, 1 );
+        return Fn\intEq($this->deleted, 1);
     }
 
     public function getAttachments()
     {
-        if ( ! is_null( $this->unserializedAttachments ) ) {
+        if (! is_null($this->unserializedAttachments)) {
             return $this->unserializedAttachments;
         }
 
-        $this->unserializedAttachments = @unserialize( $this->attachments );
+        $this->unserializedAttachments = @unserialize($this->attachments);
 
         return $this->unserializedAttachments;
     }
 
-    public function getById( $id )
+    public function getById($id)
     {
         return $this->db()
             ->select()
-            ->from( 'messages' )
-            ->where( 'id', '=', $id )
+            ->from('messages')
+            ->where('id', '=', $id)
             ->execute()
-            ->fetch( PDO::FETCH_OBJ );
+            ->fetch(PDO::FETCH_OBJ);
     }
 
-    public function getByIds( $ids )
+    public function getByIds($ids)
     {
         return $this->db()
             ->select()
-            ->from( 'messages' )
-            ->whereIn( 'id', $ids )
+            ->from('messages')
+            ->whereIn('id', $ids)
             ->execute()
-            ->fetchAll( PDO::FETCH_CLASS, $this->getClass() );
+            ->fetchAll(PDO::FETCH_CLASS, $this->getClass());
     }
 
     public function getSubjectHash()
     {
-        return self::makeSubjectHash( $this->subject );
+        return self::makeSubjectHash($this->subject);
     }
 
     /**
      * Fetches a range of messages for an account. Used during the
      * threading computation.
+     *
      * @param int $accountId
      * @param int $minId
      * @param int $maxId
      * @param int $limit
+     *
      * @return array Messages
      */
-    public function getRangeForThreading( $accountId, $minId, $maxId, $limit )
+    public function getRangeForThreading($accountId, $minId, $maxId, $limit)
     {
         return $this->db()
             ->select([
                 'id', 'thread_id', 'message_id', '`date`',
                 'in_reply_to', '`references`', 'subject'
             ])
-            ->from( 'messages' )
-            ->where( 'id', '>=', $minId )
-            ->where( 'id', '<=', $maxId )
-            ->where( 'account_id', '=', $accountId )
-            ->limit( $limit )
+            ->from('messages')
+            ->where('id', '>=', $minId)
+            ->where('id', '<=', $maxId)
+            ->where('account_id', '=', $accountId)
+            ->limit($limit)
             ->execute()
-            ->fetchAll( PDO::FETCH_CLASS, $this->getClass() );
+            ->fetchAll(PDO::FETCH_CLASS, $this->getClass());
     }
 
     /**
      * Finds the highest ID for an account.
+     *
      * @param int $accountId
+     *
      * @return int
      */
-    public function getMaxMessageId( $accountId )
+    public function getMaxMessageId($accountId)
     {
         $row = $this->db()
-            ->select([ 'max(id) as max' ])
-            ->from( 'messages' )
-            ->where( 'account_id', '=', $accountId )
+            ->select(['max(id) as max'])
+            ->from('messages')
+            ->where('account_id', '=', $accountId)
             ->execute()
             ->fetch();
 
-        return $row ? $row[ 'max' ] : 0;
+        return $row ? $row['max'] : 0;
     }
 
     /**
      * Finds the lowest ID for an account.
+     *
      * @param int $accountId
+     *
      * @return int
      */
-    public function getMinMessageId( $accountId )
+    public function getMinMessageId($accountId)
     {
         $row = $this->db()
-            ->select([ 'min(id) as min' ])
-            ->from( 'messages' )
-            ->where( 'account_id', '=', $accountId )
+            ->select(['min(id) as min'])
+            ->from('messages')
+            ->where('account_id', '=', $accountId)
             ->execute()
             ->fetch();
 
-        return $row ? $row[ 'min' ] : 0;
+        return $row ? $row['min'] : 0;
     }
 
     /**
      * Returns a list of integer unique IDs given an account ID
      * and a folder ID to search. This fetches IDs in pages to
      * not exceed any memory limits on the query response.
+     *
      * @param int $accountId
      * @param int $folderId
+     *
      * @return array of ints
      */
-    public function getSyncedIdsByFolder( $accountId, $folderId )
+    public function getSyncedIdsByFolder($accountId, $folderId)
     {
         $ids = [];
         $limit = 10000;
-        $count = $this->countSyncedIdsByFolder( $accountId, $folderId );
+        $count = $this->countSyncedIdsByFolder($accountId, $folderId);
 
-        for ( $offset = 0; $offset < $count; $offset += $limit ) {
+        for ($offset = 0; $offset < $count; $offset += $limit) {
             $ids = array_merge(
                 $ids,
                 $this->getPagedSyncedIdsByFolder(
@@ -252,80 +260,89 @@ class Message extends Model
 
     /**
      * Returns a count of unique IDs for an account.
+     *
      * @param int $accountId
+     *
      * @return int
      */
-    public function countByAccount( $accountId )
+    public function countByAccount($accountId)
     {
-        $this->requireInt( $accountId, "Account ID" );
+        $this->requireInt($accountId, 'Account ID');
+
         $messages = $this->db()
             ->select()
             ->clear()
-            ->count( 1, 'count' )
-            ->from( 'messages' )
-            ->where( 'account_id', '=', $accountId )
+            ->count(1, 'count')
+            ->from('messages')
+            ->where('account_id', '=', $accountId)
             ->execute()
             ->fetch();
 
-        return ( $messages ) ? $messages[ 'count' ] : 0;
+        return $messages ? $messages['count'] : 0;
     }
 
     /**
      * Returns a count of unique IDs for a folder.
+     *
      * @param int $accountId
      * @param int $folderId
+     *
      * @return int
      */
-    public function countSyncedIdsByFolder( $accountId, $folderId )
+    public function countSyncedIdsByFolder($accountId, $folderId)
     {
-        $this->requireInt( $folderId, "Folder ID" );
-        $this->requireInt( $accountId, "Account ID" );
+        $this->requireInt($folderId, 'Folder ID');
+        $this->requireInt($accountId, 'Account ID');
+
         $messages = $this->db()
             ->select()
             ->clear()
-            ->count( 1, 'count' )
-            ->from( 'messages' )
-            ->where( 'synced', '=', 1 )
-            ->where( 'deleted', '=', 0 )
-            ->where( 'folder_id', '=', $folderId )
-            ->where( 'account_id', '=', $accountId )
+            ->count(1, 'count')
+            ->from('messages')
+            ->where('synced', '=', 1)
+            ->where('deleted', '=', 0)
+            ->where('folder_id', '=', $folderId)
+            ->where('account_id', '=', $accountId)
             ->execute()
             ->fetch();
 
-        return ( $messages ) ? $messages[ 'count' ] : 0;
+        return $messages ? $messages['count'] : 0;
     }
 
     /**
      * This method is called by getSyncedIdsByFolder to return a
      * page of results.
+     *
      * @param int $accountId
      * @param int $folderId
      * @param int $offset
      * @param int $limit
+     *
      * @return array of ints
      */
-    private function getPagedSyncedIdsByFolder( $accountId, $folderId, $offset = 0, $limit = 100 )
+    private function getPagedSyncedIdsByFolder($accountId, $folderId, $offset = 0, $limit = 100)
     {
+        $this->requireInt($folderId, 'Folder ID');
+        $this->requireInt($accountId, 'Account ID');
+
         $ids = [];
-        $this->requireInt( $folderId, "Folder ID" );
-        $this->requireInt( $accountId, "Account ID" );
         $messages = $this->db()
-            ->select([ 'unique_id' ])
-            ->from( 'messages' )
-            ->where( 'synced', '=', 1 )
-            ->where( 'deleted', '=', 0 )
-            ->where( 'folder_id', '=', $folderId )
-            ->where( 'account_id', '=', $accountId )
-            ->limit( $limit, $offset )
+            ->select(['unique_id'])
+            ->from('messages')
+            ->where('synced', '=', 1)
+            ->where('deleted', '=', 0)
+            ->where('folder_id', '=', $folderId)
+            ->where('account_id', '=', $accountId)
+            ->limit($limit, $offset)
             ->execute()
             ->fetchAll();
 
-        if ( ! $messages ) {
+        if (! $messages) {
             return $ids;
         }
 
-        foreach ( $messages as $message ) {
-            $ids[] = $message[ 'unique_id' ];
+        foreach ($messages as $message) {
+            $ids[] = $message['unique_id'];
         }
 
         return $ids;
@@ -333,133 +350,133 @@ class Message extends Model
 
     /**
      * Create or updates a message record.
+     *
      * @param array $data
+     *
      * @throws ValidationException
      * @throws DatabaseUpdateException
      * @throws DatabaseInsertException
      */
-    public function save( $data = [] )
+    public function save($data = [])
     {
         $val = new Validator;
-        $val->required( 'folder_id', 'Folder ID' )->integer();
-        $val->required( 'unique_id', 'Unique ID' )->integer();
-        $val->required( 'account_id', 'Account ID' )->integer();
+        $val->required('folder_id', 'Folder ID')->integer();
+        $val->required('unique_id', 'Unique ID')->integer();
+        $val->required('account_id', 'Account ID')->integer();
         // Optional fields
-        $val->required( 'size', 'Size' )->integer();
-        $val->required( 'message_no', 'Message Number' )->integer();
-        $val->optional( 'date', 'Date' )->datetime( DATE_DATABASE );
-        $val->optional( 'subject', 'Subject' )->lengthBetween( 0, 270 );
-        $val->optional( 'charset', 'Charset' )->lengthBetween( 0, 100 );
-        $val->optional( 'date_str', 'RFC Date' )->lengthBetween( 0, 100 );
-        $val->optional( 'seen', 'Seen' )->callback([ $this, 'isValidFlag' ]);
-        $val->optional( 'message_id', 'Message ID' )->lengthBetween( 0, 250 );
-        $val->optional( 'draft', 'Draft' )->callback([ $this, 'isValidFlag' ]);
-        $val->optional( 'recv_str', 'Received Date' )->lengthBetween( 0, 250 );
-        $val->optional( 'in_reply_to', 'In-Reply-To' )->lengthBetween( 0, 250 );
-        $val->optional( 'recent', 'Recent' )->callback([ $this, 'isValidFlag' ]);
-        $val->optional( 'date_recv', 'Date Received' )->datetime( DATE_DATABASE );
-        $val->optional( 'flagged', 'Flagged' )->callback([ $this, 'isValidFlag' ]);
-        $val->optional( 'deleted', 'Deleted' )->callback([ $this, 'isValidFlag' ]);
-        $val->optional( 'answered', 'Answered' )->callback([ $this, 'isValidFlag' ]);
+        $val->required('size', 'Size')->integer();
+        $val->required('message_no', 'Message Number')->integer();
+        $val->optional('date', 'Date')->datetime(DATE_DATABASE);
+        $val->optional('subject', 'Subject')->lengthBetween(0, 270);
+        $val->optional('charset', 'Charset')->lengthBetween(0, 100);
+        $val->optional('date_str', 'RFC Date')->lengthBetween(0, 100);
+        $val->optional('seen', 'Seen')->callback([$this, 'isValidFlag']);
+        $val->optional('message_id', 'Message ID')->lengthBetween(0, 250);
+        $val->optional('draft', 'Draft')->callback([$this, 'isValidFlag']);
+        $val->optional('recv_str', 'Received Date')->lengthBetween(0, 250);
+        $val->optional('in_reply_to', 'In-Reply-To')->lengthBetween(0, 250);
+        $val->optional('recent', 'Recent')->callback([$this, 'isValidFlag']);
+        $val->optional('date_recv', 'Date Received')->datetime(DATE_DATABASE);
+        $val->optional('flagged', 'Flagged')->callback([$this, 'isValidFlag']);
+        $val->optional('deleted', 'Deleted')->callback([$this, 'isValidFlag']);
+        $val->optional('answered', 'Answered')->callback([$this, 'isValidFlag']);
 
-        $this->setData( $data );
+        $this->setData($data);
         $data = $this->getData();
 
-        if ( ! $val->validate( $data ) ) {
+        if (! $val->validate($data)) {
             throw new ValidationException(
                 $this->getErrorString(
                     $val,
-                    "This message is missing required data."
+                    'This message is missing required data.'
                 ));
         }
 
         // Update flags to have the right data type
-        $this->updateFlagValues( $data, [
+        $this->updateFlagValues($data, [
             'seen', 'draft', 'recent', 'flagged',
             'deleted', 'answered'
         ]);
-        $this->updateUtf8Values( $data, [
+        $this->updateUtf8Values($data, [
             'subject', 'text_html', 'text_plain'
         ]);
 
         // Check if this message exists
         $exists = $this->db()
             ->select()
-            ->from( 'messages' )
-            ->where( 'folder_id', '=', $this->folder_id )
-            ->where( 'unique_id', '=', $this->unique_id )
-            ->where( 'account_id', '=', $this->account_id )
+            ->from('messages')
+            ->where('folder_id', '=', $this->folder_id)
+            ->where('unique_id', '=', $this->unique_id)
+            ->where('account_id', '=', $this->account_id)
             ->execute()
             ->fetchObject();
-        $updateMessage = function ( $db, $id, $data ) {
+        $updateMessage = function ($db, $id, $data) {
             return $db
-                ->update( $data )
-                ->table( 'messages' )
-                ->where( 'id', '=', $id )
+                ->update($data)
+                ->table('messages')
+                ->where('id', '=', $id)
                 ->execute();
         };
-        $insertMessage = function ( $db, $data ) {
+        $insertMessage = function ($db, $data) {
             return $db
-                ->insert( array_keys( $data ) )
-                ->into( 'messages' )
-                ->values( array_values( $data ) )
+                ->insert(array_keys($data))
+                ->into('messages')
+                ->values(array_values($data))
                 ->execute();
         };
 
-        if ( $exists ) {
+        if ($exists) {
             $this->id = $exists->id;
-            unset( $data[ 'id' ] );
-            unset( $data[ 'created_at' ] );
+            unset($data['id']);
+            unset($data['created_at']);
 
             try {
-                $updated = $updateMessage( $this->db(), $this->id, $data );
+                $updated = $updateMessage($this->db(), $this->id, $data);
             }
-            catch ( PDOException $e ) {
+            catch (PDOException $e) {
                 // Check for bad UTF-8 errors
-                if ( strpos( $e->getMessage(), "Incorrect string value:" ) ) {
-                    $data[ 'subject' ] = Encoding::fixUTF8( $data[ 'subject' ] );
-                    $data[ 'text_html' ] = Encoding::fixUTF8( $data[ 'text_html' ] );
-                    $data[ 'text_plain' ] = Encoding::fixUTF8( $data[ 'text_plain' ] );
-                    $newMessageId = $updateMessage( $this->db(), $data );
-                }
-                else {
+                if (strpos($e->getMessage(), 'Incorrect string value:')) {
+                    $data['subject'] = Encoding::fixUTF8($data['subject']);
+                    $data['text_html'] = Encoding::fixUTF8($data['text_html']);
+                    $data['text_plain'] = Encoding::fixUTF8($data['text_plain']);
+                    $newMessageId = $updateMessage($this->db(), $data);
+                } else {
                     throw $e;
                 }
             }
 
-            if ( ! Belt::isNumber( $updated ) ) {
+            if (! Belt::isNumber($updated)) {
                 throw new DatabaseUpdateException(
                     MESSAGE,
-                    $this->db()->getError() );
+                    $this->db()->getError());
             }
 
             return;
         }
 
         $createdAt = new DateTime;
-        unset( $data[ 'id' ] );
-        $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
+        unset($data['id']);
+        $data['created_at'] = $createdAt->format(DATE_DATABASE);
 
         try {
-            $newMessageId = $insertMessage( $this->db(), $data );
+            $newMessageId = $insertMessage($this->db(), $data);
         }
-        catch ( PDOException $e ) {
+        catch (PDOException $e) {
             // Check for bad UTF-8 errors
-            if ( strpos( $e->getMessage(), "Incorrect string value:" ) ) {
-                $data[ 'subject' ] = Encoding::fixUTF8( $data[ 'subject' ] );
-                $data[ 'text_html' ] = Encoding::fixUTF8( $data[ 'text_html' ] );
-                $data[ 'text_plain' ] = Encoding::fixUTF8( $data[ 'text_plain' ] );
-                $newMessageId = $insertMessage( $this->db(), $data );
-            }
-            else {
+            if (strpos($e->getMessage(), 'Incorrect string value:')) {
+                $data['subject'] = Encoding::fixUTF8($data['subject']);
+                $data['text_html'] = Encoding::fixUTF8($data['text_html']);
+                $data['text_plain'] = Encoding::fixUTF8($data['text_plain']);
+                $newMessageId = $insertMessage($this->db(), $data);
+            } else {
                 throw $e;
             }
         }
 
-        if ( ! $newMessageId ) {
+        if (! $newMessageId) {
             throw new DatabaseInsertException(
                 MESSAGE,
-                $this->getError() );
+                $this->getError());
         }
 
         $this->id = $newMessageId;
@@ -468,18 +485,19 @@ class Message extends Model
     /**
      * Saves the meta information and content for a message as data
      * on the class object.
+     *
      * @param array $meta
      * @param array $options
      */
-    public function setMessageData( ImapMessage $message, array $options = [] )
+    public function setMessageData(ImapMessage $message, array $options = [])
     {
-        if ( Fn\get( $options, self::OPT_TRUNCATE_FIELDS ) === TRUE ) {
-            $message->subject = substr( $message->subject, 0, 270 );
+        if (true === Fn\get($options, self::OPT_TRUNCATE_FIELDS)) {
+            $message->subject = substr($message->subject, 0, 270);
         }
 
-        if ( Fn\get( $options, self::OPT_SKIP_CONTENT ) === TRUE ) {
-            $message->textHtml = NULL;
-            $message->textPlain = NULL;
+        if (true === Fn\get($options, self::OPT_SKIP_CONTENT)) {
+            $message->textHtml = null;
+            $message->textPlain = null;
         }
 
         $this->setData([
@@ -508,52 +526,57 @@ class Message extends Model
             // The cc and inReplyTo fields come in as arrays with the
             // address as the index and the name as the value. Create
             // the proper comma separated strings for these fields.
-            'cc' => $this->formatAddress( $message->cc ),
-            'bcc' => $this->formatAddress( $message->bcc ),
-            'reply_to' => $this->formatAddress( $message->replyTo ),
-            'attachments' => $this->formatAttachments( $message->getAttachments() )
+            'cc' => $this->formatAddress($message->cc),
+            'bcc' => $this->formatAddress($message->bcc),
+            'reply_to' => $this->formatAddress($message->replyTo),
+            'attachments' => $this->formatAttachments($message->getAttachments())
         ]);
     }
 
     /**
      * Takes in an array of message unique IDs and marks them all as
      * deleted in the database.
+     *
      * @param array $uniqueIds
      * @param int $accountId
      * @param int $folderId
+     *
      * @throws DatabaseUpdateException
      */
-    public function markDeleted( $uniqueIds, $accountId, $folderId )
+    public function markDeleted($uniqueIds, $accountId, $folderId)
     {
-        if ( ! is_array( $uniqueIds ) || ! count( $uniqueIds ) ) {
+        if (! is_array($uniqueIds) || ! count($uniqueIds)) {
             return;
         }
 
-        $this->requireInt( $folderId, "Folder ID" );
-        $this->requireInt( $accountId, "Account ID" );
+        $this->requireInt($folderId, 'Folder ID');
+        $this->requireInt($accountId, 'Account ID');
+
         $updated = $this->db()
-            ->update([ 'deleted' => 1 ])
-            ->table( 'messages' )
-            ->where( 'folder_id', '=', $folderId )
-            ->where( 'account_id', '=', $accountId )
-            ->whereIn( 'unique_id', $uniqueIds )
+            ->update(['deleted' => 1])
+            ->table('messages')
+            ->where('folder_id', '=', $folderId)
+            ->where('account_id', '=', $accountId)
+            ->whereIn('unique_id', $uniqueIds)
             ->execute();
 
-        if ( ! Belt::isNumber( $updated ) ) {
+        if (! Belt::isNumber($updated)) {
             throw new DatabaseUpdateException(
                 MESSAGE,
-                $this->getError() );
+                $this->getError());
         }
     }
 
     /**
      * Takes in an array of message unique IDs and sets a flag to on.
+     *
      * @param array $uniqueIds
      * @param int $accountId
      * @param int $folderId
      * @param string $flag
      * @param bool $state On or off
      * @param bool $inverse If set, do where not in $uniqueIds query
+     *
      * @throws DatabaseUpdateException
      */
     public function markFlag(
@@ -561,43 +584,42 @@ class Message extends Model
         $accountId,
         $folderId,
         $flag,
-        $state = TRUE,
-        $inverse = FALSE )
-    {
-        if ( $inverse === FALSE
-            && ( ! is_array( $uniqueIds ) || ! count( $uniqueIds ) ) )
+        $state = true,
+        $inverse = false
+    ) {
+        if (false === $inverse
+            && (! is_array($uniqueIds) || ! count($uniqueIds)))
         {
             return;
         }
 
-        $this->isValidFlag( $state, "State" );
-        $this->requireInt( $folderId, "Folder ID" );
-        $this->requireInt( $accountId, "Account ID" );
-        $this->requireValue( $flag, [
+        $this->isValidFlag($state, 'State');
+        $this->requireInt($folderId, 'Folder ID');
+        $this->requireInt($accountId, 'Account ID');
+        $this->requireValue($flag, [
             self::FLAG_SEEN, self::FLAG_FLAGGED
         ]);
         $query = $this->db()
-            ->update([ $flag => $state ? 1 : 0 ])
-            ->table( 'messages' )
-            ->where( $flag, '=', $state ? 0 : 1 )
-            ->where( 'folder_id', '=', $folderId )
-            ->where( 'account_id', '=', $accountId );
+            ->update([$flag => $state ? 1 : 0])
+            ->table('messages')
+            ->where($flag, '=', $state ? 0 : 1)
+            ->where('folder_id', '=', $folderId)
+            ->where('account_id', '=', $accountId);
 
-        if ( $inverse === TRUE ) {
-            if ( count( $uniqueIds ) ) {
-                $query->whereNotIn( 'unique_id', $uniqueIds );
+        if (true === $inverse) {
+            if (count($uniqueIds)) {
+                $query->whereNotIn('unique_id', $uniqueIds);
             }
-        }
-        else {
-            $query->whereIn( 'unique_id', $uniqueIds );
+        } else {
+            $query->whereIn('unique_id', $uniqueIds);
         }
 
         $updated = $query->execute();
 
-        if ( ! Belt::isNumber( $updated ) ) {
+        if (! Belt::isNumber($updated)) {
             throw new DatabaseUpdateException(
                 MESSAGE,
-                $this->getError() );
+                $this->getError());
         }
 
         return $updated;
@@ -605,37 +627,39 @@ class Message extends Model
 
     /**
      * Saves a flag value for a message by ID.
+     *
      * @param int $id
      * @param string $flag
      * @param string $value
+     *
      * @throws ValidationException
      * @throws DatabaseUpdateException
      */
-    public function setFlag( $id, $flag, $value )
+    public function setFlag($id, $flag, $value)
     {
-        $this->requireInt( $id, 'Message ID' );
-        $this->requireValue( $flag, [
+        $this->requireInt($id, 'Message ID');
+        $this->requireValue($flag, [
             self::FLAG_SEEN, self::FLAG_FLAGGED,
             self::FLAG_DELETED
         ]);
 
-        if ( ! $this->isValidFlag( $value ) ) {
+        if (! $this->isValidFlag($value)) {
             throw new ValidationException(
-                "Invalid flag value '$value' for $flag" );
+                "Invalid flag value '$value' for $flag");
         }
 
         $updated = $this->db()
             ->update([
                 $flag => $value
             ])
-            ->table( 'messages' )
-            ->where( 'id', '=', $id )
+            ->table('messages')
+            ->where('id', '=', $id)
             ->execute();
 
-        if ( ! Belt::isNumber( $updated ) ) {
+        if (! Belt::isNumber($updated)) {
             throw new DatabaseUpdateException(
                 MESSAGE,
-                $this->db()->getError() );
+                $this->db()->getError());
         }
     }
 
@@ -643,56 +667,62 @@ class Message extends Model
      * Removes any message from the specified folder that is missing
      * a message_no and unique_id. These messages were copied by the
      * client and not synced yet.
+     *
      * @param int $messageId
      * @param int $folderId
+     *
      * @throws ValidationException
      */
-    public function deleteCopiedMessages( $messageId, $folderId )
+    public function deleteCopiedMessages($messageId, $folderId)
     {
-        $this->requireInt( $folderId, 'Folder ID' );
-        $this->requireInt( $messageId, 'Message ID' );
+        $this->requireInt($folderId, 'Folder ID');
+        $this->requireInt($messageId, 'Message ID');
 
-        $message = $this->getById( $messageId );
+        $message = $this->getById($messageId);
 
-        if ( ! $message ) {
+        if (! $message) {
             throw new ValidationException(
-                "No message found when deleting copies" );
+                'No message found when deleting copies');
         }
 
         $deleted = $this->db()
             ->delete()
-            ->from( 'messages' )
-            ->whereNull( 'unique_id' )
-            ->where( 'folder_id', '=', $folderId )
-            ->where( 'thread_id', '=', $message->thread_id )
-            ->where( 'message_id', '=', $message->message_id )
-            ->where( 'account_id', '=', $message->account_id )
+            ->from('messages')
+            ->whereNull('unique_id')
+            ->where('folder_id', '=', $folderId)
+            ->where('thread_id', '=', $message->thread_id)
+            ->where('message_id', '=', $message->message_id)
+            ->where('account_id', '=', $message->account_id)
             ->execute();
 
-        return is_numeric( $deleted );
+        return is_numeric($deleted);
     }
 
     /**
      * Saves a thread ID for the given messages.
+     *
      * @param array $ids
      * @param int $threadId
+     *
      * @throws DatabaseUpdateException
+     *
      * @return int
      */
-    public function saveThreadId( $ids, $threadId )
+    public function saveThreadId($ids, $threadId)
     {
-        $this->requireArray( $ids, "IDs" );
-        $this->requireInt( $threadId, "Thread ID" );
+        $this->requireArray($ids, 'IDs');
+        $this->requireInt($threadId, 'Thread ID');
+
         $updated = $this->db()
-            ->update([ 'thread_id' => $threadId ])
-            ->table( 'messages' )
-            ->whereIn( 'id', $ids )
+            ->update(['thread_id' => $threadId])
+            ->table('messages')
+            ->whereIn('id', $ids)
             ->execute();
 
-        if ( ! Belt::isNumber( $updated ) ) {
+        if (! Belt::isNumber($updated)) {
             throw new DatabaseUpdateException(
                 MESSAGE,
-                $this->getError() );
+                $this->getError());
         }
 
         return $updated;
@@ -700,53 +730,58 @@ class Message extends Model
 
     /**
      * Takes in an array of addresses and formats them in a list.
+     *
      * @return string
      */
-    private function formatAddress( $addresses )
+    private function formatAddress($addresses)
     {
-        if ( ! is_array( $addresses ) ) {
-            return NULL;
+        if (! is_array($addresses)) {
+            return null;
         }
 
         $formatted = [];
 
-        foreach ( $addresses as $address ) {
+        foreach ($addresses as $address) {
             $formatted[] = sprintf(
-                "%s <%s>",
+                '%s <%s>',
                 $address->getName(),
-                $address->getEmail() );
+                $address->getEmail());
         }
 
-        return implode( ", ", $formatted );
+        return implode(', ', $formatted);
     }
 
     /**
      * Attachments need to be serialized. They come in as an array
      * of objects with name, path, and id fields.
+     *
      * @param Attachment array $attachments
+     *
      * @return string
      */
-    private function formatAttachments( $attachments )
+    private function formatAttachments($attachments)
     {
-        if ( ! is_array( $attachments ) ) {
-            return NULL;
+        if (! is_array($attachments)) {
+            return null;
         }
 
         $formatted = [];
 
-        foreach ( $attachments as $attachment ) {
+        foreach ($attachments as $attachment) {
             $formatted[] = $attachment->toArray();
         }
 
-        return json_encode( $formatted, JSON_UNESCAPED_SLASHES );
+        return json_encode($formatted, JSON_UNESCAPED_SLASHES);
     }
 
     /**
      * Creates a hash of the simplified subject line.
+     *
      * @param string $subject
+     *
      * @return string
      */
-    static private function makeSubjectHash( $subject )
+    private static function makeSubjectHash($subject)
     {
         $subject = trim(
             preg_replace(
@@ -755,6 +790,6 @@ class Message extends Model
                 $subject
             ));
 
-        return md5( trim( $subject, '[]()' ) );
+        return md5(trim($subject, '[]()'));
     }
 }

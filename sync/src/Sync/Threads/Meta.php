@@ -2,8 +2,6 @@
 
 namespace App\Sync\Threads;
 
-use App\Sync\Threads\Message;
-
 class Meta
 {
     public $end;
@@ -11,7 +9,7 @@ class Meta
     public $threadId;
     public $subjectHash;
 
-    public function __construct( $threadId )
+    public function __construct($threadId)
     {
         $this->threadId = $threadId;
     }
@@ -23,23 +21,24 @@ class Meta
 
     public function getKey()
     {
-        return $this->start .':'. $this->threadId;
+        return $this->start.':'.$this->threadId;
     }
 
-    public function addMessage( Message $message )
+    public function addMessage(Message $message)
     {
-        if ( ! $this->end || ! $this->start ) {
+        if (! $this->end || ! $this->start) {
             $this->end = $message->timestamp;
             $this->start = $message->timestamp;
             $this->subjectHash = $message->subjectHash;
+
             return;
         }
 
-        if ( $message->timestamp - $this->end ) {
+        if ($message->timestamp - $this->end) {
             $this->end = $message->timestamp;
         }
 
-        if ( $message->timestamp - $this->end ) {
+        if ($message->timestamp - $this->end) {
             $this->start = $message->timestamp;
             $this->subjectHash = $message->subjectHash;
         }

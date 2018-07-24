@@ -2,14 +2,10 @@
 
 namespace App;
 
-use Fn
-  , App\Daemon
-  , App\Console
-  , App\Message
-  , App\Message\StatsMessage
-  , App\Model\Folder as FolderModel
-  , App\Model\Account as AccountModel
-  , App\Model\Message as MessageModel;
+use Fn;
+use App\Message\StatsMessage;
+use App\Model\Folder as FolderModel;
+use App\Model\Account as AccountModel;
 
 /**
  * Reports statistics about the syncing process. This will
@@ -26,50 +22,50 @@ class Stats
     private $activeFolder;
     private $activeAccount;
 
-    public function __construct( Console $console )
+    public function __construct(Console $console)
     {
         $this->cli = $console->getCli();
         $this->daemon = $console->daemon;
     }
 
-    public function setAsleep( $asleep = TRUE )
+    public function setAsleep($asleep = true)
     {
         $this->asleep = $asleep;
         $this->unsetActiveFolder();
     }
 
-    public function setRunning( $running = TRUE )
+    public function setRunning($running = true)
     {
         $this->running = $running;
 
-        if ( $running && ! $this->startTime ) {
+        if ($running && ! $this->startTime) {
             $this->startTime = time();
         }
     }
 
-    public function setActiveAccount( $account )
+    public function setActiveAccount($account)
     {
         $this->activeAccount = $account;
 
-        if ( $this->daemon ) {
-            $this->json( TRUE );
+        if ($this->daemon) {
+            $this->json(true);
         }
     }
 
-    public function setActiveFolder( $folder )
+    public function setActiveFolder($folder)
     {
         $this->activeFolder = $folder;
 
-        if ( $this->daemon ) {
+        if ($this->daemon) {
             $this->json();
         }
     }
 
     public function unsetActiveFolder()
     {
-        $this->activeFolder = NULL;
+        $this->activeFolder = null;
 
-        if ( $this->daemon ) {
+        if ($this->daemon) {
             $this->json();
         }
     }
@@ -77,15 +73,17 @@ class Stats
     /**
      * Returns all of the statistics and sync status info on
      * all of the folders for all of the accounts.
+     *
      * @param array $useCache If true, use it instead of fetching.
      *   This is useful when sending the message to the client
      *   like 'update the active folder' but without needing to
      *   query for all folder statistics.
+     *
      * @return array
      */
-    public function getStats( $useCache = FALSE )
+    public function getStats($useCache = false)
     {
-        if ( $useCache === TRUE && ! is_null( $this->stats ) ) {
+        if (true === $useCache && ! is_null($this->stats)) {
             return $this->stats;
         }
 
@@ -97,27 +95,27 @@ class Stats
         $accountModel = new AccountModel;
         $accounts = $accountModel->getActive();
 
-        foreach ( $accounts as $account ) {
+        foreach ($accounts as $account) {
             $folderStats = [];
-            $folders = $folderModel->getByAccount( $account->getId() );
+            $folders = $folderModel->getByAccount($account->getId());
 
-            foreach ( $folders as $folder ) {
-                if ( $folder->isIgnored() ) {
+            foreach ($folders as $folder) {
+                if ($folder->isIgnored()) {
                     continue;
                 }
 
-                $folderStats[ $folder->getName() ] = [
+                $folderStats[$folder->getName()] = [
                     'count' => $folder->getCount(),
                     'synced' => $folder->getSynced(),
-                    'percent' => ( $folder->getSynced() > 0 )
-                        ? Fn\percent( $folder->getSynced() / $folder->getCount() )
-                        : (( $folder->getCount() > 0 )
-                            ? "0%"
-                            : "100%")
+                    'percent' => ($folder->getSynced() > 0)
+                        ? Fn\percent($folder->getSynced() / $folder->getCount())
+                        : (($folder->getCount() > 0)
+                            ? '0%'
+                            : '100%')
                 ];
             }
 
-            $stats[ $account->getEmail() ] = $folderStats;
+            $stats[$account->getEmail()] = $folderStats;
         }
 
         $this->stats = $stats;
@@ -132,29 +130,29 @@ class Stats
     {
         $stats = $this->getStats();
 
-        foreach ( $stats as $account => $folders ) {
+        foreach ($stats as $account => $folders) {
             $columns = [
-                [ 'Folder', 'Count', 'Synced', '%' ]
+                ['Folder', 'Count', 'Synced', '%']
             ];
-            $this->cli->out( $account );
+            $this->cli->out($account);
 
-            foreach ( $folders as $folderName => $folderStats ) {
+            foreach ($folders as $folderName => $folderStats) {
                 $columns[] = [
                     $folderName,
-                    $folderStats[ 'count' ],
-                    $folderStats[ 'synced' ],
-                    $folderStats[ 'percent' ]
+                    $folderStats['count'],
+                    $folderStats['synced'],
+                    $folderStats['percent']
                 ];
             }
 
-            $this->cli->columns( $columns );
+            $this->cli->columns($columns);
         }
     }
 
     /**
      * Prints the statistics as JSON to stdout.
      */
-    public function json( $useCache = FALSE )
+    public function json($useCache = false)
     {
         Message::send(
             new StatsMessage(
@@ -163,7 +161,7 @@ class Stats
                 $this->activeAccount,
                 (bool) $this->running,
                 time() - $this->startTime,
-                $this->getStats( $useCache )
+                $this->getStats($useCache)
             ));
     }
 }

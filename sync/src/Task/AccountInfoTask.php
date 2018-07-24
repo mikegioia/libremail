@@ -2,13 +2,12 @@
 
 namespace App\Task;
 
-use App\Task
-  , App\Message
-  , App\Task\AbstractTask
-  , App\Server\StatsServer
-  , App\Message\AccountInfoMessage
-  , App\Message\NotificationMessage
-  , App\Model\Account as AccountModel;
+use App\Task;
+use App\Message;
+use App\Server\StatsServer;
+use App\Message\AccountInfoMessage;
+use App\Message\NotificationMessage;
+use App\Model\Account as AccountModel;
 
 class AccountInfoTask extends AbstractTask
 {
@@ -17,25 +16,26 @@ class AccountInfoTask extends AbstractTask
 
     /**
      * Returns info about the account.
-     * @param StatsServer $server Optional server interface to
-     *   broadcast messages to.
+     *
+     * @param StatsServer $server optional server interface to
+     *   broadcast messages to
      */
-    public function run( StatsServer $server = NULL )
+    public function run(StatsServer $server = null)
     {
-        $account = (new AccountModel)->getByEmail( $this->email );
+        $account = (new AccountModel)->getByEmail($this->email);
 
-        if ( ! $account ) {
+        if (! $account) {
             Message::send(
                 new NotificationMessage(
                     STATUS_ERROR,
-                    "That account could not be found." ),
-                $server );
+                    'That account could not be found.'),
+                $server);
 
-            return FALSE;
+            return false;
         }
 
-        Message::send( new AccountInfoMessage( $account ), $server );
+        Message::send(new AccountInfoMessage($account), $server);
 
-        return TRUE;
+        return true;
     }
 }

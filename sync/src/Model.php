@@ -2,40 +2,40 @@
 
 namespace App;
 
-use Monolog\Logger
-  , Pimple\Container
-  , Slim\PDO\Database
-  , League\CLImate\CLImate
-  , Particle\Validator\Validator;
+use Monolog\Logger;
+use Pimple\Container;
+use Slim\PDO\Database;
+use League\CLImate\CLImate;
+use Particle\Validator\Validator;
 
 class Model
 {
-    static protected $db;
-    static protected $di;
-    static protected $cli;
-    static protected $log;
-    static protected $config;
+    protected static $db;
+    protected static $di;
+    protected static $cli;
+    protected static $log;
+    protected static $config;
 
     const ASC = 'asc';
     const DESC = 'desc';
 
     /**
-     * @var bool Mode for returning new DB instance.
+     * @var bool mode for returning new DB instance
      */
-    static protected $factoryMode = FALSE;
+    protected static $factoryMode = false;
 
     /**
-     * @var Database Local reference if in factory mode.
+     * @var Database local reference if in factory mode
      */
-    static protected $localDb;
+    protected static $localDb;
 
-    public function __construct( $data = NULL )
+    public function __construct($data = null)
     {
-        if ( ! $data ) {
+        if (! $data) {
             return;
         }
 
-        $this->setData( $data );
+        $this->setData($data);
     }
 
     /**
@@ -46,9 +46,9 @@ class Model
         return [];
     }
 
-    public function setData( $data )
+    public function setData($data)
     {
-        foreach ( $data as $key => $value ) {
+        foreach ($data as $key => $value) {
             $this->$key = $value;
         }
     }
@@ -57,30 +57,30 @@ class Model
      * Sets the internal database connection statically for all
      * models to use.
      */
-    static function setDb( Database $db )
+    public static function setDb(Database $db)
     {
         self::$db = $db;
     }
 
-    static function setCLI( CLImate $cli )
+    public static function setCLI(CLImate $cli)
     {
         self::$cli = $cli;
     }
 
-    static function setLog( Logger $log )
+    public static function setLog(Logger $log)
     {
         self::$log = $log;
     }
 
-    static function setConfig( array $config )
+    public static function setConfig(array $config)
     {
         self::$config = $config;
     }
 
-    static function setDbFactory( Container $di )
+    public static function setDbFactory(Container $di)
     {
         self::$di = $di;
-        self::$factoryMode = TRUE;
+        self::$factoryMode = true;
     }
 
     public function db()
@@ -88,14 +88,14 @@ class Model
         return self::getDb();
     }
 
-    static public function getDb()
+    public static function getDb()
     {
-        if ( self::$factoryMode === TRUE ) {
-            if ( isset( self::$localDb ) ) {
+        if (true === self::$factoryMode) {
+            if (isset(self::$localDb)) {
                 return self::$localDb;
             }
 
-            self::$localDb = self::$di[ 'db_factory' ];
+            self::$localDb = self::$di['db_factory'];
 
             return self::$localDb;
         }
@@ -105,7 +105,7 @@ class Model
 
     public function ping()
     {
-        $this->db()->query( 'SELECT 1;' );
+        $this->db()->query('SELECT 1;');
     }
 
     public function cli()
@@ -121,43 +121,45 @@ class Model
     /**
      * If a key came in, return the config value. The key is of
      * the form some.thing and will be exploded on the period.
+     *
      * @param string $key Optional key to lookup
+     *
      * @return mixed | array
      */
-    public function config( $key = '' )
+    public function config($key = '')
     {
-        if ( ! $key ) {
+        if (! $key) {
             return self::$config;
         }
 
         $lookup = self::$config;
 
-        foreach ( explode( '.', $key ) as $part ) {
-            if ( ! isset( $lookup[ $part ] ) ) {
-                return NULL;
+        foreach (explode('.', $key) as $part) {
+            if (! isset($lookup[$part])) {
+                return null;
             }
 
-            $lookup = $lookup[ $part ];
+            $lookup = $lookup[$part];
         }
 
         return $lookup;
     }
 
-    public function getErrorString( Validator $validator, $message )
+    public function getErrorString(Validator $validator, $message)
     {
         $return = [];
         $messages = $validator->getMessages();
 
-        foreach ( $messages as $key => $messages ) {
-            $return = array_merge( $return, array_values( $messages ) );
+        foreach ($messages as $key => $messages) {
+            $return = array_merge($return, array_values($messages));
         }
 
         return trim(
             sprintf(
                 "%s\n\n%s",
                 $message,
-                implode( "\n", $return )
+                implode("\n", $return)
             ),
-            ". \t\n\r\0\x0B" ) .".";
+            ". \t\n\r\0\x0B").'.';
     }
 }

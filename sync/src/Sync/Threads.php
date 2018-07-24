@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Groups messages into threads. This process runs in O(2n).
+ * Groups messages into threads. This process runs in O(n).
  *
  * Pass 1: Load all messages from database and bucket by
  *   message-id. Store all references.
@@ -9,6 +9,11 @@
  *   and compact the union of references on all messages,
  *   along with the lowest numbered internal ID as the
  *   thread ID.
+ * Pass 3: Run through all thread collections and connect
+ *   any messages that have the same subject are are within
+ *   a certain window of time.
+ * Pass 4: Iterate over each thread and save it to the
+ *   database if anything has changed.
  */
 
 namespace App\Sync;
@@ -61,7 +66,7 @@ class Threads
      * @param CLImate $cli
      * @param bool $interactive
      */
-    public function __construct( Logger $log, CLImate $cli, $interactive )
+    public function __construct(Logger $log, CLImate $cli, $interactive)
     {
         $this->log = $log;
         $this->cli = $cli;
@@ -73,13 +78,14 @@ class Threads
      * than the one we have in the cache, then start over. This should
      * either be set up to handle multiple accounts, or the sync script
      * should not run for multiple accounts on the same process.
+     *
      * @param AccountModel $account
      * @param Emitter $emitter
      */
-    public function run( AccountModel $account, Emitter $emitter )
+    public function run(AccountModel $account, Emitter $emitter)
     {
-        if ( ! $this->account || $account->id !== $this->account->id ) {
-            $this->maxId = NULL;
+        if (! $this->account || $account->id !== $this->account->id) {
+            $this->maxId = null;
             $this->totalIds = 0;
             $this->currentId = 0;
             $this->messages = [];
@@ -92,14 +98,12 @@ class Threads
         $this->storeMessageIdBounds();
         $this->storeTotalMessageIds();
 
-        // Pass 1
-        if ( ! $this->messages || $this->currentId < $this->maxId ) {
+        if (! $this->messages || $this->currentId < $this->maxId) {
             $this->storeMessages();
         }
 
-        // Pass 2
         $this->updateThreadIds();
-        // Pass 3
+        //$this->combineThreads();
         $this->commitThreadIds();
     }
 
@@ -109,22 +113,22 @@ class Threads
     private function storeMessageIdBounds()
     {
         $model = new MessageModel;
-        $this->maxId = $model->getMaxMessageId( $this->account->id );
+        $this->maxId = $model->getMaxMessageId($this->account->id);
 
-        if ( ! $this->currentId ) {
-            $this->currentId = $model->getMinMessageId( $this->account->id );
+        if (! $this->currentId) {
+            $this->currentId = $model->getMinMessageId($this->account->id);
         }
     }
 
     private function storeTotalMessageIds()
     {
-        $this->totalIds = (new MessageModel)->countByAccount( $this->account->id );
+        $this->totalIds = (new MessageModel)->countByAccount($this->account->id);
     }
 
     private function updateEmitter()
     {
-        $this->emitter->on( self::EVENT_MESSAGE_DIRTY, function ( $id ) {
-            $this->dirtyMessageIds[ $id ] = TRUE;
+        $this->emitter->on(self::EVENT_MESSAGE_DIRTY, function ($id) {
+            $this->dirtyMessageIds[$id] = true;
         });
     }
 
@@ -132,6 +136,7 @@ class Threads
      * Load all messages, or any new messages, from the database into
      * the internal storage array. This will instantiate a new message
      * object and store the references for that message.
+     *
      * @param AccountModel $account
      */
     private function storeMessages()
@@ -142,50 +147,51 @@ class Threads
         $total = $this->maxId - $minId;
         $messageModel = new MessageModel;
         $this->log->debug(
-            "Storing messages for threading for {$this->account->email}" );
+            "Storing messages for threading for {$this->account->email}");
         $this->printMemory();
-        $this->startProgress( 1, $total );
+        $this->startProgress(1, $total);
 
-        for ( $minId; $minId < $this->maxId; $minId += self::BATCH_SIZE ) {
+        for ($minId; $minId < $this->maxId; $minId += self::BATCH_SIZE) {
             $messages = $messageModel->getRangeForThreading(
                 $this->account->id,
                 $minId,
                 $this->maxId,
-                self::BATCH_SIZE );
+                self::BATCH_SIZE);
 
-            foreach ( $messages as $message ) {
-                $currentId++;
-                $this->storeMessage( $message );
-                $this->updateProgress( ++$count, $total );
+            foreach ($messages as $message) {
+                ++$currentId;
+                $this->storeMessage($message);
+                $this->updateProgress(++$count, $total);
             }
 
             $this->currentId = $currentId - 1;
-            $this->emitter->emit( Sync::EVENT_CHECK_HALT );
+            $this->emitter->emit(Sync::EVENT_CHECK_HALT);
             $this->account->ping();
         }
 
         $this->printMemory();
         $this->account->ping();
-        $this->emitter->emit( Sync::EVENT_GARBAGE_COLLECT );
+        $this->emitter->emit(Sync::EVENT_GARBAGE_COLLECT);
     }
 
     /**
      * Stores a new message into the internal array.
+     *
      * @param MessageModel $message
      */
-    private function storeMessage( MessageModel $message )
+    private function storeMessage(MessageModel $message)
     {
-        $threadMessage = new ThreadMessage( $message );
+        $threadMessage = new ThreadMessage($message);
         $messageId = $threadMessage->messageId;
 
-        if ( isset( $this->messages[ $messageId ] ) ) {
-            $existingMessage = $this->messages[ $messageId ];
-            $existingMessage->merge( $threadMessage );
-            $this->messages[ $messageId ] = $existingMessage;
+        if (isset($this->messages[$messageId])) {
+            $existingMessage = $this->messages[$messageId];
+            $existingMessage->merge($threadMessage);
+            $this->messages[$messageId] = $existingMessage;
         }
         else {
             $this->unthreaded[] = $messageId;
-            $this->messages[ $messageId ] = $threadMessage;
+            $this->messages[$messageId] = $threadMessage;
         }
     }
 
@@ -195,59 +201,57 @@ class Threads
     private function updateThreadIds()
     {
         $count = 0;
-        $total = count( $this->messages );
-        $noun = Fn\plural( 'message', $total );
+        $total = count($this->messages);
+        $noun = Fn\plural('message', $total);
         $this->log->debug(
-            "Threading {$total} {$noun} for {$this->account->email}" );
+            "Threading {$total} {$noun} for {$this->account->email}");
         $this->printMemory();
 
-        if ( $this->interactive ) {
-            $this->cli->whisper( "Threading Pass 2" );
+        if ($this->interactive) {
+            $this->cli->whisper('Threading Pass 2');
         }
 
-        foreach ( $this->unthreaded as $unthreadedId ) {
-            $count++;
+        foreach ($this->unthreaded as $unthreadedId) {
+            ++$count;
             $refs = [];
             $processed = [];
-            $threadId = NULL;
-            $message = $this->messages[ $unthreadedId ];
-            $this->updateMessageThread( $message, $refs, $processed, $threadId );
+            $threadId = null;
+            $message = $this->messages[$unthreadedId];
+            $this->updateMessageThread($message, $refs, $processed, $threadId);
 
-            if ( $count % self::BATCH_SIZE === 0 ) {
+            if (0 === $count % self::BATCH_SIZE) {
                 $this->printMemory();
                 $this->account->ping();
-                $this->log->debug( "{$count} of {$total} threaded" );
-                $this->emitter->emit( Sync::EVENT_CHECK_HALT );
-                $this->emitter->emit( Sync::EVENT_GARBAGE_COLLECT );
+                $this->log->debug("{$count} of {$total} threaded");
+                $this->emitter->emit(Sync::EVENT_CHECK_HALT);
+                $this->emitter->emit(Sync::EVENT_GARBAGE_COLLECT);
             }
 
-            if ( ! $threadId && ! $refs ) {
+            if (! $threadId && ! $refs) {
                 continue;
             }
 
-            // Use this for subject threading (not done)
-            // $threadMeta = new ThreadMeta( $threadId );
+            // This class prepares fields used for subject threading
+            $threadMeta = new ThreadMeta($threadId);
 
             // Update all processed messages with this set of references,
             // and store an index with information about each thread. This
             // index will be used for the final thread pass (subject line).
-            foreach ( $refs as $messageId => $index ) {
-                $message = $this->messages[ $messageId ];
-                $message->setThreadId( $threadId );
-                // Un-comment for subject threading
-                // $threadMeta->addMessage( $message );
+            foreach ($refs as $messageId => $index) {
+                $message = $this->messages[$messageId];
+                $message->setThreadId($threadId);
+                $threadMeta->addMessage($message);
             }
 
             // Set the indexes with this thread meta info
-            // Uncomment form subject threading
-            // if ( $threadMeta->exists() ) {
-            //     $key = $threadMeta->getKey();
-            //     $hash = $threadMeta->subjectHash;
-            //     $this->threadMeta[ $threadId ] = $threadMeta;
-            //     $this->subjectHashes[ $hash ][ $key ] = $threadId;
-            // }
+            if ($threadMeta->exists()) {
+                $key = $threadMeta->getKey();
+                $hash = $threadMeta->subjectHash;
+                $this->threadMeta[$threadId] = $threadMeta;
+                $this->subjectHashes[$hash][$key] = $threadId;
+            }
         }
-
+print_r($this->threadMeta);
         // Clear the unthreaded array
         $this->unthreaded = [];
     }
@@ -255,6 +259,7 @@ class Threads
     /**
      * Recurses through the message's references and builds an array
      * of all references across all known messages.
+     *
      * @param ThreadMessage $message
      * @param array $refs Master list of common message IDs
      * @param array $processed List of processed message IDs
@@ -264,42 +269,42 @@ class Threads
         ThreadMessage $message,
         array &$refs,
         array &$processed,
-        &$threadId )
-    {
-        if ( ! $threadId
-            || ( $message->getThreadId()
-                && $message->getThreadId() < $threadId ) )
+        &$threadId
+    ) {
+        if (! $threadId
+            || ($message->getThreadId()
+                && $message->getThreadId() < $threadId))
         {
             $threadId = $message->getThreadId();
         }
 
-        if ( isset( $this->allProcessed[ $message->messageId ] ) ) {
+        if (isset($this->allProcessed[$message->messageId])) {
             return;
         }
 
-        $refs = $message->addReferences( $refs );
-        $processed[ $message->messageId ] = TRUE;
-        $this->allProcessed[ $message->messageId ] = TRUE;
+        $refs = $message->addReferences($refs);
+        $processed[$message->messageId] = true;
+        $this->allProcessed[$message->messageId] = true;
 
         // For each reference, add it's references to our set
         // and then recursively process it.
-        foreach ( $message->references as $refId => $index ) {
-            if ( ! isset( $this->messages[ $refId ] ) ) {
-                $this->messages[ $refId ] = new ThreadMessage(
+        foreach ($message->references as $refId => $index) {
+            if (! isset($this->messages[$refId])) {
+                $this->messages[$refId] = new ThreadMessage(
                     new MessageModel([
-                        'id' => NULL,
+                        'id' => null,
                         'references' => '',
-                        'thread_id' => NULL,
+                        'thread_id' => null,
                         'in_reply_to' => '',
                         'message_id' => $refId
                     ]));
             }
 
             $this->updateMessageThread(
-                $this->messages[ $refId ],
+                $this->messages[$refId],
                 $refs,
                 $processed,
-                $threadId );
+                $threadId);
         }
     }
 
@@ -310,69 +315,69 @@ class Threads
     {
         $count = 0;
         $updateCount = 0;
-        $transactionStarted = FALSE;
+        $transactionStarted = false;
         $messageModel = new MessageModel;
-        $total = count( $this->messages );
+        $total = count($this->messages);
         $this->log->debug(
-            "Saving new thread IDs for {$this->account->email}" );
+            "Saving new thread IDs for {$this->account->email}");
         $this->printMemory();
-        $this->startProgress( 3, $total );
+        $this->startProgress(3, $total);
 
-        foreach ( $this->messages as $message ) {
-            if ( $message->hasUpdate() ) {
-                $updateCount += count( $message->ids );
+        foreach ($this->messages as $message) {
+            if ($message->hasUpdate()) {
+                $updateCount += count($message->ids);
             }
 
-            if ( $updateCount && ! $transactionStarted ) {
+            if ($updateCount && ! $transactionStarted) {
                 $messageModel->db()->beginTransaction();
-                $transactionStarted = TRUE;
+                $transactionStarted = true;
             }
 
-            $message->save( $messageModel );
+            $message->save($messageModel);
 
             // After we get enough to make, commit them
-            if ( $updateCount > self::BATCH_SIZE ) {
+            if ($updateCount > self::BATCH_SIZE) {
                 $messageModel->db()->commit();
-                $transactionStarted = FALSE;
+                $transactionStarted = false;
                 $updateCount = 0;
             }
 
-            $this->updateProgress( ++$count, $total );
+            $this->updateProgress(++$count, $total);
 
-            if ( $count % self::BATCH_SIZE === 0 ) {
-                $this->emitter->emit( Sync::EVENT_CHECK_HALT );
-                $this->emitter->emit( Sync::EVENT_GARBAGE_COLLECT );
+            if (0 === $count % self::BATCH_SIZE) {
+                $this->emitter->emit(Sync::EVENT_CHECK_HALT);
+                $this->emitter->emit(Sync::EVENT_GARBAGE_COLLECT);
             }
         }
 
-        if ( $transactionStarted ) {
+        if ($transactionStarted) {
             $messageModel->db()->commit();
         }
     }
 
-    private function startProgress( $pass, $total )
+    private function startProgress($pass, $total)
     {
-        if ( $this->interactive ) {
-            $noun = Fn\plural( 'message', $total );
-            $this->cli->whisper( "Threading Pass {$pass}" );
+        if ($this->interactive) {
+            $noun = Fn\plural('message', $total);
+            $this->cli->whisper("Threading Pass {$pass}");
             $this->cli->whisper(
-                "Processing {$total} {$noun} for {$this->account->getEmail()}:" );
-            $this->progress = $this->cli->progress()->total( 100 );
+                "Processing {$total} {$noun} for {$this->account->getEmail()}:");
+            $this->progress = $this->cli->progress()->total(100);
         }
     }
 
-    private function updateProgress( $count, $total )
+    private function updateProgress($count, $total)
     {
-        if ( $this->interactive && $count <= $total ) {
-            $this->progress->current( ( $count / $total ) * 100 );
+        if ($this->interactive && $count <= $total) {
+            $this->progress->current(($count / $total) * 100);
         }
     }
 
     private function printMemory()
     {
         $this->log->debug(
-            "Memory usage: ". Fn\formatBytes( memory_get_usage() ) .
-            ", real usage: ". Fn\formatBytes( memory_get_usage( TRUE ) ) .
-            ", peak usage: ". Fn\formatBytes( memory_get_peak_usage() ) );
+            'Memory usage: '.Fn\formatBytes(memory_get_usage()).
+            ', real usage: '.Fn\formatBytes(memory_get_usage(true)).
+            ', peak usage: '.Fn\formatBytes(memory_get_peak_usage()));
     }
 }

@@ -44,14 +44,14 @@ class Folder extends Model
 
     public function getCount()
     {
-        return ( $this->count )
+        return $this->count
             ? (int) $this->count
             : 0;
     }
 
     public function getSynced()
     {
-        return ( $this->synced )
+        return $this->synced
             ? (int) $this->synced
             : 0;
     }
@@ -63,48 +63,50 @@ class Folder extends Model
 
     public function isIgnored()
     {
-        return Fn\intEq( $this->ignored, 1 );
+        return Fn\intEq($this->ignored, 1);
     }
 
     /**
      * Create a new folder record. Updates a folder to be active
      * if it exists in the system already.
+     *
      * @param array $data
+     *
      * @throws ValidationException
      * @throws DatabaseUpdateException
      * @throws DatabaseInsertException
      */
-    public function save( $data = [] )
+    public function save($data = [])
     {
         $val = new Validator;
-        $val->optional( 'count', 'Count' )->integer();
-        $val->optional( 'ignored', 'Ignored' )->numeric();
-        $val->optional( 'synced', 'Synced count' )->numeric();
-        $val->required( 'account_id', 'Account ID' )->numeric();
-        $val->required( 'name', 'Name' )->lengthBetween( 0, 255 );
-        $this->setData( $data );
+        $val->optional('count', 'Count')->integer();
+        $val->optional('ignored', 'Ignored')->numeric();
+        $val->optional('synced', 'Synced count')->numeric();
+        $val->required('account_id', 'Account ID')->numeric();
+        $val->required('name', 'Name')->lengthBetween(0, 255);
+        $this->setData($data);
         $data = $this->getData();
 
-        if ( ! $val->validate( $data ) ) {
+        if (! $val->validate($data)) {
             throw new ValidationException(
                 $this->getErrorString(
                     $val,
-                    "This folder is missing required data."
+                    'This folder is missing required data.'
                 ));
         }
 
         // Check if this folder exists
         $exists = $this->db()
             ->select()
-            ->from( 'folders' )
-            ->where( 'deleted', '=', 0 )
-            ->where( 'name', '=', $this->name )
-            ->where( 'account_id', '=', $this->account_id )
+            ->from('folders')
+            ->where('deleted', '=', 0)
+            ->where('name', '=', $this->name)
+            ->where('account_id', '=', $this->account_id)
             ->execute()
             ->fetchObject();
 
         // If it exists, unset deleted
-        if ( $exists ) {
+        if ($exists) {
             $this->deleted = 0;
             $this->id = $exists->id;
             $this->ignored = $exists->ignored;
@@ -114,29 +116,29 @@ class Folder extends Model
                     'count' => $this->getCount(),
                     'synced' => $this->getSynced()
                 ])
-                ->table( 'folders' )
-                ->where( 'id', '=', $this->id )
+                ->table('folders')
+                ->where('id', '=', $this->id)
                 ->execute();
 
-            if ( $updated === FALSE ) {
-                throw new DatabaseUpdateException( FOLDER );
+            if (false === $updated) {
+                throw new DatabaseUpdateException(FOLDER);
             }
 
             return;
         }
 
         $createdAt = new DateTime;
-        unset( $data[ 'id' ] );
-        $data[ 'deleted' ] = 0;
-        $data[ 'created_at' ] = $createdAt->format( DATE_DATABASE );
+        unset($data['id']);
+        $data['deleted'] = 0;
+        $data['created_at'] = $createdAt->format(DATE_DATABASE);
         $newFolderId = $this->db()
-            ->insert( array_keys( $data ) )
-            ->into( 'folders' )
-            ->values( array_values( $data ) )
+            ->insert(array_keys($data))
+            ->into('folders')
+            ->values(array_values($data))
             ->execute();
 
-        if ( ! $newFolderId ) {
-            throw new DatabaseInsertException( FOLDER );
+        if (! $newFolderId) {
+            throw new DatabaseInsertException(FOLDER);
         }
 
         $this->id = $newFolderId;
@@ -149,12 +151,12 @@ class Folder extends Model
             ->update([
                 'deleted' => 1
             ])
-            ->table( 'folders' )
-            ->where( 'id', '=', $this->id )
+            ->table('folders')
+            ->where('id', '=', $this->id)
             ->execute();
 
-        if ( $updated === FALSE ) {
-            throw new DatabaseUpdateException( FOLDER );
+        if (false === $updated) {
+            throw new DatabaseUpdateException(FOLDER);
         }
     }
 
@@ -162,11 +164,13 @@ class Folder extends Model
      * Stores the meta information about the folder. This includes
      * the total count of messages on the IMAP server, and the
      * count of messages confirmed to be synced in our database.
-     * @param integer $count
-     * @param integer $synced
-     * @return boolean
+     *
+     * @param int $count
+     * @param int $synced
+     *
+     * @return bool
      */
-    public function saveStats( $count, $synced )
+    public function saveStats($count, $synced)
     {
         $this->count = $count;
         $this->synced = $synced;
@@ -176,26 +180,28 @@ class Folder extends Model
 
     /**
      * Finds a folder by account and name.
+     *
      * @param int $accountId
      * @param string $name
      * @param bool $failOnNotFound If set, throw an Exception when
      *   the folder isn't found
+     *
      * @return bool | FolderModel
      */
-    public function getByName( $accountId, $name, $failOnNotFound = FALSE )
+    public function getByName($accountId, $name, $failOnNotFound = false)
     {
-        $this->requireInt( $accountId, "Account ID" );
-        $this->requireString( $name, "Folder name" );
+        $this->requireInt($accountId, 'Account ID');
+        $this->requireString($name, 'Folder name');
 
         $folder = $this->db()
             ->select()
-            ->from( 'folders' )
-            ->where( 'name', '=', $name )
-            ->where( 'account_id', '=', $accountId )
+            ->from('folders')
+            ->where('name', '=', $name)
+            ->where('account_id', '=', $accountId)
             ->execute()
-            ->fetchObject( $this->getClass() );
+            ->fetchObject($this->getClass());
 
-        $this->handleNotFound( $folder, FOLDER, $failOnNotFound );
+        $this->handleNotFound($folder, FOLDER, $failOnNotFound);
 
         return $folder;
     }
@@ -203,31 +209,33 @@ class Folder extends Model
     /**
      * Returns a list of folders by an account ID. This is useful for
      * comparing the new folders against the already saved ones.
+     *
      * @param int $accountId
      * @param bool $indexByName Return array indexed by folder name
+     *
      * @return FolderModel array
      */
-    public function getByAccount( $accountId, $indexByName = TRUE )
+    public function getByAccount($accountId, $indexByName = true)
     {
         $indexed = [];
-        $this->requireInt( $accountId, "Account ID" );
+        $this->requireInt($accountId, 'Account ID');
         $folders = $this->db()
             ->select()
-            ->from( 'folders' )
-            ->where( 'deleted', '=', 0 )
-            ->where( 'account_id', '=', $accountId )
+            ->from('folders')
+            ->where('deleted', '=', 0)
+            ->where('account_id', '=', $accountId)
             ->execute()
-            ->fetchAll( PDO::FETCH_CLASS, $this->getClass() );
+            ->fetchAll(PDO::FETCH_CLASS, $this->getClass());
 
-        if ( ! $indexByName ) {
+        if (! $indexByName) {
             return $folders;
         }
 
-        foreach ( $folders as $folder ) {
-            $indexed[ $folder->getName() ] = $folder;
+        foreach ($folders as $folder) {
+            $indexed[$folder->getName()] = $folder;
         }
 
-        ksort( $indexed );
+        ksort($indexed);
 
         return $indexed;
     }

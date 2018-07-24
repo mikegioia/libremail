@@ -2,10 +2,9 @@
 
 namespace App;
 
-use App\Daemon
-  , Pimple\Container
-  , App\Message\PidMessage
-  , App\Model\Account as AccountModel;
+use Pimple\Container;
+use App\Message\PidMessage;
+use App\Model\Account as AccountModel;
 
 /**
  * Runs at the start of the application and performs various
@@ -16,48 +15,48 @@ class Startup
     private $log;
     private $console;
 
-    public function __construct( Container $di )
+    public function __construct(Container $di)
     {
-        $this->console = $di[ 'console' ];
-        $this->log = $di[ 'log' ]->getLogger();
+        $this->console = $di['console'];
+        $this->log = $di['log']->getLogger();
     }
 
     public function run()
     {
-        $this->log->debug( "Starting sync engine" );
-        $this->log->info( "Process ID: ". getmypid() );
+        $this->log->debug('Starting sync engine');
+        $this->log->info('Process ID: '.getmypid());
 
-        if ( $this->console->daemon ) {
-            Message::send( new PidMessage( getmypid() ) );
+        if ($this->console->daemon) {
+            Message::send(new PidMessage(getmypid()));
         }
 
         $this->checkIfAccountsExist();
 
-        if ( $this->console->sleep === TRUE ) {
+        if (true === $this->console->sleep) {
             $this->log->warn(
-                "Sleep mode enabled. I will only respond to signals." );
+                'Sleep mode enabled. I will only respond to signals.');
             $this->log->warn(
-                "Run 'kill -SIGQUIT ". getmypid() . "' to exit!" );
+                "Run 'kill -SIGQUIT ".getmypid()."' to exit!");
         }
     }
 
     public function runServer()
     {
-        $this->log->debug( "Starting socket server" );
-        $this->log->info( "Process ID: ". getmypid() );
+        $this->log->debug('Starting socket server');
+        $this->log->info('Process ID: '.getmypid());
 
-        if ( $this->console->daemon ) {
-            Message::send( new PidMessage( getmypid() ) );
+        if ($this->console->daemon) {
+            Message::send(new PidMessage(getmypid()));
         }
     }
 
     public function runInbox()
     {
-        $this->log->debug( "Starting inbox engine" );
-        $this->log->info( "Process ID: ". getmypid() );
+        $this->log->debug('Starting inbox engine');
+        $this->log->info('Process ID: '.getmypid());
 
-        if ( $this->console->daemon ) {
-            Message::send( new PidMessage( getmypid() ) );
+        if ($this->console->daemon) {
+            Message::send(new PidMessage(getmypid()));
         }
 
         $this->checkIfAccountsExist();
@@ -73,8 +72,8 @@ class Startup
         $accountModel = new AccountModel;
         $accounts = $accountModel->getActive();
 
-        if ( ! $accounts ) {
-            if ( $this->console->interactive ) {
+        if (! $accounts) {
+            if ($this->console->interactive) {
                 $this->console->createNewAccount();
             }
         }

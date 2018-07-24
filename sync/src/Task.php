@@ -16,26 +16,34 @@ class Task
 
     /**
      * Takes in a type and a data array and makes a new Task.
-     * @param String $type
-     * @param Object $data
+     *
+     * @param string $type
+     * @param object $data
+     *
      * @throws Exception
+     *
      * @return AbstractTask
      */
-    static public function make( $type, $data )
+    public static function make($type, $data)
     {
-        switch ( $type ) {
+        switch ($type) {
             case self::SAVE_ACCOUNT:
-                Fn\expects( $data )->toHave([ 'email', 'password' ]);
-                return new SaveAccountTask( $data );
+                Fn\expects($data)->toHave(['email', 'password']);
+
+                return new SaveAccountTask($data);
+
             case self::ACCOUNT_INFO:
-                Fn\expects( $data )->toHave([ 'email' ]);
-                return new AccountInfoTask( $data );
+                Fn\expects($data)->toHave(['email']);
+
+                return new AccountInfoTask($data);
+
             case self::REMOVE_ACCOUNT:
-                Fn\expects( $data )->toHave([ 'email' ]);
-                return new RemoveAccountTask( $data );
+                Fn\expects($data)->toHave(['email']);
+
+                return new RemoveAccountTask($data);
         }
 
         throw new Exception(
-            "Invalid task type passed to Task::make" );
+            'Invalid task type passed to Task::make');
     }
 }

@@ -3,14 +3,9 @@
 namespace App;
 
 use Fn;
-use App\Log;
-use App\Sync;
 use Exception;
-use App\Daemon;
-use App\Message;
 use PDOException;
 use Pimple\Container;
-use League\CLImate\CLImate;
 use App\Message\ErrorMessage;
 use App\Message\DiagnosticsMessage;
 use App\Model\Migration as MigrationModel;
@@ -29,18 +24,20 @@ class Diagnostics
 
     /**
      * Statically set config used in static methods.
+     *
      * @var array
      */
-    static private $config;
+    private static $config;
 
     /**
      * Stores tests, their error messages, and statuses.
+     *
      * @var array
      */
     private $tests;
 
     /**
-     * Test name constants
+     * Test name constants.
      */
     const TEST_DB_CONN = 'db_conn';
     const TEST_LOG_PATH = 'log_path';
@@ -48,58 +45,54 @@ class Diagnostics
     const TEST_MAX_PACKET = 'max_packet';
     const TEST_ATTACH_PATH = 'attach_path';
 
-    public function __construct( Container $di )
+    public function __construct(Container $di)
     {
         $this->di = $di;
-        $this->cli = $di[ 'cli' ];
-        $this->console = $di[ 'console' ];
-        $this->log = $di[ 'log' ]->getLogger();
+        $this->cli = $di['cli'];
+        $this->console = $di['console'];
+        $this->log = $di['log']->getLogger();
         $this->tests = [
             self::TEST_LOG_PATH => [
                 'code' => 1,
-                'status' => NULL,
-                'message' => NULL,
+                'status' => null,
+                'message' => null,
                 'name' => 'log path is writable',
-                'suggestion' =>
-                    'Check the permissions on the logging directory.'
+                'suggestion' => 'Check the permissions on the logging directory.'
             ],
             self::TEST_DB_CONN => [
                 'code' => 2,
-                'status' => NULL,
-                'message' => NULL,
+                'status' => null,
+                'message' => null,
                 'name' => 'database connection is alive',
-                'suggestion' =>
-                    'Make sure your SQL username and password are correct and '.
+                'suggestion' => 'Make sure your SQL username and password are correct and '.
                     'that you have a SQL database running.'
             ],
             self::TEST_DB_EXISTS => [
                 'code' => 3,
-                'status' => NULL,
-                'message' => NULL,
+                'status' => null,
+                'message' => null,
                 'name' => 'database was created',
                 'suggestion' => 'You probably need to create the SQL database.'
             ],
             self::TEST_MAX_PACKET => [
                 'code' => 4,
-                'status' => NULL,
-                'message' => NULL,
+                'status' => null,
+                'message' => null,
                 'name' => 'max_allowed_packet is safe',
-                'suggestion' =>
-                    'Update your max_allowed_packet in your SQL config file.'
+                'suggestion' => 'Update your max_allowed_packet in your SQL config file.'
             ],
             self::TEST_ATTACH_PATH => [
                 'code' => 5,
-                'status' => NULL,
-                'message' => NULL,
+                'status' => null,
+                'message' => null,
                 'name' => 'attachment path is writable',
-                'suggestion' =>
-                    'Check the permissions on the attachment directory. This '.
+                'suggestion' => 'Check the permissions on the attachment directory. This '.
                     'directory is needed to save file attachments from your emails.'
             ]
         ];
 
         // Set the config statically
-        self::$config = $di[ 'config' ];
+        self::$config = $di['config'];
     }
 
     /**
@@ -117,8 +110,8 @@ class Diagnostics
         $this->testAttachmentPathWritable();
         $this->finish();
 
-        if ( $this->console->diagnostics ) {
-            exit( 0 );
+        if ($this->console->diagnostics) {
+            exit(0);
         }
     }
 
@@ -141,15 +134,15 @@ class Diagnostics
      */
     public function testLogPathWritable()
     {
-        $this->startTest( self::TEST_LOG_PATH );
+        $this->startTest(self::TEST_LOG_PATH);
 
         try {
-            $path = Log::preparePath( self::$config[ 'log' ][ 'path' ] );
-            Log::checkLogPath( FALSE, $path );
-            $this->endTest( STATUS_SUCCESS, self::TEST_LOG_PATH );
+            $path = Log::preparePath(self::$config['log']['path']);
+            Log::checkLogPath(false, $path);
+            $this->endTest(STATUS_SUCCESS, self::TEST_LOG_PATH);
         }
-        catch ( LogPathNotWriteableException $e ) {
-            $this->endTest( STATUS_ERROR, self::TEST_LOG_PATH, $e );
+        catch (LogPathNotWriteableException $e) {
+            $this->endTest(STATUS_ERROR, self::TEST_LOG_PATH, $e);
         }
     }
 
@@ -158,21 +151,21 @@ class Diagnostics
      */
     public function testDatabaseConnection()
     {
-        $this->startTest( self::TEST_DB_CONN );
+        $this->startTest(self::TEST_DB_CONN);
 
         try {
-            $dbConfig = self::$config[ 'sql' ];
-            $dbConfig[ 'database' ] = '';
-            $dbFactory = $this->di->raw( 'db_factory' );
-            $db = $dbFactory( $this->di, $dbConfig );
-            $this->endTest( STATUS_SUCCESS, self::TEST_DB_CONN );
+            $dbConfig = self::$config['sql'];
+            $dbConfig['database'] = '';
+            $dbFactory = $this->di->raw('db_factory');
+            $db = $dbFactory($this->di, $dbConfig);
+            $this->endTest(STATUS_SUCCESS, self::TEST_DB_CONN);
         }
-        catch ( TerminateException $e ) {
-            $this->endTest( STATUS_ERROR, self::TEST_DB_CONN, $e );
+        catch (TerminateException $e) {
+            $this->endTest(STATUS_ERROR, self::TEST_DB_CONN, $e);
         }
 
-        $db = NULL;
-        unset( $db );
+        $db = null;
+        unset($db);
     }
 
     /**
@@ -180,18 +173,18 @@ class Diagnostics
      */
     public function testDatabaseExists()
     {
-        $this->startTest( self::TEST_DB_EXISTS );
+        $this->startTest(self::TEST_DB_EXISTS);
 
         try {
-            $db = $this->di[ 'db_factory' ];
-            $this->endTest( STATUS_SUCCESS, self::TEST_DB_EXISTS );
+            $db = $this->di['db_factory'];
+            $this->endTest(STATUS_SUCCESS, self::TEST_DB_EXISTS);
         }
-        catch ( TerminateException $e ) {
-            $this->endTest( STATUS_ERROR, self::TEST_DB_EXISTS, $e );
+        catch (TerminateException $e) {
+            $this->endTest(STATUS_ERROR, self::TEST_DB_EXISTS, $e);
         }
 
-        $db = NULL;
-        unset( $db );
+        $db = null;
+        unset($db);
     }
 
     /**
@@ -199,34 +192,33 @@ class Diagnostics
      */
     public function testMaxAllowedPacketSize()
     {
-        $this->startTest( self::TEST_MAX_PACKET );
+        $this->startTest(self::TEST_MAX_PACKET);
 
         try {
             $safeMb = 16;
-            $db = $this->di[ 'db_factory' ];
+            $db = $this->di['db_factory'];
             $migrationModel = new MigrationModel;
-            $safeSize = (int) ( $safeMb * 1024 * 1024 );
-            $size = $migrationModel->getMaxAllowedPacket( $db );
+            $safeSize = (int) ($safeMb * 1024 * 1024);
+            $size = $migrationModel->getMaxAllowedPacket($db);
 
-            if ( ! $size || $size < $safeSize ) {
+            if (! $size || $size < $safeSize) {
                 $e = new MaxAllowedPacketException(
-                    Fn\formatBytes( $size, 0 ),
-                    Fn\formatBytes( $safeSize, 0 ) );
-                $this->endTest( STATUS_WARNING, self::TEST_MAX_PACKET, $e );
-            }
-            else {
-                $this->endTest( STATUS_SUCCESS, self::TEST_MAX_PACKET );
+                    Fn\formatBytes($size, 0),
+                    Fn\formatBytes($safeSize, 0));
+                $this->endTest(STATUS_WARNING, self::TEST_MAX_PACKET, $e);
+            } else {
+                $this->endTest(STATUS_SUCCESS, self::TEST_MAX_PACKET);
             }
         }
-        catch ( TerminateException $e ) {
-            $this->endTest( STATUS_SKIP, self::TEST_MAX_PACKET );
+        catch (TerminateException $e) {
+            $this->endTest(STATUS_SKIP, self::TEST_MAX_PACKET);
         }
-        catch ( PDOException $e ) {
-            $this->endTest( STATUS_ERROR, self::TEST_MAX_PACKET, $e );
+        catch (PDOException $e) {
+            $this->endTest(STATUS_ERROR, self::TEST_MAX_PACKET, $e);
         }
 
-        $db = NULL;
-        unset( $db );
+        $db = null;
+        unset($db);
     }
 
     /**
@@ -234,21 +226,22 @@ class Diagnostics
      */
     public function testAttachmentPathWritable()
     {
-        $this->startTest( self::TEST_ATTACH_PATH );
+        $this->startTest(self::TEST_ATTACH_PATH);
 
         try {
             $attachmentPath = self::checkAttachmentsPath(
                 'test@example.org',
-                FALSE ); // don't create the directory
-            $this->endTest( STATUS_SUCCESS, self::TEST_ATTACH_PATH );
+                false); // don't create the directory
+            $this->endTest(STATUS_SUCCESS, self::TEST_ATTACH_PATH);
         }
-        catch ( AttachmentsPathNotWriteableException $e ) {
-            $this->endTest( STATUS_ERROR, self::TEST_ATTACH_PATH, $e );
+        catch (AttachmentsPathNotWriteableException $e) {
+            $this->endTest(STATUS_ERROR, self::TEST_ATTACH_PATH, $e);
         }
     }
 
     /**
      * Returns the internal testing info.
+     *
      * @return array
      */
     public function getTests()
@@ -258,17 +251,18 @@ class Diagnostics
 
     /**
      * Check if any errors were hit during the testing.
+     *
      * @return bool
      */
     public function hasError()
     {
-        foreach ( $this->tests as $test => $data ) {
-            if ( $data[ 'status' ] === STATUS_ERROR ) {
-                return TRUE;
+        foreach ($this->tests as $test => $data) {
+            if (STATUS_ERROR === $data['status']) {
+                return true;
             }
         }
 
-        return FALSE;
+        return false;
     }
 
     /**
@@ -276,85 +270,89 @@ class Diagnostics
      */
     private function start()
     {
-        if ( ! $this->console->diagnostics ) {
+        if (! $this->console->diagnostics) {
             return;
         }
 
-        $this->cli->info( "Starting diagnostic tests" );
+        $this->cli->info('Starting diagnostic tests');
 
-        if ( $this->hasError() ) {
+        if ($this->hasError()) {
             $this->cli->comment(
-                "There were errors encountered during the tests that ".
-                "prevent this application from running!" );
+                'There were errors encountered during the tests that '.
+                'prevent this application from running!');
         }
     }
 
     /**
      * Mark test as started and possibly write to console.
+     *
      * @param const $test
      */
-    private function startTest( $test )
+    private function startTest($test)
     {
-        $message = $this->tests[ $test ][ 'name' ];
+        $message = $this->tests[$test]['name'];
 
-        if ( $this->console->diagnostics ) {
-            $this->cli->inline( "[....] Testing $message" );
+        if ($this->console->diagnostics) {
+            $this->cli->inline("[....] Testing $message");
         }
-        elseif ( ! $this->console->interactive ) {
-            $this->log->addDebug( "[Diagnostics] Testing $message" );
+        elseif (! $this->console->interactive) {
+            $this->log->addDebug("[Diagnostics] Testing $message");
         }
     }
 
     /**
      * Mark test as finished and write to log and/or console.
+     *
      * @param string $status
      * @param const $test
      * @param Exception $e Optional exception for errors
+     *
      * @throws FatalException
      */
-    private function endTest( $status, $test, Exception $e = NULL )
+    private function endTest($status, $test, Exception $e = null)
     {
-        $code = $this->tests[ $test ][ 'code' ];
-        $message = ( $e )
+        $code = $this->tests[$test]['code'];
+        $message = ($e)
             ? $e->getMessage()
-            : "Testing ". $this->tests[ $test ][ 'name' ];
-        $this->tests[ $test ][ 'status' ] = $status;
-        $this->tests[ $test ][ 'message' ] = $message;
+            : 'Testing '.$this->tests[$test]['name'];
+        $this->tests[$test]['status'] = $status;
+        $this->tests[$test]['message'] = $message;
 
         // If we're not in diagnostic mode (and not daemon mode), then
         // use exceptions
-        if ( ! $this->console->diagnostics ) {
-            if ( $status === STATUS_ERROR && ! $this->console->daemon ) {
+        if (! $this->console->diagnostics) {
+            if (STATUS_ERROR === $status && ! $this->console->daemon) {
                 throw new FatalException(
-                    "Failed diagnostic test #$code, $message" );
+                    "Failed diagnostic test #$code, $message");
             }
 
-            if ( ! $this->console->interactive ) {
-                $this->log->addDebug( "[Diagnostics] Finished with status ". $status );
+            if (! $this->console->interactive) {
+                $this->log->addDebug('[Diagnostics] Finished with status '.$status);
             }
 
             return;
         }
 
-        if ( $status === STATUS_SKIP ) {
-            $this->cli->dim( "\r[skip] $message" );
+        if (STATUS_SKIP === $status) {
+            $this->cli->dim("\r[skip] $message");
+
             return;
         }
 
-        $this->cli->inline( "\r[" );
+        $this->cli->inline("\r[");
 
-        switch ( $status ) {
+        switch ($status) {
             case STATUS_WARNING:
-                $this->cli->yellowInline( "warn" )->inline( "] " );
-                $this->cli->yellow( $message );
+                $this->cli->yellowInline('warn')->inline('] ');
+                $this->cli->yellow($message);
                 break;
             case STATUS_ERROR:
-                $this->cli->redInline( "fail" )->inline( "] " );
-                $this->cli->red( $message );
+                $this->cli->redInline('fail')->inline('] ');
+                $this->cli->red($message);
                 break;
             case STATUS_SUCCESS:
-                $this->cli->greenInline( " ok " )->inline( "] " );
-                $this->cli->dim( $message );
+                $this->cli->greenInline(' ok ')->inline('] ');
+                $this->cli->dim($message);
                 break;
         }
     }
@@ -364,71 +362,76 @@ class Diagnostics
      */
     private function finish()
     {
-        if ( $this->console->daemon ) {
+        if ($this->console->daemon) {
             Message::send(
                 new DiagnosticsMessage(
                     $this->tests
                 ));
         }
 
-        if ( ! $this->console->diagnostics ) {
+        if (! $this->console->diagnostics) {
             return;
         }
 
-        if ( $this->hasError() ) {
+        if ($this->hasError()) {
             $this->cli->br()->boldRedBackgroundBlack(
-                "There were errors encountered during the tests that ".
-                "prevent this application from running!" );
+                'There were errors encountered during the tests that '.
+                'prevent this application from running!');
         }
     }
 
     /**
      * Attempts to connect to the mail server using the new account
      * settings from the prompt.
-     * @param Array $account Account credentials
+     *
+     * @param array $account Account credentials
+     *
      * @throws Exception
      */
-    static public function testImapConnection( Array $account )
+    public static function testImapConnection(array $account)
     {
         $sync = new Sync;
-        $sync->setConfig( self::$config );
+        $sync->setConfig(self::$config);
         $sync->connect(
-            $account[ 'imap_host' ],
-            $account[ 'imap_port' ],
-            $account[ 'email' ],
-            $account[ 'password' ],
-            $folder = NULL,
-            $setRunning = FALSE );
+            $account['imap_host'],
+            $account['imap_port'],
+            $account['email'],
+            $account['password'],
+            $folder = null,
+            $setRunning = false);
     }
 
     /**
      * Checks if the attachments path is writeable by the user.
+     *
      * @param string $email
+     *
      * @throws AttachmentsPathNotWriteableException
-     * @return boolean
+     *
+     * @return bool
      */
-    static public function checkAttachmentsPath( $email, $createEmailDir = TRUE )
+    public static function checkAttachmentsPath($email, $createEmailDir = true)
     {
         $slash = DIRECTORY_SEPARATOR;
-        $configPath = self::$config[ 'email' ][ 'attachments' ][ 'path' ];
-        $attachmentsDir = ( substr( $configPath, 0, 1 ) !== $slash )
+        $configPath = self::$config['email']['attachments']['path'];
+        $attachmentsDir = substr($configPath, 0, 1) !== $slash
             ? BASEPATH
             : $configPath;
 
-        if ( ! is_writeable( $attachmentsDir ) ) {
-            throw new AttachmentsPathNotWriteableException( $attachmentsDir );
+        if (! is_writeable($attachmentsDir)) {
+            throw new AttachmentsPathNotWriteableException($attachmentsDir);
         }
 
-        if ( ! $createEmailDir ) {
-            return TRUE;
+        if (! $createEmailDir) {
+            return true;
         }
 
-        $attachmentsPath = ( substr( $configPath, 0, 1 ) !== $slash )
-            ? BASEPATH ."$slash$configPath"
+        $attachmentsPath = substr($configPath, 0, 1) !== $slash
+            ? BASEPATH."$slash$configPath"
             : $configPath;
         $attachmentsPath .= "$slash$email";
 
-        @mkdir( $attachmentsPath, 0755, TRUE );
+        @mkdir($attachmentsPath, 0755, true);
 
         return $attachmentsPath;
     }
@@ -437,21 +440,23 @@ class Diagnostics
      * Reads in a PDOException and checks if it's the SQL server
      * going away. If so, disconnect from the database and attempt
      * to reconnect.
+     *
      * @param Container $di Dependency container
      * @param PDOException $e The recently thrown exception
      * @param bool $forwardException On failed re-connect, forward the
      *   termination exception
      * @param int $sleepSeconds Number of seconds to halt before
      *   creating the new database connection
-     * @throws TerminateException If re-connect fails and the flag
-     *   $forwardException is true.
+     *
+     * @throws TerminateException if re-connect fails and the flag
+     *   $forwardException is true
      */
-    static public function checkDatabaseException(
+    public static function checkDatabaseException(
         Container &$di,
         PDOException $e,
-        $forwardException = FALSE,
-        $sleepSeconds = NULL )
-    {
+        $forwardException = false,
+        $sleepSeconds = null
+    ) {
         $messages = [
             'Lost connection',
             'Error while sending',
@@ -462,46 +467,44 @@ class Diagnostics
             'SSL connection has been closed unexpectedly'
         ];
 
-        if ( ! Fn\contains( $e->getMessage(), $messages ) ) {
-            if ( $di[ 'console' ]->daemon ) {
+        if (! Fn\contains($e->getMessage(), $messages)) {
+            if ($di['console']->daemon) {
                 Message::send(
                     new ErrorMessage(
                         ERR_DATABASE,
                         $e->getMessage(),
-                        "This could be a timeout problem, and if so the ".
-                        "server is restarting itself."
+                        'This could be a timeout problem, and if so the '.
+                        'server is restarting itself.'
                     ));
-            }
-            else {
-                $di[ 'log' ]->getLogger()->addNotice( $e->getMessage() );
+            } else {
+                $di['log']->getLogger()->addNotice($e->getMessage());
             }
 
             throw new TerminateException(
-                "System encountered an un-recoverable database error. ".
-                "Going to halt now, please see the log file for info." );
-        }
-        else {
-            $di[ 'log' ]->getLogger()->addDebug(
-                "Database connection lost: ". $e->getMessage() );
+                'System encountered an un-recoverable database error. '.
+                'Going to halt now, please see the log file for info.');
+        } else {
+            $di['log']->getLogger()->addDebug(
+                'Database connection lost: '.$e->getMessage());
         }
 
         // This should drop the DB connection
-        $di[ 'db' ] = NULL;
+        $di['db'] = null;
 
-        if ( is_numeric( $sleepSeconds ) ) {
-            $di[ 'log' ]->getLogger()->addDebug(
-                "Sleeping $sleepSeconds before attempting to re-connect." );
-            sleep( $sleepSeconds );
+        if (is_numeric($sleepSeconds)) {
+            $di['log']->getLogger()->addDebug(
+                "Sleeping $sleepSeconds before attempting to re-connect.");
+            sleep($sleepSeconds);
         }
 
         try {
             // Create a new database connection. This will throw a
             // TerminateException on failure to connect.
-            $di[ 'db' ] = $di[ 'db_factory' ];
-            Model::setDb( $di[ 'db' ] );
+            $di['db'] = $di['db_factory'];
+            Model::setDb($di['db']);
         }
-        catch ( TerminateException $err ) {
-            if ( $forwardException ) {
+        catch (TerminateException $err) {
+            if ($forwardException) {
                 throw $err;
             }
         }

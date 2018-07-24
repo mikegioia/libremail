@@ -27,7 +27,7 @@ class Messages
     private $emitter;
     private $mailbox;
     private $interactive;
-    private $skipContent = FALSE;
+    private $skipContent = false;
 
     const FLAG_UNSEEN = 'UNSEEN';
     const FLAG_FLAGGED = 'FLAGGED';
@@ -47,38 +47,39 @@ class Messages
         Emitter $emitter,
         Mailbox $mailbox,
         $interactive,
-        array $options = [] )
-    {
+        array $options = []
+    ) {
         $this->log = $log;
         $this->cli = $cli;
         $this->emitter = $emitter;
         $this->mailbox = $mailbox;
         $this->interactive = $interactive;
 
-        if ( isset( $options[ self::OPT_SKIP_CONTENT ] ) ) {
-            $this->skipContent = $options[ self::OPT_SKIP_CONTENT ];
+        if (isset($options[self::OPT_SKIP_CONTENT])) {
+            $this->skipContent = $options[self::OPT_SKIP_CONTENT];
         }
     }
 
     /**
      * Syncs the content, threads, and flags for all messages in a folder.
+     *
      * @param AccountModel $account
      * @param FolderModel $folder
      * @param array $newIds New message IDs
      * @param array $savedIds Existing message IDs
      * @param array $options (see syncMessages)
      */
-    public function run( AccountModel $account, FolderModel $folder, $options )
+    public function run(AccountModel $account, FolderModel $folder, $options)
     {
         $newIds = $this->mailbox->getUniqueIds();
         $savedIds = (new MessageModel)->getSyncedIdsByFolder(
             $account->getId(),
-            $folder->getId() );
+            $folder->getId());
 
-        $this->downloadMessages( $newIds, $savedIds, $folder, $options );
-        $this->markDeleted( $newIds, $savedIds, $folder, $options );
-        $this->updateSeenFlags( $account, $folder );
-        $this->updateFlaggedFlags( $account, $folder );
+        $this->downloadMessages($newIds, $savedIds, $folder, $options);
+        $this->markDeleted($newIds, $savedIds, $folder, $options);
+        $this->updateSeenFlags($account, $folder);
+        $this->updateFlaggedFlags($account, $folder);
     }
 
     /**
@@ -87,109 +88,113 @@ class Messages
      * retrieved from IMAP, and a list of the IDs we have in the
      * database, copy all the new messages down and mark the removed
      * ones as such in the database.
+     *
      * @param array $newIds
      * @param array $savedIds
      * @param FolderModel $folder
      * @param array $options (see syncMessages)
      */
-    private function downloadMessages( $newIds, $savedIds, FolderModel $folder, $options )
+    private function downloadMessages($newIds, $savedIds, FolderModel $folder, $options)
     {
         // First get the list of messages to download by taking
         // a diff of the arrays. Download all these messages.
         $i = 1;
-        $progress = NULL;
-        $total = count( $newIds );
-        $toDownload = array_diff( $newIds, $savedIds );
-        $count = count( $toDownload );
+        $progress = null;
+        $total = count($newIds);
+        $toDownload = array_diff($newIds, $savedIds);
+        $count = count($toDownload);
         $syncedCount = $total - $count;
-        $noun = Fn\plural( 'message', $total );
-        $this->log->debug( "Downloading messages in {$folder->name}" );
+        $noun = Fn\plural('message', $total);
+        $this->log->debug("Downloading messages in {$folder->name}");
 
-        if ( $count ) {
-            $this->log->info( "{$folder->name}: found $total $noun, $count new" );
-        }
-        else {
-            $this->log->debug( "Found $total $noun, none are new" );
+        if ($count) {
+            $this->log->info("{$folder->name}: found $total $noun, $count new");
+        } else {
+            $this->log->debug("Found $total $noun, none are new");
         }
 
         // Update folder stats with count
-        $folder->saveStats( $total, $syncedCount );
+        $folder->saveStats($total, $syncedCount);
 
-        if ( Fn\get( $options, Sync::OPT_SKIP_DOWNLOAD ) === TRUE ) {
+        if (true === Fn\get($options, Sync::OPT_SKIP_DOWNLOAD)) {
             return;
         }
 
-        if ( ! $count ) {
-            $this->log->debug( "No new messages, skipping {$folder->name}" );
+        if (! $count) {
+            $this->log->debug("No new messages, skipping {$folder->name}");
+
             return;
         }
 
-        if ( $this->interactive ) {
-            $noun = Fn\plural( 'message', $count );
+        if ($this->interactive) {
+            $noun = Fn\plural('message', $count);
             $this->cli->whisper(
-                "Syncing $count new $noun in {$folder->name}:" );
-            $progress = $this->cli->progress()->total( 100 );
+                "Syncing $count new $noun in {$folder->name}:");
+            $progress = $this->cli->progress()->total(100);
         }
 
         // Sort these newest first to get the new mail earlier
-        arsort( $toDownload );
+        arsort($toDownload);
 
-        foreach ( $toDownload as $messageId => $uniqueId ) {
-            $this->downloadMessage( $messageId, $uniqueId, $folder );
+        foreach ($toDownload as $messageId => $uniqueId) {
+            $this->downloadMessage($messageId, $uniqueId, $folder);
 
-            if ( $this->interactive ) {
-                $progress->current( ( $i++ / $count ) * 100 );
+            if ($this->interactive) {
+                $progress->current(($i++ / $count) * 100);
             }
 
-            $message = NULL;
-            $imapMessage = NULL;
+            $message = null;
+            $imapMessage = null;
 
             // Save stats about the folder
-            $folder->saveStats( $total, ++$syncedCount );
+            $folder->saveStats($total, ++$syncedCount);
 
             // After each download, try to reclaim memory.
-            $this->emitter->emit( Sync::EVENT_GARBAGE_COLLECT );
-            $this->emitter->emit( Sync::EVENT_CHECK_HALT );
+            $this->emitter->emit(Sync::EVENT_GARBAGE_COLLECT);
+            $this->emitter->emit(Sync::EVENT_CHECK_HALT);
         }
 
-        $this->emitter->emit( Sync::EVENT_GARBAGE_COLLECT );
+        $this->emitter->emit(Sync::EVENT_GARBAGE_COLLECT);
     }
 
     /**
      * Download a specified message by message ID.
-     * @param integer $messageId
-     * @param integer $uniqueId
+     *
+     * @param int $messageId
+     * @param int $uniqueId
      * @param FolderModel $folder
      */
-    private function downloadMessage( $messageId, $uniqueId, FolderModel $folder )
+    private function downloadMessage($messageId, $uniqueId, FolderModel $folder)
     {
         try {
-            $imapMessage = $this->mailbox->getMessage( $messageId );
+            $imapMessage = $this->mailbox->getMessage($messageId);
             $message = new MessageModel([
                 'synced' => 1,
                 'folder_id' => $folder->getId(),
                 'account_id' => $folder->getAccountId(),
             ]);
-            $message->setMessageData( $imapMessage, [
+            $message->setMessageData($imapMessage, [
                 // This will trim subjects to the max size
-                MessageModel::OPT_TRUNCATE_FIELDS => TRUE,
+                MessageModel::OPT_TRUNCATE_FIELDS => true,
                 MessageModel::OPT_SKIP_CONTENT => $this->skipContent
             ]);
         }
-        catch ( PDOException $e ) {
+        catch (PDOException $e) {
             throw $e;
         }
-        catch ( MessageSizeLimitException $e ) {
+        catch (MessageSizeLimitException $e) {
             $this->log->notice(
                 "Size exceeded during download of message $messageId: ".
-                $e->getMessage() );
+                $e->getMessage());
+
             return;
         }
-        catch ( Exception $e ) {
+        catch (Exception $e) {
             $this->log->warning(
                 "Failed download for message {$messageId}: ".
-                $e->getMessage() );
-            $this->emitter->emit( Sync::EVENT_CHECK_CLOSED_CONN, [ $e ] );
+                $e->getMessage());
+            $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
+
             return;
         }
 
@@ -198,60 +203,63 @@ class Messages
         try {
             $message->save();
         }
-        catch ( ValidationException $e ) {
+        catch (ValidationException $e) {
             $this->log->notice(
                 "Failed validation for message $messageId: ".
-                $e->getMessage() );
+                $e->getMessage());
         }
     }
 
     /**
      * For any messages we have saved that didn't come back from the
      * mailbox, mark them as deleted in the database.
+     *
      * @param array $newIds
      * @param array $savedIds
      * @param FolderModel $folder
      */
-    private function markDeleted( $newIds, $savedIds, FolderModel $folder )
+    private function markDeleted($newIds, $savedIds, FolderModel $folder)
     {
-        $toDelete = array_diff( $savedIds, $newIds );
-        $count = count( $toDelete );
+        $toDelete = array_diff($savedIds, $newIds);
+        $count = count($toDelete);
 
-        if ( ! $count ) {
-            $this->log->debug( "No messages to delete in {$folder->name}" );
+        if (! $count) {
+            $this->log->debug("No messages to delete in {$folder->name}");
+
             return;
         }
 
         $this->log->info(
-            "Marking $count deletion". ( $count == 1 ? '' : 's' ) .
-            " in {$folder->name}" );
+            "Marking $count deletion".(1 == $count ? '' : 's').
+            " in {$folder->name}");
 
         try {
             (new MessageModel)->markDeleted(
                 $toDelete,
                 $folder->getAccountId(),
-                $folder->getId() );
+                $folder->getId());
         }
-        catch ( ValidationException $e ) {
+        catch (ValidationException $e) {
             $this->log->notice(
-                "Failed validation for marking deleted messages: ".
-                $e->getMessage() );
+                'Failed validation for marking deleted messages: '.
+                $e->getMessage());
         }
     }
 
     /**
      * Syncs the seen flag between the IMAP mailbox and SQL.
+     *
      * @param AccountModel $account
      * @param FolderModel $model
      */
-    private function updateSeenFlags( AccountModel $account, FolderModel $folder )
+    private function updateSeenFlags(AccountModel $account, FolderModel $folder)
     {
         // Fetch all unseen message IDs from the mailbox
-        $unseenIds = $this->mailbox->search( self::FLAG_UNSEEN, TRUE );
+        $unseenIds = $this->mailbox->search(self::FLAG_UNSEEN, true);
 
         // Mark as unseen anything in this collection
-        if ( $unseenIds ) {
-            $count = count( $unseenIds );
+        if ($unseenIds) {
+            $count = count($unseenIds);
 
             try {
                 $updated = (new MessageModel)->markFlag(
@@ -259,55 +267,56 @@ class Messages
                     $folder->getAccountId(),
                     $folder->getId(),
                     MessageModel::FLAG_SEEN,
-                    FALSE );
+                    false);
 
-                if ( $updated ) {
+                if ($updated) {
                     $this->log->info(
-                        "Marking $updated as unseen in {$folder->name}" );
+                        "Marking $updated as unseen in {$folder->name}");
                 }
             }
-            catch ( ValidationException $e ) {
+            catch (ValidationException $e) {
                 $this->log->notice(
-                    "Failed validation for marking unseen messages: ".
-                    $e->getMessage() );
+                    'Failed validation for marking unseen messages: '.
+                    $e->getMessage());
             }
         }
 
         // Mark as seen anything unseen that's not in this collection
         try {
-            $updated =  (new MessageModel)->markFlag(
+            $updated = (new MessageModel)->markFlag(
                 $unseenIds,
                 $folder->getAccountId(),
                 $folder->getId(),
                 MessageModel::FLAG_SEEN,
-                TRUE,
-                TRUE ); // Inverse
+                true,
+                true); // Inverse
 
-            if ( $updated ) {
+            if ($updated) {
                 $this->log->debug(
-                    "Marking {$updated} as seen in {$folder->name}" );
+                    "Marking {$updated} as seen in {$folder->name}");
             }
         }
-        catch ( ValidationException $e ) {
+        catch (ValidationException $e) {
             $this->log->notice(
-                "Failed validation for marking seen messages: ".
-                $e->getMessage() );
+                'Failed validation for marking seen messages: '.
+                $e->getMessage());
         }
     }
 
     /**
      * Syncs the flagged (starred) flag between the IMAP mailbox and SQL.
+     *
      * @param AccountModel $account
      * @param FolderModel $model
      */
-    private function updateFlaggedFlags( AccountModel $account, FolderModel $folder )
+    private function updateFlaggedFlags(AccountModel $account, FolderModel $folder)
     {
         // Fetch all flagged message IDs from the mailbox
-        $flaggedIds = $this->mailbox->search( self::FLAG_FLAGGED, TRUE );
+        $flaggedIds = $this->mailbox->search(self::FLAG_FLAGGED, true);
 
         // Mark as flagged anything in this collection
-        if ( $flaggedIds ) {
-            $count = count( $flaggedIds );
+        if ($flaggedIds) {
+            $count = count($flaggedIds);
 
             try {
                 $updated = (new MessageModel)->markFlag(
@@ -315,17 +324,17 @@ class Messages
                     $folder->getAccountId(),
                     $folder->getId(),
                     MessageModel::FLAG_FLAGGED,
-                    TRUE );
+                    true);
 
-                if ( $updated ) {
+                if ($updated) {
                     $this->log->info(
-                        "Marking $updated as flagged in {$folder->name}" );
+                        "Marking $updated as flagged in {$folder->name}");
                 }
             }
-            catch ( ValidationException $e ) {
+            catch (ValidationException $e) {
                 $this->log->notice(
-                    "Failed validation for marking flagged messages: ".
-                    $e->getMessage() );
+                    'Failed validation for marking flagged messages: '.
+                    $e->getMessage());
             }
         }
 
@@ -336,18 +345,18 @@ class Messages
                 $folder->getAccountId(),
                 $folder->getId(),
                 MessageModel::FLAG_FLAGGED,
-                FALSE,
-                TRUE ); // Inverse
+                false,
+                true); // Inverse
 
-            if ( $updated ) {
+            if ($updated) {
                 $this->log->debug(
-                    "Marking {$updated} as un-flagged in {$folder->name}" );
+                    "Marking {$updated} as un-flagged in {$folder->name}");
             }
         }
-        catch ( ValidationException $e ) {
+        catch (ValidationException $e) {
             $this->log->notice(
-                "Failed validation for marking un-flagged messages: ".
-                $e->getMessage() );
+                'Failed validation for marking un-flagged messages: '.
+                $e->getMessage());
         }
     }
 }

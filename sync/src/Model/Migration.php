@@ -27,112 +27,119 @@ class Migration extends Model
      * Read each file in the script folder and check to see
      * if it's been run before. If so, skip it. If not, run
      * the script and log it in the migrations table.
+     *
      * @param string $scriptDir Path to script files
      */
     public function run()
     {
-        $this->cli()->info( "Running SQL migration scripts" );
+        $this->cli()->info('Running SQL migration scripts');
 
-        foreach ( glob( DBSCRIPTS ) as $filename ) {
-            $script = basename( $filename, ".sql" );
-            $queries = explode( "\n\n", file_get_contents( $filename ) );
+        foreach (glob(DBSCRIPTS) as $filename) {
+            $script = basename($filename, '.sql');
+            $queries = explode("\n\n", file_get_contents($filename));
 
-            if ( $this->isRunAlready( $script ) ) {
-                $this->cli()->dim( "[skip] {$script}.sql" );
+            if ($this->isRunAlready($script)) {
+                $this->cli()->dim("[skip] {$script}.sql");
                 continue;
             }
 
-            $this->cli()->inline( "[....] Running {$script}.sql" );
+            $this->cli()->inline("[....] Running {$script}.sql");
 
-            foreach ( $queries as $query ) {
-                if ( ! $this->db()->query( $query ) ) {
+            foreach ($queries as $query) {
+                if (! $this->db()->query($query)) {
                     $this->cli()
-                        ->inline( "\r[" )
-                        ->redInline( "fail" )
-                        ->inline( "] Running {$script}.sql" )
+                        ->inline("\r[")
+                        ->redInline('fail')
+                        ->inline("] Running {$script}.sql")
                         ->br()
                         ->br()
-                        ->error( $this->getError() );
+                        ->error($this->getError());
+
                     return;
                 }
             }
 
-            $this->markRun( $script );
+            $this->markRun($script);
             $this->cli()
-                ->inline( "\r[" )
-                ->greenInline( " ok " )
-                ->inline( "] Running {$script}.sql" )
+                ->inline("\r[")
+                ->greenInline(' ok ')
+                ->inline("] Running {$script}.sql")
                 ->br();
         }
     }
 
-    public function setMaxAllowedPacket( $mb = 16 )
+    public function setMaxAllowedPacket($mb = 16)
     {
         $value = $this->getMaxAllowedPacket();
-        $newSize = (int) ( $mb * 1024 * 1024 );
+        $newSize = (int) ($mb * 1024 * 1024);
 
-        if ( ! $value || $value < $newSize ) {
+        if (! $value || $value < $newSize) {
             $stmt = $this->db()
-                ->query( "SET GLOBAL max_allowed_packet = $newSize;" );
-            return FALSE;
+                ->query("SET GLOBAL max_allowed_packet = $newSize;");
+
+            return false;
         }
 
-        return TRUE;
+        return true;
     }
 
     /**
      * Returns the max_allowed_packet setting. This takes an optional
      * $db argument to use as the database connection if this query
      * is run outside of the Model scope.
+     *
      * @param Database $db Optional database connection
+     *
      * @return int
      */
-    public function getMaxAllowedPacket( Database $db = NULL )
+    public function getMaxAllowedPacket(Database $db = null)
     {
-        $db = ( $db ) ?: $this->db();
+        $db = $db ?: $this->db();
         $size = $db
-            ->query( "SHOW VARIABLES LIKE 'max_allowed_packet';" )
+            ->query("SHOW VARIABLES LIKE 'max_allowed_packet';")
             ->fetch();
 
-        return Fn\get( $size, 'Value' );
+        return Fn\get($size, 'Value');
     }
 
     /**
      * Checks if the script was already run.
+     *
      * @param string $script Filename for the script
      */
-    private function isRunAlready( $script )
+    private function isRunAlready($script)
     {
         $migrationsExists = $this->db()
-            ->query( "show tables like 'migrations';" )
+            ->query("show tables like 'migrations';")
             ->fetch();
 
-        if ( ! $migrationsExists ) {
-            return FALSE;
+        if (! $migrationsExists) {
+            return false;
         }
 
         return $this->db()
             ->select()
-            ->from( 'migrations' )
-            ->where( 'name', '=', $script )
+            ->from('migrations')
+            ->where('name', '=', $script)
             ->execute()
-            ->fetchObject( $this->getClass() );
+            ->fetchObject($this->getClass());
     }
 
     /**
      * Marks a script as 'run'.
+     *
      * @param string $script Filename for the script
      */
-    private function markRun( $script )
+    private function markRun($script)
     {
         $createdAt = new DateTime;
 
         return $this->db()
-            ->insert([ 'name', 'created_at' ])
-            ->into( 'migrations' )
+            ->insert(['name', 'created_at'])
+            ->into('migrations')
             ->values([
                 $script,
-                $createdAt->format( DATE_DATABASE )
+                $createdAt->format(DATE_DATABASE)
             ])->execute();
     }
 }

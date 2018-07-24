@@ -2,10 +2,7 @@
 
 namespace App;
 
-use App\Log;
 use Exception;
-use App\Command;
-use App\Message;
 use App\Events\MessageEvent;
 use App\Console\DaemonConsole;
 use App\Message\HealthMessage;
@@ -13,7 +10,6 @@ use React\ChildProcess\Process;
 use App\Message\AbstractMessage;
 use React\EventLoop\LoopInterface;
 use App\Traits\JsonMessage as JsonMessageTrait;
-use App\Exceptions\Terminate as TerminateException;
 use App\Exceptions\BadCommand as BadCommandException;
 use Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 
@@ -53,8 +49,8 @@ class Daemon
         Emitter $emitter,
         DaemonConsole $console,
         Command $command,
-        Array $config )
-    {
+        array $config
+    ) {
         $this->loop = $loop;
         $this->config = $config;
         $this->emitter = $emitter;
@@ -66,54 +62,54 @@ class Daemon
             PROC_SERVER => time()
         ];
         $this->processRestartInterval = [
-            PROC_SYNC => $config[ 'restart_interval' ][ PROC_SYNC ],
-            PROC_SERVER => $config[ 'restart_interval' ][ PROC_SERVER ]
+            PROC_SYNC => $config['restart_interval'][PROC_SYNC],
+            PROC_SERVER => $config['restart_interval'][PROC_SERVER]
         ];
     }
 
     public function startSync()
     {
-        if ( $this->halt === TRUE ) {
+        if (true === $this->halt) {
             return;
         }
 
-        if ( ! $this->console->sync ) {
+        if (! $this->console->sync) {
             return;
         }
 
-        if ( $this->syncProcess ) {
+        if ($this->syncProcess) {
             $this->syncProcess->close();
-            $this->syncProcess = NULL;
-            $this->processPids[ PROC_SYNC ] = NULL;
+            $this->syncProcess = null;
+            $this->processPids[PROC_SYNC] = null;
         }
 
-        $syncProcess = new Process( BASEPATH . EXEC_SYNC );
+        $syncProcess = new Process(BASEPATH.EXEC_SYNC);
 
         // When the sync process exits, we want to alert the
         // daemon. This is to restart the sync upon crash or
         // to handle the error.
-        $syncProcess->on( 'exit', function ( $exitCode, $termSignal ) {
-            $this->emitter->dispatch( EV_SYNC_EXITED );
+        $syncProcess->on('exit', function ($exitCode, $termSignal) {
+            $this->emitter->dispatch(EV_SYNC_EXITED);
         });
 
         // Start the sync engine immediately
-        $this->loop->addTimer( 0.001, function ( $timer ) use ( $syncProcess ) {
-            $syncProcess->start( $timer->getLoop() );
-            $syncProcess->stdout->on( 'data', function ( $output ) {
+        $this->loop->addTimer(0.001, function ($timer) use ($syncProcess) {
+            $syncProcess->start($timer->getLoop());
+            $syncProcess->stdout->on('data', function ($output) {
                 // If JSON came back, we have a message to parse. Run
                 // it through our message handler. Otherwise forward the
                 // output to STDOUT.
-                $this->processMessage( $output, PROC_SYNC );
+                $this->processMessage($output, PROC_SYNC);
             });
         });
 
         // Every 10 seconds signal the sync process to get statistics.
         // Only do this if the webserver is running.
-        $this->loop->addPeriodicTimer( 10, function ( $timer ) use ( $syncProcess ) {
-            if ( isset( $this->processPids[ PROC_SYNC ] )
-                && $this->webServerProcess )
+        $this->loop->addPeriodicTimer(10, function ($timer) use ($syncProcess) {
+            if (isset($this->processPids[PROC_SYNC])
+                && $this->webServerProcess)
             {
-                posix_kill( $this->processPids[ PROC_SYNC ], SIGUSR2 );
+                posix_kill($this->processPids[PROC_SYNC], SIGUSR2);
             }
         });
 
@@ -122,34 +118,34 @@ class Daemon
 
     public function startWebServer()
     {
-        if ( ! $this->console->webServer ) {
+        if (! $this->console->webServer) {
             return;
         }
 
-        if ( $this->webServerProcess ) {
+        if ($this->webServerProcess) {
             $this->webServerProcess->close();
-            $this->webServerProcess = NULL;
-            $this->processPids[ PROC_SERVER ] = NULL;
+            $this->webServerProcess = null;
+            $this->processPids[PROC_SERVER] = null;
         }
 
-        if ( $this->halt === TRUE ) {
+        if (true === $this->halt) {
             return;
         }
 
-        $webServerProcess = new Process( BASEPATH . EXEC_SERVER );
+        $webServerProcess = new Process(BASEPATH.EXEC_SERVER);
 
         // When the server process exits, we want to alert the
         // daemon. This is to restart the server upon crash or
         // to handle the error.
-        $webServerProcess->on( 'exit', function ( $exitCode, $termSignal ) {
-            $this->emitter->dispatch( EV_SERVER_EXITED );
+        $webServerProcess->on('exit', function ($exitCode, $termSignal) {
+            $this->emitter->dispatch(EV_SERVER_EXITED);
         });
 
         // Start the web server immediately
-        $this->loop->addTimer( 0.001, function ( $timer ) use ( $webServerProcess ) {
-            $webServerProcess->start( $timer->getLoop() );
-            $webServerProcess->stdout->on( 'data', function ( $output ) {
-                $this->processMessage( $output, PROC_SERVER );
+        $this->loop->addTimer(0.001, function ($timer) use ($webServerProcess) {
+            $webServerProcess->start($timer->getLoop());
+            $webServerProcess->stdout->on('data', function ($output) {
+                $this->processMessage($output, PROC_SERVER);
             });
         });
 
@@ -161,37 +157,38 @@ class Daemon
      * of time has passed, plus some decay value. The decay is
      * used to not thrash a reconnect if we have networking
      * problems.
+     *
      * @param string $process
      */
-    public function restartWithDecay( $process, $event )
+    public function restartWithDecay($process, $event)
     {
         $now = time();
-        $decay = $this->config[ 'decay' ][ $process ];
-        $restartMax = $this->config[ 'restart_max' ][ $process ];
+        $decay = $this->config['decay'][$process];
+        $restartMax = $this->config['restart_max'][$process];
 
         // We want to eventually reset this back to the starting
         // point if the process has been running for over an hour.
-        if ( $now - $this->processLastRestartTime[ $process ] >= 3600 ) {
-            $currentInterval = $this->config[ 'restart_interval' ][ $process ];
+        if ($now - $this->processLastRestartTime[$process] >= 3600) {
+            $currentInterval = $this->config['restart_interval'][$process];
         }
         else {
-            $currentInterval = $this->processRestartInterval[ $process ];
+            $currentInterval = $this->processRestartInterval[$process];
         }
 
         // Now figure out the next interval to run this process
-        $nextInterval = ( $decay * $currentInterval < $restartMax )
+        $nextInterval = ($decay * $currentInterval < $restartMax)
             ? $decay * $currentInterval
             : $restartMax;
 
         $this->loop->addTimer(
             $nextInterval,
-            function ( $timer ) use ( $event ) {
-                $this->emitter->dispatch( $event );
+            function ($timer) use ($event) {
+                $this->emitter->dispatch($event);
             });
 
         // Update the restart interval for next time
-        $this->processLastRestartTime[ $process ] = $now;
-        $this->processRestartInterval[ $process ] = $nextInterval;
+        $this->processLastRestartTime[$process] = $now;
+        $this->processRestartInterval[$process] = $nextInterval;
     }
 
     /**
@@ -199,8 +196,8 @@ class Daemon
      */
     public function continueSync()
     {
-        if ( isset( $this->processPids[ PROC_SYNC ] ) ) {
-            posix_kill( $this->processPids[ PROC_SYNC ], SIGCONT );
+        if (isset($this->processPids[PROC_SYNC])) {
+            posix_kill($this->processPids[PROC_SYNC], SIGCONT);
         }
     }
 
@@ -209,8 +206,8 @@ class Daemon
      */
     public function stopSync()
     {
-        if ( isset( $this->processPids[ PROC_SYNC ] ) ) {
-            posix_kill( $this->processPids[ PROC_SYNC ], SIGURG );
+        if (isset($this->processPids[PROC_SYNC])) {
+            posix_kill($this->processPids[PROC_SYNC], SIGURG);
         }
     }
 
@@ -219,19 +216,20 @@ class Daemon
      */
     public function pollStats()
     {
-        if ( isset( $this->processPids[ PROC_SYNC ] ) ) {
-            posix_kill( $this->processPids[ PROC_SYNC ], SIGUSR2 );
+        if (isset($this->processPids[PROC_SYNC])) {
+            posix_kill($this->processPids[PROC_SYNC], SIGUSR2);
         }
     }
 
     /**
      * Sends a message to the server process to forward to any clients.
+     *
      * @param AbstractMessage $message
      */
-    public function broadcast( AbstractMessage $message )
+    public function broadcast(AbstractMessage $message)
     {
-        if ( ! $this->webServerProcess ) {
-            return FALSE;
+        if (! $this->webServerProcess) {
+            return false;
         }
 
         // Resume the stdin stream, send the message and then pause
@@ -250,8 +248,8 @@ class Daemon
         $this->broadcast(
             new HealthMessage(
                 $this->diagnostics, [
-                    PROC_SYNC => isset( $this->processPids[ PROC_SYNC ] ),
-                    PROC_SERVER => isset( $this->processPids[ PROC_SERVER ] )
+                    PROC_SYNC => isset($this->processPids[PROC_SYNC]),
+                    PROC_SERVER => isset($this->processPids[PROC_SERVER])
                 ],
                 $this->noAccounts
             ));
@@ -259,61 +257,63 @@ class Daemon
 
     public function halt()
     {
-        $this->halt = TRUE;
+        $this->halt = true;
 
-        if ( isset( $this->processPids[ PROC_SYNC ] ) ) {
-            posix_kill( $this->processPids[ PROC_SYNC ], SIGQUIT );
+        if (isset($this->processPids[PROC_SYNC])) {
+            posix_kill($this->processPids[PROC_SYNC], SIGQUIT);
         }
 
-        if ( isset( $this->processPids[ PROC_SERVER ] ) ) {
-            posix_kill( $this->processPids[ PROC_SERVER ], SIGQUIT );
+        if (isset($this->processPids[PROC_SERVER])) {
+            posix_kill($this->processPids[PROC_SERVER], SIGQUIT);
         }
 
         $this->processPids = [];
     }
 
-    private function processMessage( $message, $process )
+    private function processMessage($message, $process)
     {
-        if ( ! ($parsed = $this->parseMessage( $message, $process )) ) {
+        if (! ($parsed = $this->parseMessage($message, $process))) {
             return;
         }
 
         // If the message was a command from a sub-process, then
         // handle that command. Otherwise print this message.
-        if ( $this->handleCommand( $parsed ) ) {
+        if ($this->handleCommand($parsed)) {
             return;
         }
 
-        fwrite( STDOUT, $parsed );
+        fwrite(STDOUT, $parsed);
     }
 
     /**
      * Reads in a JSON message from one of the child processes.
      * The message expects certain fields to be set depending on
      * the type.
+     *
      * @param string $json
      * @param string $process
      */
-    private function handleMessage( $json, $process )
+    private function handleMessage($json, $process)
     {
-        if ( ! Message::isValid( $json ) ) {
-            $this->log->addNotice( "Invalid message sent to Daemon: $json" );
-            return FALSE;
+        if (! Message::isValid($json)) {
+            $this->log->addNotice("Invalid message sent to Daemon: $json");
+
+            return false;
         }
 
         try {
-            $message = Message::make( $json );
+            $message = Message::make($json);
         }
-        catch ( Exception $e ) {
-            return FALSE;
+        catch (Exception $e) {
+            return false;
         }
 
-        switch ( $message->getType() ) {
+        switch ($message->getType()) {
             case Message::PID:
-                $this->processPids[ $process ] = $message->pid;
+                $this->processPids[$process] = $message->pid;
                 break;
             case Message::STATS:
-                if ( $message->accounts ) {
+                if ($message->accounts) {
                     $this->noAccounts = false;
                 }
                 // no break, broadcast
@@ -322,7 +322,7 @@ class Daemon
             case Message::NOTIFICATION:
                 $this->emitter->dispatch(
                     EV_BROADCAST_MSG,
-                    new MessageEvent( $message ) );
+                    new MessageEvent($message));
                 break;
             case Message::NO_ACCOUNTS:
                 $this->noAccounts = true;
@@ -337,24 +337,27 @@ class Daemon
      * Reads in a message to determine if the message is a
      * command from a subprocess. If it is, pass this command
      * off to our handler library and return true.
+     *
      * @param string $message
-     * @return boolean
+     *
+     * @return bool
      */
-    private function handleCommand( $message )
+    private function handleCommand($message)
     {
-        if ( $this->command->isValid( $message ) ) {
+        if ($this->command->isValid($message)) {
             // Ignore these but log them
             try {
-                $this->command->run( $message );
+                $this->command->run($message);
             }
-            catch ( BadCommandException $e ) {
-                $this->log->addNotice( $e->getMessage() );
-                return FALSE;
+            catch (BadCommandException $e) {
+                $this->log->addNotice($e->getMessage());
+
+                return false;
             }
 
-            return TRUE;
+            return true;
         }
 
-        return FALSE;
+        return false;
     }
 }

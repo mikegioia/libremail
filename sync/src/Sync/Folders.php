@@ -31,7 +31,7 @@ class Folders
      * @param Emitter $emitter
      * @param bool $interactive
      */
-    public function __construct( Logger $log, CLImate $cli, Emitter $emitter, $interactive )
+    public function __construct(Logger $log, CLImate $cli, Emitter $emitter, $interactive)
     {
         $this->log = $log;
         $this->cli = $cli;
@@ -41,108 +41,115 @@ class Folders
 
     /**
      * Syncs a set of IMAP folders with what we have in SQL.
+     *
      * @param array $folderList
      * @param FolderModel array $savedFolders
      * @param AccountModel $account
      */
-    public function run( $folderList, $savedFolders, AccountModel $account )
+    public function run($folderList, $savedFolders, AccountModel $account)
     {
-        $count = iterator_count( $folderList );
-        $this->log->debug( "Found $count ". Fn\plural( 'folder', $count ) );
-        $this->addNewFolders( $folderList, $savedFolders, $account );
-        $this->removeOldFolders( $folderList, $savedFolders, $account );
+        $count = iterator_count($folderList);
+        $this->log->debug("Found $count ".Fn\plural('folder', $count));
+        $this->addNewFolders($folderList, $savedFolders, $account);
+        $this->removeOldFolders($folderList, $savedFolders, $account);
     }
 
     /**
      * Adds new folders from IMAP to the database.
+     *
      * @param array $folderList
      * @param FolderModel array $savedFolders
      * @param AccountModel $account
      */
-    private function addNewFolders( $folderList, $savedFolders, AccountModel $account )
+    private function addNewFolders($folderList, $savedFolders, AccountModel $account)
     {
         $i = 1;
         $toAdd = [];
 
-        foreach ( $folderList as $folderName ) {
-            if ( ! array_key_exists( (string) $folderName, $savedFolders ) ) {
+        foreach ($folderList as $folderName) {
+            if (! array_key_exists((string) $folderName, $savedFolders)) {
                 $toAdd[] = (string) $folderName;
             }
         }
 
-        if ( ! ( $count = count( $toAdd ) ) ) {
-            $this->log->debug( "No new folders to save" );
+        if (! ($count = count($toAdd))) {
+            $this->log->debug('No new folders to save');
+
             return;
         }
 
-        if ( $this->interactive ) {
+        if ($this->interactive) {
             $this->cli->whisper(
-                "Adding $count new ". Fn\plural( 'folder', $count ) .":" );
-            $progress = $this->cli->progress()->total( $count );
+                "Adding $count new ".Fn\plural('folder', $count).':');
+            $progress = $this->cli->progress()->total($count);
         }
         else {
             $this->log->info(
-                "Adding $count new ". Fn\plural( 'folder', $count ) );
+                "Adding $count new ".Fn\plural('folder', $count));
         }
 
-        foreach ( $toAdd as $folderName ) {
+        foreach ($toAdd as $folderName) {
             $folder = new FolderModel([
                 'name' => $folderName,
                 'account_id' => $account->getId(),
-                'ignored' => $this->getIgnored( $folderName )
+                'ignored' => $this->getIgnored($folderName)
             ]);
             $folder->save();
-            $folders[ $folder->getId() ] = $folder;
+            $folders[$folder->getId()] = $folder;
 
-            if ( $this->interactive ) {
-                $progress->current( $i++ );
+            if ($this->interactive) {
+                $progress->current($i++);
             }
 
-            $this->emitter->emit( Sync::EVENT_CHECK_HALT );
+            $this->emitter->emit(Sync::EVENT_CHECK_HALT);
         }
     }
 
     /**
      * Removes purged folders no longer in the mailbox from the database.
+     *
      * @param array $folderList
      * @param FolderModel array $savedFolders
      * @param AccountModel $account
      */
-    private function removeOldFolders( $folderList, $savedFolders, AccountModel $account )
+    private function removeOldFolders($folderList, $savedFolders, AccountModel $account)
     {
         $lookup = [];
         $toRemove = [];
 
-        foreach ( $folderList as $folderName ) {
+        foreach ($folderList as $folderName) {
             $lookup[] = $folderName;
         }
 
-        foreach ( $savedFolders as $savedFolder ) {
-            if ( ! in_array( $savedFolder->getName(), $lookup ) ) {
+        foreach ($savedFolders as $savedFolder) {
+            if (! in_array($savedFolder->getName(), $lookup)) {
                 $toRemove[] = $savedFolder;
             }
         }
 
-        if ( ! ( $count = count( $toRemove ) ) ) {
-            $this->log->debug( "No folders to remove" );
+        if (! ($count = count($toRemove))) {
+            $this->log->debug('No folders to remove');
+
             return;
         }
 
-        $this->log->info( "Removing $count ". Fn\plural( 'folder', $count ) );
+        $this->log->info("Removing $count ".Fn\plural('folder', $count));
 
-        foreach ( $toRemove as $folder ) {
+        foreach ($toRemove as $folder) {
             $folder->delete();
         }
     }
 
     /**
      * Certain folders should be automatically ignored.
+     *
      * @param string $folderName
+     *
      * @return int
      */
-    private function getIgnored( $folderName )
+    private function getIgnored($folderName)
     {
-        return ( in_array( $folderName, self::IGNORED_LIST ) )
+        return in_array($folderName, self::IGNORED_LIST)
             ? 1
             : 0;
     }

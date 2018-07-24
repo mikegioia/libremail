@@ -17,7 +17,7 @@ abstract class Console
     public function __construct()
     {
         $this->cli = new CLI;
-        $this->cli->description( self::DESCRIPTION );
+        $this->cli->description(self::DESCRIPTION);
 
         $this->setupArgs();
         $this->parseArgs();
