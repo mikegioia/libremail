@@ -83,11 +83,13 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `account_id` int(10) unsigned NOT NULL,
   `folder_id` int(10) unsigned NOT NULL,
   `unique_id` int(10) unsigned DEFAULT NULL,
+  `thread_id` int(10) unsigned DEFAULT NULL,
   `date_str` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   `charset` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   `subject` varchar(270) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `message_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
   `in_reply_to` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `recv_str` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
   `size` int(10) unsigned DEFAULT NULL,
   `message_no` int(10) unsigned DEFAULT NULL,
   `to` text COLLATE utf8_unicode_ci,
@@ -107,6 +109,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `answered` tinyint(1) unsigned DEFAULT NULL,
   `synced` tinyint(1) unsigned DEFAULT NULL,
   `date` datetime DEFAULT NULL,
+  `date_recv` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   INDEX (`folder_id`),
@@ -127,6 +130,9 @@ CREATE TABLE IF NOT EXISTS `messages` (
    differs from the `message_no` in that it is an unchanging ID issued from the
    mail server. This unique ID (or uid) is used in determining which messages
    are new or marked for deletion in the syncing process.
+- `thread_id` An identifier common to all messages within a thread. A thread is
+   computed using the `message_id`, `references`, and any addresses in the `to`,
+   `cc`, `from`, `bcc`, and `reply_to` fields.
 - `date_str` The date string as stored in the mail header. This can take
    many different formats and sometimes not even be a valid date string. It
    should be stored here regardless. The `date` field is a cleansed version of
@@ -140,6 +146,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
    mail server.
 - `in_reply_to` Optional string containing the `message_id` of the message that
    this email is replying to. This value comes from the mail header.
+- `recv_str` Date the message was received by the account's mail server.
 - `size` Integer denoting the size in bytes of the message.
 - `message_no` The positional message number returned from the mail server.
    **This value can change** if messages are moved within a folder and is only
@@ -173,4 +180,6 @@ CREATE TABLE IF NOT EXISTS `messages` (
    remain 0 until the text, html, attachments, and other mail parts were synced.
 - `date` Date-time field representing the processed `date_str` from the message.
    This field is in the format `YYYY-MM-DD HH-MM-SS`.
+- `date_rcv` Date-time fields represending the processed `recv_str` from the
+   message.
 - `created_at` Timestamp denoting when the message was added to the database.
