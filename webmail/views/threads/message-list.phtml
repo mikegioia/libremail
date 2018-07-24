@@ -1,0 +1,34 @@
+<h5 class="thread-title">
+    <span class="strong subject"><?php $view->clean( $thread->getSubject() ); ?></span>
+<?php
+foreach ( $thread->getFolders() as $folder ): ?>
+    <mark style="background-color:<?php echo $folder->color->bg; ?>; color:<?php echo $folder->color->fg; ?>"><?php $view->clean( $folder->label ); ?></mark>
+<?php
+endforeach; ?>
+</h5>
+<!-- Message List -->
+<section class="thread-msg-list">
+<?php
+foreach ( $thread->getMessages() as $message ): ?>
+    <input id="thread-msg-checkbox-<?php echo $message->id; ?>" type="checkbox" class="thread-msg-checkbox" />
+    <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-label">
+        <span class="snippet">
+            <strong class="from"><?php $view->clean( $message->from_name ); ?></strong>
+            <span><?php $view->clean( $message->snippet ); ?></span>
+        </span>
+        <span class="date">1:05 pm</span>
+    </label>
+    <article id="message-<?php echo $message->id; ?>" class="thread-msg">
+        <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-header">
+            <span class="from">
+                <strong><?php $view->clean( $message->from_name ); ?></strong>
+                <span><?php $view->clean( $message->from_email ); ?></span>
+            </span>
+        </label>
+        <div class="message">
+            <?php echo nl2br( trim( $view->clean( $message->text_plain, TRUE ) ) ); ?>
+        </div>
+    </article>
+<?php
+endforeach; ?>
+</section>

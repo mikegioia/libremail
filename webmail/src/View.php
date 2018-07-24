@@ -7,11 +7,25 @@
 
 namespace App;
 
+use DateTime;
 use Exception;
+use DateTimeZone;
 
 class View
 {
     private $data = [];
+
+    static private $timezone;
+
+    const UTC = 'UTC';
+    const TIME = 'g:i a';
+    const DATE_SHORT = 'M j';
+    const DATE_FULL = 'Y-m-d';
+
+    static public function setTimezone( $timezone )
+    {
+        self::$timezone = $timezone;
+    }
 
     /**
      * Add data to the internal variables. This is chainable,
@@ -66,6 +80,35 @@ class View
         }
 
         echo htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
+    }
+
+    /**
+     * Renders a date, formatted for the timezone.
+     * @param string $dateString
+     * @param string $format
+     */
+    public function date( $dateString, $format )
+    {
+        echo self::getDate( $date, $format );
+    }
+
+    /**
+     * Formats a date according to the timezone and format.
+     * @param string $dateString
+     * @param string $format
+     * @return string
+     */
+    static public function getDate( $dateString, $format )
+    {
+        $utc = new DateTimeZone( self::UTC );
+        $tz = new DateTimeZone( self::$timezone );
+
+        $date = ( $dateString )
+            ? new DateTime( $dateString, $utc )
+            : new DateTime;
+        $date->setTimezone( $tz );
+
+        return $date->format( $format );
     }
 
     /**

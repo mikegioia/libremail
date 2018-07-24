@@ -1,0 +1,54 @@
+<?php
+
+$view->render( 'header' );
+
+$view->render( 'nav', [
+    'view' => $view,
+    'folders' => $folders,
+    'activeId' => $folderId
+]); ?>
+
+<section id="main">
+    <form action="/update" method="post">
+        <div id="msg-actions">
+            <?php
+            $view->render( 'nav/actions-menu', [
+                'sticky' => TRUE,
+                'threadView' => TRUE
+            ]); ?>
+        </div>
+
+        <section id="msg-list">
+            <?php
+            $view->render( 'threads/message-list', [
+                'i' => 0,
+                'view' => $view,
+                'thread' => $thread
+            ]);
+
+            $view->render( 'messages/footer' ); ?>
+        </section>
+
+        <?php
+        $view->render( 'messages/move-messages', [
+            'view' => $view,
+            'folders' => $folders->getList()
+        ]);
+        $view->render( 'messages/apply-folder', [
+            'view' => $view,
+            'folders' => $folders->getList()
+        ]); ?>
+
+        <input type="hidden" name="folder_id" value="<?php echo $folderId; ?>" />
+        <input type="hidden" name="message[]" value="<?php echo $thread->id; ?>" />
+        <input type="hidden" name="message_all[]" value="<?php echo $thread->id; ?>" />
+    </form>
+</section>
+
+<?php
+$view->render( 'messages/datalist', [
+    'view' => $view,
+    'folders' => $folders->get()
+]);
+
+$view->render( 'footer' ); ?>

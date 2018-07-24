@@ -22,6 +22,7 @@ if ( $folder->ignored != 1 && ! $folder->is_mailbox ): ?>
             $view->render( 'nav/folder', [
                 'view' => $view,
                 'folders' => $folders,
+                'activeId' => $activeId,
                 'folder' => $child[ 'folder' ],
                 'children' => $child[ 'children' ]
             ]);

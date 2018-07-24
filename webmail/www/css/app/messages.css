@@ -48,7 +48,7 @@ section #msg-list h5 .fa-caret-right {
     left: 0.2rem;
 }
 
-section #msg-list h5 span {
+section #msg-list h5 span:not(.subject) {
     margin-left: 0.5rem;
 }
 
@@ -97,6 +97,10 @@ section #msg-list h5 em {
 section #msg-list h5 var {
     font-style: normal;
     font-family: Arial, sans-serif;
+}
+
+section #msg-list .mailbox {
+    padding-right: 1rem;
 }
 
 section #msg-list .mailbox-checkbox:checked + h5 {
@@ -161,7 +165,7 @@ input[type="checkbox"].msg-checkbox {
 .msg-label:after {
     background: #f9f9f9;
     border: 1px solid #bbb;
-    border-radius: 2px;
+    border-radius: 0.125rem;
     color: #999;
     content: ' ';
     display: block;
@@ -253,7 +257,7 @@ input[type="checkbox"].msg-checkbox {
     text-decoration: none;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: calc(100% - 33rem);
+    width: calc(100% - 32rem);
 }
 
 .msg-checkbox:checked + .msg-label + .msg-contents .subject {
@@ -265,7 +269,7 @@ input[type="checkbox"].msg-checkbox {
 }
 
 .msg-contents .subject mark {
-    border-radius: 1px;
+    border-radius: 0.125rem;
     font-size: 1rem;
     padding: 0.1rem 0.4rem 0.2rem;
     position: relative;

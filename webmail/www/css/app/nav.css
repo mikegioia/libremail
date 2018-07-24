@@ -4,7 +4,7 @@
  * z-index range: 1-2
  */
 
-header {
+body > header {
     background: #f1f1f1;
     border-bottom: 4px solid #c56bde;
     height: 5rem;
@@ -13,11 +13,7 @@ header {
     z-index: 1;
 }
 
-header:hover {
-    z-index: 2;
-}
-
-header a.icon.button {
+body > header a.icon.button {
     margin-bottom: 0;
 }
 
@@ -68,6 +64,12 @@ header a.icon.button {
     width: 19rem;
 }
 
+#topnav-actions {
+    position: fixed;
+    right: 1rem;
+    top: 0.75rem;
+}
+
 #compose {
     line-height: 3.5rem;
     text-transform: uppercase;
@@ -97,7 +99,7 @@ nav a.mailbox {
     height: 2.1rem;
     margin-right: 2rem;
     overflow: hidden;
-    padding: 0.33rem 1.6rem 0.33rem 0;
+    padding: 0.33rem 1.75rem 0.33rem 0;
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 100%;
@@ -146,7 +148,7 @@ nav #mailboxes-more li {
 }
 
 nav #mailboxes-divider {
-    border-top: 2px solid #eee;
+    border-top: 0.125rem solid #eee;
     margin: 0.25rem 0 0.25rem 2rem;
 }
 
@@ -268,6 +270,10 @@ section #msg-actions a.button {
     display: none;
     position: fixed;
     top: calc(6.75rem);
+}
+
+.menu.actions.sticky {
+    display: block;
 }
 
 .folder-selector {

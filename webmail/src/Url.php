@@ -72,4 +72,22 @@ class Url
 
         self::redirectRaw( self::folder( $folderId, $page ) );
     }
+
+    static public function getRefUrl( $default = '/' )
+    {
+        $ref = ( isset( $_SERVER[ 'HTTP_REFERER' ] ) )
+            ? $_SERVER[ 'HTTP_REFERER' ]
+            : '';
+
+        // Only use this if we're on the same domain
+        $len = strlen( self::$base );
+
+        if ( strncmp( $ref, self::$base, $len ) !== 0 ) {
+            return self::get( $default );
+        }
+
+        $path = htmlspecialchars( substr( $ref, $len ) );
+
+        return self::get( $path );
+    }
 }

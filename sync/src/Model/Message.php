@@ -36,10 +36,12 @@ class Message extends Model
     public $answered;
     public $reply_to;
     public $date_str;
+    public $recv_str;
     public $unique_id;
     public $folder_id;
     public $thread_id;
     public $text_html;
+    public $date_recv;
     public $account_id;
     public $message_id;
     public $message_no;
@@ -83,10 +85,12 @@ class Message extends Model
             'answered' => $this->answered,
             'reply_to' => $this->reply_to,
             'date_str' => $this->date_str,
+            'recv_str' => $this->recv_str,
             'unique_id' => $this->unique_id,
             'folder_id' => $this->folder_id,
             'thread_id' => $this->thread_id,
             'text_html' => $this->text_html,
+            'date_recv' => $this->date_recv,
             'account_id' => $this->account_id,
             'message_id' => $this->message_id,
             'message_no' => $this->message_no,
@@ -350,11 +354,14 @@ class Message extends Model
         $val->optional( 'seen', 'Seen' )->callback([ $this, 'isValidFlag' ]);
         $val->optional( 'message_id', 'Message ID' )->lengthBetween( 0, 250 );
         $val->optional( 'draft', 'Draft' )->callback([ $this, 'isValidFlag' ]);
+        $val->optional( 'recv_str', 'Received Date' )->lengthBetween( 0, 250 );
         $val->optional( 'in_reply_to', 'In-Reply-To' )->lengthBetween( 0, 250 );
         $val->optional( 'recent', 'Recent' )->callback([ $this, 'isValidFlag' ]);
+        $val->optional( 'date_recv', 'Date Received' )->datetime( DATE_DATABASE );
         $val->optional( 'flagged', 'Flagged' )->callback([ $this, 'isValidFlag' ]);
         $val->optional( 'deleted', 'Deleted' )->callback([ $this, 'isValidFlag' ]);
         $val->optional( 'answered', 'Answered' )->callback([ $this, 'isValidFlag' ]);
+
         $this->setData( $data );
         $data = $this->getData();
 
@@ -493,8 +500,10 @@ class Message extends Model
             'message_no' => $message->messageNum,
             'references' => $message->references,
             'in_reply_to' => $message->inReplyTo,
+            'date_recv' => $message->dateReceived,
             'flagged' => $message->flags->flagged,
             'deleted' => $message->flags->deleted,
+            'recv_str' => $message->receivedString,
             'answered' => $message->flags->answered,
             // The cc and inReplyTo fields come in as arrays with the
             // address as the index and the name as the value. Create

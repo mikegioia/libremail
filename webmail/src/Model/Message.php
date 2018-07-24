@@ -26,6 +26,8 @@ class Message extends Model
     public $answered;
     public $reply_to;
     public $date_str;
+    public $recv_str;
+    public $date_recv;
     public $unique_id;
     public $folder_id;
     public $thread_id;
@@ -80,6 +82,8 @@ class Message extends Model
             'answered' => $this->answered,
             'reply_to' => $this->reply_to,
             'date_str' => $this->date_str,
+            'recv_str' => $this->recv_str,
+            'date_recv' => $this->date_recv,
             'unique_id' => $this->unique_id,
             'folder_id' => $this->folder_id,
             'thread_id' => $this->thread_id,
@@ -112,6 +116,22 @@ class Message extends Model
             ->select()
             ->from( 'messages' )
             ->whereIn( 'id', $ids )
+            ->execute()
+            ->fetchAll( PDO::FETCH_CLASS, get_class() );
+    }
+
+    /**
+     * Returns the data for an entire thread.
+     */
+    public function getThread( $accountId, $threadId )
+    {
+        return $this->db()
+            ->select()
+            ->from( 'messages' )
+            ->where( 'deleted', '=', 0 )
+            ->where( 'thread_id', '=', $threadId )
+            ->where( 'account_id', '=', $accountId )
+            ->orderBy( 'date', Model::ASC )
             ->execute()
             ->fetchAll( PDO::FETCH_CLASS, get_class() );
     }
@@ -237,13 +257,13 @@ class Message extends Model
             ->select([
                 '`from`', 'thread_id', 'message_id',
                 'folder_id', 'subject', '`date`',
-                'seen'
+                'seen', 'date_recv'
             ])
             ->from( 'messages' )
             ->where( 'deleted', '=', 0 )
             ->whereIn( 'thread_id', $threadIds )
             ->where( 'account_id', '=', $accountId )
-            ->orderBy( 'date', Model::ASC )
+            ->orderBy( '`date`', Model::ASC )
             ->execute()
             ->fetchAll( PDO::FETCH_CLASS );
 
@@ -273,8 +293,8 @@ class Message extends Model
                 $name = $this->getName( $row->from );
                 $threads[ $row->thread_id ]->count++;
                 $threads[ $row->thread_id ]->names[] = $name;
-                $threads[ $row->thread_id ]->date = $row->date;
                 $threads[ $row->thread_id ]->seens[] = $row->seen;
+                $threads[ $row->thread_id ]->date = $row->date_recv ?: $row->date;
                 $messageIds[ $row->message_id ] = TRUE;
             }
         }
@@ -431,9 +451,9 @@ class Message extends Model
      * Returns any message with the same message ID and thread ID.
      * @param array $filters
      * @param array $options
-     * @return array of ints
+     * @return array of Messages
      */
-    public function getSiblingIds( $filters = [], $options = [] )
+    public function getSiblings( $filters = [], $options = [] )
     {
         $ids = [];
         $addSelf = TRUE;
@@ -456,7 +476,7 @@ class Message extends Model
         }
 
         $query = $this->db()
-            ->select([ 'id' ])
+            ->select()
             ->from( 'messages' )
             ->where( 'deleted', '=', 0 )
             ->where( 'thread_id', '=', $this->thread_id )
@@ -470,13 +490,7 @@ class Message extends Model
             $query->where( $key, '=', $value );
         }
 
-        $results = $query->execute()->fetchAll( PDO::FETCH_CLASS );
-
-        foreach ( $results as $result ) {
-            $ids[] = $result->id;
-        }
-
-        return array_values( array_unique( $ids ) );
+        return $query->execute()->fetchAll( PDO::FETCH_CLASS, get_class() );
     }
 
     /**
@@ -485,15 +499,14 @@ class Message extends Model
      * @param string $flag
      * @param bool $state
      */
-    public function setFlag( $messageId, $flag, $state )
+    public function setFlag( $flag, $state )
     {
         $updated = $this->db()
             ->update([
                 $flag => $state ? 1 : 0
             ])
             ->table( 'messages' )
-            ->where( 'id', '=', $messageId )
-            ->where( $flag, '!=', $state ? 1 : 0 )
+            ->where( 'id', '=', $this->id )
             ->execute();
 
         return is_numeric( $updated ) ? $updated : FALSE;
