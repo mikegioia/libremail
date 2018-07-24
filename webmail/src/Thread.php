@@ -20,6 +20,7 @@ class Thread
 
     const UTF8 = 'utf-8';
     const SNIPPET_LENGTH = 160;
+    const EMAIL_REGEX = '@(http)?(s)?(://)?(([a-zA-Z])([-\w]+\.)+([^\s\.]+[^\s]*)+[^,.\s])@';
 
     /**
      * @param Account $account
@@ -175,6 +176,17 @@ class Thread
      */
     private function setContent( Message &$message )
     {
-        $message->text_markdown = $message->text_plain;
+        // @TODO
+        //$message->text_markdown = $message->text_plain;
+
+        // Cleanse it
+        $body = htmlspecialchars( $message->text_plain, ENT_QUOTES, 'UTF-8' );
+        // Convert any links
+        $body = preg_replace(
+            self::EMAIL_REGEX,
+            '<a href="http$2://$4" target="_blank" title="$0">$0</a>',
+            $body);
+
+        $message->body = nl2br( trim( $body ) );
     }
 }

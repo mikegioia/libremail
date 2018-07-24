@@ -211,7 +211,7 @@ try {
 // If the database connection dropped, kill the database service and
 // try to reconnect. Otherwise terminate.
 catch ( PDOException $e ) {
-    $di[ 'sync' ]->disconnect( TRUE );
+    isset($di[ 'sync' ]) && $di['sync']->disconnect( TRUE );
     $di[ 'sync' ] = NULL;
     $sec = $config[ 'app' ][ 'db' ][ 'sleep_minutes' ] * 60;
     Diagnostics::checkDatabaseException( $di, $e, TRUE, $sec );

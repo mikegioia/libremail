@@ -13,20 +13,26 @@ foreach ( $thread->getMessages() as $message ): ?>
     <input id="thread-msg-checkbox-<?php echo $message->id; ?>" type="checkbox" class="thread-msg-checkbox" />
     <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-label">
         <span class="snippet">
-            <strong class="from"><?php $view->clean( $message->from_name ); ?></strong>
-            <span><?php $view->clean( $message->snippet ); ?></span>
+            <span class="avatar">
+                <img src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($message->from_email))); ?>?d=identicon" />
+            </span><!--
+            --><strong class="from"><?php $view->clean( $message->from_name ); ?></strong><!--
+            --><span><?php $view->clean( $message->snippet ); ?></span>
         </span>
         <span class="date">1:05 pm</span>
     </label>
     <article id="message-<?php echo $message->id; ?>" class="thread-msg">
         <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-header">
+            <span class="avatar">
+                <img src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($message->from_email))); ?>?d=identicon" />
+            </span>
             <span class="from">
                 <strong><?php $view->clean( $message->from_name ); ?></strong>
                 <span><?php $view->clean( $message->from_email ); ?></span>
             </span>
         </label>
         <div class="message">
-            <?php echo nl2br( trim( $view->clean( $message->text_plain, TRUE ) ) ); ?>
+            <?php echo $message->body; ?>
         </div>
     </article>
 <?php

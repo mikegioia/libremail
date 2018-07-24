@@ -10,6 +10,9 @@
   #search .icon.button {
     top: 0.05rem;
   }
+  .thread-msg .message {
+    font-size: 1.25rem;
+  }
 }
 
 /* Large desktop screens */
@@ -19,6 +22,19 @@
   }
   #search .icon.button {
     top: 0;
+  }
+}
+
+/* Large devices */
+@media (min-width: 1200px) {
+  section#main {
+    left: 25rem;
+  }
+  nav {
+    width: 25rem;
+  }
+  nav #nav-wrapper {
+    width: 21rem;
   }
 }
 
