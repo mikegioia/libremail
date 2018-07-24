@@ -67,6 +67,7 @@ aside {
 
 /* Z-Index layers */
 .top-layer {
+    padding-top: 0.75rem;
     position: relative;
     z-index: 30;
 }

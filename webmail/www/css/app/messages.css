@@ -99,6 +99,10 @@ section #msg-list h5 var {
     font-family: Arial, sans-serif;
 }
 
+section #msg-list .mailbox {
+    padding-right: 1rem;
+}
+
 section #msg-list .mailbox-checkbox:checked + h5 {
     border-bottom: 1px solid #ddd;
     padding-bottom: 0.5rem;

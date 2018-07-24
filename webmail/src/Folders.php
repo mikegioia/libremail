@@ -35,22 +35,27 @@ class Folders
     const INBOX = 'inbox';
     const GMAIL = '[gmail]';
     const DRAFTS = [
-        '[Gmail]/Drafts'
+        '[Gmail]/Drafts',
+        '[Gmail]/Bozze'
     ];
     const SPAM = [
         '[Gmail]/Spam'
     ];
     const TRASH = [
-        '[Gmail]/Trash'
+        '[Gmail]/Trash',
+        '[Gmail]/Cestino'
     ];
     const STARRED = [
-        '[Gmail]/Starred'
+        '[Gmail]/Starred',
+        '[Gmail]/Speciali'
     ];
     const ALL = [
-        '[Gmail]/All Mail'
+        '[Gmail]/All Mail',
+        '[Gmail]/Tutti i messaggi'
     ];
     const SENT = [
-        '[Gmail]/Sent Mail'
+        '[Gmail]/Sent Mail',
+        '[Gmail]/Posta inviata'
     ];
 
     /**
@@ -390,7 +395,7 @@ class Folders
         // Shortened label for display in the inbox
         $parts = explode( '/', $folder->full_name );
         $partCount = count( $parts );
-        $folder->label = ( $partCount > 2 )
+        $folder->label = $partCount > 2
             ? $parts[ 0 ] .'/&hellip;/'. $parts[ $partCount - 1 ]
             : $folder->full_name;
     }
@@ -404,9 +409,7 @@ class Folders
     {
         $name = $folder->name;
 
-        if ( strtolower( $name ) === self::INBOX
-            && ! $this->inboxId )
-        {
+        if ( strtolower( $name ) === self::INBOX && ! $this->inboxId ) {
             $this->inbox =& $folder;
             $folder->is_mailbox = TRUE;
             $this->inboxId = $folder->id;
