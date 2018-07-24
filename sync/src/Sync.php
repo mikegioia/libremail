@@ -20,7 +20,6 @@ use App\Message\NotificationMessage;
 use App\Model\Folder as FolderModel;
 use App\Sync\Messages as MessageSync;
 use App\Model\Account as AccountModel;
-use App\Model\Message as MessageModel;
 use Evenement\EventEmitter as Emitter;
 use App\Exceptions\Stop as StopException;
 use App\Model\Migration as MigrationModel;
@@ -72,27 +71,28 @@ class Sync
      * used when the sync app is run from a bootstrap file and the
      * ad hoc method is when this class is used separately within
      * other classes like Console.
+     *
      * @param array $di Service container
      */
-    public function __construct( Container $di = NULL )
+    public function __construct(Container $di = null)
     {
-        $this->halt = FALSE;
+        $this->halt = false;
         $this->retries = [];
         $this->retriesFolders = [];
         $this->retriesMessages = [];
 
-        if ( $di ) {
-            $this->cli = $di[ 'cli' ];
-            $this->stats = $di[ 'stats' ];
-            $this->config = $di[ 'config' ];
-            $this->threader = $di[ 'threader' ];
-            $this->log = $di[ 'log' ]->getLogger();
-            $this->quick = $di[ 'console' ]->quick;
-            $this->sleep = $di[ 'console' ]->sleep;
-            $this->folder = $di[ 'console' ]->folder;
-            $this->daemon = $di[ 'console' ]->daemon;
-            $this->threading = $di[ 'console' ]->threading;
-            $this->interactive = $di[ 'console' ]->interactive;
+        if ($di) {
+            $this->cli = $di['cli'];
+            $this->stats = $di['stats'];
+            $this->config = $di['config'];
+            $this->threader = $di['threader'];
+            $this->log = $di['log']->getLogger();
+            $this->quick = $di['console']->quick;
+            $this->sleep = $di['console']->sleep;
+            $this->folder = $di['console']->folder;
+            $this->daemon = $di['console']->daemon;
+            $this->threading = $di['console']->threading;
+            $this->interactive = $di['console']->interactive;
         }
 
         $this->initGc();
@@ -101,7 +101,7 @@ class Sync
     /**
      * @param CLImate $cli
      */
-    public function setCLI( CLImate $cli )
+    public function setCLI(CLImate $cli)
     {
         $this->cli = $cli;
     }
@@ -109,7 +109,7 @@ class Sync
     /**
      * @param Logger $log
      */
-    public function setLog( Logger $log )
+    public function setLog(Logger $log)
     {
         $this->log = $log;
     }
@@ -117,7 +117,7 @@ class Sync
     /**
      * @param array $config
      */
-    public function setConfig( array $config )
+    public function setConfig(array $config)
     {
         $this->config = $config;
     }
@@ -130,35 +130,35 @@ class Sync
     public function loop()
     {
         $wakeUnix = 0;
-        $sleepMinutes = $this->config[ 'app' ][ 'sync' ][ 'sleep_minutes' ];
+        $sleepMinutes = $this->config['app']['sync']['sleep_minutes'];
 
-        while ( TRUE ) {
+        while (true) {
             $this->gc();
             $this->checkForHalt();
             $this->setRunning();
 
-            if ( $this->wake === TRUE ) {
+            if (true === $this->wake) {
                 $wakeUnix = 0;
-                $this->wake = FALSE;
+                $this->wake = false;
             }
 
-            if ( (new DateTime)->getTimestamp() < $wakeUnix ) {
+            if ((new DateTime)->getTimestamp() < $wakeUnix) {
                 $this->setAsleep();
-                sleep( 60 );
+                sleep(60);
                 continue;
             }
 
-            $this->setAsleep( FALSE );
+            $this->setAsleep(false);
 
-            if ( ! $this->run() ) {
-                throw new TerminateException( "Sync was prevented from running" );
+            if (! $this->run()) {
+                throw new TerminateException('Sync was prevented from running');
             }
 
-            $wakeTime = Fn\timeFromNow( $sleepMinutes );
-            $wakeUnix = Fn\unixFromNow( $sleepMinutes );
+            $wakeTime = Fn\timeFromNow($sleepMinutes);
+            $wakeUnix = Fn\unixFromNow($sleepMinutes);
             $this->log->addInfo(
                 "Going to sleep for $sleepMinutes minutes. Sync will ".
-                "re-run at $wakeTime." );
+                "re-run at $wakeTime.");
         }
     }
 
@@ -167,60 +167,64 @@ class Sync
      *  1. Get the folders
      *  2. Save all message IDs for each folder
      *  3. For each folder, add/remove messages based off IDs
-     *  4. Save attachments
+     *  4. Save attachments.
+     *
      * @param AccountModel $account Optional account to run
      */
-    public function run( AccountModel $account = NULL )
+    public function run(AccountModel $account = null)
     {
-        if ( $this->sleep ) {
-            return TRUE;
+        if ($this->sleep) {
+            return true;
         }
 
-        if ( $account ) {
-            $accounts = [ $account ];
+        if ($account) {
+            $accounts = [$account];
         }
         else {
             $accountModel = new AccountModel;
             $accounts = $accountModel->getActive();
         }
 
-        if ( ! $accounts ) {
-            $this->stats->setActiveAccount( NULL );
+        if (! $accounts) {
+            $this->stats->setActiveAccount(null);
 
             // If we're in daemon mode, just go to sleep. The script
             // will pick up once the user creates an account and a
             // SIGCONT is sent to this process.
-            if ( $this->daemon ) {
-                Message::send( new NoAccountsMessage );
-                return TRUE;
+            if ($this->daemon) {
+                Message::send(new NoAccountsMessage);
+
+                return true;
             }
 
-        	$this->log->notice( "No accounts to run, exiting." );
-        	return FALSE;
+            $this->log->notice('No accounts to run, exiting.');
+
+            return false;
         }
 
         // Try to set max allowed packet size in SQL
         $migration = new MigrationModel;
 
-        if ( ! $migration->setMaxAllowedPacket( 16 ) ) {
+        if (! $migration->setMaxAllowedPacket(16)) {
             $this->log->notice(
                 "The max_allowed_packet in MySQL is smaller than what's ".
                 "safe for this sync. I've attempted to change it to 16 MB ".
-                "but you should re-run this script to re-test. Please see ".
-                "the documentation on updating this MySQL setting in your ".
-                "configuration file." );
-            throw new Exception( "Halting script" );
+                'but you should re-run this script to re-test. Please see '.
+                'the documentation on updating this MySQL setting in your '.
+                'configuration file.');
+
+            throw new Exception('Halting script');
         }
 
         // Loop through the active accounts and perform the sync
         // sequentially. The IMAP methods throw exceptions so want
         // to wrap this is a try/catch block.
-        foreach ( $accounts as $account ) {
-            $this->retries[ $account->email ] = 1;
-            $this->runAccount( $account );
+        foreach ($accounts as $account) {
+            $this->retries[$account->email] = 1;
+            $this->runAccount($account);
         }
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -228,38 +232,40 @@ class Sync
      * to the server, syncing folders, syncing messages, etc) should be
      * allowed to fail a certain number of times before the account is
      * considered offline.
+     *
      * @param AccountModel $account
      * @param array $options Valid options include:
      *   only_update_stats (false) If true, only stats about the
      *     folders will be logged. Messages won't be downloaded.
-     * @return boolean
+     *
+     * @return bool
      */
-    public function runAccount( AccountModel $account, $options = [] )
+    public function runAccount(AccountModel $account, $options = [])
     {
-        if ( $this->retries[ $account->email ] > $this->maxRetries ) {
+        if ($this->retries[$account->email] > $this->maxRetries) {
             $message =
                 "The account '{$account->email}' has exceeded the max ".
                 "amount of retries after failure ({$this->maxRetries}) ".
-                "and is no longer being attempted to sync again.";
-            $this->log->notice( $message );
-            $this->sendMessage( $message );
+                'and is no longer being attempted to sync again.';
+            $this->log->notice($message);
+            $this->sendMessage($message);
 
-            return FALSE;
+            return false;
         }
 
         $this->setupEmitter();
 
         // If we're running in threading mode, just update threads
-        if ( $this->threading === TRUE ) {
-            $this->log->info( "Syncing threads for {$account->email}" );
-            $this->updateThreads( $account );
+        if (true === $this->threading) {
+            $this->log->info("Syncing threads for {$account->email}");
+            $this->updateThreads($account);
 
-            return TRUE;
+            return true;
         }
 
         $this->checkForHalt();
-        $this->stats->setActiveAccount( $account->email );
-        $this->log->info( "Starting sync for {$account->email}" );
+        $this->stats->setActiveAccount($account->email);
+        $this->log->info("Starting sync for {$account->email}");
 
         try {
             // Open a connection to the mailbox
@@ -268,41 +274,41 @@ class Sync
                 $account->imap_host,
                 $account->imap_port,
                 $account->email,
-                $account->password );
+                $account->password);
 
             // Check if we're only syncing one folder
-            if ( $this->folder ) {
+            if ($this->folder) {
                 try {
                     $folderModel = new FolderModel;
                     $folder = $folderModel->getByName(
                         $account->getId(),
                         $this->folder,
-                        $failOnNotFound = TRUE );
+                        $failOnNotFound = true);
                 }
-                catch ( PDOException $e ) {
+                catch (PDOException $e) {
                     throw $e;
                 }
-                catch ( Exception $e ) {
+                catch (Exception $e) {
                     throw new FatalException(
-                        "Syncing that folder failed: ". $e->getMessage() );
+                        'Syncing that folder failed: '.$e->getMessage());
                 }
 
-                $this->syncMessages( $account, [ $folder ] );
+                $this->syncMessages($account, [$folder]);
             }
             // Fetch folders and sync them to database
             else {
                 $folderModel = new FolderModel;
-                $this->retriesFolders[ $account->email ] = 1;
-                $this->syncFolders( $account );
-                $folders = $folderModel->getByAccount( $account->getId() );
+                $this->retriesFolders[$account->email] = 1;
+                $this->syncFolders($account);
+                $folders = $folderModel->getByAccount($account->getId());
                 // First pass, just log the message stats
-                $this->syncMessages( $account, $folders, [
-                    self::OPT_SKIP_DOWNLOAD => TRUE
+                $this->syncMessages($account, $folders, [
+                    self::OPT_SKIP_DOWNLOAD => true
                 ]);
 
                 // If the all that's requested is to update the folder stats,
                 // then we can exit here.
-                if ( Fn\get( $options, 'only_update_stats' ) === TRUE ) {
+                if (true === Fn\get($options, 'only_update_stats')) {
                     return;
                 }
 
@@ -310,65 +316,68 @@ class Sync
                 // an array of folders with 0 messages (to skip) but if we're
                 // going to run again in 15 minutes, why not just do two passes
                 // and download any extra messages while we can?
-                $this->syncMessages( $account, $folders );
+                $this->syncMessages($account, $folders);
                 // Disconnect the IMAP connection, but leave the running flag on
-                $this->disconnect( TRUE );
+                $this->disconnect(true);
                 // Update all thread IDs. This will run for a long time for the
                 // first iteration, and all subsequent runs will only update
                 // threads for any new messages.
-                $this->updateThreads( $account );
+                $this->updateThreads($account);
             }
         }
-        catch ( PDOException $e ) {
+        catch (PDOException $e) {
             throw $e;
         }
-        catch ( FatalException $e ) {
-            $this->log->critical( $e->getMessage() );
-            exit( 1 );
+        catch (FatalException $e) {
+            $this->log->critical($e->getMessage());
+            exit(1);
         }
-        catch ( StopException $e ) {
+        catch (StopException $e) {
             throw $e;
         }
-        catch ( TerminateException $e ) {
+        catch (TerminateException $e) {
             throw $e;
         }
-        catch ( Exception $e ) {
-            $this->log->error( $e->getMessage() );
-            $this->checkForClosedConnection( $e );
-            $waitSeconds = $this->config[ 'app' ][ 'sync' ][ 'wait_seconds' ];
+        catch (Exception $e) {
+            $this->log->error($e->getMessage());
+            $this->checkForClosedConnection($e);
+            $waitSeconds = $this->config['app']['sync']['wait_seconds'];
             $this->log->info(
-                "Re-trying sync ({$this->retries[ $account->email ]}/".
-                "{$this->maxRetries}) in $waitSeconds seconds..." );
-            sleep( $waitSeconds );
-            $this->retries[ $account->email ]++;
+                "Re-trying sync ({$this->retries[$account->email]}/".
+                "{$this->maxRetries}) in $waitSeconds seconds...");
+            sleep($waitSeconds);
+            ++$this->retries[$account->email];
 
-            return $this->runAccount( $account );
+            return $this->runAccount($account);
         }
 
         $this->disconnect();
-        $this->log->info( "Sync complete for {$account->email}" );
+        $this->log->info("Sync complete for {$account->email}");
 
-        return TRUE;
+        return true;
     }
 
     /**
      * Connects to an IMAP mailbox using the supplied credentials.
+     *
      * @param string $host IMAP hostname, like 'imap.host.com'
      * @param string $port IMAP port, usually 993 (not used)
      * @param string $email
      * @param string $password
      * @param string $folder Optional, like "INBOX"
      * @param bool $setRunning Optional
+     *
      * @throws MissingIMAPConfigException
      */
-    public function connect( $host, $port, $email, $password, $folder = NULL, $setRunning = TRUE )
+    public function connect($host, $port, $email, $password, $folder = null, $setRunning = true)
     {
         // Check the attachment directory is writeable
-        $attachmentsPath = Diagnostics::checkAttachmentsPath( $email );
+        $attachmentsPath = Diagnostics::checkAttachmentsPath($email);
 
         // If the connection is active, then just select the folder
-        if ( $this->mailbox ) {
-            $this->mailbox->select( $folder );
+        if ($this->mailbox) {
+            $this->mailbox->select($folder);
+
             return;
         }
 
@@ -383,38 +392,39 @@ class Sync
             ]);
         $this->mailbox->getImapStream();
 
-        if ( $setRunning === TRUE ) {
-            $this->setRunning( TRUE );
+        if (true === $setRunning) {
+            $this->setRunning(true);
         }
     }
 
-    public function disconnect( $running = FALSE )
+    public function disconnect($running = false)
     {
-        if ( $this->mailbox ) {
+        if ($this->mailbox) {
             try {
                 $this->mailbox->disconnect();
             }
-            catch ( Exception $e ) {
-                $this->checkForClosedConnection( $e );
+            catch (Exception $e) {
+                $this->checkForClosedConnection($e);
+
                 throw $e;
             }
         }
 
-        $this->mailbox = NULL;
-        $this->setAsleep( FALSE );
-        $this->setRunning( $running );
+        $this->mailbox = null;
+        $this->setAsleep(false);
+        $this->setRunning($running);
     }
 
-    public function setAsleep( $asleep = TRUE )
+    public function setAsleep($asleep = true)
     {
         $this->asleep = $asleep;
-        $this->stats->setAsleep( $asleep );
+        $this->stats->setAsleep($asleep);
     }
 
-    public function setRunning( $running = TRUE )
+    public function setRunning($running = true)
     {
         $this->running = $running;
-        $this->stats->setRunning( $running );
+        $this->stats->setRunning($running);
     }
 
     /**
@@ -423,24 +433,24 @@ class Sync
      */
     public function halt()
     {
-        $this->halt = TRUE;
+        $this->halt = true;
 
         // If we're sleeping forever, throw the exception now
-        if ( $this->sleep === TRUE ) {
+        if (true === $this->sleep) {
             throw new TerminateException;
         }
     }
 
     public function stop()
     {
-        $this->halt = TRUE;
-        $this->stop = TRUE;
+        $this->halt = true;
+        $this->stop = true;
     }
 
     public function wake()
     {
-        $this->wake = TRUE;
-        $this->halt = FALSE;
+        $this->wake = true;
+        $this->halt = false;
     }
 
     /**
@@ -448,75 +458,78 @@ class Sync
      */
     private function setupEmitter()
     {
-        if ( $this->emitter ) {
+        if ($this->emitter) {
             return;
         }
 
         $this->emitter = new Emitter;
 
-        $this->emitter->on( self::EVENT_CHECK_HALT, function () {
+        $this->emitter->on(self::EVENT_CHECK_HALT, function () {
             $this->checkForHalt();
         });
 
-        $this->emitter->on( self::EVENT_GARBAGE_COLLECT, function () {
+        $this->emitter->on(self::EVENT_GARBAGE_COLLECT, function () {
             $this->gc();
         });
 
-        $this->emitter->on( self::EVENT_CHECK_CLOSED_CONN, function ( $e ) {
-            $this->checkForClosedConnection( $e );
+        $this->emitter->on(self::EVENT_CHECK_CLOSED_CONN, function ($e) {
+            $this->checkForClosedConnection($e);
         });
     }
 
     /**
      * Syncs a collection of IMAP folders to the database.
+     *
      * @param AccountModel $account Account to sync
+     *
      * @throws FolderSyncException
+     *
      * @return array $folders List of IMAP folders
      */
-    private function syncFolders( AccountModel $account )
+    private function syncFolders(AccountModel $account)
     {
-        if ( $this->retriesFolders[ $account->email ] > $this->maxRetries ) {
+        if ($this->retriesFolders[$account->email] > $this->maxRetries) {
             $this->log->notice(
                 "The account '{$account->email}' has exceeded the max ".
-                "amount of retries after folder sync failure ".
-                "({$this->maxRetries})." );
+                'amount of retries after folder sync failure '.
+                "({$this->maxRetries}).");
             // @TODO increment a counter on the folder record
             // if its >=3 then mark folder as inactive
             throw new FolderSyncException;
         }
 
-        $this->log->debug( "Syncing IMAP folders for {$account->email}" );
+        $this->log->debug("Syncing IMAP folders for {$account->email}");
 
         try {
             $folderSync = new FolderSync(
                 $this->log,
                 $this->cli,
                 $this->emitter,
-                $this->interactive );
+                $this->interactive);
             $folderList = $this->mailbox->getFolders();
-            $savedFolders = (new FolderModel)->getByAccount( $account->getId() );
-            $folderSync->run( $folderList, $savedFolders, $account );
+            $savedFolders = (new FolderModel)->getByAccount($account->getId());
+            $folderSync->run($folderList, $savedFolders, $account);
         }
-        catch ( PDOException $e ) {
+        catch (PDOException $e) {
             throw $e;
         }
-        catch ( StopException $e ) {
+        catch (StopException $e) {
             throw $e;
         }
-        catch ( TerminateException $e ) {
+        catch (TerminateException $e) {
             throw $e;
         }
-        catch ( Exception $e ) {
-            $this->log->error( $e->getMessage() );
-            $this->checkForClosedConnection( $e );
-            $waitSeconds = $this->config[ 'app' ][ 'sync' ][ 'wait_seconds' ];
+        catch (Exception $e) {
+            $this->log->error($e->getMessage());
+            $this->checkForClosedConnection($e);
+            $waitSeconds = $this->config['app']['sync']['wait_seconds'];
             $this->log->info(
-                "Re-trying folder sync ({$this->retriesFolders[ $account->email ]}/".
-                "{$this->maxRetries}) in $waitSeconds seconds..." );
-            sleep( $waitSeconds );
-            $this->retriesFolders[ $account->email ]++;
+                "Re-trying folder sync ({$this->retriesFolders[$account->email]}/".
+                "{$this->maxRetries}) in $waitSeconds seconds...");
+            sleep($waitSeconds);
+            ++$this->retriesFolders[$account->email];
             $this->checkForHalt();
-            $this->syncFolders( $account );
+            $this->syncFolders($account);
         }
     }
 
@@ -524,30 +537,31 @@ class Sync
      * Syncs all of the messages for an account. This is set up
      * to try each folder some amount of times before moving on
      * to the next folder.
+     *
      * @param AccountModel $account
      * @param array FolderModel $folders
      * @param array $options Valid options include:
      *   skip_download (false) If true, only stats about the
      *     folder will be logged. The messages won't be downloaded.
      */
-    private function syncMessages( AccountModel $account, $folders, $options = [] )
+    private function syncMessages(AccountModel $account, $folders, $options = [])
     {
-        if ( Fn\get( $options, self::OPT_SKIP_DOWNLOAD ) === TRUE ) {
-            $this->log->debug( "Updating folder counts" );
+        if (true === Fn\get($options, self::OPT_SKIP_DOWNLOAD)) {
+            $this->log->debug('Updating folder counts');
         }
         else {
-            $this->log->debug( "Syncing messages in each folder" );
+            $this->log->debug('Syncing messages in each folder');
         }
 
-        foreach ( $folders as $folder ) {
-            $this->retriesMessages[ $account->email ] = 1;
-            $this->stats->setActiveFolder( $folder->name );
+        foreach ($folders as $folder) {
+            $this->retriesMessages[$account->email] = 1;
+            $this->stats->setActiveFolder($folder->name);
 
             try {
-                $this->syncFolderMessages( $account, $folder, $options );
+                $this->syncFolderMessages($account, $folder, $options);
             }
-            catch ( MessagesSyncException $e ) {
-                $this->log->error( $e->getMessage() );
+            catch (MessagesSyncException $e) {
+                $this->log->error($e->getMessage());
             }
 
             $this->checkForHalt();
@@ -558,43 +572,49 @@ class Sync
 
     /**
      * Updates message threads. See Threading class for info.
+     *
      * @param AccountModel $account
      */
-    private function updateThreads( AccountModel $account )
+    private function updateThreads(AccountModel $account)
     {
-        $this->threader->run( $account, $this->emitter );
+        $this->threader->run($account, $this->emitter);
     }
 
     /**
      * Syncs all of the messages for a given IMAP folder.
+     *
      * @param AccountModel $account
      * @param FolderModel $folder
      * @param array $options (see syncMessages)
+     *
      * @throws MessagesSyncException
+     *
      * @return bool
      */
-    private function syncFolderMessages( AccountModel $account, FolderModel $folder, $options )
+    private function syncFolderMessages(AccountModel $account, FolderModel $folder, $options)
     {
-        if ( $folder->isIgnored() ) {
-            $this->log->debug( 'Skipping ignored folder' );
+        if ($folder->isIgnored()) {
+            $this->log->debug('Skipping ignored folder');
+
             return;
         }
 
-        if ( $this->retriesMessages[ $account->email ] > $this->maxRetries ) {
+        if ($this->retriesMessages[$account->email] > $this->maxRetries) {
             $this->log->notice(
                 "The account '{$account->email}' has exceeded the max ".
                 "amount of retries ({$this->maxRetries}) after trying ".
                 "to sync the folder '{$folder->name}'. Skipping to the ".
-                "next folder." );
-            throw new MessagesSyncException( $folder->name );
+                'next folder.');
+
+            throw new MessagesSyncException($folder->name);
         }
 
         $this->log->debug(
-            "Syncing messages in {$folder->name} for {$account->email}" );
+            "Syncing messages in {$folder->name} for {$account->email}");
         $this->log->debug(
-            "Memory usage: ". Fn\formatBytes( memory_get_usage() ) .
-            ", real usage: ". Fn\formatBytes( memory_get_usage( TRUE ) ) .
-            ", peak usage: ". Fn\formatBytes( memory_get_peak_usage() ) );
+            'Memory usage: '.Fn\formatBytes(memory_get_usage()).
+            ', real usage: '.Fn\formatBytes(memory_get_usage(true)).
+            ', peak usage: '.Fn\formatBytes(memory_get_peak_usage()));
 
         // Syncing a folder of messages is done using the following
         // algorithm:
@@ -614,40 +634,40 @@ class Sync
                 ]);
             // Select the folder's mailbox, this is sent to the
             // messages sync library to perform operations on
-            $this->mailbox->select( $folder->name );
-            $messageSync->run( $account, $folder, $options );
+            $this->mailbox->select($folder->name);
+            $messageSync->run($account, $folder, $options);
             $this->checkForHalt();
         }
-        catch ( PDOException $e ) {
+        catch (PDOException $e) {
             throw $e;
         }
-        catch ( StopException $e ) {
+        catch (StopException $e) {
             throw $e;
         }
-        catch ( TerminateException $e ) {
+        catch (TerminateException $e) {
             throw $e;
         }
-        catch ( Exception $e ) {
+        catch (Exception $e) {
             $this->stats->unsetActiveFolder();
-            $this->log->error( substr( $e->getMessage(), 0, 500 ) );
-            $this->checkForClosedConnection( $e );
-            $retryCount = $this->retriesMessages[ $account->email ];
-            $waitSeconds = $this->config[ 'app' ][ 'sync' ][ 'wait_seconds' ];
+            $this->log->error(substr($e->getMessage(), 0, 500));
+            $this->checkForClosedConnection($e);
+            $retryCount = $this->retriesMessages[$account->email];
+            $waitSeconds = $this->config['app']['sync']['wait_seconds'];
             $this->log->info(
                 "Re-trying message sync ($retryCount/{$this->maxRetries}) ".
-                "for folder '{$folder->name}' in $waitSeconds seconds..." );
-            sleep( $waitSeconds );
-            $this->retriesMessages[ $account->email ]++;
+                "for folder '{$folder->name}' in $waitSeconds seconds...");
+            sleep($waitSeconds);
+            ++$this->retriesMessages[$account->email];
             $this->checkForHalt();
 
-            return $this->syncFolderMessages( $account, $folder, $options );
+            return $this->syncFolderMessages($account, $folder, $options);
         }
     }
 
-    private function sendMessage( $message, $status = STATUS_ERROR )
+    private function sendMessage($message, $status = STATUS_ERROR)
     {
-        if ( $this->daemon ) {
-            Message::send( new NotificationMessage( $status, $message ) );
+        if ($this->daemon) {
+            Message::send(new NotificationMessage($status, $message));
         }
     }
 
@@ -655,6 +675,7 @@ class Sync
      * Checks if a halt command has been issued. This is a command
      * to stop the sync. We want to do is gracefull though so the
      * app checks in various places when it's save to halt.
+     *
      * @throws StopException
      * @throws TerminateException
      */
@@ -662,17 +683,17 @@ class Sync
     {
         pcntl_signal_dispatch();
 
-        if ( $this->halt === TRUE ) {
+        if (true === $this->halt) {
             $this->disconnect();
-            $this->stats->setActiveAccount( NULL );
+            $this->stats->setActiveAccount(null);
 
             // If there was a stop command issued, then don't terminate
-            if ( $this->stop === TRUE ) {
+            if (true === $this->stop) {
                 throw new StopException;
             }
 
             // If we just want to sleep, then don't terminate
-            if ( $this->sleep !== TRUE ) {
+            if (true !== $this->sleep) {
                 throw new TerminateException;
             }
         }
@@ -683,17 +704,20 @@ class Sync
      * This can happen when the IMAP socket is closed or fails. When
      * this happens we want to terminate the sync and let the whole
      * thing pick back up.
+     *
      * @param Exception $e
+     *
      * @throws StopException
      */
-    private function checkForClosedConnection( Exception $e )
+    private function checkForClosedConnection(Exception $e)
     {
-        if ( strpos( $e->getMessage(), "connection closed?" ) !== FALSE ) {
+        if (false !== strpos($e->getMessage(), 'connection closed?')) {
             $this->sendMessage(
-                "The IMAP connection was lost. Your internet connection ".
-                "could be down or it could just be a network error. The ".
-                "system will sleep for a bit before re-trying.",
-                STATUS_ERROR );
+                'The IMAP connection was lost. Your internet connection '.
+                'could be down or it could just be a network error. The '.
+                'system will sleep for a bit before re-trying.',
+                STATUS_ERROR);
+
             throw new StopException;
         }
     }

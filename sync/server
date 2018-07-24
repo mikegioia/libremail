@@ -29,162 +29,161 @@ use Symfony\Component\Routing\Route;
 use App\Exceptions\Terminate as TerminateException;
 
 // Set up paths and constants
-set_time_limit( 0 );
-define( 'BASEPATH', __DIR__ );
-date_default_timezone_set( 'UTC' );
+set_time_limit(0);
+define('BASEPATH', __DIR__);
+date_default_timezone_set('UTC');
 
 // Load the vendor libraries
-require( BASEPATH .'/vendor/autoload.php' );
+require BASEPATH.'/vendor/autoload.php';
 
 // Load configuration files and parse the CLI arguments
-$constants = parse_ini_file( BASEPATH .'/config/constants.ini', FALSE );
-$default = parse_ini_file( BASEPATH .'/config/default.ini', TRUE );
-$local = parse_ini_file( BASEPATH .'/config/local.ini', TRUE );
-$config = array_replace_recursive( $default, $local );
-Constants::process( $constants );
-unset( $constants );
+$constants = parse_ini_file(BASEPATH.'/config/constants.ini', false);
+$default = parse_ini_file(BASEPATH.'/config/default.ini', true);
+$local = parse_ini_file(BASEPATH.'/config/local.ini', true);
+$config = array_replace_recursive($default, $local);
+Constants::process($constants);
+unset($constants);
 
 // Set the memory limit from the config
-ini_set( 'memory_limit', $config[ 'app' ][ 'memory' ] );
+ini_set('memory_limit', $config['app']['memory']);
 
 // Set up dependency container and register all services
 $di = new Container;
 
 // Store the configuration as a service
-$di[ 'config' ] = $config;
+$di['config'] = $config;
 
 // Diagnostic test service
-$di[ 'diagnostics' ] = function ( $c ) {
-    return new Diagnostics( $c );
+$di['diagnostics'] = function ($c) {
+    return new Diagnostics($c);
 };
 
 // Console/CLI service
-$di[ 'console' ] = new ServerConsole( $config );
-$di[ 'cli' ] = function ( $c ) {
-    return $c[ 'console' ]->getCLI();
+$di['console'] = new ServerConsole($config);
+$di['cli'] = function ($c) {
+    return $c['console']->getCLI();
 };
 
 // Logging service
-$di[ 'log' ] = function ( $c ) {
+$di['log'] = function ($c) {
     return new Log(
-        $c[ 'cli' ],
-        $c[ 'config' ][ 'serverlog' ],
-        $c[ 'console' ]->interactive === TRUE );
+        $c['cli'],
+        $c['config']['serverlog'],
+        true === $c['console']->interactive);
 };
 
 // Initialize the error and exception handlers
-$di[ 'log' ]->init();
+$di['log']->init();
 
 // Parse the CLI
-$di[ 'console' ]->init();
+$di['console']->init();
 
 // Boot the diagnostics service
-$di[ 'diagnostics' ]->init();
+$di['diagnostics']->init();
 
 // React event loop, used for Ratchet.
-$di[ 'loop' ] = Factory::create();
+$di['loop'] = Factory::create();
 
 // Statically set the services in the base model
-Model::setCLI( $di[ 'cli' ] );
-Model::setConfig( $di[ 'config' ] );
-Model::setLog( $di[ 'log' ]->getLogger() );
+Model::setCLI($di['cli']);
+Model::setConfig($di['config']);
+Model::setLog($di['log']->getLogger());
 
 // Set Message service
-Message::setLog( $di[ 'log' ]->getLogger() );
+Message::setLog($di['log']->getLogger());
 
 // Set up the signal handler to shutdown
-$HALT = function () use ( $di ) {
-    if ( isset( $di[ 'loop' ] ) && $di[ 'loop' ] ) {
-        $di[ 'loop' ]->stop();
+$HALT = function () use ($di) {
+    if (isset($di['loop']) && $di['loop']) {
+        $di['loop']->stop();
     }
 
     throw new TerminateException;
 };
 
 // Set up process handler bindings for React
-$pcntl = new PCNTL( $di[ 'loop' ] );
-$pcntl->on( SIGHUP, $HALT );
-$pcntl->on( SIGINT, $HALT );
-$pcntl->on( SIGTERM, $HALT );
-$pcntl->on( SIGQUIT, $HALT );
+$pcntl = new PCNTL($di['loop']);
+$pcntl->on(SIGHUP, $HALT);
+$pcntl->on(SIGINT, $HALT);
+$pcntl->on(SIGTERM, $HALT);
+$pcntl->on(SIGQUIT, $HALT);
 
 // PDO factory, this uses Slim-PDO as a wrapper
-$di[ 'db_factory' ] = $di->factory( function ( $c, $config = NULL ) {
-    $dbConfig = ( $config ) ?: $c[ 'config' ][ 'sql' ];
+$di['db_factory'] = $di->factory(function ($c, $config = null) {
+    $dbConfig = ($config) ?: $c['config']['sql'];
     $dsn = sprintf(
-        "mysql:host=%s;dbname=%s;charset=%s",
-        $dbConfig[ 'hostname' ],
-        $dbConfig[ 'database' ],
-        $dbConfig[ 'charset' ] );
+        'mysql:host=%s;dbname=%s;charset=%s',
+        $dbConfig['hostname'],
+        $dbConfig['database'],
+        $dbConfig['charset']);
 
     try {
         return new Database(
             $dsn,
-            $dbConfig[ 'username' ],
-            $dbConfig[ 'password' ] );
+            $dbConfig['username'],
+            $dbConfig['password']);
     }
-    catch ( PDOException $e ) {
+    catch (PDOException $e) {
         throw new PDOException(
-            "There was a problem connecting to the database. ".
-            "Are you sure it exists? Here are the details: ".
-            $e->getMessage() );
+            'There was a problem connecting to the database. '.
+            'Are you sure it exists? Here are the details: '.
+            $e->getMessage());
     }
 });
 
 // Create a new socket server handler
-$di[ 'server.web' ] = new WebServer( $di[ 'log' ], $di[ 'config' ] );
-$di[ 'server.stats' ] = new StatsServer( $di[ 'log' ], $di[ 'loop' ] );
+$di['server.web'] = new WebServer($di['log'], $di['config']);
+$di['server.stats'] = new StatsServer($di['log'], $di['loop']);
 
 // Ratchet web server instance
-$di[ 'ratchet' ] = new RatchetApp(
-    $config[ 'server' ][ 'host' ],
-    $config[ 'server' ][ 'port' ],
-    $config[ 'server' ][ 'address' ],
-    $di[ 'loop' ] );
+$di['ratchet'] = new RatchetApp(
+    $config['server']['host'],
+    $config['server']['port'],
+    $config['server']['address'],
+    $di['loop']);
 // Socket route
-$di[ 'ratchet' ]->route(
+$di['ratchet']->route(
     ENDPOINT_STATS,
-    $di[ 'server.stats' ],
-    $config[ 'server' ][ 'allowed_origins' ]);
+    $di['server.stats'],
+    $config['server']['allowed_origins']);
 // Web route
-$di[ 'ratchet' ]->route(
+$di['ratchet']->route(
     ENDPOINT_WEB,
-    $di[ 'server.web' ],
-    $config[ 'server' ][ 'allowed_origins' ]);
+    $di['server.web'],
+    $config['server']['allowed_origins']);
 // Catch-all route
-$di[ 'ratchet' ]->route(
-    new Route( '/{any}', [], [ 'any' => '.*' ] ),
-    $di[ 'server.web' ],
-    $config[ 'server' ][ 'allowed_origins' ] );
+$di['ratchet']->route(
+    new Route('/{any}', [], ['any' => '.*']),
+    $di['server.web'],
+    $config['server']['allowed_origins']);
 
 // Run the loop until we hit a halt signal
 try {
     // This sets the entire dependency container into the
     // model class as a static reference. Whenever the db()
     // is requested, a new connection will be made.
-    Model::setDbFactory( $di );
+    Model::setDbFactory($di);
 
     // Kick off the server application
-    $startup = new Startup( $di );
+    $startup = new Startup($di);
     $startup->runServer();
 
-    runLoop: {
-        $di[ 'loop' ]->stop();
-        $di[ 'ratchet' ]->run();
-    }
+    runLoop:
+        $di['loop']->stop();
+        $di['ratchet']->run();
 }
 // Uncaught PDO exceptions, this should only be the
 // connection error.
-catch ( PDOException $e ) {
-    Diagnostics::checkDatabaseException( $di, $e, TRUE );
+catch (PDOException $e) {
+    Diagnostics::checkDatabaseException($di, $e, true);
     goto runLoop;
 }
 // Gracefully exit if we're terminated
-catch ( TerminateException $e ) {
-    $di[ 'log' ]->getLogger()->addInfo( $e->getMessage() );
-    exit( 0 );
+catch (TerminateException $e) {
+    $di['log']->getLogger()->addInfo($e->getMessage());
+    exit(0);
 }
 // Unhandled exceptions
-catch ( Exception $e ) {
-    $di[ 'log' ]->displayError( $e );
+catch (Exception $e) {
+    $di['log']->displayError($e);
 }

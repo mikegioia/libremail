@@ -10,7 +10,9 @@ $finder = PhpCsFixer\Finder::create()
         'logs',
         'vendor'
     ])
-    ->notPath('src/Sync.php')
+    ->name('libremail')
+    ->name('server')
+    ->name('sync')
     ->in(__DIR__);
 
 return PhpCsFixer\Config::create()

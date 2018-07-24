@@ -26,209 +26,207 @@ use App\Exceptions\Stop as StopException;
 use App\Exceptions\Terminate as TerminateException;
 
 // Set up paths and constants
-set_time_limit( 0 );
-define( 'BASEPATH', __DIR__ );
+set_time_limit(0);
+define('BASEPATH', __DIR__);
 // User UTF-8
-mb_internal_encoding( 'UTF-8' );
+mb_internal_encoding('UTF-8');
 //date_default_timezone_set( 'UTC' );
-define( 'DBSCRIPTS', BASEPATH .'/db/*.sql' );
+define('DBSCRIPTS', BASEPATH.'/db/*.sql');
 
 // Load configuration files and parse the CLI arguments
-$constants = parse_ini_file( BASEPATH .'/config/constants.ini', FALSE );
-$default = parse_ini_file( BASEPATH .'/config/default.ini', TRUE );
-$local = parse_ini_file( BASEPATH .'/config/local.ini', TRUE );
-$config = array_replace_recursive( $default, $local );
+$constants = parse_ini_file(BASEPATH.'/config/constants.ini', false);
+$default = parse_ini_file(BASEPATH.'/config/default.ini', true);
+$local = parse_ini_file(BASEPATH.'/config/local.ini', true);
+$config = array_replace_recursive($default, $local);
 
 // Set the memory limit from the config
-ini_set( 'memory_limit', $config[ 'app' ][ 'memory' ] );
-ini_set( 'mysql.connect_timeout', $config[ 'sql' ][ 'timeout' ] );
-ini_set( 'default_socket_timeout', $config[ 'sql' ][ 'timeout' ] );
+ini_set('memory_limit', $config['app']['memory']);
+ini_set('mysql.connect_timeout', $config['sql']['timeout']);
+ini_set('default_socket_timeout', $config['sql']['timeout']);
 
 // Load the vendor libraries
-require( BASEPATH .'/vendor/autoload.php' );
+require BASEPATH.'/vendor/autoload.php';
 
 // Process constants
-Constants::process( $constants );
-unset( $constants );
+Constants::process($constants);
+unset($constants);
 
 // Set up dependency container and register all services
 $di = new Container;
 
 // Store the configuration as a service
-$di[ 'config' ] = $config;
+$di['config'] = $config;
 
 // Console/CLI service
-$di[ 'console' ] = new SyncConsole( $config );
-$di[ 'cli' ] = function ( $c ) {
-    return $c[ 'console' ]->getCLI();
+$di['console'] = new SyncConsole($config);
+$di['cli'] = function ($c) {
+    return $c['console']->getCLI();
 };
 
 // Diagnostic test service
-$di[ 'diagnostics' ] = function ( $c ) {
-    return new Diagnostics( $c );
+$di['diagnostics'] = function ($c) {
+    return new Diagnostics($c);
 };
 
 // Statistics logging and printing service
-$di[ 'stats' ] = function ( $c ) {
-    return new Stats( $c[ 'console' ] );
+$di['stats'] = function ($c) {
+    return new Stats($c['console']);
 };
 
 // Logging service
-$di[ 'log' ] = function ( $c ) {
+$di['log'] = function ($c) {
     return new Log(
-        $c[ 'cli' ],
-        $c[ 'config' ][ 'log' ],
-        $c[ 'console' ]->interactive === TRUE );
+        $c['cli'],
+        $c['config']['log'],
+        true === $c['console']->interactive);
 };
 
 // Initialize the error and exception handlers
-$di[ 'log' ]->init();
+$di['log']->init();
 
 // Store a static reference to the threading system. This should be
 // saved in the container because the threading operation needs to
 // query and organize a large amount of data during the first pass.
-$di[ 'threader' ] = function ( $c ) {
+$di['threader'] = function ($c) {
     return new ThreadSync(
-        $c[ 'log' ]->getLogger(),
-        $c[ 'cli' ],
-        $c[ 'console' ]->interactive === TRUE );
+        $c['log']->getLogger(),
+        $c['cli'],
+        true === $c['console']->interactive);
 };
 
 // Set up the signal handler to shutdown
-$HALT = function ( $signo ) use ( $di ) {
-    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ) {
-        $di[ 'sync' ]->halt();
-    }
-    else {
+$HALT = function ($signo) use ($di) {
+    if (isset($di['sync']) && $di['sync']) {
+        $di['sync']->halt();
+    } else {
         throw new TerminateException;
     }
 };
 
-pcntl_signal( SIGHUP, $HALT );
-pcntl_signal( SIGINT, $HALT );
-pcntl_signal( SIGTERM, $HALT );
-pcntl_signal( SIGQUIT, $HALT );
+pcntl_signal(SIGHUP, $HALT);
+pcntl_signal(SIGINT, $HALT);
+pcntl_signal(SIGTERM, $HALT);
+pcntl_signal(SIGQUIT, $HALT);
 
 // No-op, continue sync if asleep
-pcntl_signal( SIGCONT, function ( $signo ) use ( $di ) {
-    $di[ 'log' ]->getLogger()->addInfo(
-        "SIGCONT received, restarting sync" );
+pcntl_signal(SIGCONT, function ($signo) use ($di) {
+    $di['log']->getLogger()->addInfo(
+        'SIGCONT received, restarting sync');
 
-    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ) {
-        $di[ 'sync' ]->wake();
+    if (isset($di['sync']) && $di['sync']) {
+        $di['sync']->wake();
     }
 });
 
 // Return back statistics on the current sync
-pcntl_signal( SIGUSR1, function ( $signo ) use ( $di ) {
-    $di[ 'log' ]->getLogger()->addDebug(
-        "SIGUSR1 received, printing text stats" );
+pcntl_signal(SIGUSR1, function ($signo) use ($di) {
+    $di['log']->getLogger()->addDebug(
+        'SIGUSR1 received, printing text stats');
 
-    if ( isset( $di[ 'stats' ] ) && $di[ 'stats' ] ) {
-        $di[ 'stats' ]->text();
+    if (isset($di['stats']) && $di['stats']) {
+        $di['stats']->text();
     }
 });
 
 // SIGUSR2 returns JSON
-pcntl_signal( SIGUSR2, function ( $signo ) use ( $di ) {
-    $di[ 'log' ]->getLogger()->addDebug(
-        "SIGUSR2 received, printing JSON stats" );
+pcntl_signal(SIGUSR2, function ($signo) use ($di) {
+    $di['log']->getLogger()->addDebug(
+        'SIGUSR2 received, printing JSON stats');
 
-    if ( isset( $di[ 'stats' ] ) && $di[ 'stats' ] ) {
-        $di[ 'stats' ]->json();
+    if (isset($di['stats']) && $di['stats']) {
+        $di['stats']->json();
     }
 });
 
 // SIGURG stops the syncing
-pcntl_signal( SIGURG, function ( $signo ) use ( $di ) {
-    $di[ 'log' ]->getLogger()->addInfo(
-        "SIGURG received, stopping sync" );
+pcntl_signal(SIGURG, function ($signo) use ($di) {
+    $di['log']->getLogger()->addInfo(
+        'SIGURG received, stopping sync');
 
-    if ( isset( $di[ 'sync' ] ) && $di[ 'sync' ] ) {
-        $di[ 'sync' ]->stop();
+    if (isset($di['sync']) && $di['sync']) {
+        $di['sync']->stop();
     }
 });
 
 // PDO factory, this uses Slim-PDO as a wrapper
-$di[ 'db_factory' ] = $di->factory( function ( $c, $config = NULL ) {
-    $dbConfig = ( $config ) ?: $c[ 'config' ][ 'sql' ];
+$di['db_factory'] = $di->factory(function ($c, $config = null) {
+    $dbConfig = $config ?: $c['config']['sql'];
     $dsn = sprintf(
-        "mysql:host=%s;dbname=%s;charset=%s",
-        $dbConfig[ 'hostname' ],
-        $dbConfig[ 'database' ],
-        $dbConfig[ 'charset' ] );
+        'mysql:host=%s;dbname=%s;charset=%s',
+        $dbConfig['hostname'],
+        $dbConfig['database'],
+        $dbConfig['charset']);
 
     try {
         $db = new Database(
             $dsn,
-            $dbConfig[ 'username' ],
-            $dbConfig[ 'password' ] );
-        $db->query( 'SET SESSION wait_timeout = 28800;' );
-        $db->query( 'SET NAMES '. $dbConfig[ 'charset' ] .';' );
+            $dbConfig['username'],
+            $dbConfig['password']);
+        $db->query('SET SESSION wait_timeout = 28800;');
+        $db->query('SET NAMES '.$dbConfig['charset'].';');
 
         return $db;
     }
-    catch ( PDOException $e ) {
+    catch (PDOException $e) {
         throw new TerminateException(
-            "There was a problem connecting to the database. ".
-            "Are you sure it exists? Here are the details: ".
-            $e->getMessage() );
+            'There was a problem connecting to the database. '.
+            'Are you sure it exists? Here are the details: '.
+            $e->getMessage());
     }
 });
 
 // Run the diagnostic tests. If specified from the CLI, then
 // output the results to the console and exit.
-$di[ 'diagnostics' ]->run();
+$di['diagnostics']->run();
 
 // PDO connection. This attempts to connect to the database.
 // If it fails here, the script will halt.
-$di[ 'db' ] = $di[ 'db_factory' ];
+$di['db'] = $di['db_factory'];
 
 // Statically set the services in the base model
-Model::setDb( $di[ 'db' ] );
-Model::setCLI( $di[ 'cli' ] );
-Model::setConfig( $di[ 'config' ] );
-Model::setLog( $di[ 'log' ]->getLogger() );
+Model::setDb($di['db']);
+Model::setCLI($di['cli']);
+Model::setConfig($di['config']);
+Model::setLog($di['log']->getLogger());
 
 // Statically set Message logging service
-Message::setLog( $di[ 'log' ]->getLogger() );
+Message::setLog($di['log']->getLogger());
 
 // Parse the CLI
-$di[ 'console' ]->init();
+$di['console']->init();
 
 // Run initialization checks, like if the database exists or if there
 // are email accounts saved. This may prompt the user to add an account
 // if we're running in interactive mode.
 try {
-    $startup = new Startup( $di );
+    $startup = new Startup($di);
     $startup->run();
 
-    runSyncLoop: {
-        $di[ 'sync' ] = new Sync( $di );
-        $di[ 'sync' ]->loop();
-    }
+    runSyncLoop:
+        $di['sync'] = new Sync($di);
+        $di['sync']->loop();
 }
 // If the database connection dropped, kill the database service and
 // try to reconnect. Otherwise terminate.
-catch ( PDOException $e ) {
-    isset($di[ 'sync' ]) && $di['sync']->disconnect( TRUE );
-    $di[ 'sync' ] = NULL;
-    $sec = $config[ 'app' ][ 'db' ][ 'sleep_minutes' ] * 60;
-    Diagnostics::checkDatabaseException( $di, $e, TRUE, $sec );
+catch (PDOException $e) {
+    isset($di['sync']) && $di['sync']->disconnect(true);
+    $di['sync'] = null;
+    $sec = $config['app']['db']['sleep_minutes'] * 60;
+    Diagnostics::checkDatabaseException($di, $e, true, $sec);
     goto runSyncLoop;
 }
 // Stop the current sync and re-run it
-catch ( StopException $e ) {
-    $di[ 'sync' ] = NULL;
-    sleep( 5 );
+catch (StopException $e) {
+    $di['sync'] = null;
+    sleep(5);
     goto runSyncLoop;
 }
 // Gracefully exit if we're terminated
-catch ( TerminateException $e ) {
-    $di[ 'log' ]->getLogger()->addInfo( $e->getMessage() );
-    exit( 0 );
+catch (TerminateException $e) {
+    $di['log']->getLogger()->addInfo($e->getMessage());
+    exit(0);
 }
 // Unhandled exceptions
-catch ( Exception $e ) {
-    $di[ 'log' ]->displayError( $e );
+catch (Exception $e) {
+    $di['log']->displayError($e);
 }

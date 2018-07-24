@@ -21,66 +21,65 @@ use MKraemer\ReactPCNTL\PCNTL;
 use React\ChildProcess\Process;
 use Symfony\Component\EventDispatcher\Event;
 use App\Exceptions\Terminate as TerminateException;
-use App\Exceptions\BadCommand as BadCommandException;
 use Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 
 // Set up paths and constants
-set_time_limit( 0 );
-define( 'BASEPATH', __DIR__ );
-date_default_timezone_set( 'UTC' );
+set_time_limit(0);
+define('BASEPATH', __DIR__);
+date_default_timezone_set('UTC');
 
 // Load the vendor libraries
-require( BASEPATH .'/vendor/autoload.php' );
+require BASEPATH.'/vendor/autoload.php';
 
 // Load configuration files and parse the CLI arguments
-$constants = parse_ini_file( BASEPATH .'/config/constants.ini', FALSE );
-$default = parse_ini_file( BASEPATH .'/config/default.ini', TRUE );
-$local = parse_ini_file( BASEPATH .'/config/local.ini', TRUE );
-$config = array_replace_recursive( $default, $local );
-Constants::process( $constants );
-unset( $constants );
+$constants = parse_ini_file(BASEPATH.'/config/constants.ini', false);
+$default = parse_ini_file(BASEPATH.'/config/default.ini', true);
+$local = parse_ini_file(BASEPATH.'/config/local.ini', true);
+$config = array_replace_recursive($default, $local);
+Constants::process($constants);
+unset($constants);
 
 // Set the memory limit from the config
-ini_set( 'memory_limit', $config[ 'app' ][ 'memory' ] );
+ini_set('memory_limit', $config['app']['memory']);
 
 // Set up dependency container and register all services
 $di = new Container;
 
 // Store the configuration as a service
-$di[ 'config' ] = $config;
+$di['config'] = $config;
 
 // Console/CLI service
-$di[ 'console' ] = new DaemonConsole;
-$di[ 'cli' ] = function ( $c ) {
-    return $c[ 'console' ]->getCLI();
+$di['console'] = new DaemonConsole;
+$di['cli'] = function ($c) {
+    return $c['console']->getCLI();
 };
 
 // Logging service
-$di[ 'log' ] = function ( $c ) {
+$di['log'] = function ($c) {
     return new Log(
-        $c[ 'cli' ],
-        $c[ 'config' ][ 'daemonlog' ],
-        FALSE );
+        $c['cli'],
+        $c['config']['daemonlog'],
+        false);
 };
 
 // Initialize the error and exception handlers
-$di[ 'log' ]->init();
+$di['log']->init();
 
 // Parse the CLI
-$di[ 'console' ]->init();
+$di['console']->init();
 
 // Set up the event dispatcher
-$di[ 'emitter' ] = new Emitter;
+$di['emitter'] = new Emitter;
 
 // React event loop, used for child-process and web socket
 // server (Ratchet).
-$di[ 'loop' ] = Factory::create();
+$di['loop'] = Factory::create();
 
 // Set up the command handler
-$di[ 'command' ] = new Command( $di[ 'emitter' ], $di[ 'log' ] );
+$di['command'] = new Command($di['emitter'], $di['log']);
 
 // Statically set Message logging service
-Message::setLog( $di[ 'log' ]->getLogger() );
+Message::setLog($di['log']->getLogger());
 
 // Set up the signal handler to shutdown
 $TERMINATE = function () {
@@ -88,47 +87,47 @@ $TERMINATE = function () {
 };
 
 // Graceful shutdown
-$HALT = function () use ( $di ) {
-    if ( isset( $di[ 'daemon' ] ) && $di[ 'daemon' ] ) {
-        $di[ 'daemon' ]->halt();
+$HALT = function () use ($di) {
+    if (isset($di['daemon']) && $di['daemon']) {
+        $di['daemon']->halt();
     }
 };
 
 // Set up process handler bindings for React
-$pcntl = new PCNTL( $di[ 'loop' ] );
-$pcntl->on( SIGHUP, $TERMINATE );
-$pcntl->on( SIGINT, $TERMINATE );
-$pcntl->on( SIGTERM, $TERMINATE );
-$pcntl->on( SIGQUIT, $TERMINATE );
+$pcntl = new PCNTL($di['loop']);
+$pcntl->on(SIGHUP, $TERMINATE);
+$pcntl->on(SIGINT, $TERMINATE);
+$pcntl->on(SIGTERM, $TERMINATE);
+$pcntl->on(SIGQUIT, $TERMINATE);
 
 // Daemon manages the sync and websocket processes
-$di[ 'daemon' ] = new Daemon(
-    $di[ 'log' ],
-    $di[ 'loop' ],
-    $di[ 'emitter' ],
-    $di[ 'console' ],
-    $di[ 'command' ],
-    $config[ 'daemon' ] );
+$di['daemon'] = new Daemon(
+    $di['log'],
+    $di['loop'],
+    $di['emitter'],
+    $di['console'],
+    $di['command'],
+    $config['daemon']);
 
 // This event is fired to start or restart the sync process.
-$di[ 'emitter' ]->addListener(
+$di['emitter']->addListener(
     EV_START_SYNC,
-    function ( Event $event ) use ( $di ) {
-        $di[ 'daemon' ]->startSync();
+    function (Event $event) use ($di) {
+        $di['daemon']->startSync();
     });
 
 // This event is fired to start or restart the server process.
-$di[ 'emitter' ]->addListener(
+$di['emitter']->addListener(
     EV_START_SERVER,
-    function ( Event $event ) use ( $di ) {
-        $di[ 'daemon' ]->startWebServer();
+    function (Event $event) use ($di) {
+        $di['daemon']->startWebServer();
     });
 
 // This event is fired to stop the sync process.
-$di[ 'emitter' ]->addListener(
+$di['emitter']->addListener(
     EV_STOP_SYNC,
-    function ( Event $event ) use ( $di ) {
-        $di[ 'daemon' ]->stopSync();
+    function (Event $event) use ($di) {
+        $di['daemon']->stopSync();
     });
 
 // Fired when the sync is terminated for any reason. This is
@@ -136,67 +135,66 @@ $di[ 'emitter' ]->addListener(
 // During restart, we want to incorporate some form of
 // exponential back-off. Attempt to restart quickly but slow
 // down over time.
-$di[ 'emitter' ]->addListener(
+$di['emitter']->addListener(
     EV_SYNC_EXITED,
-    function ( Event $event ) use ( $di ) {
+    function (Event $event) use ($di) {
         // We want to trigger this after a grace period, and
         // with an increasing decay.
-        $di[ 'daemon' ]->restartWithDecay( PROC_SYNC, EV_START_SYNC );
+        $di['daemon']->restartWithDecay(PROC_SYNC, EV_START_SYNC);
     });
 
 // Fired when the server is terminated for any reason.
-$di[ 'emitter' ]->addListener(
+$di['emitter']->addListener(
     EV_SERVER_EXITED,
-    function ( Event $event ) use ( $di ) {
-        $di[ 'daemon' ]->restartWithDecay( PROC_SERVER, EV_START_SERVER );
+    function (Event $event) use ($di) {
+        $di['daemon']->restartWithDecay(PROC_SERVER, EV_START_SERVER);
     });
 
 // Triggered to update the stats to all websocket connections
-$di[ 'emitter' ]->addListener(
+$di['emitter']->addListener(
     EV_BROADCAST_MSG,
-    function ( Event $event ) use ( $di ) {
-        $di[ 'daemon' ]->broadcast( $event->getMessage() );
+    function (Event $event) use ($di) {
+        $di['daemon']->broadcast($event->getMessage());
     });
 
 // Triggered to wake up a sleeping sync process
-$di[ 'emitter' ]->addListener(
+$di['emitter']->addListener(
     EV_CONTINUE_SYNC,
-    function ( Event $event ) use ( $di ) {
-        $di[ 'daemon' ]->continueSync();
+    function (Event $event) use ($di) {
+        $di['daemon']->continueSync();
     });
 
 // Triggered to send stats update (SIGUSR2)
-$di[ 'emitter' ]->addListener(
+$di['emitter']->addListener(
     EV_POLL_STATS,
-    function ( Event $event ) use ( $di ) {
-        $di[ 'daemon' ]->pollStats();
+    function (Event $event) use ($di) {
+        $di['daemon']->pollStats();
     });
 
 // Sends a health report about the sync/server processes
-$di[ 'emitter' ]->addListener(
+$di['emitter']->addListener(
     EV_POLL_DAEMON,
-    function ( Event $event ) use ( $di ) {
-        $di[ 'daemon' ]->broadcastHealth();
+    function (Event $event) use ($di) {
+        $di['daemon']->broadcastHealth();
     });
 
 // Trigger the events to load the timers
-$di[ 'emitter' ]->dispatch( EV_START_SYNC );
-$di[ 'emitter' ]->dispatch( EV_START_SERVER );
+$di['emitter']->dispatch(EV_START_SYNC);
+$di['emitter']->dispatch(EV_START_SERVER);
 
 // Run the loop until we hit a halt signal
 try {
-    runLoop: {
-        $di[ 'loop' ]->stop();
-        $di[ 'loop' ]->run();
-    }
+    runLoop:
+        $di['loop']->stop();
+        $di['loop']->run();
 }
 // Gracefully exit if we're terminated
-catch ( TerminateException $e ) {
-    $di[ 'log' ]->getLogger()->addInfo( $e->getMessage() );
+catch (TerminateException $e) {
+    $di['log']->getLogger()->addInfo($e->getMessage());
     $HALT();
 }
 // Unhandled exceptions
-catch ( Exception $e ) {
-    $di[ 'log' ]->displayError( $e );
+catch (Exception $e) {
+    $di['log']->displayError($e);
     $HALT();
 }
