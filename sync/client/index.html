@@ -3,11 +3,11 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title>LibreMail Sync -- Admin</title>
+        <title>LibreMail Sync</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <!-- Load built CSS -->
-        <link rel="stylesheet" href="dist/libremail.css">
+        <link rel="stylesheet" type="text/css" href="dist/libremail.css">
+        <link rel="icon" type="image/png" href="dist/favicon.ico">
     </head>
     <body>
         <!-- Application layout -->
@@ -218,10 +218,10 @@
         <script type="text/javascript" src="dist/libremail.js"></script>
         <!-- Load the stats page -->
         <script type="text/javascript">
-            (function ( Pages ) {
+            (function (Pages) {
                 (Pages.Global()).load();
                 (Pages.Stats()).load();
-            }( LibreMail.Pages ));
+            }(window.LibreMail.Pages));
         </script>
     </body>
 </html>
