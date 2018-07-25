@@ -26,7 +26,8 @@
 
 @media (max-width: 600px) {
     html {
-        font-size: 71.875%;
+        /*font-size: 71.875%;*/
+        font-size: 78.125%;
     }
     .folder {
         width: calc(100%/2);
@@ -40,6 +41,15 @@
 }
 
 @media (max-width: 380px) {
+    form {
+        margin-top: 2rem;
+        max-width: none;
+        min-width: auto;
+        width: calc(100% - 4rem);
+    }
+    form label {
+        text-align: left;
+    }
     .folder {
         width: 100%;
     }
@@ -48,7 +58,7 @@
 
 @media (min-width: 1200px) {
     html {
-        font-size: 87.5%;
+        font-size: 93.75%;
     }
     .folder {
         width: calc(100%/5);

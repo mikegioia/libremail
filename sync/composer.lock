@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "c2898a2cc19d74f8a198bb8033c8742c",
+    "content-hash": "8ad1ed6ec764d70b0926aa00c7512973",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -314,12 +314,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mikegioia/pdo.git",
-                "reference": "5832e46a625e01763a9af41b3df83cd99206ae43"
+                "reference": "adeeb2f283f65ed30c08ea36faaa462c72699ff6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikegioia/pdo/zipball/5832e46a625e01763a9af41b3df83cd99206ae43",
-                "reference": "5832e46a625e01763a9af41b3df83cd99206ae43",
+                "url": "https://api.github.com/repos/mikegioia/pdo/zipball/adeeb2f283f65ed30c08ea36faaa462c72699ff6",
+                "reference": "adeeb2f283f65ed30c08ea36faaa462c72699ff6",
                 "shasum": ""
             },
             "require": {
@@ -359,9 +359,9 @@
             "support": {
                 "issues": "https://github.com/mikegioia/Slim-PDO/issues",
                 "docs": "https://github.com/mikegioia/Slim-PDO/blob/master/docs/README.md",
-                "source": "https://github.com/mikegioia/Slim-PDO/tree/master"
+                "source": "https://github.com/mikegioia/pdo/tree/master"
             },
-            "time": "2018-07-22T23:29:12+00:00"
+            "time": "2018-07-25T03:02:46+00:00"
         },
         {
             "name": "mkraemer/react-pcntl",
@@ -523,55 +523,6 @@
             "time": "2017-05-22T18:50:57+00:00"
         },
         {
-            "name": "paragonie/random_compat",
-            "version": "v2.0.17",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "29af24f25bab834fcbb38ad2a69fa93b867e070d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/29af24f25bab834fcbb38ad2a69fa93b867e070d",
-                "reference": "29af24f25bab834fcbb38ad2a69fa93b867e070d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.2.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "4.*|5.*"
-            },
-            "suggest": {
-                "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "lib/random.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Paragon Initiative Enterprises",
-                    "email": "security@paragonie.com",
-                    "homepage": "https://paragonie.com"
-                }
-            ],
-            "description": "PHP 5.x polyfill for random_bytes() and random_int() from PHP 7",
-            "keywords": [
-                "csprng",
-                "polyfill",
-                "pseudorandom",
-                "random"
-            ],
-            "time": "2018-07-04T16:31:37+00:00"
-        },
-        {
             "name": "particle/validator",
             "version": "v2.3.2",
             "source": {
@@ -639,12 +590,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "ad8be64b7b06fd9ac4c006763647c43f0dcc669f"
+                "reference": "e9e555134cd918e9d11b8db2d75bfe7d97d28993"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/ad8be64b7b06fd9ac4c006763647c43f0dcc669f",
-                "reference": "ad8be64b7b06fd9ac4c006763647c43f0dcc669f",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/e9e555134cd918e9d11b8db2d75bfe7d97d28993",
+                "reference": "e9e555134cd918e9d11b8db2d75bfe7d97d28993",
                 "shasum": ""
             },
             "require": {
@@ -678,10 +629,10 @@
                 "mail"
             ],
             "support": {
-                "source": "https://github.com/ParticleBits/imap/tree/1.1.0",
+                "source": "https://github.com/ParticleBits/imap/tree/master",
                 "issues": "https://github.com/ParticleBits/imap/issues"
             },
-            "time": "2018-07-22T21:58:06+00:00"
+            "time": "2018-07-25T03:35:11+00:00"
         },
         {
             "name": "particlebits/zend-mail",
@@ -1615,30 +1566,30 @@
         },
         {
             "name": "symfony/http-foundation",
-            "version": "3.4.x-dev",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "2b8e08c085e2dc7449ee6d55a238be87d3727c96"
+                "reference": "bcd7178461fdf85a49595983d4ebf40c0da2c38d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/2b8e08c085e2dc7449ee6d55a238be87d3727c96",
-                "reference": "2b8e08c085e2dc7449ee6d55a238be87d3727c96",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/bcd7178461fdf85a49595983d4ebf40c0da2c38d",
+                "reference": "bcd7178461fdf85a49595983d4ebf40c0da2c38d",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.5.9|>=7.0.8",
-                "symfony/polyfill-mbstring": "~1.1",
-                "symfony/polyfill-php70": "~1.6"
+                "php": "^7.1.3",
+                "symfony/polyfill-mbstring": "~1.1"
             },
             "require-dev": {
-                "symfony/expression-language": "~2.8|~3.0|~4.0"
+                "predis/predis": "~1.0",
+                "symfony/expression-language": "~3.4|~4.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.4-dev"
+                    "dev-master": "4.2-dev"
                 }
             },
             "autoload": {
@@ -1665,7 +1616,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-19T07:08:28+00:00"
+            "time": "2018-07-16T14:05:48+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -1727,93 +1678,34 @@
             "time": "2018-05-30T15:56:36+00:00"
         },
         {
-            "name": "symfony/polyfill-php70",
+            "name": "symfony/routing",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/polyfill-php70.git",
-                "reference": "77454693d8f10dd23bb24955cffd2d82db1007a6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php70/zipball/77454693d8f10dd23bb24955cffd2d82db1007a6",
-                "reference": "77454693d8f10dd23bb24955cffd2d82db1007a6",
-                "shasum": ""
-            },
-            "require": {
-                "paragonie/random_compat": "~1.0|~2.0",
-                "php": ">=5.3.3"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.8-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Php70\\": ""
-                },
-                "files": [
-                    "bootstrap.php"
-                ],
-                "classmap": [
-                    "Resources/stubs"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony polyfill backporting some PHP 7.0+ features to lower PHP versions",
-            "homepage": "https://symfony.com",
-            "keywords": [
-                "compatibility",
-                "polyfill",
-                "portable",
-                "shim"
-            ],
-            "time": "2018-04-26T10:06:28+00:00"
-        },
-        {
-            "name": "symfony/routing",
-            "version": "3.4.x-dev",
-            "source": {
-                "type": "git",
                 "url": "https://github.com/symfony/routing.git",
-                "reference": "6b9fef5343828e542db17e2519722ef08992f2c1"
+                "reference": "9c128924fd1069ea5a3789eb8dd1f8897ab69e12"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/routing/zipball/6b9fef5343828e542db17e2519722ef08992f2c1",
-                "reference": "6b9fef5343828e542db17e2519722ef08992f2c1",
+                "url": "https://api.github.com/repos/symfony/routing/zipball/9c128924fd1069ea5a3789eb8dd1f8897ab69e12",
+                "reference": "9c128924fd1069ea5a3789eb8dd1f8897ab69e12",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.5.9|>=7.0.8"
+                "php": "^7.1.3"
             },
             "conflict": {
-                "symfony/config": "<3.3.1",
-                "symfony/dependency-injection": "<3.3",
+                "symfony/config": "<3.4",
+                "symfony/dependency-injection": "<3.4",
                 "symfony/yaml": "<3.4"
             },
             "require-dev": {
                 "doctrine/annotations": "~1.0",
                 "psr/log": "~1.0",
-                "symfony/config": "^3.3.1|~4.0",
-                "symfony/dependency-injection": "~3.3|~4.0",
-                "symfony/expression-language": "~2.8|~3.0|~4.0",
-                "symfony/http-foundation": "~2.8|~3.0|~4.0",
+                "symfony/config": "~3.4|~4.0",
+                "symfony/dependency-injection": "~3.4|~4.0",
+                "symfony/expression-language": "~3.4|~4.0",
+                "symfony/http-foundation": "~3.4|~4.0",
                 "symfony/yaml": "~3.4|~4.0"
             },
             "suggest": {
@@ -1827,7 +1719,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.4-dev"
+                    "dev-master": "4.2-dev"
                 }
             },
             "autoload": {
@@ -1860,7 +1752,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2018-06-19T20:52:10+00:00"
+            "time": "2018-07-09T13:38:45+00:00"
         },
         {
             "name": "true/punycode",
@@ -2082,7 +1974,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.0",
+        "php": "^7.0|^7.1|^7.2",
         "ext-pdo": "*",
         "ext-iconv": "*",
         "ext-mbstring": "*"
