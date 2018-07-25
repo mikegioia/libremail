@@ -80,8 +80,10 @@ class Names
 
             $prevName = $lastName;
 
-            // Don't show author twice in the beginning and end
-            if ($list[3]->name == $list[1]->name) {
+            // Don't show author twice in the beginning and end, except
+            // when the final message is unread
+            if ($list[3]->name == $list[1]->name && 1 != $list[3]->seen) {
+                $list[2] = $list[3];
                 $list[3] = $this->getRow($lastName, $lastSeen, $i);
             }
             // If the message is unread,
@@ -89,7 +91,7 @@ class Names
                 // and if we have something in the middle,
                 // and if the final message is read,
                 // and finally if the middle message is unread,
-                if ($list[2] && $list[3]->seen && ! $list[2]->seen) {
+                if ($list[2] && 1 == $list[3]->seen && 1 != $list[2]->seen) {
                     // then move the middle message to the end.
                     $list[3] = $list[2];
                 }
