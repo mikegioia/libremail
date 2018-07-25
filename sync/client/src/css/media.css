@@ -41,11 +41,15 @@
 }
 
 @media (max-width: 380px) {
-    form {
+    form,
+    section.status-message {
         margin-top: 2rem;
         max-width: none;
         min-width: auto;
         width: calc(100% - 4rem);
+    }
+    section.status-message {
+        width: calc(100% - 7rem);
     }
     form label {
         text-align: left;

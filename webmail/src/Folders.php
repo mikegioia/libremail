@@ -220,7 +220,7 @@ class Folders
             ? $this->folderCounts[$folderId]
             : 0;
 
-        return ($returnString)
+        return $returnString
             ? ($count ? " ($count)" : '')
             : ($count ?: 0);
     }

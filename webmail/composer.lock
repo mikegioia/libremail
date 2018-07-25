@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b05604d5abbed0e08eb755623673aac",
+    "content-hash": "8acff0128d7ebbf3284987b42df32072",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -59,12 +59,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mikegioia/pdo.git",
-                "reference": "5832e46a625e01763a9af41b3df83cd99206ae43"
+                "reference": "adeeb2f283f65ed30c08ea36faaa462c72699ff6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikegioia/pdo/zipball/5832e46a625e01763a9af41b3df83cd99206ae43",
-                "reference": "5832e46a625e01763a9af41b3df83cd99206ae43",
+                "url": "https://api.github.com/repos/mikegioia/pdo/zipball/adeeb2f283f65ed30c08ea36faaa462c72699ff6",
+                "reference": "adeeb2f283f65ed30c08ea36faaa462c72699ff6",
                 "shasum": ""
             },
             "require": {
@@ -106,7 +106,7 @@
                 "docs": "https://github.com/mikegioia/Slim-PDO/blob/master/docs/README.md",
                 "source": "https://github.com/mikegioia/pdo/tree/master"
             },
-            "time": "2018-07-22T23:29:12+00:00"
+            "time": "2018-07-25T03:02:46+00:00"
         },
         {
             "name": "zendframework/zend-escaper",
@@ -164,7 +164,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^5.6|^7.0",
+        "php": "^7.0|^7.1|^7.2",
+        "ext-pdo": "*",
         "ext-mbstring": "*"
     },
     "platform-dev": []

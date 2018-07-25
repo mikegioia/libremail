@@ -64,6 +64,19 @@ module.exports = function ( grunt ) {
                     ],
                     dest: './build/fonts/'
                 }]
+            },
+            dist: {
+                files: [{
+                    expand: true,
+                    flatten: true,
+                    src: [
+                        './build/*.js',
+                        './build/*.css',
+                        './build/*.map',
+                        './build/fonts'
+                    ],
+                    dest: './dist/'
+                }]
             }
         },
         // HTML paths
@@ -98,9 +111,9 @@ module.exports = function ( grunt ) {
     grunt.loadNpmTasks( 'grunt-contrib-watch' );
     grunt.loadNpmTasks( 'grunt-contrib-concat' );
 
-    grunt.registerTask( 'dist', [ 'replace:dist' ] );
-    grunt.registerTask( 'build', [ 'concat', 'copy', 'replace:build' ] );
-    grunt.registerTask( 'default', [ 'concat', 'copy', 'watch' ] );
+    grunt.registerTask( 'dist', [ 'replace:dist', 'copy:dist' ] );
+    grunt.registerTask( 'build', [ 'concat', 'copy:fonts', 'replace:build' ] );
+    grunt.registerTask( 'default', [ 'concat', 'copy:fonts', 'watch' ] );
     grunt.registerTask( 'printenv', function () {
         console.log( process.env );
     });

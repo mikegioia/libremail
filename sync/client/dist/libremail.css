@@ -974,7 +974,6 @@ button.button-primary[disabled]:focus {
     border-color: #444;
 }
 html {
-    /*font-size: 78.125%;*/
     font-size: 87.5%;
 }
 
@@ -1459,7 +1458,8 @@ section.notifications .notification .success {
 }
 
 @media (max-width: 380px) {
-    form {
+    form,
+    section.status-message {
         margin-top: 2rem;
         max-width: none;
         min-width: auto;
