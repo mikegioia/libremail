@@ -105,6 +105,9 @@ $renderMailbox = function ($id, $page = 1, $limit = 25) use ($account) {
             Message::ONLY_FLAGGED => STARRED === $id
         ]);
 
+    header('Content-Type: text/html');
+    header('Cache-Control: private, max-age=0, no-cache, no-store');
+
     // Render the inbox
     $view->render('mailbox', [
         'urlId' => $id,
@@ -117,7 +120,7 @@ $renderMailbox = function ($id, $page = 1, $limit = 25) use ($account) {
         'folderId' => $folderId,
         'unflagged' => $unflagged,
         'showPaging' => INBOX !== $id,
-        'mainHeading' => (INBOX === $id)
+        'mainHeading' => INBOX === $id
             ? 'Everything else'
             : $folder->name
     ]);
@@ -191,7 +194,6 @@ $router->get('/thread/(\d+)/(\d+)', function ($folderId, $threadId) use ($accoun
     // Load the thread object, this will throw an exception if
     // the thread is not found
     $thread = new Thread($account, $folders, $threadId);
-
     // Render the message thread
     $view->render('thread', [
         'view' => $view,

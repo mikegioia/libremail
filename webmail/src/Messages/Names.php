@@ -4,7 +4,7 @@ namespace App\Messages;
 
 class Names
 {
-    const MAX_LEN = 20;
+    const MAX_LEN = 18;
     const UTF8 = 'utf-8';
 
     /**
@@ -21,64 +21,54 @@ class Names
      */
     public function get(array $names, array $seens)
     {
-        // First, remove any duplicate names that we don't want
-        $names = $this->compress($names);
-
-        return $this->getNames($names, $seens);
-    }
-
-    /**
-     * Compresses the list of names and removes the duplicates.
-     * If the same name appears later in the thread, then we don't
-     * need any more than the first reference.
-     *
-     * @param array $names
-     *
-     * @return array
-     */
-    private function compress(array $names)
-    {
-        return $names;
-    }
-
-    /**
-     * Prepare the name strings for the message.
-     *
-     * @param array $names List of all names on the message
-     * @param array $seens List of seen flags for all names
-     *
-     * @return string
-     *
-     * @todo Move this to App\Messages\Names
-     */
-    private function getNames(array $names, array $seens)
-    {
-        $prevName = null;
         $i = count($names);
-        $getRow = function ($name, $seen, $index) {
-            $short = trim(current(explode(' ', $name)), ' "');
-
-            return (object) [
-                'name' => $name,
-                'index' => $index,
-                'seen' => 1 == $seen,
-                'short' => current(explode('@', $short))
-            ];
-        };
-        // Final set will have at most three, and at least two
-        $final = [
-            1 => $getRow(array_shift($names), array_shift($seens), 1),
+        // Final set will have at most three, and at least two names
+        $list = [
+            1 => $this->getRow(array_shift($names), array_shift($seens), 1),
             2 => null,
-            3 => $getRow(array_pop($names), array_pop($seens), $i)
+            3 => $this->getRow(array_pop($names), array_pop($seens), $i)
         ];
 
         if (1 === $i) {
-            return sprintf(
-                '<%s>%s</%s>',
-                $final[1]->seen ? 'span' : 'strong',
-                $this->clean($final[1]->name),
-                $final[1]->seen ? 'span' : 'strong');
+            return $this->getSingleName($list[1]->name, $list[1]->seen);
         }
+
+        $this->buildNamesList($list, $i, $names, $seens);
+        $this->cleanupNamesList($list);
+
+        // Finally, we need to combine the names in the most
+        // space efficient way possible
+        if (1 === count($list)) {
+            return $this->getSingleName($list[1]->name, $list[1]->seen);
+        }
+
+        return $this->getMultipleNames($list);
+    }
+
+    private function getRow($name, $seen, $index) {
+        $short = trim(current(explode(' ', $name)), ' "');
+
+        return (object) [
+            'name' => $name,
+            'index' => $index,
+            'seen' => 1 == $seen,
+            'short' => current(explode('@', $short))
+        ];
+    }
+
+    private function getEmptyRow()
+    {
+        return $this->getRow('', 0, 0);
+    }
+
+    /**
+     * Iterate backwards through the list of names on all
+     * of the messages and build an intelligent array of up
+     * to three names.
+     */
+    private function buildNamesList(&$list, &$i, $names, $seens)
+    {
+        $prevName = null;
 
         while ($names) {
             $lastName = array_pop($names);
@@ -90,116 +80,159 @@ class Names
 
             $prevName = $lastName;
 
-            // Don't show author twice, even if author is most recent,
-            // but only if the final message has been seen
-            if ($final[3]->seen
-                && $final[3]->name == $final[1]->name)
-            {
-                $final[3] = $getRow($lastName, $lastSeen, $i);
+            // Don't show author twice in the beginning and end
+            if ($list[3]->name == $list[1]->name) {
+                $list[3] = $this->getRow($lastName, $lastSeen, $i);
             }
-            // If the message is unread
+            // If the message is unread,
             elseif (1 != $lastSeen) {
-                // and if we have something in the middle
-                if ($final[2]
-                    // and if the final message is read
-                    && $final[3]->seen
-                    // and finally if the middle message is unread
-                    && ! $final[2]->seen)
-                {
-                    // Move the middle message to the end
-                    $final[3] = $final[2];
+                // and if we have something in the middle,
+                // and if the final message is read,
+                // and finally if the middle message is unread,
+                if ($list[2] && $list[3]->seen && ! $list[2]->seen) {
+                    // then move the middle message to the end.
+                    $list[3] = $list[2];
                 }
 
                 // Middle message becomes most oldest unread message
                 // in the chain, but only if there's nothing in the
                 // middle or the name is different.
-                if (! $final[2]
-                    || ($final[2]
-                        && $final[2]->name != $lastName))
-                {
-                    if ($lastName !== $final[3]->name) {
-                        $final[2] = $getRow($lastName, $lastSeen, $i);
+                if (! $list[2] || ($list[2] && $list[2]->name != $lastName)) {
+                    if ($lastName != $list[3]->name) {
+                        $list[2] = $this->getRow($lastName, $lastSeen, $i);
                     }
                 }
             }
         }
+    }
 
+    /**
+     * Performs list compaction and cleanup.
+     */
+    private function cleanupNamesList(&$list)
+    {
         // Clean up instances of the same name adjacent to itself
-        if ($final[2] && $final[1]->name == $final[2]->name) {
-            if ($final[1]->seen && $final[2]->seen) {
-                unset($final[2]);
+        if ($list[2] && $list[1]->name == $list[2]->name) {
+            if ($list[1]->seen && $list[2]->seen) {
+                $list[2] = $this->getEmptyRow();
             }
-            elseif (! $final[1]->seen && $final[2]->seen) {
-                $final[1] = $final[2];
-                unset($final[2]);
-            }
-        }
-
-        if (! $final[2] && $final[1]->name == $final[3]->name) {
-            if ($final[1]->seen && $final[3]->seen) {
-                unset($final[3]);
-            }
-            elseif (! $final[1]->seen && $final[3]->seen) {
-                $final[1] = $final[3];
-                unset($final[3]);
+            elseif (! $list[1]->seen && $list[2]->seen) {
+                $list[1] = $list[2];
+                $list[2] = $this->getEmptyRow();
             }
         }
 
-        $i = 0;
-        $raw = '';
-        $return = '';
-        $final = array_filter($final);
-
-        // Finally, we need to combine the names in the most
-        // space efficient way possible
-        if (1 === count($final)) {
-            return sprintf(
-                '<%s>%s</%s>',
-                $final[1]->seen ? 'span' : 'strong',
-                $this->clean($final[1]->name),
-                $final[1]->seen ? 'span' : 'strong');
-        }
-
-        foreach ($final as $item) {
-            if (! $return) {
-                $i = $item->index;
-                $return = sprintf(
-                    '<%s>%s</%s>',
-                    $item->seen ? 'span' : 'strong',
-                    $this->clean($item->short),
-                    $item->seen ? 'span' : 'strong');
-                continue;
+        // If nothing is in the middle and the first and third names
+        // are the same,
+        if (! $list[2] && $list[1]->name == $list[3]->name) {
+            // and if all messages are seen then kill the final one;
+            if ($list[1]->seen && $list[3]->seen) {
+                $list[3] = $this->getEmptyRow();
             }
-
-            $return .= ($item->index - $i > 1)
-                ? '&nbsp;..&nbsp;'
-                : ',&nbsp;';
-
-            if (strlen($raw.$item->short) > self::MAX_LEN) {
-                $return .= sprintf(
-                    '<%s>%s</%s>',
-                    $item->seen ? 'span' : 'strong',
-                    $this->clean(
-                        substr(
-                            $item->short,
-                            0,
-                            self::MAX_LEN - strlen($raw)
-                        )),
-                    $item->seen ? 'span' : 'strong');
-
-                return $return;
-            }
-            else {
-                $raw .= $item->short;
-                $return .= sprintf(
-                    '<%s>%s</%s>',
-                    $item->seen ? 'span' : 'strong',
-                    $this->clean($item->short),
-                    $item->seen ? 'span' : 'strong');
+            // or if the last one is seen then mark the whole thread
+            // as seen.
+            elseif (! $list[1]->seen && $list[3]->seen) {
+                $list[1] = $list[3];
+                $list[3] = $this->getEmptyRow();
             }
         }
 
-        return $return;
+        if (! $list[2]) {
+            $list[2] = $this->getEmptyRow();
+        }
+
+        if (! $list[3]) {
+            $list[3] = $this->getEmptyRow();
+        }
+    }
+
+    /**
+     * Returns a string of more than one names.
+     *
+     * @param array $list;
+     *
+     * @return string
+     */
+    private function getMultipleNames($list)
+    {
+        $names = [
+            1 => $list[1]->short,
+            2 => $list[2]->short,
+            3 => $list[3]->short
+        ];
+
+        // If all three names are under the limit, then use them all
+        if (strlen($names[1]) + strlen($names[2]) + strlen($names[3]) <= self::MAX_LEN) {
+            $prevItem = $list[1];
+            $return = $this->getSingleName($names[1], $list[1]->seen);
+
+            if ($list[2]->index) {
+                $prevItem = $list[2];
+                $return .= $this->getDelimeter($list[1], $list[2])
+                    .$this->getSingleName($names[2], $list[2]->seen);
+            }
+
+            if ($list[3]->index) {
+                $return .= $this->getDelimeter($prevItem, $list[3])
+                    .$this->getSingleName($names[3], $list[3]->seen);
+            }
+
+            return $return;
+        }
+
+        // Otherwise, try to see if the bookends are under the limit
+        if (strlen($names[1]) + strlen($names[3]) <= self::MAX_LEN) {
+            return $this->getSingleName($names[1], $list[1]->seen)
+                .'&nbsp;..&nbsp;'
+                .$this->getSingleName($names[3], $list[3]->seen);
+        }
+
+        // If not even the last name is short enough, just truncate it
+        if (self::MAX_LEN - strlen($names[3]) <= 0) {
+            return $this->getSingleName(
+                substr($names[3], 0, self::MAX_LEN - 1).'.',
+                $list[3]->seen);
+        }
+
+        // Shorten the first if it's longer and try that
+        if (strlen($names[1]) > strlen($names[3])) {
+            $trimmed = substr($names[1], 0, self::MAX_LEN - strlen($names[3]));
+
+            return $this->getSingleName($trimmed, $list[1]->seen)
+                .'&nbsp;..&nbsp;'
+                .$this->getSingleName($names[3], $list[3]->seen);
+        }
+
+        // Shorten the last one and send it back
+        $trimmed = substr($names[3], 0, self::MAX_LEN - strlen($names[1]));
+
+        return $this->getSingleName($names[1], $list[1]->seen)
+            .'&nbsp;..&nbsp;'
+            .$this->getSingleName($trimmed, $list[3]->seen);
+    }
+
+    private function getSingleName($name, $seen)
+    {
+        if (! $name) {
+            return '';
+        }
+
+        return sprintf(
+            '<%s>%s</%s>',
+            $seen ? 'span' : 'strong',
+            $this->clean($name),
+            $seen ? 'span' : 'strong');
+    }
+
+    private function getDelimeter($itemA, $itemB)
+    {
+        if (! $itemA->index || ! $itemB->index) {
+            return '';
+        }
+
+        return $itemB->index - $itemA->index > 1
+            ? '&nbsp;..&nbsp;'
+            : ',&nbsp;';
     }
 
     /**
