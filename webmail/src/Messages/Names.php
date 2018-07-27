@@ -69,6 +69,7 @@ class Names
     private function buildNamesList(&$list, &$i, $names, $seens)
     {
         $prevName = null;
+        $allRead = array_sum($seens) === count($seens);
 
         while ($names) {
             $lastName = array_pop($names);
@@ -83,14 +84,17 @@ class Names
             $prevName = $lastName;
 
             // Try not to show the author at the beginning and end, but
-            // only if the message is seen already
-            if ($list[3]->name == $list[1]->name && 1 == $list[3]->seen) {
+            // only if the message is seen already or the current message
+            // is unread.
+            if ($list[3]->name == $list[1]->name
+                && (1 == $list[3]->seen || 1 != $lastSeen))
+            {
                 $list[3] = $this->getRow($lastName, $lastSeen, $i);
                 continue;
             }
 
-            // If the message is unread,
-            if (1 != $lastSeen) {
+            // If the message is unread or if ALL messages are read,
+            if (1 != $lastSeen || $allRead) {
                 // and if we have something in the middle,
                 // and if the final message is read,
                 // and finally if the middle message is unread,
@@ -101,16 +105,14 @@ class Names
 
                 // Middle message becomes most oldest unread message
                 // in the chain, but only if there's nothing in the
-                // middle or the name is different.
-                if (! $list[2] || ($list[2] && $list[2]->name != $lastName)) {
+                // middle.
+                if (! $list[2]) {
                     if ($lastName != $list[3]->name) {
                         $list[2] = $this->getRow($lastName, $lastSeen, $i);
                     }
                 }
             }
         }
-
-        //print_r($list);exit;
     }
 
     /**
