@@ -74,20 +74,23 @@ class Names
             $lastName = array_pop($names);
             $lastSeen = array_pop($seens);
 
+            // We only decrement the distance counter when the name in
+            // the message thread changes
             if (! $prevName || $prevName != $lastName) {
                 --$i;
             }
 
             $prevName = $lastName;
 
-            // Don't show author twice in the beginning and end, except
-            // when the final message is unread
-            if ($list[3]->name == $list[1]->name && 1 != $list[3]->seen) {
-                $list[2] = $list[3];
+            // Try not to show the author at the beginning and end, but
+            // only if the message is seen already
+            if ($list[3]->name == $list[1]->name && 1 == $list[3]->seen) {
                 $list[3] = $this->getRow($lastName, $lastSeen, $i);
+                continue;
             }
+
             // If the message is unread,
-            elseif (1 != $lastSeen) {
+            if (1 != $lastSeen) {
                 // and if we have something in the middle,
                 // and if the final message is read,
                 // and finally if the middle message is unread,
@@ -106,6 +109,8 @@ class Names
                 }
             }
         }
+
+        //print_r($list);exit;
     }
 
     /**

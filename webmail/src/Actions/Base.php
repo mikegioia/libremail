@@ -52,8 +52,8 @@ abstract class Base
     protected function setFlag(MessageModel $message, $flag, $state, $filters = [], $options = [])
     {
         $taskModel = new TaskModel;
-        $newValue = ($state) ? 1 : 0;
-        $oldValue = ($state) ? 0 : 1;
+        $newValue = $state ? 1 : 0;
+        $oldValue = $state ? 0 : 1;
         // We need to update this flag for all messsages with
         // the same message-id within the thread.
         $messages = $message->getSiblings($filters, $options);

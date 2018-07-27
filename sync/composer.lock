@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "8ad1ed6ec764d70b0926aa00c7512973",
@@ -590,12 +590,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "e9e555134cd918e9d11b8db2d75bfe7d97d28993"
+                "reference": "4f46ecec483582f28784731d246736c59dd65f5c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/e9e555134cd918e9d11b8db2d75bfe7d97d28993",
-                "reference": "e9e555134cd918e9d11b8db2d75bfe7d97d28993",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/4f46ecec483582f28784731d246736c59dd65f5c",
+                "reference": "4f46ecec483582f28784731d246736c59dd65f5c",
                 "shasum": ""
             },
             "require": {
@@ -609,6 +609,17 @@
                 "psr-4": {
                     "Pb\\Imap\\": "src/"
                 }
+            },
+            "scripts": {
+                "fix": [
+                    "php-cs-fixer fix"
+                ],
+                "test": [
+                    "@php tests/memory.php"
+                ],
+                "lint": [
+                    "php-cs-fixer fix --dry-run --diff"
+                ]
             },
             "license": [
                 "BSD-3-Clause"
@@ -629,10 +640,10 @@
                 "mail"
             ],
             "support": {
-                "source": "https://github.com/ParticleBits/imap/tree/master",
+                "source": "https://github.com/ParticleBits/imap/tree/1.2.0",
                 "issues": "https://github.com/ParticleBits/imap/issues"
             },
-            "time": "2018-07-25T03:35:11+00:00"
+            "time": "2018-07-26T23:41:06+00:00"
         },
         {
             "name": "particlebits/zend-mail",
@@ -1507,12 +1518,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "fdd5abcebd1061ec647089c6c41a07ed60af09f8"
+                "reference": "b2e1f19280c09a42dc64c0b72b80fe44dd6e88fb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/fdd5abcebd1061ec647089c6c41a07ed60af09f8",
-                "reference": "fdd5abcebd1061ec647089c6c41a07ed60af09f8",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/b2e1f19280c09a42dc64c0b72b80fe44dd6e88fb",
+                "reference": "b2e1f19280c09a42dc64c0b72b80fe44dd6e88fb",
                 "shasum": ""
             },
             "require": {
@@ -1562,7 +1573,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2018-04-06T07:35:25+00:00"
+            "time": "2018-07-26T09:06:28+00:00"
         },
         {
             "name": "symfony/http-foundation",
@@ -1570,12 +1581,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "bcd7178461fdf85a49595983d4ebf40c0da2c38d"
+                "reference": "54613260ca7f74117122e41f29745d42583f19d0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/bcd7178461fdf85a49595983d4ebf40c0da2c38d",
-                "reference": "bcd7178461fdf85a49595983d4ebf40c0da2c38d",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/54613260ca7f74117122e41f29745d42583f19d0",
+                "reference": "54613260ca7f74117122e41f29745d42583f19d0",
                 "shasum": ""
             },
             "require": {
@@ -1616,7 +1627,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-16T14:05:48+00:00"
+            "time": "2018-07-26T11:25:51+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -1683,12 +1694,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/routing.git",
-                "reference": "9c128924fd1069ea5a3789eb8dd1f8897ab69e12"
+                "reference": "efaada6a040a0248919d36c47f05f4552e61fb25"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/routing/zipball/9c128924fd1069ea5a3789eb8dd1f8897ab69e12",
-                "reference": "9c128924fd1069ea5a3789eb8dd1f8897ab69e12",
+                "url": "https://api.github.com/repos/symfony/routing/zipball/efaada6a040a0248919d36c47f05f4552e61fb25",
+                "reference": "efaada6a040a0248919d36c47f05f4552e61fb25",
                 "shasum": ""
             },
             "require": {
@@ -1752,7 +1763,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2018-07-09T13:38:45+00:00"
+            "time": "2018-07-26T11:25:51+00:00"
         },
         {
             "name": "true/punycode",

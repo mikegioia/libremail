@@ -42,9 +42,7 @@ input[type="checkbox"].thread-msg-checkbox {
   display: block;
 }
 
-label.thread-msg-label {
-  background-color: #f1f1f1;
-  border-bottom: 0.0625rem solid #e1e1e1;
+.thread-msg-row label {
   box-sizing: border-box;
   cursor: pointer;
   display: block;
@@ -56,7 +54,12 @@ label.thread-msg-label {
   width: calc(100% - 1rem);
 }
 
-label.thread-msg-label .snippet {
+.thread-msg-row label.thread-msg-label {
+  background-color: #f1f1f1;
+  border-bottom: 0.125rem solid #e1e1e1;
+}
+
+.thread-msg-row label .snippet {
   color: #888;
   display: block;
   float: left;
@@ -67,30 +70,28 @@ label.thread-msg-label .snippet {
   width: calc(100% - 8rem);
 }
 
-label.thread-msg-label .snippet strong {
+.thread-msg-row label .snippet strong {
   color: #333;
   margin-right: 0.5rem;
 }
 
-label.thread-msg-label .snippet span {
+.thread-msg-row label .snippet span {
   font-weight: 400;
 }
 
-.thread-msg .avatar,
-label.thread-msg-label .snippet .avatar {
+.thread-msg-row label .snippet .avatar {
   display: inline-block;
   width: 3rem;
 }
 
-.thread-msg .avatar img,
-label.thread-msg-label .snippet .avatar img {
+.thread-msg-row label .avatar img {
   height: 1.75rem;
   transform: translateY(-0.05rem);
   vertical-align: middle;
   width: 1.75rem;
 }
 
-label.thread-msg-label .date {
+.thread-msg-row label .date {
   box-sizing: border-box;
   color: #333;
   display: block;
@@ -100,6 +101,57 @@ label.thread-msg-label .date {
   text-align: right;
   text-decoration: none;
   width: 8rem;
+}
+
+/* Expand message list */
+
+input[type="checkbox"].thread-msg-more-checkbox {
+  display: none;
+}
+
+.thread-msg-group {
+  position: relative;
+}
+
+.thread-msg-group .thread-msg-row {
+  display: none;
+}
+
+.thread-msg-group .placeholder {
+  background-color: #f1f1f1;
+  border-bottom: 0.125rem solid #e1e1e1;
+  height: 0.875rem;
+  width: calc(100% - 1rem);
+}
+
+.thread-msg-more-checkbox + label {
+  bottom: 0;
+  cursor: pointer;
+  margin: 0;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  width: calc(100% - 1rem);
+}
+
+.thread-msg-more-checkbox + label span {
+  color: #888;
+  background-color: #f1f1f1;
+  display: inline-block;
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.5;
+  padding: 0rem 1rem;
+  vertical-align: middle;
+}
+
+.thread-msg-more-checkbox:checked + label,
+.thread-msg-more-checkbox:checked ~ .placeholder {
+  display: none;
+}
+
+.thread-msg-more-checkbox:checked ~ .thread-msg-row {
+  display: block;
 }
 
 /* Message body */
@@ -113,7 +165,7 @@ label.thread-msg-label .date {
   margin: 0 1rem 1.5rem 0;
   line-height: 3.5rem;
   padding: 0 1rem 0 4rem;
-  width: calc(100% - 1rem);
+  width: 100%;
 }
 
 .thread-msg label.thread-msg-header .from strong {

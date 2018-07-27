@@ -34,7 +34,7 @@ class Messages
      * @param int $limit
      * @param array $options
      *
-     * @return [ array, array, array ] Messages, Messages, ints
+     * @return [array, array, array] Message, Message, int
      */
     public function getThreads($folderId, $page = 1, $limit = 25, array $options = [])
     {

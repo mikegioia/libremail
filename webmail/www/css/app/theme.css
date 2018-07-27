@@ -1,0 +1,55 @@
+/* Easier on the eyes
+
+body,
+.menu.default {
+  background-color: #f5e7dc;
+}
+
+.msg-contents {
+  background-color: #f5e7dc;
+  border-bottom: 1px solid #dcc5b3;
+  border-top: 1px solid #dcc5b3;
+}
+
+.msg-label {
+  background-color: #f5e7dc;
+}
+.msg-label:after {
+  border-color: #b19c8c;
+}
+
+.msg-label.unseen,
+.msg-contents.unseen {
+  background-color: #fdf5ef;
+}
+
+.msg-contents .subject {
+  color: #94877d;
+}
+
+.button,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  border-color: #b19c8c;
+}
+
+#search .icon.button,
+input[type="search"],
+input[type="text"],
+textarea,
+select {
+  background-color: #fdf5ef;
+  border-color: #dcc5b3;
+}
+
+.dropdown a,
+.dropdown li a,
+.dropdown li input[type="submit"] {
+  background: #f5e7dc;
+}
+
+nav #mailboxes-divider {
+  border-color: #e8d3c2;
+}

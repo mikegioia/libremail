@@ -17,6 +17,8 @@ class Archive extends Base
     {
         $this->setFlag($message, MessageModel::FLAG_DELETED, true, [
             'folder_id' => $folders->getInboxId()
+        ], [
+            MessageModel::ALL_SIBLINGS => true
         ]);
     }
 

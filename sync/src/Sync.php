@@ -318,10 +318,6 @@ class Sync
                 $this->syncMessages($account, $folders);
                 // Disconnect the IMAP connection, but leave the running flag on
                 $this->disconnect(true);
-                // Update all thread IDs. This will run for a long time for the
-                // first iteration, and all subsequent runs will only update
-                // threads for any new messages.
-                $this->updateThreads($account);
             }
         }
         catch (PDOException $e) {
@@ -564,6 +560,9 @@ class Sync
             }
 
             $this->checkForHalt();
+            $this->updateThreads($account);
+            $this->checkForHalt();
+
         }
 
         $this->stats->unsetActiveFolder();
@@ -571,6 +570,9 @@ class Sync
 
     /**
      * Updates message threads. See Threading class for info.
+     * This will run for a long time for the first iteration,
+     * and all subsequent runs will only update threads for
+     * new messages.
      *
      * @param AccountModel $account
      */

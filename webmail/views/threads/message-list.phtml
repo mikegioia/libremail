@@ -1,40 +1,51 @@
 <h5 class="thread-title">
-    <span class="strong subject"><?php $view->clean( $thread->getSubject() ); ?></span>
+    <span class="strong subject"><?php $view->clean($thread->getSubject()); ?></span>
 <?php
-foreach ( $thread->getFolders() as $folder ): ?>
-    <mark style="background-color:<?php echo $folder->color->bg; ?>; color:<?php echo $folder->color->fg; ?>"><?php $view->clean( $folder->label ); ?></mark>
+foreach ($thread->getFolders() as $folder): ?>
+    <mark style="background-color:<?php echo $folder->color->bg; ?>; color:<?php echo $folder->color->fg; ?>"><?php $view->clean($folder->label); ?></mark>
 <?php
 endforeach; ?>
 </h5>
 <!-- Message List -->
 <section class="thread-msg-list">
 <?php
-foreach ( $thread->getMessages() as $message ): ?>
-    <input id="thread-msg-checkbox-<?php echo $message->id; ?>" type="checkbox" class="thread-msg-checkbox" />
-    <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-label">
-        <span class="snippet">
-            <span class="avatar">
-                <img src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($message->from_email))); ?>?d=identicon" />
-            </span><!--
-            --><strong class="from"><?php $view->clean( $message->from_name ); ?></strong><!--
-            --><span><?php $view->clean( $message->snippet ); ?></span>
-        </span>
-        <span class="date">1:05 pm</span>
-    </label>
-    <article id="message-<?php echo $message->id; ?>" class="thread-msg">
-        <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-header">
-            <span class="avatar">
-                <img src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($message->from_email))); ?>?d=identicon" />
-            </span>
-            <span class="from">
-                <strong><?php $view->clean( $message->from_name ); ?></strong>
-                <span><?php $view->clean( $message->from_email ); ?></span>
-            </span>
-        </label>
-        <div class="message">
-            <?php echo $message->body; ?>
-        </div>
-    </article>
-<?php
+foreach ($thread->getThreadIndex() as $i => $item):
+    if ($item->type === $thread::INDEX_MESSAGE):
+        $view->render( 'threads/message', [
+            'view' => $view,
+            'open' => $item->open,
+            'message' => $item->message
+        ]);
+    elseif ($item->type === $thread::INDEX_GROUP):
+        if ($item->count > 1): ?>
+        <div class="thread-msg-group">
+            <input id="thread-msg-more-checkbox-<?php echo $i; ?>" type="checkbox" class="thread-msg-more-checkbox" />
+            <label for="thread-msg-more-checkbox-<?php echo $i; ?>" class="thread-msg-show-more">
+                <?php
+                if ($item->count > 2): ?>
+                <span><?php echo $item->count; ?> older messages</span>
+                <?php
+                endif; ?>
+            </label>
+            <div class="placeholder"></div>
+            <div class="placeholder"></div>
+            <?php
+            if ($item->count > 2): ?>
+            <div class="placeholder"></div>
+            <?php
+            endif;
+        endif;
+        foreach ($item->messages as $message):
+            $view->render( 'threads/message', [
+                'open' => false,
+                'view' => $view,
+                'message' => $message
+            ]);
+        endforeach;
+        if ($item->count > 1): ?>
+        </div><!-- /thread-msg-group -->
+        <?php
+        endif;
+    endif; // group of messages
 endforeach; ?>
 </section>

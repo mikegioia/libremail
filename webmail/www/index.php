@@ -189,11 +189,11 @@ $router->get('/thread/(\d+)/(\d+)', function ($folderId, $threadId) use ($accoun
     $colors = getConfig('colors');
     $select = Url::getParam('select');
     $folders = new Folders($account, $colors);
-    // Mark this thread as read
-    (new MarkReadAction)->run([$threadId], $folders);
     // Load the thread object, this will throw an exception if
     // the thread is not found
     $thread = new Thread($account, $folders, $threadId);
+    // Mark this thread as read
+    (new MarkReadAction)->run([$threadId], $folders);
     // Render the message thread
     $view->render('thread', [
         'view' => $view,

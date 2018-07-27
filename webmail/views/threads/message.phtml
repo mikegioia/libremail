@@ -1,0 +1,31 @@
+<div class="thread-msg-row">
+    <input id="thread-msg-checkbox-<?php echo $message->id; ?>" type="checkbox"
+        class="thread-msg-checkbox"<?php echo $open === true ? ' checked' : '' ?> />
+    <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-label">
+        <span class="snippet">
+            <span class="avatar">
+                <img src="<?php echo $message->avatar_url; ?>" />
+            </span><!--
+            --><strong class="from"><?php $view->clean($message->from_name); ?></strong><!--
+            --><span><?php $view->clean($message->snippet); ?></span>
+        </span>
+        <span class="date" title="<?php echo $message->datetime_string; ?>"><?php echo $message->date_string; ?></span>
+    </label>
+    <article id="message-<?php echo $message->id; ?>" class="thread-msg">
+        <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-header">
+            <span class="snippet">
+                <span class="avatar">
+                    <img src="<?php echo $message->avatar_url; ?>" />
+                </span>
+                <span class="from">
+                    <strong><?php $view->clean($message->from_name); ?></strong>
+                    <span><?php $view->clean($message->from_email); ?></span>
+                </span>
+            </span>
+            <span class="date" title="<?php echo $message->datetime_string; ?>"><?php echo $message->date_string; ?></span>
+        </label>
+        <div class="message">
+            <?php echo $message->body; ?>
+        </div>
+    </article>
+</div>

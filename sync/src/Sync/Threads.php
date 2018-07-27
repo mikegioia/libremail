@@ -147,7 +147,8 @@ class Threads
         $total = $this->maxId - $minId;
         $messageModel = new MessageModel;
         $this->log->debug(
-            "Storing messages for threading for {$this->account->email}");
+            "Threading: storing messages for threading for ".
+            "{$this->account->email}");
         $this->printMemory();
         $this->startProgress(1, $total);
 
@@ -204,12 +205,9 @@ class Threads
         $total = count($this->messages);
         $noun = Fn\plural('message', $total);
         $this->log->debug(
-            "Threading {$total} {$noun} for {$this->account->email}");
+            "Threading Pass 1: updating {$total} {$noun} for ".
+            "{$this->account->email}");
         $this->printMemory();
-
-        if ($this->interactive) {
-            $this->cli->whisper('Threading Pass 2');
-        }
 
         foreach ($this->unthreaded as $unthreadedId) {
             ++$count;
@@ -316,12 +314,9 @@ class Threads
     private function combineThreads()
     {
         $this->log->debug(
-            "Combining threads by subject for {$this->account->email}");
+            "Threading Pass 3: combining threads by subject for ".
+            "{$this->account->email}");
         $this->printMemory();
-
-        if ($this->interactive) {
-            $this->cli->whisper('Threading Pass 3');
-        }
 
         foreach ($this->subjectHashes as $hash => $threads) {
             $master = null;
@@ -369,7 +364,7 @@ class Threads
         $messageModel = new MessageModel;
         $total = count($this->messages);
         $this->log->debug(
-            "Saving new thread IDs for {$this->account->email}");
+            "Threading: saving new thread IDs for {$this->account->email}");
         $this->printMemory();
         $this->startProgress(4, $total);
 
@@ -416,9 +411,9 @@ class Threads
     {
         if ($this->interactive) {
             $noun = Fn\plural('message', $total);
-            $this->cli->whisper("Threading Pass {$pass}");
-            $this->cli->whisper(
-                "Processing {$total} {$noun} for {$this->account->getEmail()}:");
+            $this->log->debug(
+                "Threading Pass {$pass}: processing {$total} {$noun} ".
+                "for {$this->account->getEmail()}:");
             $this->progress = $this->cli->progress()->total(100);
         }
     }

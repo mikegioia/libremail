@@ -368,12 +368,13 @@ class Message extends Model
     public function getUnreadCounts($accountId)
     {
         $indexed = [];
-        $unseenThreadIds = (new Message)->getUnseenThreads($accountId);
+        $unseenThreadIds = $this->getUnseenThreads($accountId);
 
         if ($unseenThreadIds) {
             $folderThreads = $this->db()
                 ->select(['folder_id', 'thread_id'])
                 ->from('messages')
+                ->where('deleted', '=', 0)
                 ->whereIn('thread_id', $unseenThreadIds)
                 ->groupBy('folder_id, thread_id')
                 ->execute()
@@ -411,7 +412,7 @@ class Message extends Model
             $threads[] = $row->thread_id;
         }
 
-        return $threads;
+        return array_values(array_unique($threads));
     }
 
     private function getName($from)
