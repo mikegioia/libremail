@@ -24,7 +24,7 @@ class Delete extends Base
             $filters['folder_id'] = $options[Actions::FROM_FOLDER_ID];
         }
 
-        $this->setFlag($message, MessageModel::FLAG_DELETED, true, $filters);
+        $this->setFlag($message, MessageModel::FLAG_DELETED, true, $filters, $options);
     }
 
     public function getType()

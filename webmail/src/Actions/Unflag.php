@@ -17,7 +17,7 @@ class Unflag extends DeleteAction
      */
     public function update(MessageModel $message, Folders $folders, array $options = [])
     {
-        $this->setFlag($message, MessageModel::FLAG_FLAGGED, false);
+        $this->setFlag($message, MessageModel::FLAG_FLAGGED, false, [], $options);
 
         (new DeleteAction)->update($message, $folders, $options);
     }

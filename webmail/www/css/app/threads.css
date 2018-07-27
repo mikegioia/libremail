@@ -67,7 +67,7 @@ input[type="checkbox"].thread-msg-checkbox {
   text-decoration: none;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: calc(100% - 8rem);
+  width: calc(100% - 10rem);
 }
 
 .thread-msg-row label .snippet strong {
@@ -95,12 +95,22 @@ input[type="checkbox"].thread-msg-checkbox {
   box-sizing: border-box;
   color: #333;
   display: block;
-  float: right;
+  float: left;
   font-size: 1.25rem;
   font-weight: 400;
   text-align: right;
   text-decoration: none;
   width: 8rem;
+}
+
+.thread-msg-row label .star {
+    border: 0;
+    color: #d6a70e;
+    float: left;
+    height: 3.5rem;
+    line-height: 3.5rem;
+    text-align: right;
+    width: 2rem;
 }
 
 /* Expand message list */

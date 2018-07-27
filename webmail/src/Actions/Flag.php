@@ -19,12 +19,15 @@ class Flag extends BaseAction
      */
     public function update(MessageModel $message, Folders $folders, array $options = [])
     {
-        $this->setFlag($message, MessageModel::FLAG_FLAGGED, true);
+        $this->setFlag($message, MessageModel::FLAG_FLAGGED, true, [], $options);
+
+        // Overwrite and set the folder ID option
+        $options = array_merge($options, [
+            Actions::TO_FOLDER_ID => $folders->getStarredId()
+        ]);
 
         if ($folders->getStarredId()) {
-            (new CopyAction)->update($message, $folders, [
-                Actions::TO_FOLDER_ID => $folders->getStarredId()
-            ]);
+            (new CopyAction)->update($message, $folders, $options);
         }
     }
 

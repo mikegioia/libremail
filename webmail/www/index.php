@@ -30,8 +30,10 @@ mb_internal_encoding('UTF-8');
 define('GET', 'GET');
 define('POST', 'POST');
 define('INBOX', 'inbox');
+define('THREAD', 'thread');
 define('VIEWEXT', '.phtml');
 define('STARRED', 'starred');
+define('MAILBOX', 'mailbox');
 define('BASEDIR', __DIR__.'/..');
 define('DIR', DIRECTORY_SEPARATOR);
 define('VIEWDIR', BASEDIR.'/views');
@@ -155,11 +157,12 @@ $router->post('/update', function () use ($account) {
 });
 
 // Get the star HTML for a message
-$router->get('/star/(\d+)/(\w+).html', function ($id, $state) {
+$router->get('/star/(\w+)/(\d+)/(\w+).html', function ($type, $id, $state) {
     header('Content-Type: text/html');
     header('Cache-Control: max-age=86400'); // one day
     (new View)->render('/star', [
         'id' => $id,
+        'type' => $type,
         'flagged' => 'on' === $state
     ]);
 });
@@ -167,6 +170,7 @@ $router->get('/star/(\d+)/(\w+).html', function ($id, $state) {
 // Set star flag on a message
 $router->post('/star', function () use ($account) {
     $folders = new Folders($account, []);
+    $type = Url::postParam('type', MAILBOX);
     $actions = new Actions($folders, $_POST + $_GET);
     $actions->handleAction(
         'on' === Url::postParam('state', 'on')
@@ -174,10 +178,12 @@ $router->post('/star', function () use ($account) {
             : Actions::UNFLAG,
         [
             Url::postParam('id', 0)
-        ],
-        []);
+        ], [], [
+            Message::ALL_SIBLINGS => MAILBOX === $type
+        ]);
     (new View)->render('/star', [
         'id' => Url::postParam('id', 0),
+        'type' => Url::postParam('type'),
         'flagged' => 'on' === Url::postParam('state', 'on')
     ]);
 });
@@ -221,8 +227,8 @@ catch (ClientException $e) {
     echo '<h1>400 Bad Request</h1>';
     echo '<p>'.$e->getMessage().'</p>';
 }
-// catch ( Exception $e ) {
-//     header( 'HTTP/1.1 500 Server Error' );
+// catch (Exception $e) {
+//     header('HTTP/1.1 500 Server Error');
 //     echo '<h1>500 Server Error</h1>';
 //     echo '<p>'. $e->getMessage() .'</p>';
 // }

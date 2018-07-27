@@ -15,11 +15,13 @@ class Archive extends Base
      */
     public function update(MessageModel $message, Folders $folders, array $options = [])
     {
+        $options = array_merge([
+            MessageModel::ALL_SIBLINGS => true
+        ], $options);
+
         $this->setFlag($message, MessageModel::FLAG_DELETED, true, [
             'folder_id' => $folders->getInboxId()
-        ], [
-            MessageModel::ALL_SIBLINGS => true
-        ]);
+        ], $options);
     }
 
     public function getType()

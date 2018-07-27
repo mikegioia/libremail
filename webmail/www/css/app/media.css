@@ -36,6 +36,12 @@
   nav #nav-wrapper {
     width: 21rem;
   }
+  #logo {
+    width: 23rem;
+  }
+  #search {
+    width: calc(100% - 45rem)
+  }
 }
 
 /* Large devices (laptops) */

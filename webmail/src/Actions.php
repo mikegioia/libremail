@@ -39,6 +39,7 @@ class Actions
     const ACTION_CONVERSIONS = [
         'Add star' => 'flag',
         'Remove star' => 'unflag',
+        'Move to Inbox' => 'restore',
         'Mark as unread' => 'mark_unread',
         'Mark all as read' => 'mark_all_read'
     ];
@@ -126,23 +127,24 @@ class Actions
      * @param string $action
      * @param array $messageIds
      * @param array $allMessageIds
+     * @param array $options
      *
      * @throws Exception
      */
-    public function handleAction($action, array $messageIds, array $allMessageIds)
-    {
+    public function handleAction(
+        $action,
+        array $messageIds,
+        array $allMessageIds,
+        array $options = []
+    ) {
         if (self::MARK_ALL_READ === $action) {
             (new MarkReadAction)->run($allMessageIds, $this->folders);
-
-            return;
         }
-        elseif (! array_key_exists($action, self::ACTION_CLASSES)) {
-            return;
+        elseif (array_key_exists($action, self::ACTION_CLASSES)) {
+            $class = self::ACTION_CLASSES[$action];
+            $actionHandler = new $class;
+            $actionHandler->run($messageIds, $this->folders, $options);
         }
-
-        $class = self::ACTION_CLASSES[$action];
-        $actionHandler = new $class;
-        $actionHandler->run($messageIds, $this->folders);
     }
 
     private function convertAction($action)

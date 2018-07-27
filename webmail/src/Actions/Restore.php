@@ -4,10 +4,9 @@ namespace App\Actions;
 
 use App\Actions;
 use App\Folders;
-use App\Model\MessageModel;
-use App\Actions\Copy as CopyAction;
+use App\Model\Message as MessageModel;
 
-class Restore extends CopyAction
+class Restore extends Copy
 {
     /**
      * Restores messages back to inbox. This issues a copy command

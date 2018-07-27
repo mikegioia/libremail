@@ -15,7 +15,7 @@ class MarkUnread extends Base
      */
     public function update(MessageModel $message, Folders $folders, array $option = [])
     {
-        $this->setFlag($message, MessageModel::FLAG_SEEN, false);
+        $this->setFlag($message, MessageModel::FLAG_SEEN, false, [], $options);
     }
 
     public function getType()

@@ -10,12 +10,20 @@
         margin: 0;
     }
     div {
-        padding-right: 0.2rem;
-        text-align: center;
-        width: 100%;
         box-sizing: border-box;
         height: 1.25rem;
+    <?php
+    if ($type === 'mailbox'): ?>
         margin-top: calc(50% - 0.75rem);
+        padding-right: 0.2rem;
+        text-align: center;
+    <?php
+    else: ?>
+        margin-top: calc(50% - 0.125rem);
+        text-align: right;
+    <?php
+    endif; ?>
+        width: 100%;
     }
     svg {
         cursor: hand;
@@ -23,7 +31,7 @@
     button {
         border: none;
         background: none;
-        padding: none;
+        padding: 0;
         outline: none;
     }
 </style>
@@ -48,6 +56,7 @@
             </svg>
         </button>
         <input type="hidden" name="id" value="<?php echo $id; ?>" />
+        <input type="hidden" name="type" value="<?php echo $type; ?>" />
         <input type="hidden" name="state" value="<?php echo $flagged ? 'off' : 'on'; ?>" />
     </form>
 </div>

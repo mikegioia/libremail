@@ -31,12 +31,9 @@ abstract class Base
     /**
      * Implemented by sub-classes.
      */
-    abstract protected function getType();
+    abstract public function getType();
 
-    abstract protected function update(
-        MessageModel $message,
-        Folders $folders,
-        array $options = []);
+    abstract public function update(MessageModel $message, Folders $folders, array $options = []);
 
     /**
      * Updates the flag for a message. Stores a row in the
