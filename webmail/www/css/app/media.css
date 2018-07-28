@@ -15,18 +15,8 @@
   }
 }
 
-/* Large desktop screens */
-@media (max-width: 1399px) {
-  html {
-    font-size: 80%;
-  }
-  #search .icon.button {
-    top: 0;
-  }
-}
-
-/* Large devices */
-@media (min-width: 1200px) {
+/* Very large devices */
+@media (min-width: 1400px) {
   section#main {
     left: 25rem;
   }
@@ -41,6 +31,35 @@
   }
   #search {
     width: calc(100% - 45rem)
+  }
+}
+
+/* Large desktop screens */
+@media (max-width: 1399px) {
+  html {
+    font-size: 80%;
+  }
+  #search .icon.button {
+    top: 0;
+  }
+}
+
+/* Large devices */
+@media (min-width: 1200px) {
+  section#main {
+    left: 22rem;
+  }
+  nav {
+    width: 22rem;
+  }
+  nav #nav-wrapper {
+    width: 18rem;
+  }
+  #logo {
+    width: 20rem;
+  }
+  #search {
+    width: calc(100% - 42rem)
   }
 }
 

@@ -375,6 +375,7 @@ class Message extends Model
                 ->select(['folder_id', 'thread_id'])
                 ->from('messages')
                 ->where('deleted', '=', 0)
+                ->where('seen', '=', 0)
                 ->whereIn('thread_id', $unseenThreadIds)
                 ->groupBy('folder_id, thread_id')
                 ->execute()

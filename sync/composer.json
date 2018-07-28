@@ -14,6 +14,8 @@
         "ext-mbstring": "*",
         "particlebits/imap": "@dev",
         "particlebits/pdo": "@dev",
+        "particlebits/zend-mail": "@dev",
+        "particlebits/zend-mime": "@dev",
         "pimple/pimple": "^3.2.3",
         "monolog/monolog": "^1.23",
         "league/climate": "^3.4",
