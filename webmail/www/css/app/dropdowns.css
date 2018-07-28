@@ -3,106 +3,115 @@
  *
  * z-index range: 21-25
  */
+
 .dropdown {
-    position: relative;
+  position: relative;
 }
 
 .dropdown > a {
-    background-color: #fff;
-    position: relative;
-    z-index: 22;
+  background-color: #fff;
+  position: relative;
+  z-index: 22;
 }
 
 .dropdown ul {
-    background-color: #fff;
-    border: 1px solid #bbb;
-    border-radius: 0 4px 4px 4px;
-    color: #333;
-    display: none;
-    list-style-type: none;
-    min-width: 16rem;
-    padding: 0.25rem 0;
-    position: absolute;
-    top: calc(3.5rem - 1px);
-    z-index: 21;
+  background-color: #fff;
+  border: 1px solid #bbb;
+  border-radius: 0 0.25rem 0.25rem 0.25rem;
+  box-shadow: 0 0.125rem 0.25rem #ddd;
+  color: #333;
+  display: none;
+  list-style-type: none;
+  min-width: 16rem;
+  padding: 0.25rem 0;
+  position: absolute;
+  top: calc(3.5rem - 1px);
+  z-index: 21;
+}
+
+.dropdown.short {
+  color: red;
+}
+.dropdown.short ul {
+  top: 2.75rem;
 }
 
 .dropdown ul.right-menu {
-    border-radius: 4px 0 4px 4px;
-    right: 0;
+  border-radius: 4px 0 4px 4px;
+  right: 0;
 }
 
 .dropdown ul.size-medium {
-    width: 22rem;
+  width: 22rem;
 }
 
 .dropdown ul.size-large {
-    width: 25rem;
+  width: 25rem;
 }
 
 .dropdown > a:focus {
-    border-bottom: none;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+  border-bottom: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .dropdown > a:focus + ul,
 .dropdown ul:hover {
-    display: block;
+  display: block;
 }
 
 .dropdown > a:focus + ul {
-    border-color: #888;
+  border-color: #888;
 }
 
 .dropdown li {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .dropdown li a,
 .dropdown li input[type="submit"] {
-    background: #fff;
-    border: none;
-    border-radius: 0;
-    color: #333;
-    display: block;
-    font-size: 1.5rem;
-    margin: 0;
-    padding: 0.5rem 1rem;
-    text-align: left;
-    text-decoration: none;
+  background: #fff;
+  border: none;
+  border-radius: 0;
+  color: #333;
+  display: block;
+  font-size: 1.5rem;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  text-align: left;
+  text-decoration: none;
 }
 
 .dropdown li input[type="submit"] {
-    font-weight: normal;
-    height: 2.5rem;
-    letter-spacing: normal;
-    line-height: 1.5rem;
-    width: 100%;
+  font-weight: normal;
+  height: 2.5rem;
+  letter-spacing: normal;
+  line-height: 1.5rem;
+  width: 100%;
 }
 
 .dropdown li a:hover,
 .dropdown li input[type="submit"]:hover {
-    background-color: #eee;
+  background-color: #eee;
 }
 
 .dropdown li.notice {
-    border-top: 1px solid #ddd;
-    color: #999;
-    line-height: 1.6rem;
-    margin-top: 0.25rem;
-    padding: 0.66rem 1rem;
-    font-size: 1.2rem;
+  border-top: 1px solid #ddd;
+  color: #999;
+  line-height: 1.6rem;
+  margin-top: 0.25rem;
+  padding: 0.66rem 1rem;
+  font-size: 1.2rem;
 }
 
 .dropdown li .left-icon {
-    color: #444;
-    display: inline-block;
-    float: left;
-    line-height: 3.25rem;
-    position: relative;
-    text-align: center;
-    top: 0.125rem;
-    width: 3.5rem;
+  color: #444;
+  display: inline-block;
+  float: left;
+  line-height: 3.25rem;
+  position: relative;
+  text-align: center;
+  top: 0.125rem;
+  width: 3.5rem;
 }

@@ -1,88 +1,88 @@
 @media (max-width: 720px) {
-    header section.accounts {
-        display: none;
-    }
-    header section.status {
-        margin-left: 0;
-        text-align: left;
-        width: 60% !important;
-    }
-    header section.status .info,
-    header section.status .time {
-        text-align: left;
-    }
-    header section.actions {
-        float: right;
-        margin-left: 0;
-        width: 40% !important;
-    }
-    #restart span {
-        display: none;
-    }
-    .folder {
-        width: calc(100%/3);
-    }
+  header section.accounts {
+    display: none;
+  }
+  header section.status {
+    margin-left: 0;
+    text-align: left;
+    width: 60% !important;
+  }
+  header section.status .info,
+  header section.status .time {
+    text-align: left;
+  }
+  header section.actions {
+    float: right;
+    margin-left: 0;
+    width: 40% !important;
+  }
+  #restart span {
+    display: none;
+  }
+  .folder {
+    width: calc(100%/3);
+  }
 }
 
 @media (max-width: 600px) {
-    html {
-        /*font-size: 71.875%;*/
-        font-size: 78.125%;
-    }
-    .folder {
-        width: calc(100%/2);
-    }
+  html {
+    /*font-size: 71.875%;*/
+    font-size: 78.125%;
+  }
+  .folder {
+    width: calc(100%/2);
+  }
 }
 
 @media (max-width: 460px) {
-    #restart {
-        display: none;
-    }
+  #restart {
+    display: none;
+  }
 }
 
 @media (max-width: 380px) {
-    form,
-    section.status-message {
-        margin-top: 2rem;
-        max-width: none;
-        min-width: auto;
-        width: calc(100% - 4rem);
-    }
-    section.status-message {
-        width: calc(100% - 7rem);
-    }
-    form label {
-        text-align: left;
-    }
-    .folder {
-        width: 100%;
-    }
+  form,
+  section.status-message {
+    margin-top: 2rem;
+    max-width: none;
+    min-width: auto;
+    width: calc(100% - 4rem);
+  }
+  section.status-message {
+    width: calc(100% - 7rem);
+  }
+  form label {
+    text-align: left;
+  }
+  .folder {
+    width: 100%;
+  }
 }
 
 
 @media (min-width: 1200px) {
-    html {
-        font-size: 93.75%;
-    }
-    .folder {
-        width: calc(100%/5);
-    }
+  html {
+    font-size: 93.75%;
+  }
+  .folder {
+    width: calc(100%/5);
+  }
 }
 
 @media (min-width: 1600px) {
-    html {
-        font-size: 100%;
-    }
-    .folder {
-        width: calc(100%/6);
-    }
+  html {
+    font-size: 100%;
+  }
+  .folder {
+    width: calc(100%/6);
+  }
 }
 
 @media (min-width: 1800px) {
-    html {
-        font-size: 110%;
-    }
-    .folder {
-        width: calc(100%/6);
-    }
+  html {
+    font-size: 110%;
+  }
+  .folder {
+    width: calc(100%/6);
+  }
 }

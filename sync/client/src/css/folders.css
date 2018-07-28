@@ -1,94 +1,94 @@
 .folders {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0.5rem;
 }
 
 .folder {
-    width: 25%;
-    padding: 0.5rem;
-    position: relative;
-    box-sizing: border-box;
-    transition: background-color 0.25s ease;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  position: relative;
+  transition: background-color 0.25s ease;
+  width: 25%;
 }
 
 .folder.active {
-    background: #d6a70e;
+  background: #d6a70e;
 }
 
 .folder.incomplete:not(.active) .top {
-    color: #aaa;
-    background: rgba(214, 167, 14, 0.1);
+  background: rgba(214, 167, 14, 0.1);
+  color: #aaa;
 }
 
 .folder.incomplete:not(.active) .bottom {
-    color: #777;
-    background: rgba(214, 167, 14, 0.1);
+  background: rgba(214, 167, 14, 0.1);
+  color: #777;
 }
 
 .folder.incomplete:not(.active) .bottom .count {
-    background: transparent;
+  background: transparent;
 }
 
 .folder .progress {
-    top: 0;
-    left: 0;
-    z-index: 1;
-    height: 0.4rem;
-    position: absolute;
+  height: 0.4rem;
+  left: 0;
+  position: absolute;
+  top: 0;
+  z-index: 1;
 }
 
 .folder .top {
-    color: #aaa;
-    overflow: hidden;
-    font-size: 1.4rem;
-    line-height: 2rem;
-    background: #2d2d2d;
-    padding: 0.4rem 0.8rem 0;
+  background: #2d2d2d;
+  color: #aaa;
+  font-size: 1.4rem;
+  line-height: 2rem;
+  overflow: hidden;
+  padding: 0.4rem 0.8rem 0;
 }
 
 .folder .top .name {
-    z-index: 2;
-    position: relative;
-    overflow-x: hidden;
-    white-space: nowrap;
+  overflow-x: hidden;
+  position: relative;
+  white-space: nowrap;
+  z-index: 2;
 }
 
 .folder .bottom {
-    color: #555;
-    overflow: hidden;
-    font-size: 0.9rem;
-    line-height: 2rem;
-    position: relative;
-    background: #2d2d2d;
-    white-space: nowrap;
-    padding: 0 0 0.2rem 0.8rem;
-    border-right: 0.8rem solid rgba(0, 0, 0, 0);
+  background: #2d2d2d;
+  border-right: 0.8rem solid rgba(0, 0, 0, 0);
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 2rem;
+  overflow: hidden;
+  padding: 0 0 0.2rem 0.8rem;
+  position: relative;
+  white-space: nowrap;
 }
 
 .folder .bottom .count {
-    right: 0;
-    top: -0.2rem;
-    padding: 0.2rem;
-    position: absolute;
-    background: #2d2d2d;
+  background: #2d2d2d;
+  padding: 0.2rem;
+  position: absolute;
+  right: 0;
+  top: -0.2rem;
 }
 
 .folder.active.incomplete {
-    animation: colorchange 20s;
-    animation-iteration-count: infinite;
+  animation: colorchange 20s;
+  animation-iteration-count: infinite;
 }
 
 .folder.active.incomplete .progress {
-    /* Not using this now */
-    /* background-color: #fffaad; */
+  /* Not using this now */
+  /* background-color: #fffaad; */
 }
 
 .folder.active.incomplete .top,
 .folder.active.incomplete .bottom,
 .folder.active.incomplete .bottom .count {
-    background: transparent;
-    color: rgba(0, 0, 0, 0.6);
+  background: transparent;
+  color: rgba(0, 0, 0, 0.6);
 }
 
 @keyframes colorchange {
@@ -102,9 +102,9 @@
 }
 
 .folders .none {
-    color: #999;
-    padding: 1rem 2rem;
-    text-align: center;
-    margin: 20% auto 0;
-    background-color: #393939;
+  background-color: #393939;
+  color: #999;
+  margin: 20% auto 0;
+  padding: 1rem 2rem;
+  text-align: center;
 }

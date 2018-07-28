@@ -15,31 +15,58 @@
         <iframe src="<?php echo App\Url::make( '/star/thread/%s/%s.html', $message->id, $message->flagged == 1 ? 'on' : 'off' ); ?>" class="star"></iframe>
     </label>
     <article id="message-<?php echo $message->id; ?>" class="thread-msg">
-        <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-header">
+        <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-header u-cf">
             <span class="snippet">
                 <span class="avatar">
                     <img src="<?php echo $message->avatar_url; ?>" />
                 </span>
-                <span class="from">
-                    <strong><?php $view->clean($message->from_name); ?></strong>
-                    <span><?php $view->clean($message->from_email); ?></span>
+                <span class="details blocked">
+                    <span class="from blocked">
+                        <strong><?php $view->clean($message->from_name); ?></strong>
+                        <span><?php $view->clean($message->from_email); ?></span>
+                    </span>
+                    <span class="to blocked">
+                        <span>to</span>
+                        <span><?php echo $view->clean($message->to_names); ?></span>
+                    </span>
                 </span>
-            </span>
-            <span class="actions dropdown inline-blocked">
-                <a href="#" class="icon button">
-                    <span class="normal">More</span>
-                    <i class="fa fa-caret-down"></i>
-                </a>
-                <ul class="right-menu size-medium">
-                    <li><input type="submit" name="action" value="Reply" /></li>
-                    <li><input type="submit" name="action" value="Reply all" /></li>
-                    <li><input type="submit" name="action" value="Forward" /></li>
-                    <li><input type="submit" name="action" value="Delete this message" /></li>
-                    <li><input type="submit" name="action" value="Mark as spam" /></li>
-                </ul>
             </span>
             <span class="date" title="<?php echo $message->datetime_string; ?>"><?php echo $message->date_string; ?></span>
             <iframe src="<?php echo App\Url::make( '/star/thread/%s/%s.html', $message->id, $message->flagged == 1 ? 'on' : 'off' ); ?>" class="star"></iframe>
+            <span class="actions">
+                <span class="button-group">
+                    <a href="#" class="button">
+                        <i class="fa fa-reply"></i>
+                    </a><!--
+                    --><span class="dropdown short inline-blocked">
+                        <a href="#" class="button">
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                        <ul class="right-menu size-medium">
+                            <li>
+                                <i class="fa left-icon fa-reply"></i>
+                                <a href="#">Reply</a>
+                            </li>
+                            <li>
+                                <i class="fa left-icon fa-reply-all"></i>
+                                <a href="#">Reply all</a>
+                            </li>
+                            <li>
+                                <i class="fa left-icon fa-forward"></i>
+                                <a href="#">Forward</a>
+                            </li>
+                            <li>
+                                <i class="fa left-icon fa-trash"></i>
+                                <a href="#">Delete this message</a>
+                            </li>
+                            <li>
+                                <i class="fa left-icon fa-exclamation-circle"></i>
+                                <a href="#">Mark as spam</a>
+                            </li>
+                        </ul>
+                    </span>
+                </span>
+            </span>
         </label>
         <div class="message">
             <?php echo $message->body; ?>

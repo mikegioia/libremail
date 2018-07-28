@@ -1,63 +1,63 @@
 form {
-    width: 60%;
-    min-width: 40rem;
-    max-width: 60rem;
-    margin: 4rem auto 0;
+  margin: 4rem auto 0;
+  max-width: 60rem;
+  min-width: 40rem;
+  width: 60%;
 }
 
 form h1 {
-    font-size: 3rem;
-    margin-bottom: 3rem;
+  font-size: 3rem;
+  margin-bottom: 3rem;
 }
 
 form h1.alt-title {
-    display: none;
+  display: none;
 }
 
 form label {
-    text-align: right;
-    font-weight: normal;
-    padding-top: 0.5rem;
+  font-weight: normal;
+  padding-top: 0.5rem;
+  text-align: right;
 }
 
 form .buttons {
-    margin-top: 2rem;
+  margin-top: 2rem;
 }
 
 form .note {
-    color: #666;
-    top: -1.25rem;
-    font-size: 1rem;
-    text-align: right;
-    position: relative;
+  color: #666;
+  font-size: 1rem;
+  position: relative;
+  text-align: right;
+  top: -1.25rem;
 }
 
 form .note a {
-    color: #666;
+  color: #666;
 }
 
 form .note:hover {
-    color: #999;
+  color: #999;
 }
 
 form .note:hover a {
-    color: #aaa;
+  color: #aaa;
 }
 
 input[type="text"],
 input[type="email"] {
-    width: 100%;
-    height: 2.2em;
-    line-height: 2em;
-    padding: 0 0.75em;
-    background-color: #555;
-    border: 1px solid #222;
+  background-color: #555;
+  border: 1px solid #222;
+  height: 2.2em;
+  line-height: 2em;
+  padding: 0 0.75em;
+  width: 100%;
 }
 
 input[type="text"]:focus,
 input[type="email"]:focus {
-    border-color: #ab51c4;
-    background-color: #555;
+  background-color: #555;
+  border-color: #ab51c4;
 }
 
 button[disabled],
@@ -66,7 +66,7 @@ button[disabled]:focus,
 button.button-primary[disabled],
 button.button-primary[disabled]:hover,
 button.button-primary[disabled]:focus {
-    color: #666;
-    background: #444;
-    border-color: #444;
+  background: #444;
+  border-color: #444;
+  color: #666;
 }

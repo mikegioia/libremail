@@ -9,286 +9,286 @@
  * The surrounding structure for housing lists of messages.
  */
 section #msg-list {
-    bottom: 0;
-    overflow-y: auto;
-    position: absolute;
-    top: 6.25rem;
-    width: 100%;
+  bottom: 0;
+  overflow-y: auto;
+  position: absolute;
+  top: 6.25rem;
+  width: 100%;
 }
 
 section #msg-list h5 {
-    font-size: 1.75rem;
-    margin: 0.75rem 1rem 0.5rem 0;
+  font-size: 1.75rem;
+  margin: 0.75rem 1rem 0.5rem 0;
 }
 
 section #msg-list h5 ~ h5 {
-    margin-top: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 section #msg-list .mailbox-checkbox {
-    display: none;
+  display: none;
 }
 
 section #msg-list h5 label {
-    display: inline;
+  display: inline;
 }
 
 section #msg-list h5 .fa-caret-right,
 section #msg-list h5 .fa-caret-down {
-    cursor: pointer;
-    display: inline-block;
-    font-size: 1.5rem;
-    position: relative;
-    top: -0.1rem;
-    width: 1rem;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 1.5rem;
+  position: relative;
+  top: -0.1rem;
+  width: 1rem;
 }
 
 section #msg-list h5 .fa-caret-right {
-    display: none;
-    left: 0.2rem;
+  display: none;
+  left: 0.2rem;
 }
 
 section #msg-list h5 span:not(.subject) {
-    margin-left: 0.5rem;
+  margin-left: 0.5rem;
 }
 
 section #msg-list h5 .paging-counts {
-    color: inherit;
-    float: right;
-    font-size: 1.3rem;
-    padding-right: 0.8rem;
-    position: relative;
-    text-decoration: none;
-    top: 0.5rem;
+  color: inherit;
+  float: right;
+  font-size: 1.3rem;
+  padding-right: 0.8rem;
+  position: relative;
+  text-decoration: none;
+  top: 0.5rem;
 }
 
 section #msg-list h5 .paging-counts a.page {
-    color: #333;
-    font-weight: 400;
-    text-decoration: none;
+  color: #333;
+  font-weight: 400;
+  text-decoration: none;
 }
 
 section #msg-list h5 .paging-counts a.page.prev {
-    margin-right: 1rem;
+  margin-right: 1rem;
 }
 
 section #msg-list h5 .paging-counts a.page.next {
-    margin-left: 1rem;
+  margin-left: 1rem;
 }
 
 section #msg-list h5 .paging-counts a.page i.fa {
-    font-size: 1rem;
-    transform: translateY(-0.0625rem);
+  font-size: 1rem;
+  transform: translateY(-0.0625rem);
 }
 
 section #msg-list h5 .paging-counts a.page:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 section #msg-list h5 a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 section #msg-list h5 em {
-    font-style: normal;
-    font-size: 1.1rem;
+  font-style: normal;
+  font-size: 1.1rem;
 }
 
 section #msg-list h5 var {
-    font-style: normal;
-    font-family: Arial, sans-serif;
+  font-style: normal;
+  font-family: Arial, sans-serif;
 }
 
 section #msg-list .mailbox {
-    padding-right: 1rem;
+  padding-right: 1rem;
 }
 
 section #msg-list .mailbox-checkbox:checked + h5 {
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 0.5rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.5rem;
 }
 
 section #msg-list .mailbox-checkbox:checked + h5 + .mailbox {
-    display: none;
+  display: none;
 }
 
 section #msg-list .mailbox-checkbox:checked + h5 label .fa-caret-right {
-    display: inline-block;
+  display: inline-block;
 }
 
 section #msg-list .mailbox-checkbox:checked + h5 label .fa-caret-down {
-    display: none;
+  display: none;
 }
 
 section #msg-list footer {
-    color: #777;
-    font-weight: 600;
-    padding: 1rem 1rem 20rem 0;
+  color: #777;
+  font-weight: 600;
+  padding: 1rem 1rem 20rem 0;
 }
 
 /**
- * Messages
- */
+* Messages
+*/
 input[type="checkbox"].msg-checkbox {
-    display: none;
+  display: none;
 }
 
 .msg-checkbox:checked ~ .menu.actions {
-    display: block;
+  display: block;
 }
 
 .msg-checkbox:checked ~ .menu.default {
-    display: none;
+  display: none;
 }
 
 .msg-label {
-    background-color: #f1f1f1;
-    border-bottom: 1px solid #e1e1e1;
-    border-top: 1px solid #e1e1e1;
-    display: block;
-    height: 3rem;
-    float: left;
-    margin: 0;
-    position: relative;
-    width: 2.5rem;
-    z-index: 6;
+  background-color: #f1f1f1;
+  border-bottom: 1px solid #e1e1e1;
+  border-top: 1px solid #e1e1e1;
+  display: block;
+  height: 3rem;
+  float: left;
+  margin: 0;
+  position: relative;
+  width: 2.5rem;
+  z-index: 6;
 }
 
 .msg-label.unseen {
-    background-color: #fff;
+  background-color: #fff;
 }
 
 .msg-label ~ .msg-label {
-    margin-top: -1px;
+  margin-top: -1px;
 }
 
 .msg-label:after {
-    background: #f9f9f9;
-    border: 1px solid #bbb;
-    border-radius: 0.125rem;
-    color: #999;
-    content: ' ';
-    display: block;
-    height: 1.2rem;
-    left: 0.8rem;
-    position: relative;
-    top: 0.85rem;
-    width: 1.2rem;
+  background: #f9f9f9;
+  border: 1px solid #bbb;
+  border-radius: 0.125rem;
+  color: #999;
+  content: ' ';
+  display: block;
+  height: 1.2rem;
+  left: 0.8rem;
+  position: relative;
+  top: 0.85rem;
+  width: 1.2rem;
 }
 
 .msg-checkbox:checked + .msg-label {
-    background-color: #ffda6d;
-    border-color: #d6a70e;
-    z-index: 7;
+  background-color: #ffda6d;
+  border-color: #d6a70e;
+  z-index: 7;
 }
 
 .msg-checkbox:checked + .msg-label:after {
-    border-color: #888;
-    color: #888;
-    content: '\f00c';
-    font-family: FontAwesome;
-    font-size: 1.2rem;
-    line-height: 1.34rem;
+  border-color: #888;
+  color: #888;
+  content: '\f00c';
+  font-family: FontAwesome;
+  font-size: 1.2rem;
+  line-height: 1.34rem;
 }
 
 .msg-checkbox:checked + .msg-label + .msg-contents {
-    background-color: #ffda6d;
-    border-color: #d6a70e;
-    z-index: 7;
+  background-color: #ffda6d;
+  border-color: #d6a70e;
+  z-index: 7;
 }
 
 .msg-contents {
-    background-color: #f1f1f1;
-    border-bottom: 1px solid #e1e1e1;
-    border-top: 1px solid #e1e1e1;
-    float: left;
-    height: 3rem;
-    line-height: 3rem;
-    overflow: hidden;
-    position: relative;
-    width: calc(100% - 2.5rem);
+  background-color: #f1f1f1;
+  border-bottom: 1px solid #e1e1e1;
+  border-top: 1px solid #e1e1e1;
+  float: left;
+  height: 3rem;
+  line-height: 3rem;
+  overflow: hidden;
+  position: relative;
+  width: calc(100% - 2.5rem);
 }
 
 .msg-contents.unseen {
-    background-color: #fff;
+  background-color: #fff;
 }
 
 .msg-contents.no-messages {
-    float: none;
-    font-size: 1.25rem;
-    text-align: center;
-    width: 100%;
+  float: none;
+  font-size: 1.25rem;
+  text-align: center;
+  width: 100%;
 }
 
 .msg-contents ~ .msg-contents {
-    margin-top: -1px;
+  margin-top: -1px;
 }
 
 .msg-contents .star {
-    border: 0;
-    color: #d6a70e;
-    float: left;
-    height: 3rem;
-    line-height: 3rem;
-    padding-right: 0.2rem;
-    text-align: center;
-    width: 3rem;
+  border: 0;
+  color: #d6a70e;
+  float: left;
+  height: 3rem;
+  line-height: 3rem;
+  padding-right: 0.2rem;
+  text-align: center;
+  width: 3rem;
 }
 
 .msg-contents .names {
-    color: #333;
-    display: block;
-    font-size: 1.3rem;
-    float: left;
-    overflow: hidden;
-    padding-right: 1rem;
-    text-decoration: none;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 19rem;
+  color: #333;
+  display: block;
+  font-size: 1.3rem;
+  float: left;
+  overflow: hidden;
+  padding-right: 1rem;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 19rem;
 }
 
 .msg-contents .subject {
-    color: #888;
-    display: block;
-    float: left;
-    font-size: 1.3rem;
-    overflow: hidden;
-    text-decoration: none;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: calc(100% - 32rem);
+  color: #888;
+  display: block;
+  float: left;
+  font-size: 1.3rem;
+  overflow: hidden;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: calc(100% - 32rem);
 }
 
 .msg-checkbox:checked + .msg-label + .msg-contents .subject {
-    color: #555;
+  color: #555;
 }
 
 .msg-contents .subject span {
-    color: #333;
+  color: #333;
 }
 
 .msg-contents .subject mark {
-    border-radius: 0.25rem;
-    font-size: 1rem;
-    padding: 0.1rem 0.4rem 0.2rem;
-    position: relative;
-    top: -0.1rem;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  padding: 0.1rem 0.4rem 0.2rem;
+  position: relative;
+  top: -0.1rem;
 }
 
 .msg-contents .date {
-    box-sizing: border-box;
-    color: #333;
-    display: block;
-    float: right;
-    font-size: 1.3rem;
-    padding-right: 0.8rem;
-    text-align: right;
-    text-decoration: none;
-    width: 8rem;
+  box-sizing: border-box;
+  color: #333;
+  display: block;
+  float: right;
+  font-size: 1.3rem;
+  padding-right: 0.8rem;
+  text-align: right;
+  text-decoration: none;
+  width: 8rem;
 }
 
 .msg-contents.unseen .date,
 .msg-contents.unseen .subject span {
-    font-weight: 700;
+  font-weight: 700;
 }

@@ -1,61 +1,65 @@
+/**
+ * Buttons
+ */
+
 button {
-    color: #ccc;
-    height: 3rem;
-    padding: 0 1rem;
-    font-weight: 400;
-    background: #222;
-    font-size: 1.5rem;
-    letter-spacing: 0;
-    border-color: #111;
-    line-height: 2.9rem;
-    text-transform: none;
+  background: #222;
+  border-color: #111;
+  color: #ccc;
+  font-size: 1.5rem;
+  font-weight: 400;
+  height: 3rem;
+  letter-spacing: 0;
+  line-height: 2.9rem;
+  padding: 0 1rem;
+  text-transform: none;
 }
 
 button.button-primary {
-    color: #eee;
-    border-color: #9238ab;
-    background-color: #9238ab;
+  background-color: #9238ab;
+  border-color: #9238ab;
+  color: #eee;
 }
 
 button:focus,
 button:hover,
 button:active {
-    color: #ddd;
-    background: #161616;
-    border-color: #060606;
+  background: #161616;
+  border-color: #060606;
+  color: #ddd;
 }
 
 button.button-primary:focus,
 button.button-primary:hover,
 button.button-primary:active {
-    color: #fff;
-    border-color: #ab51c4;
-    background-color: #ab51c4;
+  background-color: #ab51c4;
+  border-color: #ab51c4;
+  color: #fff;
 }
 
 button.disabled,
 button.disabled:focus,
 button.disabled:hover,
 button.disabled:active {
-    color: #444;
-    background: #242424;
-    border-color: #1c1c1c;
+  background: #242424;
+  border-color: #1c1c1c;
+  color: #444;
 }
 
 button i {
-    position: relative;
-    margin-right: 0.5rem;
+  margin-right: 0.5rem;
+  position: relative;
 }
 
 button i.icon-restart {
-    top: 0.1rem;
+  top: 0.1rem;
 }
 
 button i.icon-cog {
-    top: 0.15rem;
-    left: 0.15rem;
+  left: 0.15rem;
+  top: 0.15rem;
 }
 
 button i.icon-check {
-    top: 0.125rem;
+  top: 0.125rem;
 }

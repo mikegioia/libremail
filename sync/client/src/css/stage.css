@@ -1,51 +1,51 @@
 html {
-    font-size: 87.5%;
+  font-size: 87.5%;
 }
 
 body {
-    color: #ddd;
-    width: 100%;
-    height: 100%;
-    background-color: #333;
-    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+  color: #ddd;
+  width: 100%;
+  height: 100%;
+  background-color: #333;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
 
 header {
-    top: 0;
-    z-index: 2;
-    width: 100%;
-    height: 5rem;
-    position: fixed;
-    background-color: #282828;
+  top: 0;
+  z-index: 2;
+  width: 100%;
+  height: 5rem;
+  position: fixed;
+  background-color: #282828;
 }
 
 main {
-    top: 5rem;
-    bottom: 0;
-    z-index: 1;
-    width: 100%;
-    position: absolute;
+  top: 5rem;
+  bottom: 0;
+  z-index: 1;
+  width: 100%;
+  position: absolute;
 }
 
 .loading {
-    top: 50%;
-    left: 50%;
-    width: 20rem;
-    height: 10rem;
-    margin-top: -8rem;
-    position: absolute;
-    text-align: center;
-    margin-left: -10rem;
+  top: 50%;
+  left: 50%;
+  width: 20rem;
+  height: 10rem;
+  margin-top: -8rem;
+  position: absolute;
+  text-align: center;
+  margin-left: -10rem;
 }
 
 .loading i {
-    color: #555;
-    display: block;
-    line-height: 1;
-    font-size: 10rem;
+  color: #555;
+  display: block;
+  line-height: 1;
+  font-size: 10rem;
 }
 
 .loading span {
-    color: #777;
-    font-size: 2rem;
+  color: #777;
+  font-size: 2rem;
 }

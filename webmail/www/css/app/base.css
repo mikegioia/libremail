@@ -1,73 +1,74 @@
 html {
-    font-size: 90%;
-    height: 100%;
-    width: 100%;
+  font-size: 90%;
+  height: 100%;
+  width: 100%;
 }
 
 body {
-    font-family: "Open Sans", Helvetica, Arial, sans-serif;
-    height: 100%;
-    width: 100%;
+  color: #222;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
+  height: 100%;
+  width: 100%;
 }
 
 section#main {
-    bottom: 0;
-    left: 20rem;
-    position: fixed;
-    right: 0;
-    top: 5rem;
-    z-index: 1;
+  bottom: 0;
+  left: 20rem;
+  position: fixed;
+  right: 0;
+  top: 5rem;
+  z-index: 1;
 }
 
 a:hover,
 a:focus {
-    color: #007db6;
+  color: #007db6;
 }
 
 /* Alert notifications */
 aside {
-    right: 1rem;
-    position: fixed;
+  right: 1rem;
+  position: fixed;
 }
 
 /* Helpers */
 .align-right {
-    text-align: right;
+  text-align: right;
 }
 
 .blocked {
-    display: block;
+  display: block;
 }
 
 .inline-blocked {
-    display: inline-block;
+  display: inline-block;
 }
 
 .inlined {
-    display: inline;
+  display: inline;
 }
 
 .no-select {
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
 .size-sm {
-    font-size: 1rem;
+  font-size: 1rem;
 }
 
 .size-md {
-    font-size: 1.2rem;
+  font-size: 1.2rem;
 }
 
 .strong {
-    font-weight: 600;
+  font-weight: 600;
 }
 
 /* Z-Index layers */
 .top-layer {
-    padding-top: 0.75rem;
-    position: relative;
-    z-index: 30;
+  padding-top: 0.75rem;
+  position: relative;
+  z-index: 30;
 }

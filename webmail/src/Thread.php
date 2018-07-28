@@ -134,6 +134,7 @@ class Thread
                 $this->unreadIds[] = $message->id;
             }
 
+            $this->setTo($message);
             $this->setFrom($message);
             $this->setDate($message);
             $this->setAvatar($message);
@@ -152,16 +153,27 @@ class Thread
      */
     private function setFrom(Message &$message)
     {
-        $parts = explode('<', $message->from, 2);
-        $count = count($parts);
+        list($message->from_name, $message->from_email) =
+            $this->getNameParts($message->from);
+    }
 
-        if (1 === $count) {
-            $message->from_email = '';
-            $message->from_name = trim($parts[0], ' >');
-        } else {
-            $message->from_name = trim($parts[0]);
-            $message->from_email = '<'.trim($parts[1], ' <>').'>';
+    /**
+     * Prepares a shortened version of the to addresses and
+     * names. This is added as a new property, to_names.
+     *
+     * @param Message $message
+     */
+    private function setTo(Message &$message)
+    {
+        $to = [];
+        $names = explode(',', $message->to);
+
+        foreach ($names as $string) {
+            list($name, $email) = $this->getNameParts($string);
+            $to[] = $name;
         }
+
+        $message->to_names = implode(', ', $to);
     }
 
     /**
@@ -169,7 +181,7 @@ class Thread
      * date for the message, and a timestamp property for use
      * in calls to date().
      */
-    function setDate(Message &$message)
+    private function setDate(Message &$message)
     {
         $now = time();
         $startOfToday = strtotime('today');
@@ -304,5 +316,28 @@ class Thread
         }
 
         $closeGroup($group);
+    }
+
+    /**
+     * Takes a string like "John D. <john@abc.org>" and returns
+     * the name and email broken out.
+     *
+     * @param string $nameString
+     * @return [string $name, string $email]
+     */
+    private function getNameParts(string $nameString)
+    {
+        $parts = explode('<', $nameString, 2);
+        $count = count($parts);
+
+        if (1 === $count) {
+            $name = trim($parts[0], ' >');
+            $email = '';
+        } else {
+            $name = trim($parts[0]);
+            $email = '<'.trim($parts[1], ' <>').'>';
+        }
+
+        return [$name, $email];
     }
 }

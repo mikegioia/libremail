@@ -1,35 +1,35 @@
 section.notifications {
-    top: 0;
-    right: 0;
-    width: 40%;
-    z-index: 3;
-    position: fixed;
-    max-width: 32rem;
+  max-width: 32rem;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 40%;
+  z-index: 3;
 }
 
 section.notifications .notification {
-    margin: 1rem;
-    position: relative;
+  margin: 1rem;
+  position: relative;
 }
 
 section.notifications .notification a.close {
-    color: #fff;
-    top: 0.25rem;
-    right: 0.5rem;
-    position: absolute;
-    text-decoration: none;
+  color: #fff;
+  position: absolute;
+  right: 0.5rem;
+  text-decoration: none;
+  top: 0.25rem;
 }
 
 section.notifications .notification .box {
-    padding: 1rem 2rem 1rem 1.5rem;
+  padding: 1rem 2rem 1rem 1.5rem;
 }
 
 section.notifications .notification .error {
-    color: #fff;
-    background-color: #ce3c3c;
+  background-color: #ce3c3c;
+  color: #fff;
 }
 
 section.notifications .notification .success {
-    color: #fff;
-    background-color: #28a94c;
+  background-color: #28a94c;
+  color: #fff;
 }
