@@ -7,18 +7,13 @@
             "src/Functions.php"
         ]
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/mikegioia/pdo"
-        }
-    ],
     "require": {
-        "php": "^7.0|^7.1|^7.2",
+        "php": ">=7.0",
         "ext-pdo": "*",
         "ext-iconv": "*",
         "ext-mbstring": "*",
         "particlebits/imap": "@dev",
+        "particlebits/pdo": "@dev",
         "pimple/pimple": "^3.2.3",
         "monolog/monolog": "^1.23",
         "league/climate": "^3.4",
@@ -30,14 +25,12 @@
         "evenement/evenement": "^3.0",
         "symfony/event-dispatcher": "^3.4",
         "react/child-process": "^0.5.2",
-        "mkraemer/react-pcntl": "^3.0",
-        "mikegioia/pdo": "@dev"
+        "mkraemer/react-pcntl": "^3.0"
     },
     "suggest": {
         "ext-mysqlnd": "MySQL Native Driver",
         "ext-intl": "Handle IDN in AddressList hostnames"
     },
-    "minimum-stability": "dev",
     "bin": [
         "sync",
         "server",

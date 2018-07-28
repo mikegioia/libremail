@@ -1,23 +1,23 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8acff0128d7ebbf3284987b42df32072",
+    "content-hash": "f2274ce820a8c050ad7fd5b5f8eabeff",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
-            "version": "dev-master",
+            "version": "v4.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ezyang/htmlpurifier.git",
-                "reference": "b81690c17eae5dbea7557d1f359af8dd17e9beef"
+                "reference": "d85d39da4576a6934b72480be6978fb10c860021"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/b81690c17eae5dbea7557d1f359af8dd17e9beef",
-                "reference": "b81690c17eae5dbea7557d1f359af8dd17e9beef",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/d85d39da4576a6934b72480be6978fb10c860021",
+                "reference": "d85d39da4576a6934b72480be6978fb10c860021",
                 "shasum": ""
             },
             "require": {
@@ -37,7 +37,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL-2.1-or-later"
+                "LGPL"
             ],
             "authors": [
                 {
@@ -51,25 +51,25 @@
             "keywords": [
                 "html"
             ],
-            "time": "2018-06-10T02:48:13+00:00"
+            "time": "2018-02-23T01:58:20+00:00"
         },
         {
-            "name": "mikegioia/pdo",
+            "name": "particlebits/pdo",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mikegioia/pdo.git",
-                "reference": "adeeb2f283f65ed30c08ea36faaa462c72699ff6"
+                "url": "https://github.com/ParticleBits/pdo.git",
+                "reference": "f3ae3fbae9dc2aa2fe6674fb3ad1134b0811ff3e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikegioia/pdo/zipball/adeeb2f283f65ed30c08ea36faaa462c72699ff6",
-                "reference": "adeeb2f283f65ed30c08ea36faaa462c72699ff6",
+                "url": "https://api.github.com/repos/ParticleBits/pdo/zipball/f3ae3fbae9dc2aa2fe6674fb3ad1134b0811ff3e",
+                "reference": "f3ae3fbae9dc2aa2fe6674fb3ad1134b0811ff3e",
                 "shasum": ""
             },
             "require": {
                 "ext-pdo": "*",
-                "php": ">=5.3.0"
+                "php": ">= 5.6"
             },
             "type": "library",
             "autoload": {
@@ -77,6 +77,7 @@
                     "Slim\\PDO\\": "src/PDO/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -89,24 +90,17 @@
                 },
                 {
                     "name": "Mike Gioia",
-                    "homepage": "http://mikegioia.com",
-                    "email": "mikegioia@gmail.com"
+                    "email": "mike@particlebits.com",
+                    "homepage": "https://particlebits.com"
                 }
             ],
             "description": "PDO database library for Slim Framework",
-            "homepage": "https://github.com/mikegioia/Slim-PDO",
+            "homepage": "https://github.com/particlebits/pdo",
             "keywords": [
                 "database",
-                "framework",
-                "pdo",
-                "slim"
+                "pdo"
             ],
-            "support": {
-                "issues": "https://github.com/mikegioia/Slim-PDO/issues",
-                "docs": "https://github.com/mikegioia/Slim-PDO/blob/master/docs/README.md",
-                "source": "https://github.com/mikegioia/pdo/tree/master"
-            },
-            "time": "2018-07-25T03:02:46+00:00"
+            "time": "2018-07-28T01:16:31+00:00"
         },
         {
             "name": "zendframework/zend-escaper",
@@ -158,13 +152,12 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "mikegioia/pdo": 20,
-        "ezyang/htmlpurifier": 20
+        "particlebits/pdo": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.0|^7.1|^7.2",
+        "php": ">=7.0",
         "ext-pdo": "*",
         "ext-mbstring": "*"
     },

@@ -4,18 +4,12 @@
             "App\\": "src/"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/mikegioia/pdo"
-        }
-    ],
     "require": {
-        "php": "^7.0|^7.1|^7.2",
+        "php": ">=7.0",
         "ext-pdo": "*",
         "ext-mbstring": "*",
-        "mikegioia/pdo": "@dev",
-        "ezyang/htmlpurifier": "dev-master",
+        "particlebits/pdo": "@dev",
+        "ezyang/htmlpurifier": "^4.10",
         "zendframework/zend-escaper": "^2.5"
     },
     "scripts": {
