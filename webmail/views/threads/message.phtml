@@ -1,6 +1,8 @@
 <div class="thread-msg-row">
     <input id="thread-msg-checkbox-<?php echo $message->id; ?>" type="checkbox"
-        class="thread-msg-checkbox"<?php echo $open === true ? ' checked' : '' ?> />
+        class="thread-msg-checkbox"
+        <?php echo $open === true ? ' checked' : '' ?>
+        <?php echo $locked === true ? ' disabled' : ''?> />
     <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-label">
         <span class="snippet">
             <span class="avatar">
@@ -22,6 +24,19 @@
                     <strong><?php $view->clean($message->from_name); ?></strong>
                     <span><?php $view->clean($message->from_email); ?></span>
                 </span>
+            </span>
+            <span class="actions dropdown inline-blocked">
+                <a href="#" class="icon button">
+                    <span class="normal">More</span>
+                    <i class="fa fa-caret-down"></i>
+                </a>
+                <ul class="right-menu size-medium">
+                    <li><input type="submit" name="action" value="Reply" /></li>
+                    <li><input type="submit" name="action" value="Reply all" /></li>
+                    <li><input type="submit" name="action" value="Forward" /></li>
+                    <li><input type="submit" name="action" value="Delete this message" /></li>
+                    <li><input type="submit" name="action" value="Mark as spam" /></li>
+                </ul>
             </span>
             <span class="date" title="<?php echo $message->datetime_string; ?>"><?php echo $message->date_string; ?></span>
             <iframe src="<?php echo App\Url::make( '/star/thread/%s/%s.html', $message->id, $message->flagged == 1 ? 'on' : 'off' ); ?>" class="star"></iframe>

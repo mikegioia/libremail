@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `account_id` int(10) unsigned NOT NULL,
   `message_id` int(10) unsigned NOT NULL,
-  `type` varchar(8) COLLATE utf8_unicode_ci NOT NULL,
+  `type` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` tinyint(1) unsigned NOT NULL,
   `old_value` tinyint(1) unsigned DEFAULT NULL,
   `folder_id` int(10) unsigned DEFAULT NULL,

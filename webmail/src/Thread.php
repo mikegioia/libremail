@@ -256,8 +256,7 @@ class Thread
 
     /**
      * Builds an index of which messages to display, and which
-     * to collapse when rendering the thread. The active message
-     * is set as well.
+     * to collapse when rendering the thread.
      */
     private function buildThreadIndex()
     {
@@ -277,10 +276,11 @@ class Thread
             $group = [];
         };
         // Adds an individual message
-        $addItem = function ($message, $open = true) {
+        $addItem = function ($message, $open, $current = false) {
             $this->threadIndex[] = (object) [
                 'open' => $open,
                 'message' => $message,
+                'current' => $current,
                 'type' => self::INDEX_MESSAGE
             ];
         };
@@ -296,7 +296,7 @@ class Thread
             // then display it opened
             elseif (1 != $message->seen || $i >= $count - 1) {
                 $closeGroup($group);
-                $addItem($message);
+                $addItem($message, true, $i >= $count - 1);
             }
             else {
                 $group[] = $message;

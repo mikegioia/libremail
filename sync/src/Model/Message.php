@@ -50,6 +50,8 @@ class Message extends Model
     public $created_at;
     public $in_reply_to;
     public $attachments;
+    public $raw_headers;
+    public $raw_content;
 
     private $unserializedAttachments;
 
@@ -98,7 +100,9 @@ class Message extends Model
             'references' => $this->references,
             'created_at' => $this->created_at,
             'in_reply_to' => $this->in_reply_to,
-            'attachments' => $this->attachments
+            'attachments' => $this->attachments,
+            'raw_headers' => $this->raw_headers,
+            'raw_content' => $this->raw_content
         ];
     }
 
@@ -398,7 +402,8 @@ class Message extends Model
             'deleted', 'answered'
         ]);
         $this->updateUtf8Values($data, [
-            'subject', 'text_html', 'text_plain'
+            'subject', 'text_html', 'text_plain',
+            'raw_headers', 'raw_content'
         ]);
 
         // Check if this message exists
@@ -439,6 +444,8 @@ class Message extends Model
                     $data['subject'] = Encoding::fixUTF8($data['subject']);
                     $data['text_html'] = Encoding::fixUTF8($data['text_html']);
                     $data['text_plain'] = Encoding::fixUTF8($data['text_plain']);
+                    $data['raw_headers'] = Encoding::fixUTF8($data['raw_headers']);
+                    $data['raw_content'] = Encoding::fixUTF8($data['raw_content']);
                     $newMessageId = $updateMessage($this->db(), $data);
                 } else {
                     throw $e;
@@ -521,6 +528,8 @@ class Message extends Model
             'date_recv' => $message->dateReceived,
             'flagged' => $message->flags->flagged,
             'deleted' => $message->flags->deleted,
+            'raw_headers' => $message->rawHeaders,
+            'raw_content' => $message->rawContent,
             'recv_str' => $message->receivedString,
             'answered' => $message->flags->answered,
             // The cc and inReplyTo fields come in as arrays with the

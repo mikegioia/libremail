@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8ad1ed6ec764d70b0926aa00c7512973",
+    "content-hash": "cf60b5ea5d5ab9f88fe83fe23d0be7b7",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -590,19 +590,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "4f46ecec483582f28784731d246736c59dd65f5c"
+                "reference": "3d08c8860bf1ea9e67d651394eb7ae99b23f60c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/4f46ecec483582f28784731d246736c59dd65f5c",
-                "reference": "4f46ecec483582f28784731d246736c59dd65f5c",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/3d08c8860bf1ea9e67d651394eb7ae99b23f60c3",
+                "reference": "3d08c8860bf1ea9e67d651394eb7ae99b23f60c3",
                 "shasum": ""
             },
             "require": {
                 "ext-iconv": "*",
-                "particlebits/zend-mail": "dev-master@dev",
-                "particlebits/zend-mime": "dev-master@dev",
-                "php": "^5.6 || ^7.0"
+                "particlebits/zend-mail": "@dev",
+                "particlebits/zend-mime": "@dev",
+                "php": "^5.6 || ^7.0 || ^7.1 || 7.2"
             },
             "type": "library",
             "autoload": {
@@ -640,10 +640,10 @@
                 "mail"
             ],
             "support": {
-                "source": "https://github.com/ParticleBits/imap/tree/1.2.0",
+                "source": "https://github.com/ParticleBits/imap/tree/master",
                 "issues": "https://github.com/ParticleBits/imap/issues"
             },
-            "time": "2018-07-26T23:41:06+00:00"
+            "time": "2018-07-27T23:36:23+00:00"
         },
         {
             "name": "particlebits/zend-mail",

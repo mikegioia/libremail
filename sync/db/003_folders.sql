@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `folders` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `account_id` int(10) unsigned NULL,
-  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `name` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `count` int(10) unsigned DEFAULT '0',
   `synced` int(10) unsigned DEFAULT '0',
   `deleted` tinyint(1) unsigned DEFAULT '0',
@@ -9,4 +9,4 @@ CREATE TABLE IF NOT EXISTS `folders` (
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE( `account_id`, `name` )
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -10,18 +10,6 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/ParticleBits/imap"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/ParticleBits/zend-mail"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/ParticleBits/zend-mime"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/mikegioia/pdo"
         }
     ],

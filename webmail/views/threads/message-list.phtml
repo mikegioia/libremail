@@ -9,11 +9,13 @@ endforeach; ?>
 <!-- Message List -->
 <section class="thread-msg-list">
 <?php
+$threadCount = count($thread->getThreadIndex());
 foreach ($thread->getThreadIndex() as $i => $item):
     if ($item->type === $thread::INDEX_MESSAGE):
         $view->render( 'threads/message', [
             'view' => $view,
             'open' => $item->open,
+            'locked' => $item->current,
             'message' => $item->message
         ]);
     elseif ($item->type === $thread::INDEX_GROUP):
@@ -39,6 +41,7 @@ foreach ($thread->getThreadIndex() as $i => $item):
             $view->render( 'threads/message', [
                 'open' => false,
                 'view' => $view,
+                'locked' => false,
                 'message' => $message
             ]);
         endforeach;

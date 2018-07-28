@@ -16,16 +16,16 @@ use the LibreMail clients, than you must adhere to these data structures.
 ```SQL
 CREATE TABLE IF NOT EXISTS `accounts` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `service` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `email` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `password` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `imap_host` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `service` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `imap_host` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `imap_port` mediumint(5) DEFAULT NULL,
-  `imap_flags` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `imap_flags` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_active` tinyint(1) unsigned DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 - `id` Unique integer identifying the account.
@@ -51,21 +51,21 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 CREATE TABLE IF NOT EXISTS `folders` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `account_id` int(10) unsigned NULL,
-  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `name` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `count` int(10) unsigned DEFAULT '0',
   `synced` int(10) unsigned DEFAULT '0',
   `deleted` tinyint(1) unsigned DEFAULT '0',
   `ignored` tinyint(1) unsigned DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE( `account_id`, `name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  UNIQUE( `account_id`, `name` )
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 - `id` Unique integer identifying the folder.
 - `account_id` Foreign key referencing the account from the `accounts` table.
 - `name` Full global name of the folder as saved on the IMAP server. For
-   example, this would be 'Accounts/Listserv/Libremail' instead of 'Libremail'.
+   example, this would be 'Accounts/Listserv/LibreMail' instead of 'LibreMail'.
 - `count` Total number of messages in the folder.
 - `synced` Number of messages that have been downloaded for this folder.
 - `deleted` Boolean flag denoting if the folder was deleted on the IMAP server.
@@ -84,23 +84,25 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `folder_id` int(10) unsigned NOT NULL,
   `unique_id` int(10) unsigned DEFAULT NULL,
   `thread_id` int(10) unsigned DEFAULT NULL,
-  `date_str` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `charset` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `date_str` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `charset` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `subject` varchar(270) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `message_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `in_reply_to` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `recv_str` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `message_id` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `in_reply_to` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `recv_str` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `size` int(10) unsigned DEFAULT NULL,
   `message_no` int(10) unsigned DEFAULT NULL,
-  `to` text COLLATE utf8_unicode_ci,
-  `from` text COLLATE utf8_unicode_ci,
-  `cc` text COLLATE utf8_unicode_ci,
-  `bcc` text COLLATE utf8_unicode_ci,
-  `reply_to` text COLLATE utf8_unicode_ci,
+  `to` text COLLATE utf8mb4_unicode_ci,
+  `from` text COLLATE utf8mb4_unicode_ci,
+  `cc` text COLLATE utf8mb4_unicode_ci,
+  `bcc` text COLLATE utf8mb4_unicode_ci,
+  `reply_to` text COLLATE utf8mb4_unicode_ci,
   `text_plain` longtext COLLATE utf8mb4_unicode_ci,
   `text_html` longtext COLLATE utf8mb4_unicode_ci,
   `references` text COLLATE utf8mb4_unicode_ci,
   `attachments` text COLLATE utf8mb4_unicode_ci,
+  `raw_headers` longtext COLLATE utf8mb4_unicode_ci,
+  `raw_content` longtext COLLATE utf8mb4_unicode_ci,
   `seen` tinyint(1) unsigned DEFAULT NULL,
   `draft` tinyint(1) unsigned DEFAULT NULL,
   `recent` tinyint(1) unsigned DEFAULT NULL,
@@ -112,15 +114,18 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `date_recv` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  INDEX (`date`),
+  INDEX (`seen`),
+  INDEX (`synced`),
+  INDEX (`deleted`),
+  INDEX (`flagged`),
   INDEX (`folder_id`),
   INDEX (`unique_id`),
+  INDEX (`thread_id`),
   INDEX (`account_id`),
-  INDEX (`folder_id`),
-  INDEX (`deleted`),
-  INDEX (`synced`),
-  INDEX (`date`)
+  INDEX (`message_id`(16)),
+  INDEX (`in_reply_to`(16))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 ```
 
 - `id` Unique integer identifying the message.
@@ -168,6 +173,9 @@ CREATE TABLE IF NOT EXISTS `messages` (
    Serialized array of the attachment information. This is an array of objects
    containing the name, filename, path on disk, mime-type, and the original
    file name and name fields (which may be empty).
+- `raw_headers` Raw message headers as stored on the mail server.
+- `raw_content` Raw message content as stored on the mail server. This includes
+   all mail parts as one contiguous string.
 - `seen` Boolean value, 1 if the `\Seen` flag exists on the message.
 - `draft` Boolean value, 1 if the `\Draft` flag exists on the message.
 - `recent` Boolean value, 1 if the `\Recent` flag exists on the message.

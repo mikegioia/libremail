@@ -2,7 +2,7 @@
 
 foreach ( $messages as $message ):
     // URL goes to the first un-read message in the thread
-    $url = App\Url::make( '/thread/%s/%s#current', $folderId, $message->thread_id );
+    $url = App\Url::make( '/thread/%s/%s', $folderId, $message->thread_id );
     // Figure out if the message should be selected
     $selected = $select === App\Actions::SELECT_ALL
         || ( $select === App\Actions::SELECT_READ && $message->seen == 1 )

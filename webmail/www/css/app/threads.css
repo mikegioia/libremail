@@ -59,6 +59,10 @@ input[type="checkbox"].thread-msg-checkbox {
   border-bottom: 0.125rem solid #e1e1e1;
 }
 
+.thread-msg-checkbox:disabled + label + article label {
+    cursor: default;
+}
+
 .thread-msg-row label .snippet {
   color: #888;
   display: block;
@@ -192,9 +196,18 @@ input[type="checkbox"].thread-msg-more-checkbox {
   left: 1rem;
   position: absolute;
 }
+
+.thread-msg .snippet {
+  width: calc(100% - 18rem);
+}
+
 .thread-msg .message {
   line-height: 1.4;
   max-width: 60rem;
   padding: 0 1rem 0 4rem;
   word-wrap: break-word;
+}
+
+.thread-msg .actions {
+  
 }

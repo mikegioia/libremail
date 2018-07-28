@@ -46,11 +46,27 @@ script:
   Updates the database by running the migration scripts in `db/`. These scripts
   will only run once so you can run this as many times as you'd like.
 
+* `--rollback | -r`
+
+  Roll-back any un-committed tasks in the tasks database. These tasks are added
+  when you interact with the web clients. The sync script will look for tasks
+  and commit them to the IMAP server.
+
 * `--sleep | -s`
 
   Run the sync script in sleep mode. This keeps the entire sync disabled and will
   not make any IMAP connections or do anything but respond to signals. It can be
   helpful for signal testing.
+
+* `--threading | -t`
+
+  Run the sync script in threading mode. This skips download messages and goes
+  straight to performing a threading operation. It can be useful for debugging.
+
+* `--quick | -q`
+
+  Runs the sync in quick mode. This skips downloading attachments and message
+  conten. It can be useful for testing and debugging large mailboxes.
 
 * `--help | -h`
 
