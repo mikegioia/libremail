@@ -32,16 +32,15 @@ is meant to run forever with almost zero maintenance :D
 
 At a glance, this application requires the following:
 
-* PHP 7.0
-* MySQL / MariaDB
+* PHP 7.0 or newer
+* MySQL / MariaDB 10.0 or newer
 * `ext-pdo`, `ext-iconv`, and `ext-mbstring`
 
 It's recommented to install `ext-mysqlnd` as well. `php7.0-common` should already
 be installed on your system.
 
-Versions 7.1 and 7.2 will soon be supported as I test everything out with them,
-but right now I have PHP 7.0 as the only currently supported version. See below
-for info about PHP 5.6.
+Versions 7.1 and 7.2 are confirmed working, and this codebase is actively developed
+in version 7.2. See below for info about PHP 5.6.
 
 ### 1. Support for PHP 5.6
 
