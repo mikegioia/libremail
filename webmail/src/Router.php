@@ -59,7 +59,7 @@ class Router
     public function match($methods, $pattern, $fn)
     {
         $pattern = $this->baseroute.'/'.trim($pattern, '/');
-        $pattern = ($this->baseroute)
+        $pattern = $this->baseroute
             ? rtrim($pattern, '/')
             : $pattern;
 
@@ -300,6 +300,17 @@ class Router
     public function set404($fn)
     {
         $this->notFound = $fn;
+    }
+
+    /**
+     * Redirects to a new route. This issues an HTTP 303 response.
+     *
+     * @param string $url
+     */
+    public function redirect($url)
+    {
+        header('Location: '.$url, true, 303);
+        exit;
     }
 
     /**

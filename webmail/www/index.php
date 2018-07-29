@@ -209,6 +209,14 @@ $router->get('/thread/(\d+)/(\d+)', function ($folderId, $threadId) use ($accoun
     ]);
 });
 
+// Original message
+$router->get('/original/(\d+)', function ($messageId) use ($account) {
+    header('Content-Type: text/plain');
+    // Load the message, this will throw an exception if not found
+    $message = (new Message)->getById($messageId, true);
+    (new View)->clean($message->getOriginal());
+});
+
 // Handle 404s
 $router->set404(function () {
     throw new NotFoundException;

@@ -5,6 +5,7 @@ namespace App\Model;
 use PDO;
 use Exception;
 use App\Model;
+use App\Exceptions\NotFoundException;
 
 class Message extends Model
 {
@@ -40,6 +41,8 @@ class Message extends Model
     public $created_at;
     public $in_reply_to;
     public $attachments;
+    public $raw_headers;
+    public $raw_content;
     // Computed properties
     public $thread_count;
     // Cache for threading info
@@ -95,7 +98,9 @@ class Message extends Model
             'references' => $this->references,
             'created_at' => $this->created_at,
             'in_reply_to' => $this->in_reply_to,
-            'attachments' => $this->attachments
+            'attachments' => $this->attachments,
+            'raw_headers' => $this->raw_headers,
+            'raw_content' => $this->raw_content
         ];
     }
 
@@ -108,6 +113,29 @@ class Message extends Model
         $this->unserializedAttachments = @unserialize($this->attachments);
 
         return $this->unserializedAttachments;
+    }
+
+    public function getOriginal()
+    {
+        return $this->raw_headers."\r\n".$this->raw_content;
+    }
+
+    public function getById(int $id, $throwExceptionOnNotFound = false)
+    {
+        $message = $this->db()
+            ->select()
+            ->from('messages')
+            ->where('id', '=', $id)
+            ->execute()
+            ->fetchObject();
+
+        if (! $message && $throwExceptionOnNotFound) {
+            throw new NotFoundException;
+        }
+
+        return $message
+            ? new static($message)
+            : false;
     }
 
     public function getByIds(array $ids)

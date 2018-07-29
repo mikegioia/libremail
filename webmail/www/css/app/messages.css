@@ -123,7 +123,7 @@ section #msg-list .mailbox-checkbox:checked + h5 label .fa-caret-down {
 section #msg-list footer {
   color: #777;
   font-weight: 600;
-  padding: 1rem 1rem 20rem 0;
+  padding: 1rem 2rem 20rem 0;
 }
 
 /**

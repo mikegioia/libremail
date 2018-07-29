@@ -32,7 +32,7 @@
                 </span>
             </span>
             <span class="date" title="<?php echo $message->datetime_string; ?>"><?php echo $message->date_string; ?></span>
-            <iframe src="<?php echo App\Url::make( '/star/thread/%s/%s.html', $message->id, $message->flagged == 1 ? 'on' : 'off' ); ?>" class="star"></iframe>
+            <iframe src="<?php echo App\Url::make('/star/thread/%s/%s.html', $message->id, $message->flagged == 1 ? 'on' : 'off'); ?>" class="star"></iframe>
             <span class="actions">
                 <span class="button-group">
                     <a href="#" class="button">
@@ -54,6 +54,10 @@
                             <li>
                                 <i class="fa left-icon fa-forward"></i>
                                 <a href="#">Forward</a>
+                            </li>
+                            <li>
+                                <i class="fa left-icon fa-external-link-alt"></i>
+                                <a href="<?php echo App\Url::make('/original/%s', $message->id); ?>" target="_blank">Show original message</a>
                             </li>
                             <li>
                                 <i class="fa left-icon fa-trash"></i>
