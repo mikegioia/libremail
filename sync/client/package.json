@@ -1,15 +1,20 @@
 {
   "name": "libremail-sync-client",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "license": "GPLv3",
-  "author": "Mike Gioia <mikegioia@gmail.com>",
+  "author": "Mike Gioia <mike@particlebis.com>",
   "private": true,
+  "dependencies": {},
   "devDependencies": {
-    "bower": "^1.7.7",
     "grunt": "^1.0.3",
     "grunt-contrib-concat": "^1.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-watch": "^1.1.0",
     "grunt-text-replace": "^0.4.0"
+  },
+  "scripts": {
+    "build": "grunt build",
+    "dist": "grunt dist",
+    "watch": "grunt"
   }
 }

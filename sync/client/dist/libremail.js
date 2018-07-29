@@ -218,7 +218,10 @@ LibreMail.Components = {};
             timeoutInterval: 2000,
 
             /** The maximum number of reconnection attempts to make. Unlimited if null. */
-            maxReconnectAttempts: null
+            maxReconnectAttempts: null,
+
+            /** The binary type, possible values 'blob' or 'arraybuffer', default 'blob'. */
+            binaryType: 'blob'
         }
         if (!options) { options = {}; }
 
@@ -287,13 +290,14 @@ LibreMail.Components = {};
          * @param args Object an optional object that the event will use
          */
         function generateEvent(s, args) {
-        	var evt = document.createEvent("CustomEvent");
-        	evt.initCustomEvent(s, false, false, args);
-        	return evt;
+            var evt = document.createEvent("CustomEvent");
+            evt.initCustomEvent(s, false, false, args);
+            return evt;
         };
 
         this.open = function (reconnectAttempt) {
             ws = new WebSocket(self.url, protocols || []);
+            ws.binaryType = this.binaryType;
 
             if (reconnectAttempt) {
                 if (this.maxReconnectAttempts && this.reconnectAttempts > this.maxReconnectAttempts) {
@@ -448,11 +452,11 @@ LibreMail.Components = {};
     ReconnectingWebSocket.CLOSED = WebSocket.CLOSED;
 
     return ReconnectingWebSocket;
-});
-;
+});;
 /*!
  * mustache.js - Logic-less {{mustache}} templates with JavaScript
  * http://github.com/janl/mustache.js
+ * MIT License
  */
 
 /*global define: false Mustache: true*/
@@ -1079,8 +1083,7 @@ LibreMail.Components = {};
   mustache.Writer = Writer;
 
   return mustache;
-}));
-;
+}));;
 /**
  * Event Emitter
  */

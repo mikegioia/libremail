@@ -24,8 +24,8 @@ module.exports = function ( grunt ) {
                 },
                 src: [
                     './src/js/app.js',
-                    './vendor/reconnectingWebsocket/reconnecting-websocket.js',
-                    './vendor/mustache.js/mustache.js',
+                    './src/js/lib/reconnecting-websocket.js',
+                    './src/js/lib/mustache.js',
                     './src/js/emitter.js',
                     './src/js/socket.js',
                     './src/js/pages/*.js',
@@ -38,8 +38,8 @@ module.exports = function ( grunt ) {
                     sourceMap: true
                 },
                 src: [
-                    './vendor/skeleton/css/normalize.css',
-                    './vendor/skeleton/css/skeleton.css',
+                    './src/css/lib/normalize.css',
+                    './src/css/lib/skeleton.css',
                     './src/css/fonts.css',
                     './src/css/forms.css',
                     './src/css/stage.css',

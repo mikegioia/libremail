@@ -843,124 +843,123 @@ there.
 
 /* Larger than Desktop HD */
 @media (min-width: 1200px) {}
-
 @font-face {
-    font-style: normal;
-    font-weight: normal;
-    font-family: 'icomoon';
-    src: url('fonts/icomoon.woff') format('woff');
+  font-style: normal;
+  font-weight: normal;
+  font-family: 'icomoon';
+  src: url('fonts/icomoon.woff') format('woff');
 }
 
 [class^="icon-"], [class*=" icon-"] {
-    speak: none;
-    line-height: 1;
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
+  speak: none;
+  line-height: 1;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
 
-    /* Use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'icomoon' !important;
+  /* Use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
 
-    /* Better Font Rendering */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  /* Better Font Rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .icon-mail:before {
-    content: "\1f585";
+  content: "\1f585";
 }
 .icon-moon:before {
-    content: "\1f319";
+  content: "\1f319";
 }
 .icon-clock:before {
-    content: "\1f557";
+  content: "\1f557";
 }
 .icon-cog:before {
-    content: "\1f527";
+  content: "\1f527";
 }
 .icon-restart:before {
-    content: "\1f501";
+  content: "\1f501";
 }
 .icon-sun:before {
-    content: "\1f31e";
+  content: "\1f31e";
 }
 .icon-download:before {
-    content: "\1f4e5";
+  content: "\1f4e5";
 }
 .icon-plus:before {
-    content: "\2b";
+  content: "\2b";
 }
 .icon-check:before {
-    content: "\1f5f8";
+  content: "\1f5f8";
 }
 .icon-cross:before {
-    content: "\1f5f4";
+  content: "\1f5f4";
 }
 .icon-running:before {
-    content: "\1f3c3";
+  content: "\1f3c3";
 }
 
 form {
-    width: 60%;
-    min-width: 40rem;
-    max-width: 60rem;
-    margin: 4rem auto 0;
+  margin: 4rem auto 0;
+  max-width: 60rem;
+  min-width: 40rem;
+  width: 60%;
 }
 
 form h1 {
-    font-size: 3rem;
-    margin-bottom: 3rem;
+  font-size: 3rem;
+  margin-bottom: 3rem;
 }
 
 form h1.alt-title {
-    display: none;
+  display: none;
 }
 
 form label {
-    text-align: right;
-    font-weight: normal;
-    padding-top: 0.5rem;
+  font-weight: normal;
+  padding-top: 0.5rem;
+  text-align: right;
 }
 
 form .buttons {
-    margin-top: 2rem;
+  margin-top: 2rem;
 }
 
 form .note {
-    color: #666;
-    top: -1.25rem;
-    font-size: 1rem;
-    text-align: right;
-    position: relative;
+  color: #666;
+  font-size: 1rem;
+  position: relative;
+  text-align: right;
+  top: -1.25rem;
 }
 
 form .note a {
-    color: #666;
+  color: #666;
 }
 
 form .note:hover {
-    color: #999;
+  color: #999;
 }
 
 form .note:hover a {
-    color: #aaa;
+  color: #aaa;
 }
 
 input[type="text"],
 input[type="email"] {
-    width: 100%;
-    height: 2.2em;
-    line-height: 2em;
-    padding: 0 0.75em;
-    background-color: #555;
-    border: 1px solid #222;
+  background-color: #555;
+  border: 1px solid #222;
+  height: 2.2em;
+  line-height: 2em;
+  padding: 0 0.75em;
+  width: 100%;
 }
 
 input[type="text"]:focus,
 input[type="email"]:focus {
-    border-color: #ab51c4;
-    background-color: #555;
+  background-color: #555;
+  border-color: #ab51c4;
 }
 
 button[disabled],
@@ -969,366 +968,371 @@ button[disabled]:focus,
 button.button-primary[disabled],
 button.button-primary[disabled]:hover,
 button.button-primary[disabled]:focus {
-    color: #666;
-    background: #444;
-    border-color: #444;
+  background: #444;
+  border-color: #444;
+  color: #666;
 }
 html {
-    font-size: 87.5%;
+  font-size: 87.5%;
 }
 
 body {
-    color: #ddd;
-    width: 100%;
-    height: 100%;
-    background-color: #333;
-    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+  color: #ddd;
+  width: 100%;
+  height: 100%;
+  background-color: #333;
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
 
 header {
-    top: 0;
-    z-index: 2;
-    width: 100%;
-    height: 5rem;
-    position: fixed;
-    background-color: #282828;
+  top: 0;
+  z-index: 2;
+  width: 100%;
+  height: 5rem;
+  position: fixed;
+  background-color: #282828;
 }
 
 main {
-    top: 5rem;
-    bottom: 0;
-    z-index: 1;
-    width: 100%;
-    position: absolute;
+  top: 5rem;
+  bottom: 0;
+  z-index: 1;
+  width: 100%;
+  position: absolute;
 }
 
 .loading {
-    top: 50%;
-    left: 50%;
-    width: 20rem;
-    height: 10rem;
-    margin-top: -8rem;
-    position: absolute;
-    text-align: center;
-    margin-left: -10rem;
+  top: 50%;
+  left: 50%;
+  width: 20rem;
+  height: 10rem;
+  margin-top: -8rem;
+  position: absolute;
+  text-align: center;
+  margin-left: -10rem;
 }
 
 .loading i {
-    color: #555;
-    display: block;
-    line-height: 1;
-    font-size: 10rem;
+  color: #555;
+  display: block;
+  line-height: 1;
+  font-size: 10rem;
 }
 
 .loading span {
-    color: #777;
-    font-size: 2rem;
+  color: #777;
+  font-size: 2rem;
 }
+/**
+ * Buttons
+ */
+
 button {
-    color: #ccc;
-    height: 3rem;
-    padding: 0 1rem;
-    font-weight: 400;
-    background: #222;
-    font-size: 1.5rem;
-    letter-spacing: 0;
-    border-color: #111;
-    line-height: 2.9rem;
-    text-transform: none;
+  background: #222;
+  border-color: #111;
+  color: #ccc;
+  font-size: 1.5rem;
+  font-weight: 400;
+  height: 3rem;
+  letter-spacing: 0;
+  line-height: 2.9rem;
+  padding: 0 1rem;
+  text-transform: none;
 }
 
 button.button-primary {
-    color: #eee;
-    border-color: #9238ab;
-    background-color: #9238ab;
+  background-color: #9238ab;
+  border-color: #9238ab;
+  color: #eee;
 }
 
 button:focus,
 button:hover,
 button:active {
-    color: #ddd;
-    background: #161616;
-    border-color: #060606;
+  background: #161616;
+  border-color: #060606;
+  color: #ddd;
 }
 
 button.button-primary:focus,
 button.button-primary:hover,
 button.button-primary:active {
-    color: #fff;
-    border-color: #ab51c4;
-    background-color: #ab51c4;
+  background-color: #ab51c4;
+  border-color: #ab51c4;
+  color: #fff;
 }
 
 button.disabled,
 button.disabled:focus,
 button.disabled:hover,
 button.disabled:active {
-    color: #444;
-    background: #242424;
-    border-color: #1c1c1c;
+  background: #242424;
+  border-color: #1c1c1c;
+  color: #444;
 }
 
 button i {
-    position: relative;
-    margin-right: 0.5rem;
+  margin-right: 0.5rem;
+  position: relative;
 }
 
 button i.icon-restart {
-    top: 0.1rem;
+  top: 0.1rem;
 }
 
 button i.icon-cog {
-    top: 0.15rem;
-    left: 0.15rem;
+  left: 0.15rem;
+  top: 0.15rem;
 }
 
 button i.icon-check {
-    top: 0.125rem;
+  top: 0.125rem;
 }
 /**
  * Dropdowns
  *
  * z-index range: 10-20
  */
+
 .dropdown {
-    position: relative;
+  position: relative;
 }
 
 .dropdown > a,
 .dropdown > button {
-    position: relative;
+  position: relative;
 }
 
 .dropdown ul {
-    color: #ddd;
-    z-index: 10;
-    display: none;
-    min-width: 16rem;
-    padding: 0.25rem 0;
-    position: absolute;
-    list-style-type: none;
-    top: calc(3rem - 1px);
-    background-color: #161616;
-    border: 1px solid #060606;
-    border-radius: 0 0.25rem 0.25rem 0.25rem;
+  background-color: #161616;
+  border: 1px solid #060606;
+  border-radius: 0 0.25rem 0.25rem 0.25rem;
+  color: #ddd;
+  display: none;
+  list-style-type: none;
+  min-width: 16rem;
+  padding: 0.25rem 0;
+  position: absolute;
+  top: calc(3rem - 1px);
+  z-index: 10;
 }
 
 .dropdown ul.right-menu {
-    right: 0;
-    border-radius: 0.25rem 0 0.25rem 0.25rem;
+  border-radius: 0.25rem 0 0.25rem 0.25rem;
+  right: 0;
 }
 
 .dropdown > a:focus,
 .dropdown > button:focus {
-    z-index: 11;
-    border-bottom: none;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+  border-bottom: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  z-index: 11;
 }
 
 .dropdown > a:focus + ul,
 .dropdown > button:focus + ul,
 .dropdown ul:hover {
-    display: block;
+  display: block;
 }
 
 .dropdown > a:focus + ul,
 .dropdown > button:focus + ul {
-    border-color: #060606;
+  border-color: #060606;
 }
 
 .dropdown > button:focus i.icon-cog {
-    top: 0.1rem;
+  top: 0.1rem;
 }
 
 .dropdown li {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .dropdown li a {
-    margin: 0;
-    color: #ddd;
-    border: none;
-    display: block;
-    border-radius: 0;
-    text-align: left;
-    font-size: 1.5rem;
-    background: #161616;
-    padding: 0.25rem 1rem;
-    text-decoration: none;
+  background: #161616;
+  border: none;
+  border-radius: 0;
+  color: #ddd;
+  display: block;
+  font-size: 1.5rem;
+  margin: 0;
+  padding: 0.25rem 1rem;
+  text-align: left;
+  text-decoration: none;
 }
 
 .dropdown li a:hover {
-    background-color: #555;
+  background-color: #555;
 }
 header .container {
-    padding: 0;
+  padding: 0;
 }
 
 header section {
-    height: 5rem;
-    line-height: 3rem;
-    box-sizing: border-box;
+  box-sizing: border-box;
+  height: 5rem;
+  line-height: 3rem;
 }
 
 header section.accounts {
-    padding: 1rem 0 1rem 1.8rem;
+  padding: 1rem 0 1rem 1.8rem;
 }
 
 header section.accounts.disabled {
-    color: #444;
+  color: #444;
 }
 
 header section.status {
-    padding: 0.5rem 0;
-    text-align: center;
+  padding: 0.5rem 0;
+  text-align: center;
 }
 
 header section.status .icon,
 header section.status .time {
-    margin: 0 0.5rem;
-    text-align: center;
-    display: inline-block;
+  display: inline-block;
+  margin: 0 0.5rem;
+  text-align: center;
 }
 
 header section.status .icon {
-    font-size: 2.2rem;
+  font-size: 2.2rem;
 }
 
 header section.status .icon i {
-    top: 0.1rem;
-    position: relative;
+  top: 0.1rem;
+  position: relative;
 }
 
 header section.status .label {
-    color: #666;
-    top: -0.4rem;
-    font-size: 0.9rem;
-    line-height: 1rem;
-    position: relative;
-    padding: 0.2rem 0.3rem;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1rem;
+  padding: 0.2rem 0.3rem;
+  position: relative;
+  top: -0.4rem;
 }
 
 header section.status .red {
-    color: #ee3f46;
+  color: #ee3f46;
 }
 
 header section.status .blue {
-    color: #007db6;
+  color: #007db6;
 }
 
 header section.status .green {
-    color: #4da74d;
+  color: #4da74d;
 }
 
 header section.status .yellow {
-    color: #d6a70e;
+  color: #d6a70e;
 }
 
 header section.status .offline {
-    color: #777;
+  color: #777;
 }
 
 header section.actions {
-    text-align: right;
-    padding: 1rem 1rem 1rem 0;
+  padding: 1rem 1rem 1rem 0;
+  text-align: right;
 }
 
 header section.actions #restart {
-    margin-right: 0.5rem;
+  margin-right: 0.5rem;
 }
 .folders {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0.5rem;
 }
 
 .folder {
-    width: 25%;
-    padding: 0.5rem;
-    position: relative;
-    box-sizing: border-box;
-    transition: background-color 0.25s ease;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  position: relative;
+  transition: background-color 0.25s ease;
+  width: 25%;
 }
 
 .folder.active {
-    background: #d6a70e;
+  background: #d6a70e;
 }
 
 .folder.incomplete:not(.active) .top {
-    color: #aaa;
-    background: rgba(214, 167, 14, 0.1);
+  background: rgba(214, 167, 14, 0.1);
+  color: #aaa;
 }
 
 .folder.incomplete:not(.active) .bottom {
-    color: #777;
-    background: rgba(214, 167, 14, 0.1);
+  background: rgba(214, 167, 14, 0.1);
+  color: #777;
 }
 
 .folder.incomplete:not(.active) .bottom .count {
-    background: transparent;
+  background: transparent;
 }
 
 .folder .progress {
-    top: 0;
-    left: 0;
-    z-index: 1;
-    height: 0.4rem;
-    position: absolute;
+  height: 0.4rem;
+  left: 0;
+  position: absolute;
+  top: 0;
+  z-index: 1;
 }
 
 .folder .top {
-    color: #aaa;
-    overflow: hidden;
-    font-size: 1.4rem;
-    line-height: 2rem;
-    background: #2d2d2d;
-    padding: 0.4rem 0.8rem 0;
+  background: #2d2d2d;
+  color: #aaa;
+  font-size: 1.4rem;
+  line-height: 2rem;
+  overflow: hidden;
+  padding: 0.4rem 0.8rem 0;
 }
 
 .folder .top .name {
-    z-index: 2;
-    position: relative;
-    overflow-x: hidden;
-    white-space: nowrap;
+  overflow-x: hidden;
+  position: relative;
+  white-space: nowrap;
+  z-index: 2;
 }
 
 .folder .bottom {
-    color: #555;
-    overflow: hidden;
-    font-size: 0.9rem;
-    line-height: 2rem;
-    position: relative;
-    background: #2d2d2d;
-    white-space: nowrap;
-    padding: 0 0 0.2rem 0.8rem;
-    border-right: 0.8rem solid rgba(0, 0, 0, 0);
+  background: #2d2d2d;
+  border-right: 0.8rem solid rgba(0, 0, 0, 0);
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 2rem;
+  overflow: hidden;
+  padding: 0 0 0.2rem 0.8rem;
+  position: relative;
+  white-space: nowrap;
 }
 
 .folder .bottom .count {
-    right: 0;
-    top: -0.2rem;
-    padding: 0.2rem;
-    position: absolute;
-    background: #2d2d2d;
+  background: #2d2d2d;
+  padding: 0.2rem;
+  position: absolute;
+  right: 0;
+  top: -0.2rem;
 }
 
 .folder.active.incomplete {
-    animation: colorchange 20s;
-    animation-iteration-count: infinite;
+  animation: colorchange 20s;
+  animation-iteration-count: infinite;
 }
 
 .folder.active.incomplete .progress {
-    /* Not using this now */
-    /* background-color: #fffaad; */
+  /* Not using this now */
+  /* background-color: #fffaad; */
 }
 
 .folder.active.incomplete .top,
 .folder.active.incomplete .bottom,
 .folder.active.incomplete .bottom .count {
-    background: transparent;
-    color: rgba(0, 0, 0, 0.6);
+  background: transparent;
+  color: rgba(0, 0, 0, 0.6);
 }
 
 @keyframes colorchange {
@@ -1342,162 +1346,165 @@ header section.actions #restart {
 }
 
 .folders .none {
-    color: #999;
-    padding: 1rem 2rem;
-    text-align: center;
-    margin: 20% auto 0;
-    background-color: #393939;
+  background-color: #393939;
+  color: #999;
+  margin: 20% auto 0;
+  padding: 1rem 2rem;
+  text-align: center;
 }
 section.status-message {
-    width: 60%;
-    min-width: 40rem;
-    max-width: 60rem;
-    margin: 4rem auto;
-    padding: 1rem 1.25rem;
-    background-color: #1d8fb3;
+  background-color: #1d8fb3;
+  margin: 4rem auto;
+  max-width: 60rem;
+  min-width: 40rem;
+  padding: 1rem 1.25rem;
+  width: 60%;
 }
 
 section.status-message.error {
-    background-color: red;
+  background-color: red;
 }
 
 section.status-message h1 {
-    font-size: 3rem;
-    margin-bottom: 2rem;
+  font-size: 3rem;
+  margin-bottom: 2rem;
 }
 
 section.status-message .suggestion {
-    margin-top: 2rem;
-    padding: 0.5rem 1rem;
-    line-height: 2.5rem;
-    background-color: rgba( 0, 0, 0, 0.25 );
+  background-color: rgba(0, 0, 0, 0.25);
+  line-height: 2.5rem;
+  margin-top: 2rem;
+  padding: 0.5rem 1rem;
 }
 
 section.status-message .recheck {
-    margin-top: 2rem;
+  margin-top: 2rem;
 }
 
 section.status-message button {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 section.notifications {
-    top: 0;
-    right: 0;
-    width: 40%;
-    z-index: 3;
-    position: fixed;
-    max-width: 32rem;
+  max-width: 32rem;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 40%;
+  z-index: 3;
 }
 
 section.notifications .notification {
-    margin: 1rem;
-    position: relative;
+  margin: 1rem;
+  position: relative;
 }
 
 section.notifications .notification a.close {
-    color: #fff;
-    top: 0.25rem;
-    right: 0.5rem;
-    position: absolute;
-    text-decoration: none;
+  color: #fff;
+  position: absolute;
+  right: 0.5rem;
+  text-decoration: none;
+  top: 0.25rem;
 }
 
 section.notifications .notification .box {
-    padding: 1rem 2rem 1rem 1.5rem;
+  padding: 1rem 2rem 1rem 1.5rem;
 }
 
 section.notifications .notification .error {
-    color: #fff;
-    background-color: #ce3c3c;
+  background-color: #ce3c3c;
+  color: #fff;
 }
 
 section.notifications .notification .success {
-    color: #fff;
-    background-color: #28a94c;
+  background-color: #28a94c;
+  color: #fff;
 }
 @media (max-width: 720px) {
-    header section.accounts {
-        display: none;
-    }
-    header section.status {
-        margin-left: 0;
-        text-align: left;
-        width: 60% !important;
-    }
-    header section.status .info,
-    header section.status .time {
-        text-align: left;
-    }
-    header section.actions {
-        float: right;
-        margin-left: 0;
-        width: 40% !important;
-    }
-    #restart span {
-        display: none;
-    }
-    .folder {
-        width: calc(100%/3);
-    }
+  header section.accounts {
+    display: none;
+  }
+  header section.status {
+    margin-left: 0;
+    text-align: left;
+    width: 60% !important;
+  }
+  header section.status .info,
+  header section.status .time {
+    text-align: left;
+  }
+  header section.actions {
+    float: right;
+    margin-left: 0;
+    width: 40% !important;
+  }
+  #restart span {
+    display: none;
+  }
+  .folder {
+    width: calc(100%/3);
+  }
 }
 
 @media (max-width: 600px) {
-    html {
-        /*font-size: 71.875%;*/
-        font-size: 78.125%;
-    }
-    .folder {
-        width: calc(100%/2);
-    }
+  html {
+    /*font-size: 71.875%;*/
+    font-size: 78.125%;
+  }
+  .folder {
+    width: calc(100%/2);
+  }
 }
 
 @media (max-width: 460px) {
-    #restart {
-        display: none;
-    }
+  #restart {
+    display: none;
+  }
 }
 
 @media (max-width: 380px) {
-    form,
-    section.status-message {
-        margin-top: 2rem;
-        max-width: none;
-        min-width: auto;
-        width: calc(100% - 4rem);
-    }
-    form label {
-        text-align: left;
-    }
-    .folder {
-        width: 100%;
-    }
+  form,
+  section.status-message {
+    margin-top: 2rem;
+    max-width: none;
+    min-width: auto;
+    width: calc(100% - 4rem);
+  }
+  section.status-message {
+    width: calc(100% - 7rem);
+  }
+  form label {
+    text-align: left;
+  }
+  .folder {
+    width: 100%;
+  }
 }
 
 
 @media (min-width: 1200px) {
-    html {
-        font-size: 93.75%;
-    }
-    .folder {
-        width: calc(100%/5);
-    }
+  html {
+    font-size: 93.75%;
+  }
+  .folder {
+    width: calc(100%/5);
+  }
 }
 
 @media (min-width: 1600px) {
-    html {
-        font-size: 100%;
-    }
-    .folder {
-        width: calc(100%/6);
-    }
+  html {
+    font-size: 100%;
+  }
+  .folder {
+    width: calc(100%/6);
+  }
 }
 
 @media (min-width: 1800px) {
-    html {
-        font-size: 110%;
-    }
-    .folder {
-        width: calc(100%/6);
-    }
+  html {
+    font-size: 110%;
+  }
+  .folder {
+    width: calc(100%/6);
+  }
 }
 /*# sourceMappingURL=libremail.css.map */
