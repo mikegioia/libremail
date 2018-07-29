@@ -147,7 +147,7 @@ class Threads
         $total = $this->maxId - $minId;
         $messageModel = new MessageModel;
         $this->log->debug(
-            "Threading: storing messages for threading for ".
+            'Threading: storing messages for threading for '.
             "{$this->account->email}");
         $this->printMemory();
         $this->startProgress(1, $total);
@@ -314,7 +314,7 @@ class Threads
     private function combineThreads()
     {
         $this->log->debug(
-            "Threading Pass 3: combining threads by subject for ".
+            'Threading Pass 3: combining threads by subject for '.
             "{$this->account->email}");
         $this->printMemory();
 

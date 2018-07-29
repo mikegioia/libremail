@@ -23,7 +23,7 @@ class ServerConsole extends Console
      */
     protected function setupArgs()
     {
-        $this->cli->arguments->add([
+        $this->addArguments([
             'background' => [
                 'prefix' => 'b',
                 'longPrefix' => 'background',
@@ -76,7 +76,7 @@ class ServerConsole extends Console
     {
         // If help is set, show the usage and exit
         if (true === $this->help) {
-            $this->cli->usage();
+            $this->usage();
             exit(0);
         }
 

@@ -562,7 +562,6 @@ class Sync
             $this->checkForHalt();
             $this->updateThreads($account);
             $this->checkForHalt();
-
         }
 
         $this->stats->unsetActiveFolder();
