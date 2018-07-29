@@ -26,7 +26,7 @@ application.
 Both email clients in this project utilise the syncing engine provided in the
 [`sync`](sync) app. This application is designed to continually archive emails
 from any number of IMAP servers and accounts. The data is saved in a format
-outlined in the [`DATAFORMAT.md`](DATAFORMAT.md) file. Any application that
+outlined in the [`DATA_FORMAT.md`](DATA_FORMAT.md) file. Any application that
 saves data in the format outlined in that document can be used, but the
 [`sync`](sync) app here is a PHP version that you can use.
 
@@ -60,7 +60,7 @@ weight, and provides almost full parity to GMail's email client.
 Please see the [`webmail`](webmail) directory for full documentation on running
 the app. This requires your remote mail to be stored in a local SQL database.
 The [`sync`](sync) app does this for you, but you're free to use anything that
-saves data in the way outlined in [`DATAFORMAT.md`](DATAFORMAT.md).
+saves data in the way outlined in [`DATA_FORMAT.md`](DATA_FORMAT.md).
 
 ### 3. Kanban-style Email Client
 
