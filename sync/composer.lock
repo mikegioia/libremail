@@ -534,19 +534,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "3d08c8860bf1ea9e67d651394eb7ae99b23f60c3"
+                "reference": "9feedef534897535085b82d8f41a08ee118ef26c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/3d08c8860bf1ea9e67d651394eb7ae99b23f60c3",
-                "reference": "3d08c8860bf1ea9e67d651394eb7ae99b23f60c3",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/9feedef534897535085b82d8f41a08ee118ef26c",
+                "reference": "9feedef534897535085b82d8f41a08ee118ef26c",
                 "shasum": ""
             },
             "require": {
                 "ext-iconv": "*",
                 "particlebits/zend-mail": "@dev",
                 "particlebits/zend-mime": "@dev",
-                "php": "^5.6 || ^7.0 || ^7.1 || 7.2"
+                "php": ">=5.6"
             },
             "type": "library",
             "autoload": {
@@ -554,40 +554,26 @@
                     "Pb\\Imap\\": "src/"
                 }
             },
-            "scripts": {
-                "fix": [
-                    "php-cs-fixer fix"
-                ],
-                "test": [
-                    "@php tests/memory.php"
-                ],
-                "lint": [
-                    "php-cs-fixer fix --dry-run --diff"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
             "authors": [
                 {
                     "name": "Mike Gioia",
-                    "homepage": "https://particlebits.com",
-                    "email": "mike@particlebits.com"
+                    "email": "mike@particlebits.com",
+                    "homepage": "https://particlebits.com"
                 }
             ],
             "description": "PHP class to access an IMAP mailbox. Specifically uses the Zend library and not the IMAP extension.",
             "homepage": "https://github.com/particlebits/imap",
             "keywords": [
-                "IMAP",
-                "PHP",
                 "fetch",
-                "mail"
+                "imap",
+                "mail",
+                "php"
             ],
-            "support": {
-                "source": "https://github.com/ParticleBits/imap/tree/master",
-                "issues": "https://github.com/ParticleBits/imap/issues"
-            },
-            "time": "2018-07-27T23:36:23+00:00"
+            "time": "2018-07-29T18:23:57+00:00"
         },
         {
             "name": "particlebits/pdo",
@@ -648,12 +634,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/zend-mail.git",
-                "reference": "403da5836cded37684b2d912476af29eaf9d1951"
+                "reference": "5b03e46053f6905204a23208d18a6fcd96640fc5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/zend-mail/zipball/403da5836cded37684b2d912476af29eaf9d1951",
-                "reference": "403da5836cded37684b2d912476af29eaf9d1951",
+                "url": "https://api.github.com/repos/ParticleBits/zend-mail/zipball/5b03e46053f6905204a23208d18a6fcd96640fc5",
+                "reference": "5b03e46053f6905204a23208d18a6fcd96640fc5",
                 "shasum": ""
             },
             "require": {
@@ -702,7 +688,7 @@
                 "mail",
                 "zf"
             ],
-            "time": "2018-07-23T01:13:15+00:00"
+            "time": "2018-07-29T18:18:28+00:00"
         },
         {
             "name": "particlebits/zend-mime",

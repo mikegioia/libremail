@@ -4,6 +4,7 @@ namespace App;
 
 use Fn;
 use App\Message\StatsMessage;
+use App\Model\Meta as MetaModel;
 use App\Model\Folder as FolderModel;
 use App\Model\Account as AccountModel;
 
@@ -41,6 +42,8 @@ class Stats
         if ($running && ! $this->startTime) {
             $this->startTime = time();
         }
+
+        $this->log();
     }
 
     public function setActiveAccount($account)
@@ -50,6 +53,8 @@ class Stats
         if ($this->daemon) {
             $this->json(true);
         }
+
+        $this->log();
     }
 
     public function setActiveFolder($folder)
@@ -59,6 +64,8 @@ class Stats
         if ($this->daemon) {
             $this->json();
         }
+
+        $this->log();
     }
 
     public function unsetActiveFolder()
@@ -68,6 +75,8 @@ class Stats
         if ($this->daemon) {
             $this->json();
         }
+
+        $this->log();
     }
 
     /**
@@ -163,5 +172,22 @@ class Stats
                 time() - $this->startTime,
                 $this->getStats($useCache)
             ));
+    }
+
+    /**
+     * Writes the statistics to SQL. This data is used by other
+     * applications to get the status of the sync engine.
+     */
+    public function log()
+    {
+        (new MetaModel)->update([
+            MetaModel::HEARTBEAT => time(),
+            MetaModel::START_TIME => $this->startTime,
+            MetaModel::ASLEEP => $this->asleep ? 1: 0,
+            MetaModel::RUNNING => $this->running ? 1 : 0,
+            MetaModel::ACTIVE_FOLDER => $this->activeFolder,
+            MetaModel::ACTIVE_ACCOUNT => $this->activeAccount,
+            MetaModel::FOLDER_STATS => json_encode($this->getStats(true))
+        ]);
     }
 }
