@@ -88,18 +88,23 @@ abstract class Console
     private function banner()
     {
         $this->cli->br();
-        $this->cli->out('  ╔═══════════════════════════════════════════════════════════════╗');
-        $this->cli->out('  ║   ,           ,      _     _ _              __  __       _ _  ║');
-        $this->cli->out('  ║  /             \    | |   (_) |__  _ __ ___|  \/  | __ _(_) | ║');
-        $this->cli->out("  ║ ((__-^^-,-^^-__))   | |   | | '_ \| '__/ _ \ |\/| |/ _` | | | ║");
-        $this->cli->out("  ║  `-_---' `---_-'    | |___| | |_) | | |  __/ |  | | (_| | | | ║");
-        $this->cli->out("  ║   `--|o` 'o|--'     |_____|_|_.__/|_|  \___|_|  |_|\__,_|_|_| ║");
-        $this->cli->out("  ║      \  `  /                                                  ║");
-        $this->cli->out('  ║       ): :(            The #1 GPL Email Application Suite     ║');
-        $this->cli->out('  ║       :o_o:                 Version 1.0 – Mike Gioia          ║');
-        $this->cli->out('  ║        "-"                                                    ║');
-        $this->cli->out('  ╚═══════════════════════════════════════════════════════════════╝');
+        $this->bannerLine('╔═══════════════════════════════════════════════════════════════╗');
+        $this->bannerLine('║   ,           ,      _     _ _              __  __       _ _  ║');
+        $this->bannerLine('║  /             \    | |   (_) |__  _ __ ___|  \/  | __ _(_) | ║');
+        $this->bannerLine("║ ((__-^^-,-^^-__))   | |   | | '_ \| '__/ _ \ |\/| |/ _` | | | ║");
+        $this->bannerLine("║  `-_---' `---_-'    | |___| | |_) | | |  __/ |  | | (_| | | | ║");
+        $this->bannerLine("║   `--|o` 'o|--'     |_____|_|_.__/|_|  \___|_|  |_|\__,_|_|_| ║");
+        $this->bannerLine("║      \  `  /                                                  ║");
+        $this->bannerLine('║       ): :(            The #1 GPL Email Application Suite     ║');
+        $this->bannerLine('║       :o_o:                 Version 1.0 – Mike Gioia          ║');
+        $this->bannerLine('║        "-"                                                    ║');
+        $this->bannerLine('╚═══════════════════════════════════════════════════════════════╝');
         $this->cli->br();
+    }
+
+    private function bannerLine($line)
+    {
+        $this->cli->inline('  ')->backgroundBlack()->out($line);
     }
 
     private function getUsageOptions()
