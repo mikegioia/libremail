@@ -1,10 +1,10 @@
 /**
- * Header Component
+ * Status Message Component
  */
 LibreMail.Components.StatusMessage = (function ( Const, Socket, Mustache ) {
-'use strict';
 // Returns a new instance
 return function ( $root ) {
+    'use strict';
     // Event namespace
     var namespace = '.statusmessage';
     // DOM template nodes

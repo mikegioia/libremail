@@ -1,10 +1,10 @@
 /**
- * Header Component
+ * Notifications Component
  */
 LibreMail.Components.Notifications = (function ( Const, Socket, Mustache ) {
-'use strict';
 // Returns a new instance
 return function ( $root ) {
+    'use strict';
     // Event namespace
     var namespace = '.notifications';
     // DOM template nodes

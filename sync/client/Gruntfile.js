@@ -20,7 +20,7 @@ module.exports = function ( grunt ) {
             js: {
                 options : {
                     sourceMap: true,
-                    separator: ';\n'
+                    separator: ';\n\n'
                 },
                 src: [
                     './src/js/app.js',

@@ -1,10 +1,10 @@
 /**
  * Folders Component
  */
-LibreMail.Components.Folders = (function ( Mustache ) {
-'use strict';
+LibreMail.Components.Folders = (function (Mustache) {
 // Returns a new instance
 return function ( $root ) {
+    'use strict';
     // Event namespace
     var namespace = '.folders';
     // Flag if the system is "auto-scrolling"
@@ -319,4 +319,4 @@ return function ( $root ) {
         render: render,
         tearDown: tearDown
     };
-}}( Mustache ));
+}}(Mustache));

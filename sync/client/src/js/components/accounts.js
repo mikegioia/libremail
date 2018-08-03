@@ -1,10 +1,10 @@
 /**
- * Header Component
+ * Accounts Component
  */
-LibreMail.Components.Accounts = (function ( Const, Socket, Emitter, Mustache ) {
-'use strict';
+LibreMail.Components.Accounts = (function (Const, Socket, Emitter, Mustache) {
 // Returns a new instance
-return function ( $root ) {
+return function ($root) {
+    'use strict';
     // Event namespace
     var namespace = '.accounts';
     // DOM template nodes
@@ -128,4 +128,4 @@ return function ( $root ) {
         update: update,
         tearDown: tearDown
     };
-}}( LibreMail.Const, LibreMail.Socket, LibreMail.Emitter, Mustache ));
+}}(LibreMail.Const, LibreMail.Socket, LibreMail.Emitter, Mustache));

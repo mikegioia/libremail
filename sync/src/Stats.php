@@ -185,8 +185,8 @@ class Stats
             MetaModel::START_TIME => $this->startTime,
             MetaModel::ASLEEP => $this->asleep ? 1: 0,
             MetaModel::RUNNING => $this->running ? 1 : 0,
-            MetaModel::ACTIVE_FOLDER => $this->activeFolder,
-            MetaModel::ACTIVE_ACCOUNT => $this->activeAccount,
+            MetaModel::ACTIVE_FOLDER => $this->activeFolder ?: '',
+            MetaModel::ACTIVE_ACCOUNT => $this->activeAccount ?: '',
             MetaModel::FOLDER_STATS => json_encode($this->getStats(true))
         ]);
     }
