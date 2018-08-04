@@ -137,4 +137,54 @@ class View
 
         return str_replace($search, $replace, $html);
     }
+
+    /**
+     * Returns a readable version of a file size.
+     *
+     * @param int $size
+     *
+     * @return string
+     */
+    public function humanFileSize(int $size)
+    {
+        if ($size >= 1073741824) {
+            $fileSize = round($size / 1024 / 1024 / 1024, 1).' GB';
+        } elseif ($size >= 1048576) {
+            $fileSize = round($size / 1024 / 1024, 1).' MB';
+        } elseif($size >= 1024) {
+            $fileSize = round($size / 1024, 1).' KB';
+        } else {
+            $fileSize = $size.' bytes';
+        }
+
+        return $fileSize;
+    }
+
+    /**
+     * Returns the best string representation of a time span.
+     * i.e. "20 minutes ago", "1 day ago", or the date time.
+     *
+     * @param int $timestamp
+     *
+     * @return string
+     */
+    function timeSpan(int $timestamp)
+    {
+        $diff = time() - $timestamp;
+
+        if ($diff < 60) {
+            $noun = 'second';
+            $count = $diff;
+        } elseif ($diff < 3600) {
+            $noun = 'minute';
+            $count = round($diff / 60);
+        } elseif ($diff < 86400) {
+            $noun = 'hour';
+            $count = round($diff / 60 / 60);
+        } else {
+            return date('j F Y H:i', $timestamp);
+        }
+
+        return $count.' '.$noun.($count == 1 ? '' : 's').' ago';
+    }
 }

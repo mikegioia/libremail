@@ -1,7 +1,33 @@
 
     <div class="top-layer u-cf u-full-width">
         <div id="topnav-actions" class="dropdown u-pull-right">
-            <a class="icon button" href="#" tabindex="2">
+            <div class="status u-pull-left">
+                <div class="running">
+                <?php
+                if ($meta->running == 1): ?>
+                    <i class="fa fa-wifi"></i>
+                    <span>Online</span>
+                <?php
+                else: ?>
+                    <i class="fa fa-power-off"></i>
+                    <span><strong>Offline!</strong></span>
+                <?php
+                endif; ?>
+                </div>
+                <div class="asleep">
+                <?php
+                if ($meta->asleep == 1 || $meta->running != 1): ?>
+                    <i class="fa fa-moon"></i>
+                    <span>Asleep</span>
+                <?php
+                else: ?>
+                    <i class="fa fa-sync-alt"></i>
+                    <span><strong>Syncing</strong></span>
+                <?php
+                endif; ?>
+                </div>
+            </div>
+            <a class="icon button" href="#" tabindex="4">
                 <i class="fa fa-sliders-h"></i>
             </a>
             <ul class="right-menu size-medium">
@@ -11,7 +37,7 @@
                 </li>
                 <li>
                     <i class="fa left-icon fa-envelope"></i>
-                    <a href="#">Configure Email</a>
+                    <a href="#account">Configure Email</a>
                 </li>
             </ul>
         </div>

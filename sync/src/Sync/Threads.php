@@ -314,7 +314,7 @@ class Threads
     private function combineThreads()
     {
         $this->log->debug(
-            'Threading Pass 3: combining threads by subject for '.
+            'Threading Pass 2: combining threads by subject for '.
             "{$this->account->email}");
         $this->printMemory();
 
@@ -366,7 +366,7 @@ class Threads
         $this->log->debug(
             "Threading: saving new thread IDs for {$this->account->email}");
         $this->printMemory();
-        $this->startProgress(4, $total);
+        $this->startProgress(3, $total);
 
         foreach ($this->messages as $message) {
             if (isset($this->groupedThreads[$message->getThreadId()])) {

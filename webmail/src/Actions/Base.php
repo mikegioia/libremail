@@ -46,7 +46,12 @@ abstract class Base
      * @param array $filters Optional filters to limit siblings
      * @param array $options
      */
-    protected function setFlag(MessageModel $message, $flag, $state, $filters = [], $options = [])
+    protected function setFlag(
+        MessageModel $message,
+        string $flag,
+        bool $state,
+        array $filters = [],
+        array $options = [])
     {
         $taskModel = new TaskModel;
         $newValue = $state ? 1 : 0;

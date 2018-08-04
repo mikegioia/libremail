@@ -1,8 +1,8 @@
 <?php
 
-$view->render( 'header' );
+$view->render('header');
 
-$view->render( 'nav', [
+$view->render('nav', [
     'view' => $view,
     'folders' => $folders,
     'activeId' => $folderId
@@ -11,12 +11,12 @@ $view->render( 'nav', [
 <section id="main">
     <form action="/update" method="post">
         <?php
-        $view->render( 'nav/actions' ); ?>
+        $view->render('nav/actions'); ?>
 
         <section id="msg-list" class="no-select">
         <?php
-        if ( $flagged ):
-            $view->render( 'messages/message-list', [
+        if ($flagged):
+            $view->render('messages/message-list', [
                 'view' => $view,
                 'urlId' => STARRED,
                 'select' => $select,
@@ -25,11 +25,11 @@ $view->render( 'nav', [
                 'folderId' => $folderId,
                 'id' => 'mailbox-starred',
                 'showPaging' => $showPaging,
-                'counts' => $counts->flagged
+                'counts' => $paging->flagged
             ]);
         endif;
 
-            $view->render( 'messages/message-list', [
+            $view->render('messages/message-list', [
                 'view' => $view,
                 'urlId' => $urlId,
                 'select' => $select,
@@ -38,17 +38,22 @@ $view->render( 'nav', [
                 'heading' => $mainHeading,
                 'showPaging' => $showPaging,
                 'id' => 'mailbox-everything',
-                'counts' => $counts->unflagged
+                'counts' => $paging->unflagged
             ]);
-            $view->render( 'messages/footer' ); ?>
+
+            $view->render('messages/footer', [
+                'view' => $view,
+                'meta' => $meta,
+                'totals' => $totals
+            ]); ?>
         </section>
 
         <?php
-        $view->render( 'messages/move-messages', [
+        $view->render('messages/move-messages', [
             'view' => $view,
             'folders' => $folders->getList()
         ]);
-        $view->render( 'messages/apply-folder', [
+        $view->render('messages/apply-folder', [
             'view' => $view,
             'folders' => $folders->getList()
         ]); ?>
@@ -60,9 +65,11 @@ $view->render( 'nav', [
 </section>
 
 <?php
-$view->render( 'messages/datalist', [
+$view->render('messages/datalist', [
     'view' => $view,
     'folders' => $folders->get()
 ]);
 
-$view->render( 'footer' ); ?>
+$view->render('footer', [
+    'meta' => $meta
+]); ?>

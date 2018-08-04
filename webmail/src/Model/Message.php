@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use PDO;
+use stdClass;
 use Exception;
 use App\Model;
 use App\Exceptions\NotFoundException;
@@ -120,7 +121,7 @@ class Message extends Model
         return $this->raw_headers."\r\n".$this->raw_content;
     }
 
-    public function getById(int $id, $throwExceptionOnNotFound = false)
+    public function getById(int $id, bool $throwExceptionOnNotFound = false)
     {
         $message = $this->db()
             ->select()
@@ -151,7 +152,7 @@ class Message extends Model
     /**
      * Returns the data for an entire thread.
      */
-    public function getThread($accountId, $threadId)
+    public function getThread(int $accountId, int $threadId)
     {
         return $this->db()
             ->select()
@@ -172,7 +173,7 @@ class Message extends Model
      *
      * @return object
      */
-    public function getThreadCountsByFolder($accountId, $folderId)
+    public function getThreadCountsByFolder(int $accountId, int $folderId)
     {
         if ($this->threadCache($accountId, $folderId)) {
             return $this->threadCache($accountId, $folderId);
@@ -227,7 +228,7 @@ class Message extends Model
      *
      * @return array
      */
-    private function getThreadIdsByFolder($accountId, $folderId)
+    private function getThreadIdsByFolder(int $accountId, int $folderId)
     {
         $threadIds = [];
         $results = $this->db()
@@ -258,7 +259,10 @@ class Message extends Model
      *
      * @return Message array
      */
-    public function getThreadsByFolder($accountId, $folderId, $limit = 50, $offset = 0, $options = [])
+    public function getThreadsByFolder(
+        int $accountId, int $folderId,
+        int $limit = 50, int $offset = 0,
+        $options = [])
     {
         $threads = [];
         $messageIds = [];
@@ -370,7 +374,7 @@ class Message extends Model
      *
      * @return array Messages
      */
-    private function getThreads(array $threadIds, $accountId, $limit, $offset)
+    private function getThreads(array $threadIds, int $accountId, int $limit, int $offset)
     {
         if (! count($threadIds)) {
             return [];
@@ -393,7 +397,7 @@ class Message extends Model
             ->fetchAll(PDO::FETCH_CLASS, get_class());
     }
 
-    public function getUnreadCounts($accountId)
+    public function getUnreadCounts(int $accountId)
     {
         $indexed = [];
         $unseenThreadIds = $this->getUnseenThreads($accountId);
@@ -421,7 +425,7 @@ class Message extends Model
         return $indexed;
     }
 
-    public function getUnseenThreads($accountId)
+    public function getUnseenThreads(int $accountId)
     {
         $threads = [];
         $threadIds = $this->db()
@@ -444,7 +448,20 @@ class Message extends Model
         return array_values(array_unique($threads));
     }
 
-    private function getName($from)
+    public function getSizeCounts(int $accountId)
+    {
+        return $this->db()
+            ->select([
+                'count(distinct(message_id)) as count',
+                'sum(size) as size'
+            ])
+            ->from('messages')
+            ->where('deleted', '=', 0)
+            ->execute()
+            ->fetchObject();
+    }
+
+    private function getName(string $from)
     {
         $from = trim($from);
         $pos = strpos($from, '<');
@@ -463,7 +480,7 @@ class Message extends Model
      * @param int $folderId
      * @param object $counts
      */
-    private function setThreadCache($accountId, $folderId, $counts)
+    private function setThreadCache(int $accountId, int $folderId, stdClass $counts)
     {
         $this->threadsCache[$accountId.':'.$folderId] = $counts;
     }
@@ -476,7 +493,7 @@ class Message extends Model
      *
      * @return bool | object
      */
-    private function threadCache($accountId, $folderId)
+    private function threadCache(int $accountId, int $folderId)
     {
         $key = $accountId.':'.$folderId;
 
@@ -495,7 +512,7 @@ class Message extends Model
      *
      * @return array of Messages
      */
-    public function getSiblings($filters = [], $options = [])
+    public function getSiblings(array $filters = [], array $options = [])
     {
         $ids = [];
         $addSelf = true;
@@ -542,7 +559,7 @@ class Message extends Model
      * @param string $flag
      * @param bool $state
      */
-    public function setFlag($flag, $state)
+    public function setFlag(string $flag, bool $state)
     {
         $updated = $this->db()
             ->update([
@@ -564,7 +581,7 @@ class Message extends Model
      *
      * @throws Exception
      */
-    public function copyTo($folderId)
+    public function copyTo(int $folderId)
     {
         // If this message exists in the folder and is not deleted,
         // then skip the operation.

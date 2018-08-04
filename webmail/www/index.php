@@ -8,6 +8,7 @@ use App\Thread;
 use App\Folders;
 use App\Actions;
 use App\Messages;
+use App\Model\Meta;
 use App\Model\Account;
 use App\Model\Message;
 use App\Exceptions\ClientException;
@@ -85,6 +86,7 @@ $router = new Router;
 $renderMailbox = function ($id, $page = 1, $limit = 25) use ($account) {
     // Set up libraries
     $view = new View;
+    $meta = Meta::getAll();
     $colors = getConfig('colors');
     $select = Url::getParam('select');
     $folders = new Folders($account, $colors);
@@ -99,7 +101,7 @@ $renderMailbox = function ($id, $page = 1, $limit = 25) use ($account) {
     }
 
     // Get the message data
-    list($flagged, $unflagged, $counts) = $messages->getThreads(
+    list($flagged, $unflagged, $paging, $totals) = $messages->getThreads(
         $folderId,
         $page,
         $limit, [
@@ -115,8 +117,10 @@ $renderMailbox = function ($id, $page = 1, $limit = 25) use ($account) {
         'urlId' => $id,
         'view' => $view,
         'page' => $page,
-        'counts' => $counts,
+        'meta' => $meta,
+        'paging' => $paging,
         'select' => $select,
+        'totals' => $totals,
         'flagged' => $flagged,
         'folders' => $folders,
         'folderId' => $folderId,
@@ -205,7 +209,9 @@ $router->get('/thread/(\d+)/(\d+)', function ($folderId, $threadId) use ($accoun
         'view' => $view,
         'thread' => $thread,
         'folders' => $folders,
-        'folderId' => $folderId
+        'folderId' => $folderId,
+        'meta' => Meta::getAll(),
+        'totals' => (new Message)->getSizeCounts($account->id)
     ]);
 });
 

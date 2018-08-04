@@ -115,14 +115,6 @@ class Diagnostics
         }
     }
 
-    public function runInbox()
-    {
-        $this->testLogPathWritable();
-        $this->testDatabaseConnection();
-        $this->testDatabaseExists();
-        $this->testMaxAllowedPacketSize();
-    }
-
     /**
      * No-op used to instantiate class if we're not running this
      * on startup.

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use stdClass;
 use App\Model\Account;
 use App\Model\Message;
 use App\Messages\Names;
@@ -34,9 +35,9 @@ class Messages
      * @param int $limit
      * @param array $options
      *
-     * @return [array, array, array] Message, Message, int
+     * @return [Message array, Message array, object, object]
      */
-    public function getThreads($folderId, $page = 1, $limit = 25, array $options = [])
+    public function getThreads(int $folderId, int $page = 1, int $limit = 25, array $options = [])
     {
         $flagged = [];
         $unflagged = [];
@@ -72,13 +73,14 @@ class Messages
             }
         }
 
-        $counts = $this->buildCounts(
+        $paging = $this->buildPaging(
             $messageCounts,
             $page,
             $limit,
             $splitFlagged);
+        $totals = $messageModel->getSizeCounts($this->accountId);
 
-        return [$flagged, $unflagged, $counts];
+        return [$flagged, $unflagged, $paging, $totals];
     }
 
     /**
@@ -180,14 +182,14 @@ class Messages
     /**
      * Prepare the counts and paging info for the folders.
      *
-     * @param array $counts
+     * @param stdClass $counts
      * @param int $page
      * @param int $limit
      * @param bool $splitFlagged
      *
      * @return object
      */
-    private function buildCounts($counts, $page, $limit, $splitFlagged)
+    private function buildPaging(stdClass $counts, int $page, int $limit, bool $splitFlagged)
     {
         $start = 1 + (($page - 1) * $limit);
 

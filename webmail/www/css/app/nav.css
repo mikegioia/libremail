@@ -74,6 +74,48 @@ body > header a.icon.button {
   top: 0.75rem;
 }
 
+#topnav-actions .status {
+  margin-right: 1.5rem;
+}
+
+#topnav-actions .status > div {
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+#topnav-actions .status > div > i {
+  display: inline-block;
+  font-size: 1.125rem;
+  text-align: center;
+  width: 2rem;
+}
+
+#topnav-actions .status > div > span {
+  color: #666;
+  font-size: 1.125rem;
+}
+
+#topnav-actions .status > div > span > strong {
+  color: #333;
+}
+
+#topnav-actions .status i.fa-wifi {
+  color: #00b153;
+}
+
+#topnav-actions .status i.fa-power-off {
+  color: #d81956;
+}
+
+#topnav-actions .status i.fa-moon {
+  color: #0091d2;
+}
+
+#topnav-actions .status i.fa-sync-alt {
+  color: #d81956;
+  transform: translateY(0.0625rem);
+}
+
 #compose {
   line-height: 3.5rem;
   text-transform: uppercase;

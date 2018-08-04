@@ -16,11 +16,13 @@ class Meta extends Model
 
     const ASLEEP = 'asleep';
     const RUNNING = 'running';
+    const SYNC_PID = 'sync_pid';
     const HEARTBEAT = 'heartbeat';
     const START_TIME = 'start_time';
     const FOLDER_STATS = 'folder_stats';
     const ACTIVE_FOLDER = 'active_folder';
     const ACTIVE_ACCOUNT = 'active_account';
+    const LAST_SYNC_TIME = 'last_sync_time';
 
     use ModelTrait;
 

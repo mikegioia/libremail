@@ -1,8 +1,8 @@
 <?php
 
-$view->render( 'header' );
+$view->render('header');
 
-$view->render( 'nav', [
+$view->render('nav', [
     'view' => $view,
     'folders' => $folders,
     'activeId' => $folderId
@@ -12,7 +12,7 @@ $view->render( 'nav', [
     <form action="/update" method="post">
         <div id="msg-actions">
             <?php
-            $view->render( 'nav/actions-menu', [
+            $view->render('nav/actions-menu', [
                 'sticky' => TRUE,
                 'threadView' => TRUE
             ]); ?>
@@ -20,21 +20,25 @@ $view->render( 'nav', [
 
         <section id="msg-list">
             <?php
-            $view->render( 'threads/message-list', [
+            $view->render('threads/message-list', [
                 'i' => 0,
                 'view' => $view,
                 'thread' => $thread
             ]);
 
-            $view->render( 'messages/footer' ); ?>
+            $view->render('messages/footer', [
+                'view' => $view,
+                'meta' => $meta,
+                'totals' => $totals
+            ]); ?>
         </section>
 
         <?php
-        $view->render( 'messages/move-messages', [
+        $view->render('messages/move-messages', [
             'view' => $view,
             'folders' => $folders->getList()
         ]);
-        $view->render( 'messages/apply-folder', [
+        $view->render('messages/apply-folder', [
             'view' => $view,
             'folders' => $folders->getList()
         ]); ?>
@@ -46,9 +50,11 @@ $view->render( 'nav', [
 </section>
 
 <?php
-$view->render( 'messages/datalist', [
+$view->render('messages/datalist', [
     'view' => $view,
     'folders' => $folders->get()
 ]);
 
-$view->render( 'footer' ); ?>
+$view->render('footer', [
+    'meta' => $meta
+]); ?>

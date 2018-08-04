@@ -14,17 +14,20 @@ use App\Model\Account as AccountModel;
  */
 class Stats
 {
+    private $pid;
     private $cli;
     private $stats;
     private $daemon;
     private $asleep;
     private $running;
+    private $stopTime;
     private $startTime;
     private $activeFolder;
     private $activeAccount;
 
     public function __construct(Console $console)
     {
+        $this->pid = getmypid();
         $this->cli = $console->getCli();
         $this->daemon = $console->daemon;
     }
@@ -32,7 +35,7 @@ class Stats
     public function setAsleep($asleep = true)
     {
         $this->asleep = $asleep;
-        $this->unsetActiveFolder();
+        $this->unsetActiveFolder(false);
     }
 
     public function setRunning($running = true)
@@ -68,9 +71,13 @@ class Stats
         $this->log();
     }
 
-    public function unsetActiveFolder()
+    public function unsetActiveFolder($setStopTime = true)
     {
         $this->activeFolder = null;
+
+        if ($setStopTime) {
+            $this->stopTime = time();
+        }
 
         if ($this->daemon) {
             $this->json();
@@ -182,9 +189,11 @@ class Stats
     {
         (new MetaModel)->update([
             MetaModel::HEARTBEAT => time(),
+            MetaModel::SYNC_PID => $this->pid,
             MetaModel::START_TIME => $this->startTime,
             MetaModel::ASLEEP => $this->asleep ? 1: 0,
             MetaModel::RUNNING => $this->running ? 1 : 0,
+            MetaModel::LAST_SYNC_TIME => $this->stopTime,
             MetaModel::ACTIVE_FOLDER => $this->activeFolder ?: '',
             MetaModel::ACTIVE_ACCOUNT => $this->activeAccount ?: '',
             MetaModel::FOLDER_STATS => json_encode($this->getStats(true))

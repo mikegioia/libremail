@@ -1,4 +1,11 @@
 <footer class="row">
-    <div class="one-half column size-md">[TBD] of messages</div>
-    <div class="one-half column size-md align-right">Last sync: [TBD]</div>
+    <div class="one-half column size-md">
+        <?php echo $view->humanFileSize($totals->size); ?>
+        <span class="bg">&mdash;</span>
+        <?php echo number_format($totals->count); ?> messages
+    </div>
+    <div class="one-half column size-md align-right">
+        <span class="bg">Last sync:</span>
+        <?php echo $view->timeSpan($meta->last_sync_time); ?>
+    </div>
 </footer>

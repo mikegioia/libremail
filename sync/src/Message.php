@@ -88,11 +88,9 @@ class Message
     {
         if ($server) {
             $server->broadcast(json_encode($message->toArray()));
-
-            return;
+        } else {
+            self::writeJson($message->toArray());
         }
-
-        return self::writeJson($message->toArray());
     }
 
     public static function writeJson($json)
