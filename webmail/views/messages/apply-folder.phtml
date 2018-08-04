@@ -19,9 +19,14 @@
     endforeach; ?>
     </div>
     <div class="actions">
-        <button type="submit" class="icon button button-primary">
+        <button type="submit" name="add_folders" value="1" class="icon button button-primary">
             <i class="fa fa-tag"></i>&nbsp;
-            Apply Labels to Messages
+            <span class="long-text">Apply Labels to Messages</span>
+            <span class="short-text">Apply Labels</span>
+        </button>
+        <button type="submit" name="remove_folders" value="1" class="icon button button-danger u-pull-right">
+            <i class="fa fa-trash"></i>&nbsp;
+            Remove Labels
         </button>
     </div>
 </div><!-- /apply labels selector -->

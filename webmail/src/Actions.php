@@ -164,7 +164,8 @@ class Actions
 
     /**
      * Copy messages to a set of folders. This will ignore any messages
-     * (by message-id) that are already in the folders.
+     * (by message-id) that are already in the folders. If remove folders
+     * was selected, then remove the folders from the selected messages.
      */
     private function copyMessages(array $messageIds, array $copyTo)
     {
@@ -172,11 +173,19 @@ class Actions
             return;
         }
 
-        $copyAction = new CopyAction;
+        // If remove folders was selected, then remove the folders
+        // from the selected messages. Otherwise, add them.
+        if ($this->param('remove_folders') == 1) {
+            $action = new DeleteAction;
+            $param = self::FROM_FOLDER_ID;
+        } else {
+            $action = new CopyAction;
+            $param = self::TO_FOLDER_ID;
+        }
 
         foreach ($copyTo as $name) {
-            $copyAction->run($messageIds, $this->folders, [
-                self::TO_FOLDER_ID => $this->folders->findIdByName($name)
+            $action->run($messageIds, $this->folders, [
+                $param => $this->folders->findIdByName($name)
             ]);
         }
     }
@@ -196,6 +205,14 @@ class Actions
         $this->copyMessages($messageIds, $moveTo);
 
         // Then delete all of the messages
+        $deleteAction = new DeleteAction;
+        $deleteAction->run($messageIds, $this->folders, [
+            self::FROM_FOLDER_ID => $fromFolderId
+        ]);
+    }
+
+    private function deleteMessages(array $messageIds, int $fromFolderId)
+    {
         $deleteAction = new DeleteAction;
         $deleteAction->run($messageIds, $this->folders, [
             self::FROM_FOLDER_ID => $fromFolderId

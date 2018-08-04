@@ -168,9 +168,17 @@ section #msg-actions a.button {
   letter-spacing: normal;
 }
 
+.folder-selector .actions button .fa {
+  transform: translateY(0.0625rem);
+}
+
 .folder-selector .actions .hint {
   display: none;
   margin-left: 1rem;
+}
+
+.folder-selector .short-text {
+  display: none;
 }
 
 .folder-selector input[type="search"]:invalid + .list + .actions {

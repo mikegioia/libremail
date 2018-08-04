@@ -48,6 +48,19 @@ input[type="button"].button-primary:focus {
   border-color: #9238ab;
 }
 
+.button.button-danger {
+  background: #ff524e;
+  border-color: #ff524e;
+  color: #fff;
+}
+
+.button.button-danger:hover,
+.button.button-danger:focus {
+  background-color: #d43633;
+  border-color: #d43633;
+  color: #fff;
+}
+
 .button span.normal {
   font-size: 1.5rem;
   letter-spacing: normal;
