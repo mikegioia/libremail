@@ -32,15 +32,14 @@ class Task extends Model
     /**
      * Create a new task.
      *
-     * @param int $messageId
-     * @param int $accountId
-     * @param string $type
-     * @param string $oldValue
-     * @param int | null $folderId
-     *
      * @return Task
      */
-    public function create($messageId, $accountId, $type, $oldValue, $folderId = null)
+    public function create(
+        int $messageId,
+        int $accountId,
+        string $type,
+        string $oldValue = null,
+        int $folderId = null)
     {
         $data = [
             'type' => $type,

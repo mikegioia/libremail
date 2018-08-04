@@ -31,12 +31,12 @@ class Router
      *
      * @param string $methods Allowed methods, | delimited
      * @param string $pattern A route pattern such as /about/system
-     * @param object|callable $fn The handling function to be executed
+     * @param callable $fn The handling function to be executed
      */
-    public function before($methods, $pattern, $fn)
+    public function before(string $methods, string $pattern, callable $fn)
     {
         $pattern = $this->baseroute.'/'.trim($pattern, '/');
-        $pattern = ($this->baseroute)
+        $pattern = $this->baseroute
             ? rtrim($pattern, '/')
             : $pattern;
 
@@ -51,12 +51,8 @@ class Router
     /**
      * Store a route and a handling function to be executed when accessed using
      * one of the specified methods.
-     *
-     * @param string $methods Allowed methods, | delimited
-     * @param string $pattern A route pattern such as /about/system
-     * @param object|callable $fn The handling function to be executed
      */
-    public function match($methods, $pattern, $fn)
+    public function match(string $methods, string $pattern, callable $fn)
     {
         $pattern = $this->baseroute.'/'.trim($pattern, '/');
         $pattern = $this->baseroute
@@ -73,88 +69,64 @@ class Router
 
     /**
      * Shorthand for a route accessed using any method.
-     *
-     * @param string $pattern A route pattern such as /about/system
-     * @param object|callable $fn The handling function to be executed
      */
-    public function all($pattern, $fn)
+    public function all(string $pattern, callable $fn)
     {
         $this->match('GET|POST|PUT|DELETE|OPTIONS|PATCH|HEAD', $pattern, $fn);
     }
 
     /**
      * Shorthand for a route accessed using GET.
-     *
-     * @param string $pattern A route pattern such as /about/system
-     * @param object|callable $fn The handling function to be executed
      */
-    public function get($pattern, $fn)
+    public function get(string $pattern, callable $fn)
     {
         $this->match('GET', $pattern, $fn);
     }
 
     /**
      * Shorthand for a route accessed using POST.
-     *
-     * @param string $pattern A route pattern such as /about/system
-     * @param object|callable $fn The handling function to be executed
      */
-    public function post($pattern, $fn)
+    public function post(string $pattern, callable $fn)
     {
         $this->match('POST', $pattern, $fn);
     }
 
     /**
      * Shorthand for a route accessed using PATCH.
-     *
-     * @param string $pattern A route pattern such as /about/system
-     * @param object|callable $fn The handling function to be executed
      */
-    public function patch($pattern, $fn)
+    public function patch(string $pattern, callable $fn)
     {
         $this->match('PATCH', $pattern, $fn);
     }
 
     /**
      * Shorthand for a route accessed using DELETE.
-     *
-     * @param string $pattern A route pattern such as /about/system
-     * @param object|callable $fn The handling function to be executed
      */
-    public function delete($pattern, $fn)
+    public function delete(string $pattern, callable $fn)
     {
         $this->match('DELETE', $pattern, $fn);
     }
 
     /**
      * Shorthand for a route accessed using PUT.
-     *
-     * @param string $pattern A route pattern such as /about/system
-     * @param object|callable $fn The handling function to be executed
      */
-    public function put($pattern, $fn)
+    public function put(string $pattern, callable $fn)
     {
         $this->match('PUT', $pattern, $fn);
     }
 
     /**
      * Shorthand for a route accessed using OPTIONS.
-     *
-     * @param string $pattern A route pattern such as /about/system
-     * @param object|callable $fn The handling function to be executed
      */
-    public function options($pattern, $fn)
+    public function options(string $pattern, callable $fn)
     {
         $this->match('OPTIONS', $pattern, $fn);
     }
 
     /**
      * Mounts a collection of callables onto a base route.
-     *
-     * @param string $baseroute Route subpattern to mount the callables on
-     * @param callable $fn The callabled to be called
      */
-    public function mount($baseroute, $fn)
+    public function mount(string $baseroute, callable $fn)
     {
         // Track current baseroute
         $curBaseroute = $this->baseroute;
@@ -241,12 +213,12 @@ class Router
      * Execute the router: Loop all defined before middlewares and routes,
      * and execute the handling function if a match was found.
      *
-     * @param object|callable $callback Function to be executed after a matching
+     * @param callable $callback Function to be executed after a matching
      *  route was handled (= after router middleware)
      *
      * @return bool
      */
-    public function run($callback = null)
+    public function run(callable $callback = null)
     {
         // Define which method we need to handle
         $this->method = $this->getRequestMethod();
@@ -294,20 +266,16 @@ class Router
 
     /**
      * Set the 404 handling function.
-     *
-     * @param object|callable $fn The function to be executed
      */
-    public function set404($fn)
+    public function set404(callable $fn)
     {
         $this->notFound = $fn;
     }
 
     /**
      * Redirects to a new route. This issues an HTTP 303 response.
-     *
-     * @param string $url
      */
-    public function redirect($url)
+    public function redirect(string $url)
     {
         header('Location: '.$url, true, 303);
         exit;
@@ -324,11 +292,10 @@ class Router
      *
      * @return int The number of routes handled
      */
-    private function handle($routes, $quitAfterRun = false)
+    private function handle(array $routes, bool $quitAfterRun = false)
     {
         // Counter to keep track of the number of routes we've handled
         $numHandled = 0;
-
         // The current page URL
         $uri = $this->getCurrentUri();
 
@@ -344,7 +311,6 @@ class Router
             if ($matched) {
                 // Rework matches to only contain the matches, not the orig string
                 $matches = array_slice($matches, 1);
-
                 // Extract the matched URL parameters (and only the parameters)
                 $params = array_map(
                     function ($match, $index) use ($matches) {
@@ -375,7 +341,6 @@ class Router
                 // Call the handling function with the URL parameters
                 call_user_func_array($route['fn'], $params);
 
-                // Yay!
                 ++$numHandled;
 
                 // If we need to quit, then quit

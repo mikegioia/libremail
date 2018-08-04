@@ -10,10 +10,6 @@ abstract class Base
 {
     /**
      * Iterates over the messages and calls subclass method.
-     *
-     * @param array $messageIds
-     * @param Folders $folders
-     * @param array $options
      */
     public function run(array $messageIds, Folders $folders, array $options = [])
     {
@@ -33,18 +29,17 @@ abstract class Base
      */
     abstract public function getType();
 
-    abstract public function update(MessageModel $message, Folders $folders, array $options = []);
+    abstract public function update(
+        MessageModel $message,
+        Folders $folders,
+        array $options = []);
 
     /**
      * Updates the flag for a message. Stores a row in the
      * tasks table, and both operations are wrapped in a SQL
      * transaction.
      *
-     * @param MessageModel $message
-     * @param string $flag
-     * @param bool $state
      * @param array $filters Optional filters to limit siblings
-     * @param array $options
      */
     protected function setFlag(
         MessageModel $message,

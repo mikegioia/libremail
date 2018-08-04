@@ -13,8 +13,12 @@ class MarkUnread extends Base
      *
      * @see Base for params
      */
-    public function update(MessageModel $message, Folders $folders, array $option = [])
+    public function update(MessageModel $message, Folders $folders, array $options = [])
     {
+        $options = array_merge([
+            MessageModel::ALL_SIBLINGS => true
+        ], $options);
+
         $this->setFlag($message, MessageModel::FLAG_SEEN, false, [], $options);
     }
 

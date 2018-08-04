@@ -24,7 +24,7 @@ class Decode
         'iso646-US' => 'ASCII'
     ];
 
-    public static function decode($string, $charset)
+    public static function decode(string $string, string $charset = null)
     {
         // If we have one, try to match it
         if ($charset) {

@@ -16,10 +16,6 @@ class Messages
     const UTF8 = 'utf-8';
     const SNIPPET_LENGTH = 160;
 
-    /**
-     * @param Account $account
-     * @param Folders $folders
-     */
     public function __construct(Account $account, Folders $folders)
     {
         $this->folders = $folders;
@@ -29,11 +25,6 @@ class Messages
     /**
      * Load the threads for a folder. Returns two arrays, a starred
      * (or flagged) collection, and non-starred.
-     *
-     * @param int $folderId
-     * @param int $page
-     * @param int $limit
-     * @param array $options
      *
      * @return [Message array, Message array, object, object]
      */
@@ -85,9 +76,6 @@ class Messages
 
     /**
      * Prepares an HTML-safe snippet to display in the message line.
-     *
-     * @param Message $message
-     * @param Escaper $escaper
      */
     private function setSnippet(Message &$message, Escaper $escaper)
     {
@@ -117,9 +105,6 @@ class Messages
      *
      * @todo Make this smarter, right now it only shows original from but
      *   gmail shows multiple people on the thread.
-     *
-     * @param Message $message
-     * @param Names $messageNames
      */
     private function setNameList(Message &$message, Names $messageNames)
     {
@@ -136,8 +121,6 @@ class Messages
 
     /**
      * Prepares a human-readable date for the message line.
-     *
-     * @param Message $message
      */
     private function setDisplayDate(Message &$message)
     {
@@ -153,8 +136,6 @@ class Messages
 
     /**
      * Prepare the folder labels for the message.
-     *
-     * @param Message $message
      */
     private function setFolders(Message &$message, array $folders)
     {
@@ -181,11 +162,6 @@ class Messages
 
     /**
      * Prepare the counts and paging info for the folders.
-     *
-     * @param stdClass $counts
-     * @param int $page
-     * @param int $limit
-     * @param bool $splitFlagged
      *
      * @return object
      */

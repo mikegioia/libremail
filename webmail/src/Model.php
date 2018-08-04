@@ -14,6 +14,9 @@ class Model
     const ASC = 'asc';
     const DESC = 'desc';
 
+    /**
+     * @param array|Model|null $data
+     */
     public function __construct($data = null)
     {
         if (! $data) {
@@ -27,12 +30,8 @@ class Model
 
     /**
      * Store the connection info statically.
-     *
-     * @param string $dsn
-     * @param string $username
-     * @param string $password
      */
-    public static function initDb($dsn, $username, $password)
+    public static function initDb(string $dsn, string $username, string $password)
     {
         self::$dsn = $dsn;
         self::$username = $username;

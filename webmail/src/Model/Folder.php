@@ -20,12 +20,11 @@ class Folder extends Model
      * Returns a list of folders by an account ID. This is useful for
      * comparing the new folders against the already saved ones.
      *
-     * @param int $accountId
      * @param bool $indexByName Return array indexed by folder name
      *
      * @return FolderModel array
      */
-    public function getByAccount($accountId, $indexByName = true)
+    public function getByAccount(int $accountId, bool $indexByName = true)
     {
         $indexed = [];
         $folders = $this->db()

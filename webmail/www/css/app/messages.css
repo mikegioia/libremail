@@ -191,6 +191,7 @@ input[type="checkbox"].msg-checkbox {
   content: '\f00c';
   font-family: FontAwesome;
   font-size: 1.2rem;
+  font-weight: 900;
   line-height: 1.34rem;
 }
 

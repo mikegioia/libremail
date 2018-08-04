@@ -45,6 +45,11 @@ function getConfig($file) {
     return include BASEDIR.'/config/'.$file.'.php';
 }
 
+// Helper function to get an item from an array
+function get(array $list, string $key, $default = null) {
+    return $list[$key] ?? $default;
+}
+
 // Load environment config
 $config = parse_ini_file(BASEDIR.'/.env');
 // Set the timezone now
@@ -176,7 +181,7 @@ $router->post('/star', function () use ($account) {
     $folders = new Folders($account, []);
     $type = Url::postParam('type', MAILBOX);
     $actions = new Actions($folders, $_POST + $_GET);
-    $actions->handleAction(
+    $actions->runAction(
         'on' === Url::postParam('state', 'on')
             ? Actions::FLAG
             : Actions::UNFLAG,
@@ -241,8 +246,12 @@ catch (ClientException $e) {
     echo '<h1>400 Bad Request</h1>';
     echo '<p>'.$e->getMessage().'</p>';
 }
-// catch (Exception $e) {
-//     header('HTTP/1.1 500 Server Error');
-//     echo '<h1>500 Server Error</h1>';
-//     echo '<p>'. $e->getMessage() .'</p>';
-// }
+catch (Exception $e) {
+    if ($config['APP_DEBUG'] !== true) {
+        header('HTTP/1.1 500 Server Error');
+        echo '<h1>500 Server Error</h1>';
+        echo '<p>'. $e->getMessage() .'</p>';
+    } else {
+        throw $e;
+    }
+}

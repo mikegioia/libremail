@@ -251,17 +251,13 @@ class Message extends Model
     /**
      * Returns a list of messages by folder and account.
      *
-     * @param int $accountId
-     * @param int $folderId
-     * @param int $limit
-     * @param int $offset
-     * @param array $options
-     *
      * @return Message array
      */
     public function getThreadsByFolder(
-        int $accountId, int $folderId,
-        int $limit = 50, int $offset = 0,
+        int $accountId,
+        int $folderId,
+        int $limit = 50,
+        int $offset = 0,
         $options = [])
     {
         $threads = [];
@@ -367,11 +363,6 @@ class Message extends Model
     /**
      * Load the messages for threading.
      *
-     * @param array $threadIds
-     * @param int $accountId
-     * @param int $limit
-     * @param int $offset
-     *
      * @return array Messages
      */
     private function getThreads(array $threadIds, int $accountId, int $limit, int $offset)
@@ -475,10 +466,6 @@ class Message extends Model
 
     /**
      * Store a computed thread count object in the cache.
-     *
-     * @param int $accountId
-     * @param int $folderId
-     * @param object $counts
      */
     private function setThreadCache(int $accountId, int $folderId, stdClass $counts)
     {
@@ -487,9 +474,6 @@ class Message extends Model
 
     /**
      * Checks the cache and returns (if set) the counts object.
-     *
-     * @param int $accountId
-     * @param int $folderId
      *
      * @return bool | object
      */
@@ -506,9 +490,6 @@ class Message extends Model
 
     /**
      * Returns any message with the same message ID and thread ID.
-     *
-     * @param array $filters
-     * @param array $options
      *
      * @return array of Messages
      */
@@ -554,10 +535,6 @@ class Message extends Model
 
     /**
      * Updates a flag on the message.
-     *
-     * @param int $messageId
-     * @param string $flag
-     * @param bool $state
      */
     public function setFlag(string $flag, bool $state)
     {
@@ -574,8 +551,6 @@ class Message extends Model
 
     /**
      * Create a new message in the specified folder.
-     *
-     * @param int $folderId
      *
      * @return Message
      *

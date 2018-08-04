@@ -12,7 +12,7 @@ endforeach; ?>
 $threadCount = count($thread->getThreadIndex());
 foreach ($thread->getThreadIndex() as $i => $item):
     if ($item->type === $thread::INDEX_MESSAGE):
-        $view->render( 'threads/message', [
+        $view->render('threads/message', [
             'view' => $view,
             'open' => $item->open,
             'locked' => $item->current,
@@ -38,7 +38,7 @@ foreach ($thread->getThreadIndex() as $i => $item):
             endif;
         endif;
         foreach ($item->messages as $message):
-            $view->render( 'threads/message', [
+            $view->render('threads/message', [
                 'open' => false,
                 'view' => $view,
                 'locked' => false,

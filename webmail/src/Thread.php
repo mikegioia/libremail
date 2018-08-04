@@ -12,10 +12,12 @@ class Thread
     private $thread;
     private $folders;
     private $messages;
+    private $threadId;
     private $folderIds;
     private $accountId;
     private $messageCount;
     private $unreadIds = [];
+    private $messageIds = [];
     private $threadIndex = [];
     private $threadFolders = [];
     private $threadFolderIds = [];
@@ -27,13 +29,14 @@ class Thread
     const EMAIL_REGEX = '@(http)?(s)?(://)?(([a-zA-Z])([-\w]+\.)+([^\s\.]+[^\s]*)+[^,.\s])@';
 
     /**
-     * @param Account $account
-     * @param Folders $folders
-     * @param int $threadId
      * @param bool $load If true, loads the thread data from SQL. This
      *   will throw an exception if no thread is found.
      */
-    public function __construct(Account $account, Folders $folders, $threadId, $load = true)
+    public function __construct(
+        Account $account,
+        Folders $folders,
+        int $threadId,
+        bool $load = true)
     {
         $this->folders = $folders;
         $this->threadId = $threadId;
@@ -106,7 +109,17 @@ class Thread
         return $this->threadIndex;
     }
 
-    public function isUnread($id)
+    public function getThreadId()
+    {
+        return $this->threadId;
+    }
+
+    public function getMessageIds()
+    {
+        return $this->messageIds;
+    }
+
+    public function isUnread(int $id)
     {
         return in_array($id, $this->unreadIds);
     }
@@ -114,7 +127,7 @@ class Thread
     /**
      * Adds additional fields to each message.
      */
-    private function updateMessages($allMessages)
+    private function updateMessages(array $allMessages)
     {
         $messageIds = [];
         $escaper = new Escaper(self::UTF8);
@@ -122,7 +135,7 @@ class Thread
         foreach ($allMessages as $message) {
             // Remove all duplicate messages (message-id)
             if (in_array($message->message_id, $messageIds)) {
-                $folders[] = $message->folder_id;
+                $this->threadFolderIds[] = $message->folder_id;
                 continue;
             }
 
@@ -148,8 +161,6 @@ class Thread
 
     /**
      * Adds two new properties, from_name and from_email.
-     *
-     * @param Message $message
      */
     private function setFrom(Message &$message)
     {
@@ -160,8 +171,6 @@ class Thread
     /**
      * Prepares a shortened version of the to addresses and
      * names. This is added as a new property, to_names.
-     *
-     * @param Message $message
      */
     private function setTo(Message &$message)
     {
@@ -217,9 +226,6 @@ class Thread
 
     /**
      * Prepares an HTML-safe snippet to display in the message line.
-     *
-     * @param Message $message
-     * @param Escaper $escaper
      */
     private function setSnippet(Message &$message, Escaper $escaper)
     {
@@ -246,8 +252,6 @@ class Thread
     /**
      * Parses the text/plain content into escaped HTML.
      *
-     * @param Message $message
-     *
      * @todo
      */
     private function setContent(Message &$message)
@@ -268,7 +272,8 @@ class Thread
 
     /**
      * Builds an index of which messages to display, and which
-     * to collapse when rendering the thread.
+     * to collapse when rendering the thread. This also builds
+     * the messageIds array.
      */
     private function buildThreadIndex()
     {
@@ -276,7 +281,7 @@ class Thread
         $this->threadIndex = [];
         $count = $this->messageCount;
         // Adds a group of collapsed messages to the index
-        $closeGroup = function (&$group) {
+        $closeGroup = function (array &$group) {
             if (count($group) > 0) {
                 $this->threadIndex[] = (object) [
                     'messages' => $group,
@@ -288,7 +293,7 @@ class Thread
             $group = [];
         };
         // Adds an individual message
-        $addItem = function ($message, $open, $current = false) {
+        $addItem = function (Message $message, bool $open, bool $current = false) {
             $this->threadIndex[] = (object) [
                 'open' => $open,
                 'message' => $message,
@@ -313,16 +318,18 @@ class Thread
             else {
                 $group[] = $message;
             }
+
+            $this->messageIds[] = $message->id;
         }
 
         $closeGroup($group);
+
+        $this->messageIds = array_values(array_unique($this->messageIds));
     }
 
     /**
      * Takes a string like "John D. <john@abc.org>" and returns
      * the name and email broken out.
-     *
-     * @param string $nameString
      *
      * @return [string $name, string $email]
      */

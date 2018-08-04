@@ -11,6 +11,7 @@ namespace App;
 use App\Actions\Copy as CopyAction;
 use App\Actions\Delete as DeleteAction;
 use App\Actions\MarkRead as MarkReadAction;
+use App\Actions\MarkUnread as MarkUnreadAction;
 
 class Actions
 {
@@ -25,6 +26,7 @@ class Actions
     const MARK_READ = 'mark_read';
     const MARK_UNREAD = 'mark_unread';
     const MARK_ALL_READ = 'mark_all_read';
+    const MARK_ALL_UNREAD = 'mark_all_unread';
     // Selections
     const SELECT_ALL = 'all';
     const SELECT_NONE = 'none';
@@ -33,6 +35,7 @@ class Actions
     const SELECT_FLAGGED = 'starred';
     const SELECT_UNFLAGGED = 'unstarred';
     // Options
+    const ALL_MESSAGES = 'all_messages';
     const TO_FOLDER_ID = 'to_folder_id';
     const FROM_FOLDER_ID = 'from_folder_id';
     // Convert these action names
@@ -41,7 +44,8 @@ class Actions
         'Remove star' => 'unflag',
         'Move to Inbox' => 'restore',
         'Mark as unread' => 'mark_unread',
-        'Mark all as read' => 'mark_all_read'
+        'Mark all as read' => 'mark_all_read',
+        'Mark all as unread' => 'mark_all_unread'
     ];
     // Lookup of actions to action classes
     const ACTION_CLASSES = [
@@ -63,16 +67,13 @@ class Actions
     /**
      * Returns a param from the request.
      *
-     * @param string $key
      * @param mixed $default
      *
      * @return mixed
      */
-    public function param($key, $default = null)
+    public function param(string $key, $default = null)
     {
-        return (isset($this->params[$key]))
-            ? $this->params[$key]
-            : $default;
+        return $this->params[$key] ?? $default;
     }
 
     /**
@@ -94,6 +95,11 @@ class Actions
         // Some actions have names that need to be converted
         $action = $this->convertAction($action);
 
+        // Prepare the options
+        $options = [
+            self::ALL_MESSAGES => $this->param('apply_to_all') == 1
+        ];
+
         // If a selection was made, return to the previous page
         // with the key in the query params.
         if ($select) {
@@ -104,7 +110,7 @@ class Actions
 
         try {
             // If an action came in, route it to the child class
-            $this->handleAction($action, $messageIds, $allMessageIds);
+            $this->runAction($action, $messageIds, $allMessageIds, $options);
             // Copy and/or move any messages that were sent in
             $this->copyMessages($messageIds, $copyTo);
             $this->moveMessages($messageIds, $moveTo, $folderId);
@@ -118,32 +124,33 @@ class Actions
         Model::getDb()->commit();
 
         // If we got here, redirect
-        Url::actionRedirect($urlId, $folderId, $page);
+        Url::actionRedirect($urlId, $folderId, $page ?: '');
     }
 
     /**
      * Processes a requested action.
      *
-     * @param string $action
-     * @param array $messageIds
-     * @param array $allMessageIds
-     * @param array $options
-     *
      * @throws Exception
      */
-    public function handleAction(
-        $action,
+    public function runAction(
+        string $action,
         array $messageIds,
         array $allMessageIds,
-        array $options = []
-    ) {
+        array $options = [])
+    {
         if (self::MARK_ALL_READ === $action) {
-            (new MarkReadAction)->run($allMessageIds, $this->folders);
+            return (new MarkReadAction)->run($allMessageIds, $this->folders);
+        }
+        elseif (self::MARK_ALL_UNREAD === $action) {
+            return (new MarkUnreadAction)->run($allMessageIds, $this->folders);
         }
         elseif (array_key_exists($action, self::ACTION_CLASSES)) {
             $class = self::ACTION_CLASSES[$action];
             $actionHandler = new $class;
-            $actionHandler->run($messageIds, $this->folders, $options);
+            $ids = get($options, self::ALL_MESSAGES) === true
+                ? $allMessageIds
+                : $messageIds;
+            $actionHandler->run($ids, $this->folders, $options);
         }
     }
 
@@ -158,9 +165,6 @@ class Actions
     /**
      * Copy messages to a set of folders. This will ignore any messages
      * (by message-id) that are already in the folders.
-     *
-     * @param array $messageIds
-     * @param array $copyTo
      */
     private function copyMessages(array $messageIds, array $copyTo)
     {
@@ -181,12 +185,8 @@ class Actions
      * Move messages to a set of folders. This will ignore any messages
      * (by message-id) that are already in the folders. Moving messages
      * is a copy followed by a delete of the original message.
-     *
-     * @param array $messageIds
-     * @param array $moveTo
-     * @param int $fromFolderId
      */
-    private function moveMessages(array $messageIds, array $moveTo, $fromFolderId)
+    private function moveMessages(array $messageIds, array $moveTo, int $fromFolderId)
     {
         if (! $moveTo) {
             return;

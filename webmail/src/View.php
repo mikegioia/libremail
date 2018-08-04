@@ -22,7 +22,7 @@ class View
     const DATE_SHORT = 'M j';
     const DATE_FULL = 'Y-m-d';
 
-    public static function setTimezone($timezone)
+    public static function setTimezone(string $timezone)
     {
         self::$timezone = $timezone;
     }
@@ -46,13 +46,11 @@ class View
      * Render the requested view via echo. This will clear the data
      * array unless told not to.
      *
-     * @param string $view
-     * @param array $data View data
      * @param bool $return Whether to return the string
      *
      * @throws Exception
      */
-    public function render($view, array $data = [], $return = false)
+    public function render(string $view, array $data = [], bool $return = false)
     {
         $viewPath = VIEWDIR.DIR.$view.VIEWEXT;
 
@@ -67,17 +65,15 @@ class View
 
         if ($return) {
             return ob_get_clean();
-        } else {
-            echo ob_get_clean();
         }
+
+        echo ob_get_clean();
     }
 
     /**
      * Sanitizes and prints a value for a view.
-     *
-     * @param string $value
      */
-    public function clean($value, $return = false)
+    public function clean(string $value, bool $return = false)
     {
         if ($return) {
             return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
@@ -88,11 +84,8 @@ class View
 
     /**
      * Renders a date, formatted for the timezone.
-     *
-     * @param string $dateString
-     * @param string $format
      */
-    public function date($dateString, $format)
+    public function date(string $dateString, string $format)
     {
         echo self::getDate($date, $format);
     }
@@ -100,12 +93,11 @@ class View
     /**
      * Formats a date according to the timezone and format.
      *
-     * @param string $dateString
-     * @param string $format
-     *
      * @return string
      */
-    public static function getDate($dateString, $format)
+    public static function getDate(
+        string $dateString = null,
+        string $format = self::DATE_SHORT)
     {
         $utc = new DateTimeZone(self::UTC);
         $tz = new DateTimeZone(self::$timezone);
@@ -122,13 +114,11 @@ class View
      * Prepares a data URI attribute for an element. Escapes the
      * HTML to comply with a data:TYPE attribute.
      *
-     * @param string $view
-     *
      * @throws Exception
      *
      * @return string
      */
-    public function dataUri($view, array $data = [])
+    public function dataUri(string $view, array $data = [])
     {
         $html = $this->render($view, $data, true);
         $search = ['%', '&', '#', '"', "'"];

@@ -58,9 +58,6 @@ class Folders
         '[Gmail]/Posta inviata'
     ];
 
-    /**
-     * @param Account $account
-     */
     public function __construct(Account $account, array $colors)
     {
         $this->colors = $colors;
@@ -103,7 +100,7 @@ class Folders
         return $this->getMailboxId('starredId');
     }
 
-    private function getMailboxId($mailbox)
+    private function getMailboxId(string $mailbox)
     {
         if (isset($this->{$mailbox})) {
             return $this->{$mailbox};
@@ -160,11 +157,9 @@ class Folders
     /**
      * Returns a folder by ID.
      *
-     * @param int $id
-     *
      * @return Folder | null
      */
-    public function getById($id)
+    public function getById(int $id)
     {
         // Load folders if not set
         $this->get();
@@ -179,11 +174,9 @@ class Folders
     /**
      * Returns a folder ID by full name.
      *
-     * @param string $name
-     *
      * @return int $folderId
      */
-    public function findIdByName($name)
+    public function findIdByName(string $name)
     {
         if ($this->nameLookup) {
             return isset($this->nameLookup[$name])
@@ -205,12 +198,11 @@ class Folders
     /**
      * Returns the count of unread messages for a folder.
      *
-     * @param int $folderId
      * @param bool $returnString If true, returns a formatted string
      *
      * @return int | string
      */
-    public function getUnreadCount($folderId, $returnString = false)
+    public function getUnreadCount(int $folderId, bool $returnString = false)
     {
         if (! is_array($this->folderCounts)) {
             $this->get();
@@ -228,13 +220,9 @@ class Folders
     /**
      * Returns a string of HTML classes for the folders in the nav.
      *
-     * @param int $folderId
-     * @param int $activeId
-     * @param bool $children If the folder has children
-     *
      * @return string
      */
-    public function getNavClassString($folderId, $activeId, $children = false)
+    public function getNavClassString(int $folderId, int $activeId, array $children = null)
     {
         $classes = [];
 
@@ -322,14 +310,9 @@ class Folders
     /**
      * Recursive function to build the folder tree.
      *
-     * @param array $tree
-     * @param array $parts
-     * @param Folder $folder
-     * @param int $depth
-     *
      * @return array
      */
-    private function treeify(&$tree, $parts, $folder, $depth)
+    private function treeify(array &$tree, array $parts, Folder $folder, int $depth)
     {
         $part = array_shift($parts);
 
@@ -358,13 +341,12 @@ class Folders
     /**
      * Stores positional info on the tree folders. This is used for
      * determining the folder color.
-     *
-     * @param array $branch
-     * @param int $index
-     * @param int $offset
-     * @param int $parentOffset
      */
-    private function updateTreePositions($branch, &$index, $offset, $parentOffset)
+    private function updateTreePositions(
+        array $branch,
+        int &$index,
+        int $offset,
+        int $parentOffset)
     {
         if ($branch['folder']->is_mailbox) {
             return;
@@ -392,11 +374,8 @@ class Folders
 
     /**
      * Convert certain folder names for better readability.
-     *
-     * @param Folder $folder
-     * @param string $finalPart
      */
-    private function fixName(&$folder, $finalPart)
+    private function fixName(Folder &$folder, string $finalPart)
     {
         $folder->full_name = $folder->name;
         $folder->name = $finalPart;
@@ -416,10 +395,8 @@ class Folders
     /**
      * Determines if the folder is a mailbox or a regular folder.
      * Adds a property to the folder 'is_mailbox'.
-     *
-     * @param Folder $folder
      */
-    private function setMailboxType(&$folder)
+    private function setMailboxType(Folder &$folder)
     {
         $name = $folder->name;
 
@@ -459,7 +436,7 @@ class Folders
         }
     }
 
-    private function addUnreadCount(&$folder)
+    private function addUnreadCount(Folder &$folder)
     {
         if (isset($this->folderCounts[$folder->id])) {
             $folder->unread_count = $this->folderCounts[$folder->id];
@@ -470,10 +447,8 @@ class Folders
 
     /**
      * Ignores certain folders that shouldn't display.
-     *
-     * @param Folder $folder
      */
-    private function setIgnore(&$folder)
+    private function setIgnore(Folder &$folder)
     {
         if (self::GMAIL === strtolower($folder->name)) {
             $folder->ignored = 1;
@@ -482,11 +457,8 @@ class Folders
 
     /**
      * Adds a default color for the folder.
-     *
-     * @param Folder $folder
-     * @param int $index
      */
-    private function setColor(&$folder)
+    private function setColor(Folder &$folder)
     {
         if (! isset($this->index[$folder->id])) {
             return;

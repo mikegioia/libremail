@@ -6,61 +6,60 @@ class Url
 {
     private static $base;
 
-    public static function setBase($base)
+    public static function setBase(string $base)
     {
         self::$base = $base;
     }
 
-    public static function get($path, $params = [])
+    public static function get(string $path, array $params = [])
     {
         return self::$base.$path
             .($params ? '?'.http_build_query($params) : '');
     }
 
-    public static function make($path, ...$parts)
+    public static function make(string $path, ...$parts)
     {
         return self::$base.vsprintf($path, $parts);
     }
 
-    public static function starred($page)
+    public static function starred(string $page)
     {
         return self::make('/starred/%s', $page);
     }
 
-    public static function folder($folderId, $page = null)
+    public static function folder(int $folderId, string $page = null)
     {
-        return ($page)
+        return $page
             ? self::make('/folder/%s/%s', $folderId, $page)
             : self::make('/folder/%s', $folderId);
     }
 
-    public static function redirect($path, $params = [], $code = 303)
+    public static function redirect(string $path, array $params = [], int $code = 303)
     {
         header('Location: '.self::get($path, $params), $code);
         die();
     }
 
-    public static function redirectRaw($url, $code = 303)
+    public static function redirectRaw(string $url, int $code = 303)
     {
         header('Location: '.$url, $code);
         die();
     }
 
-    public static function postParam($key, $default = null)
+    public static function postParam(string $key, $default = null)
     {
-        return (isset($_POST[$key]))
-            ? $_POST[$key]
-            : $default;
+        return $_POST[$key] ?? $default;
     }
 
-    public static function getParam($key, $default = null)
+    public static function getParam(string $key, $default = null)
     {
-        return (isset($_GET[$key]))
-            ? $_GET[$key]
-            : $default;
+        return $_GET[$key] ?? $default;
     }
 
-    public static function actionRedirect($urlId, $folderId, $page)
+    /**
+     * @param string|null $urlId If set, needs to be a constant
+     */
+    public static function actionRedirect($urlId, int $folderId, string $page)
     {
         if (INBOX === $urlId) {
             self::redirect('/');
@@ -73,12 +72,9 @@ class Url
         self::redirectRaw(self::folder($folderId, $page));
     }
 
-    public static function getRefUrl($default = '/')
+    public static function getRefUrl(string $default = '/')
     {
-        $ref = (isset($_SERVER['HTTP_REFERER']))
-            ? $_SERVER['HTTP_REFERER']
-            : '';
-
+        $ref = $_SERVER['HTTP_REFERER'] ?? '';
         // Only use this if we're on the same domain
         $len = strlen(self::$base);
 

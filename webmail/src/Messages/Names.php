@@ -2,6 +2,8 @@
 
 namespace App\Messages;
 
+use stdClass;
+
 class Names
 {
     const MAX_LEN = 18;
@@ -13,9 +15,6 @@ class Names
      * string. The $names list is an array of all from headers in
      * order on the thread, and the $seens list is the corresponding
      * seen flag for each message.
-     *
-     * @param array $names
-     * @param array $seens
      *
      * @return string
      */
@@ -45,13 +44,13 @@ class Names
         return $this->getMultipleNames($list);
     }
 
-    private function getRow($name, $seen, $index) {
-        $short = trim(current(explode(' ', $name)), ' "');
+    private function getRow(string $name = null, int $seen = null, int $index = 1) {
+        $short = trim(current(explode(' ', $name ?: '')), ' "');
 
         return (object) [
-            'name' => $name,
             'index' => $index,
             'seen' => 1 == $seen,
+            'name' => $name ?: '',
             'short' => current(explode('@', $short))
         ];
     }
@@ -66,7 +65,7 @@ class Names
      * of the messages and build an intelligent array of up
      * to three names.
      */
-    private function buildNamesList(&$list, &$i, $names, $seens)
+    private function buildNamesList(array &$list, int &$i, array $names, array $seens)
     {
         $prevName = null;
         $allRead = array_sum($seens) === count($seens);
@@ -118,7 +117,7 @@ class Names
     /**
      * Performs list compaction and cleanup.
      */
-    private function cleanupNamesList(&$list)
+    private function cleanupNamesList(array &$list)
     {
         // Clean up instances of the same name adjacent to itself
         if ($list[2] && $list[1]->name == $list[2]->name) {
@@ -158,11 +157,9 @@ class Names
     /**
      * Returns a string of more than one names.
      *
-     * @param array $list;
-     *
      * @return string
      */
-    private function getMultipleNames($list)
+    private function getMultipleNames(array $list)
     {
         $names = [
             1 => $list[1]->short,
@@ -220,7 +217,7 @@ class Names
             .$this->getSingleName($trimmed, $list[3]->seen);
     }
 
-    private function getSingleName($name, $seen)
+    private function getSingleName(string $name, int $seen)
     {
         if (! $name) {
             return '';
@@ -233,7 +230,7 @@ class Names
             $seen ? 'span' : 'strong');
     }
 
-    private function getDelimeter($itemA, $itemB)
+    private function getDelimeter(stdClass $itemA, stdClass $itemB)
     {
         if (! $itemA->index || ! $itemB->index) {
             return '';
@@ -246,10 +243,8 @@ class Names
 
     /**
      * Sanitizes and prints a value.
-     *
-     * @param string $value
      */
-    private function clean($value)
+    private function clean(string $value)
     {
         return htmlspecialchars($value, ENT_QUOTES, self::UTF8);
     }

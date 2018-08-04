@@ -22,10 +22,13 @@ h5.thread-title mark {
   border-radius: 0.25rem;
   font-size: 1.125rem;
   font-weight: 400;
-  margin-left: 0.25rem;
   padding: 0.25rem 0.6rem 0.3rem;
   position: relative;
   top: -0.2rem;
+}
+
+h5.thread-title mark:first-of-type {
+  margin-left: 0.25rem;
 }
 
 /* Collapsed messages */

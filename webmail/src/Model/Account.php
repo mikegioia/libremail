@@ -36,7 +36,7 @@ class Account extends Model
             : null;
     }
 
-    public function getByEmail($email)
+    public function getByEmail(string $email)
     {
         $account = $this->db()
             ->select()
