@@ -34,6 +34,11 @@ class Url
             : self::make('/folder/%s', $folderId);
     }
 
+    public static function thread(int $folderId, int $threadId)
+    {
+        return self::make('/thread/%s/%s', $folderId, $threadId);
+    }
+
     public static function redirect(string $path, array $params = [], int $code = 303)
     {
         header('Location: '.self::get($path, $params), $code);
@@ -58,8 +63,9 @@ class Url
 
     /**
      * @param string|null $urlId If set, needs to be a constant
+     * @param int|string $page Additional URL argument
      */
-    public static function actionRedirect($urlId, int $folderId, string $page)
+    public static function actionRedirect($urlId, int $folderId, $page, string $action)
     {
         if (INBOX === $urlId) {
             self::redirect('/');
@@ -69,7 +75,20 @@ class Url
             self::redirectRaw(self::starred($page ?: 1));
         }
 
+        if (THREAD === $urlId) {
+            if ($action !== Actions::MARK_UNREAD) {
+                self::redirectRaw(self::thread($folderId, $page));
+            } else {
+                self::redirectRaw(self::folder($folderId));
+            }
+        }
+
         self::redirectRaw(self::folder($folderId, $page));
+    }
+
+    public static function getCurrentUrl()
+    {
+        return self::$base.($_SERVER['REQUEST_URI'] ?? '/');
     }
 
     public static function getRefUrl(string $default = '/')
@@ -85,5 +104,15 @@ class Url
         $path = htmlspecialchars(substr($ref, $len));
 
         return self::get($path);
+    }
+
+    public static function getBackUrl(string $default = '/')
+    {
+        $refUrl = self::getRefUrl($default);
+        $currentUrl = self::getCurrentUrl();
+
+        return $refUrl === $currentUrl
+            ? self::get($default)
+            : $refUrl;
     }
 }

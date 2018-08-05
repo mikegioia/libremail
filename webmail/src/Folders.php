@@ -111,13 +111,17 @@ class Folders
         return $this->{$mailbox};
     }
 
-    public function get()
+    public function get($withMeta = false)
     {
         if ($this->loaded) {
             return $this->folders;
         }
 
-        $this->loadMetaTree();
+        $this->loadFolders();
+
+        if ($withMeta) {
+            $this->loadMetaTree();
+        }
 
         return $this->folders;
     }
@@ -138,10 +142,10 @@ class Folders
      *
      * @return array
      */
-    public function getList()
+    public function getList(array $selectedIds = [])
     {
         if ($this->listFolders) {
-            return $this->listFolders;
+            return $this->applySelected($this->listFolders, $selectedIds);
         }
 
         $this->listFolders = array_filter(
@@ -151,7 +155,7 @@ class Folders
                     && false === $folder->is_mailbox;
             });
 
-        return $this->listFolders;
+        return $this->applySelected($this->listFolders, $selectedIds);
     }
 
     /**
@@ -178,6 +182,10 @@ class Folders
      */
     public function findIdByName(string $name)
     {
+        if (! $this->loaded) {
+            $this->loadMetaTree();
+        }
+
         if ($this->nameLookup) {
             return isset($this->nameLookup[$name])
                 ? $this->nameLookup[$name]
@@ -204,6 +212,10 @@ class Folders
      */
     public function getUnreadCount(int $folderId, bool $returnString = false)
     {
+        if (! $this->loaded) {
+            $this->loadMetaTree();
+        }
+
         if (! is_array($this->folderCounts)) {
             $this->get();
         }
@@ -474,5 +486,31 @@ class Folders
         $position = $index->pos + $index->offset - 1;
         $color = $this->colors[$position % $this->colorCount];
         $folder->color = (object) $color;
+    }
+
+    /**
+     * Adds the boolean property "selected" based on the IDs
+     * passed in. Sorts the entire by selected items first.
+     */
+    private function applySelected(array $folderList, array $selectedIds)
+    {
+        $folders = [];
+
+        foreach ($folderList as $folder) {
+            $cloned = clone $folder;
+            $cloned->selected = in_array($cloned->id, $selectedIds);
+            $folders[] = $cloned;
+        }
+
+        if (! $selectedIds) {
+            return $folders;
+        }
+
+        // Sory by selected first
+        usort($folders, function ($a, $b) {
+            return $b->selected <=> $a->selected;
+        });
+
+        return $folders;
     }
 }

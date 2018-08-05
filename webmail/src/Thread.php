@@ -99,6 +99,11 @@ class Thread
         return $this->threadFolders;
     }
 
+    public function getFolderIds()
+    {
+        return $this->threadFolderIds;
+    }
+
     public function getMessageCount()
     {
         return $this->messageCount;

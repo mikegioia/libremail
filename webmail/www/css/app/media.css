@@ -68,12 +68,6 @@
   html {
     font-size: 80%;
   }
-  .folder-selector .long-text {
-    display: none;
-  }
-  .folder-selector .short-text {
-    display: inline;
-  }
 }
 
 /* Medium devices (laptops) */

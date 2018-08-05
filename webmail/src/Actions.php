@@ -18,7 +18,10 @@ class Actions
     private $params;
 
     // Actions
+    const COPY = 'copy';
     const FLAG = 'flag';
+    const MOVE = 'move';
+    const UNCOPY = 'uncopy';
     const UNFLAG = 'unflag';
     const DELETE = 'delete';
     const RESTORE = 'restore';
@@ -82,8 +85,8 @@ class Actions
      */
     public function run()
     {
-        $page = $this->param('page');
         $urlId = $this->param('url_id');
+        $page = $this->param('page', '');
         $action = $this->param('action');
         $select = $this->param('select');
         $folderId = $this->param('folder_id');
@@ -112,7 +115,7 @@ class Actions
             // If an action came in, route it to the child class
             $this->runAction($action, $messageIds, $allMessageIds, $options);
             // Copy and/or move any messages that were sent in
-            $this->copyMessages($messageIds, $copyTo);
+            $this->copyMessages($messageIds, $copyTo, $action);
             $this->moveMessages($messageIds, $moveTo, $folderId);
         }
         catch (Exception $e) {
@@ -124,7 +127,7 @@ class Actions
         Model::getDb()->commit();
 
         // If we got here, redirect
-        Url::actionRedirect($urlId, $folderId, $page ?: '');
+        Url::actionRedirect($urlId, $folderId, $page, $action);
     }
 
     /**
@@ -167,7 +170,7 @@ class Actions
      * (by message-id) that are already in the folders. If remove folders
      * was selected, then remove the folders from the selected messages.
      */
-    private function copyMessages(array $messageIds, array $copyTo)
+    private function copyMessages(array $messageIds, array $copyTo, string $action)
     {
         if (! $copyTo) {
             return;
@@ -175,7 +178,7 @@ class Actions
 
         // If remove folders was selected, then remove the folders
         // from the selected messages. Otherwise, add them.
-        if ($this->param('remove_folders') == 1) {
+        if ($action === self::UNCOPY) {
             $action = new DeleteAction;
             $param = self::FROM_FOLDER_ID;
         } else {

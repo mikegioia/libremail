@@ -67,7 +67,7 @@ $view->render('nav', [
 <?php
 $view->render('messages/datalist', [
     'view' => $view,
-    'folders' => $folders->get()
+    'folders' => $folders->get(true)
 ]);
 
 $view->render('footer', [

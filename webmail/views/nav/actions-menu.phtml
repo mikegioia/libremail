@@ -1,8 +1,8 @@
 <!-- Contextual menu for selected messages -->
-<div class="actions menu<?php echo isset( $sticky ) ? ' sticky' : ''; ?>">
+<div class="actions menu<?php echo isset($sticky) ? ' sticky' : ''; ?>">
 <?php
-if ( isset( $threadView ) ): ?>
-    <a href="<?php echo App\Url::getRefUrl(); ?>" class="icon button control" data-tooltip="Back">
+if (isset($threadView)): ?>
+    <a href="<?php echo App\Url::getBackUrl(); ?>" class="icon button control" data-tooltip="Back" tabindex="4">
         <i class="fa fa-arrow-left"></i>
     </a>
 <?php
@@ -41,9 +41,18 @@ endif; ?>
     <button name="action" value="delete" class="icon button control" data-tooltip="Delete">
         <i class="fa fa-trash-alt"></i>
     </button>
+<?php
+if (isset($threadView)): ?>
+    <button name="action" value="mark_unread" class="icon button control" data-tooltip="Mark unread" data-wide>
+        <i class="far fa-envelope"></i>
+    </button>
+<?php
+else: ?>
     <button name="action" value="mark_read" class="icon button control">
         <span class="normal">Mark as read</span>
     </button>
+<?php
+endif; ?>
     <a href="#move-messages" class="icon button control" data-tooltip="Move to">
         <i class="far fa-folder"></i>
         <i class="fa fa-plus"></i>

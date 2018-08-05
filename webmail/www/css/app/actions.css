@@ -49,13 +49,13 @@ section #msg-actions a.button {
 .folder-selector {
   background-color: #fff;
   border-left: 1px solid #bbb;
-  box-shadow: 0px 0px 15px #bbb;
+  box-shadow: 0px 0px 1rem #bbb;
   bottom: 0;
-  right: calc(-44% + -20px);
+  right: calc(-43rem);
   position: fixed;
   top: calc(5rem + 4px);
   transition: right 250ms cubic-bezier(0.165, 0.84, 0.44, 1);
-  width: 44%;
+  width: 42rem;
   z-index: 30;
 }
 

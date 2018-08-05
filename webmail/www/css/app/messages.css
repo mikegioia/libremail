@@ -280,6 +280,11 @@ input[type="checkbox"].msg-checkbox {
   top: -0.1rem;
 }
 
+.msg-contents .subject mark a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .msg-contents .date {
   box-sizing: border-box;
   color: #333;

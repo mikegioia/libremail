@@ -41,3 +41,8 @@
   width: 4.5rem;
   z-index: 27;
 }
+
+[data-tooltip][data-wide]:hover:after {
+  left: calc((100% - 11rem) / 2);
+  width: 8.5rem;
+}

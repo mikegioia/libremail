@@ -13,8 +13,8 @@ $view->render('nav', [
         <div id="msg-actions">
             <?php
             $view->render('nav/actions-menu', [
-                'sticky' => TRUE,
-                'threadView' => TRUE
+                'sticky' => true,
+                'threadView' => true
             ]); ?>
         </div>
 
@@ -40,11 +40,13 @@ $view->render('nav', [
         ]);
         $view->render('messages/apply-folder', [
             'view' => $view,
-            'folders' => $folders->getList()
+            'folders' => $folders->getList($thread->getFolderIds())
         ]); ?>
 
+        <input type="hidden" name="url_id" value="thread" />
         <input type="hidden" name="apply_to_all" value="1" />
         <input type="hidden" name="folder_id" value="<?php echo $folderId; ?>" />
+        <input type="hidden" name="page" value="<?php echo $thread->getThreadId(); ?>" />
         <input type="hidden" name="message[]" value="<?php echo $thread->getThreadId(); ?>" />
     <?php
     foreach ($thread->getMessageIds() as $messageId): ?>
@@ -57,7 +59,7 @@ $view->render('nav', [
 <?php
 $view->render('messages/datalist', [
     'view' => $view,
-    'folders' => $folders->get()
+    'folders' => $folders->get(true)
 ]);
 
 $view->render('footer', [

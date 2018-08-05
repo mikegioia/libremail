@@ -205,10 +205,12 @@ $router->get('/thread/(\d+)/(\d+)', function ($folderId, $threadId) use ($accoun
     $select = Url::getParam('select');
     $folders = new Folders($account, $colors);
     // Load the thread object, this will throw an exception if
-    // the thread is not found
+    // the thread is not found. Do this BEFORE we mark as read
+    // so that we know which message to take the user to.
     $thread = new Thread($account, $folders, $threadId);
     // Mark this thread as read
     (new MarkReadAction)->run([$threadId], $folders);
+    // Re-compute the un-read totals, as this may be changed now
     // Render the message thread
     $view->render('thread', [
         'view' => $view,

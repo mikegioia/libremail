@@ -1,34 +1,34 @@
 <?php
 
-foreach ( $messages as $message ):
+foreach ($messages as $message):
     // URL goes to the first un-read message in the thread
-    $url = App\Url::make( '/thread/%s/%s', $folderId, $message->thread_id );
+    $url = App\Url::make('/thread/%s/%s', $folderId, $message->thread_id);
     // Figure out if the message should be selected
     $selected = $select === App\Actions::SELECT_ALL
-        || ( $select === App\Actions::SELECT_READ && $message->seen == 1 )
-        || ( $select === App\Actions::SELECT_UNREAD && $message->seen != 1 )
-        || ( $select === App\Actions::SELECT_FLAGGED && $message->flagged == 1 )
-        || ( $select === App\Actions::SELECT_UNFLAGGED && $message->flagged != 1 ); ?>
+        || ($select === App\Actions::SELECT_READ && $message->seen == 1)
+        || ($select === App\Actions::SELECT_UNREAD && $message->seen != 1)
+        || ($select === App\Actions::SELECT_FLAGGED && $message->flagged == 1)
+        || ($select === App\Actions::SELECT_UNFLAGGED && $message->flagged != 1); ?>
     <input type="checkbox" name="message[]" value="<?php echo $message->id; ?>"
         id="msg-checkbox-<?php echo $message->id; ?>" class="msg-checkbox"
         <?php echo $selected ? ' checked="checked"' : ''; ?>/>
     <label for="msg-checkbox-<?php echo $message->id; ?>"
         class="msg-label <?php echo $message->seen == 1 ? 'seen' : 'unseen'; ?>"></label>
     <div class="msg-contents <?php echo $message->seen == 1 ? 'seen' : 'unseen'; ?>" id="msg-contents-<?php echo $message->id; ?>">
-        <iframe src="<?php echo App\Url::make( '/star/mailbox/%s/%s.html', $message->id, $message->flagged == 1 ? 'on' : 'off' ); ?>" class="star"></iframe>
+        <iframe src="<?php echo App\Url::make('/star/mailbox/%s/%s.html', $message->id, $message->flagged == 1 ? 'on' : 'off'); ?>" class="star"></iframe>
         <a href="<?php echo $url; ?>" class="names">
             <?php echo $message->names; // cleaned already ?>
         </a>
         <a href="<?php echo $url; ?>" class="subject">
         <?php
         foreach ( $message->folders as $folder ): ?>
-            <mark style="background-color:<?php echo $folder->color->bg; ?>; color:<?php echo $folder->color->fg; ?>"><?php $view->clean( $folder->label ); ?></mark>
+            <mark style="background-color:<?php echo $folder->color->bg; ?>; color:<?php echo $folder->color->fg; ?>"><?php $view->clean($folder->label); ?></mark>
         <?php
         endforeach; ?>
-            <span><?php $view->clean( $message->subject ); ?></span>&nbsp;<?php echo $message->snippet; // cleaned already ?>
+            <span><?php $view->clean($message->subject); ?></span>&nbsp;<?php echo $message->snippet; // cleaned already ?>
         </a>
         <a href="<?php echo $url; ?>" class="date">
-            <?php $view->clean( $message->display_date ); ?>
+            <?php $view->clean($message->display_date); ?>
         </a>
     </div>
     <input type="hidden" name="message_all[]" value="<?php echo $message->id; ?>" />
