@@ -147,7 +147,7 @@ class Threads
         $total = $this->maxId - $minId;
         $messageModel = new MessageModel;
         $this->log->debug(
-            'Threading: storing messages for threading for '.
+            "Threading: storing {$total} messages for threading for ".
             "{$this->account->email}");
         $this->printMemory();
         $this->startProgress(1, $total);
@@ -205,7 +205,7 @@ class Threads
         $total = count($this->messages);
         $noun = Fn\plural('message', $total);
         $this->log->debug(
-            "Threading Pass 1: updating {$total} {$noun} for ".
+            "Threading Pass 2: updating {$total} {$noun} for ".
             "{$this->account->email}");
         $this->printMemory();
 
@@ -314,7 +314,7 @@ class Threads
     private function combineThreads()
     {
         $this->log->debug(
-            'Threading Pass 2: combining threads by subject for '.
+            'Threading Pass 3: combining threads by subject for '.
             "{$this->account->email}");
         $this->printMemory();
 
@@ -366,7 +366,7 @@ class Threads
         $this->log->debug(
             "Threading: saving new thread IDs for {$this->account->email}");
         $this->printMemory();
-        $this->startProgress(3, $total);
+        $this->startProgress(4, $total);
 
         foreach ($this->messages as $message) {
             if (isset($this->groupedThreads[$message->getThreadId()])) {

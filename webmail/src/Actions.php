@@ -21,8 +21,10 @@ class Actions
     const COPY = 'copy';
     const FLAG = 'flag';
     const MOVE = 'move';
+    const SPAM = 'spam';
     const UNCOPY = 'uncopy';
     const UNFLAG = 'unflag';
+    const UNSPAM = 'unspam';
     const DELETE = 'delete';
     const RESTORE = 'restore';
     const ARCHIVE = 'archive';

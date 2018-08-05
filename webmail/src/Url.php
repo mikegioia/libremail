@@ -76,7 +76,10 @@ class Url
         }
 
         if (THREAD === $urlId) {
-            if ($action !== Actions::MARK_UNREAD) {
+            if ($action !== Actions::MARK_UNREAD
+                && $action !== Actions::DELETE
+                && $action !== Actions::SPAM)
+            {
                 self::redirectRaw(self::thread($folderId, $page));
             } else {
                 self::redirectRaw(self::folder($folderId));

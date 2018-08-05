@@ -2,9 +2,9 @@
     <span class="strong subject"><?php $view->clean($thread->getSubject()); ?></span>
 <?php
 foreach ($thread->getFolders() as $folder): ?>
-    <mark style="background-color:<?php echo $folder->color->bg; ?>; color:<?php echo $folder->color->fg; ?>">
-        <a href="<?php echo App\Url::folder($folder->id); ?>"><?php $view->clean($folder->label); ?></a>
-    </mark>
+    <mark style="background-color:<?php echo $folder->color->bg; ?>; color:<?php echo $folder->color->fg; ?>"><!--
+        --><a href="<?php echo App\Url::folder($folder->id); ?>"><?php $view->clean($folder->label); ?></a><!--
+    --></mark>
 <?php
 endforeach; ?>
 </h5>

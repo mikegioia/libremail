@@ -45,8 +45,7 @@ class Rollback
                     ++$count;
                 }
             }
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->cli->whisper(
                 'Problem during rollback, rolling back the rollback :P');
             Model::getDb()->rollBack();
