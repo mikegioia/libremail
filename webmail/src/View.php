@@ -158,8 +158,12 @@ class View
      *
      * @return string
      */
-    function timeSpan(int $timestamp)
+    public function timeSpan(int $timestamp)
     {
+        if (! $timestamp) {
+            return 'Never';
+        }
+
         $diff = time() - $timestamp;
 
         if ($diff < 60) {
@@ -175,6 +179,6 @@ class View
             return date('j F Y H:i', $timestamp);
         }
 
-        return $count.' '.$noun.($count == 1 ? '' : 's').' ago';
+        return $count.' '.$noun.(1 == $count ? '' : 's').' ago';
     }
 }

@@ -102,7 +102,7 @@ class Actions
 
         // Prepare the options
         $options = [
-            self::ALL_MESSAGES => $this->param('apply_to_all') == 1
+            self::ALL_MESSAGES => 1 == $this->param('apply_to_all')
         ];
 
         // If a selection was made, return to the previous page
@@ -128,6 +128,12 @@ class Actions
 
         Model::getDb()->commit();
 
+        // Set an alert message
+        $count = true === $options[self::ALL_MESSAGES]
+            ? count($allMessageIds)
+            : count($messageIds);
+        $this->setResponseMessage($action, $count, $copyTo + $moveTo);
+
         // If we got here, redirect
         Url::actionRedirect($urlId, $folderId, $page, $action);
     }
@@ -152,7 +158,7 @@ class Actions
         elseif (array_key_exists($action, self::ACTION_CLASSES)) {
             $class = self::ACTION_CLASSES[$action];
             $actionHandler = new $class;
-            $ids = get($options, self::ALL_MESSAGES) === true
+            $ids = true === get($options, self::ALL_MESSAGES)
                 ? $allMessageIds
                 : $messageIds;
             $actionHandler->run($ids, $this->folders, $options);
@@ -180,7 +186,7 @@ class Actions
 
         // If remove folders was selected, then remove the folders
         // from the selected messages. Otherwise, add them.
-        if ($action === self::UNCOPY) {
+        if (self::UNCOPY === $action) {
             $action = new DeleteAction;
             $param = self::FROM_FOLDER_ID;
         } else {
@@ -222,5 +228,71 @@ class Actions
         $deleteAction->run($messageIds, $this->folders, [
             self::FROM_FOLDER_ID => $fromFolderId
         ]);
+    }
+
+    /**
+     * Writes a response message to the session for the next
+     * page to render.
+     */
+    private function setResponseMessage(
+        string $action,
+        int $count,
+        array $folders)
+    {
+        $message = null;
+        $folderName = count($folders) > 1
+            ? count($folders) + ' folders'
+            : implode(', ', $folders);
+
+        if (self::MARK_ALL_READ === $action
+            || self::MARK_READ === $action)
+        {
+            $message = 'marked as read';
+        }
+        elseif (self::MARK_ALL_UNREAD === $action
+            || self::MARK_UNREAD === $action)
+        {
+            $message = 'marked as unread';
+        }
+        elseif (self::COPY === $action) {
+            $message = "copied to {$folderName}";
+        }
+        elseif (self::UNCOPY === $action) {
+            $message = "removed from {$folderName}";
+        }
+        elseif (self::MOVE === $action) {
+            $message = "moved to {$folderName}";
+        }
+        elseif (self::FLAG === $action) {
+            $message = 'starred';
+        }
+        elseif (self::UNFLAG === $action) {
+            $message = 'unstarred';
+        }
+        elseif (self::SPAM === $action) {
+            $message = 'flagged as spam';
+        }
+        elseif (self::UNSPAM === $action) {
+            $message = 'un-flagged as spam';
+        }
+        elseif (self::DELETE === $action) {
+            $message = 'deleted';
+        }
+        elseif (self::RESTORE === $action) {
+            $message = 'removed from trash';
+        }
+        elseif (self::ARCHIVE === $action) {
+            $message = 'archived';
+        }
+
+        if (! $message ) {
+            return;
+        }
+
+        $_SESSION['alert'] = sprintf('%s %s.',
+            1 === $count
+                ? 'Conversation'
+                : $count.' conversations',
+            $message);
     }
 }

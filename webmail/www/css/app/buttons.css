@@ -67,3 +67,27 @@ input[type="button"].button-primary:focus {
   position: relative;
   top: -0.2rem;
 }
+
+.button.pill {
+  position: relative;
+}
+
+.button.pill:hover {
+  z-index: 23;
+}
+
+.button.pill-left {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+  margin-right: -1px;
+}
+
+.button.pill-middle {
+  border-radius: 0;
+  margin-right: -1px;
+}
+
+.button.pill-right {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}

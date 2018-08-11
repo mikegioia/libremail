@@ -16,4 +16,4 @@ VALUES
   ('folder_stats', '', NOW()),
   ('active_folder', '', NOW()),
   ('active_account', '', NOW()),
-  ('last_sync_time', '', NOW());
+  ('last_sync_time', 0, NOW());

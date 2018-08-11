@@ -50,6 +50,14 @@ function get(array $list, string $key, $default = null) {
     return $list[$key] ?? $default;
 }
 
+// Retrieve and remove a session value
+function getSession(string $key, $default = null) {
+    $value = $_SESSION[$key] ?? $default;
+    unset($_SESSION[$key]);
+
+    return $value;
+}
+
 // Load environment config
 $config = parse_ini_file(BASEDIR.'/.env');
 // Set the timezone now
@@ -114,6 +122,7 @@ $renderMailbox = function ($id, $page = 1, $limit = 25) use ($account) {
             Message::ONLY_FLAGGED => STARRED === $id
         ]);
 
+    session_start();
     header('Content-Type: text/html');
     header('Cache-Control: private, max-age=0, no-cache, no-store');
 
@@ -133,7 +142,8 @@ $renderMailbox = function ($id, $page = 1, $limit = 25) use ($account) {
         'showPaging' => INBOX !== $id,
         'mainHeading' => INBOX === $id
             ? 'Everything else'
-            : $folder->name
+            : $folder->name,
+        'alertMessage' => getSession('alert')
     ]);
 };
 
@@ -162,6 +172,8 @@ $router->post('/update', function () use ($account) {
     $colors = getConfig('colors');
     $folders = new Folders($account, $colors);
     $actions = new Actions($folders, $_POST + $_GET);
+
+    session_start();
     $actions->run();
 });
 
@@ -169,6 +181,7 @@ $router->post('/update', function () use ($account) {
 $router->get('/star/(\w+)/(\d+)/(\w+).html', function ($type, $id, $state) {
     header('Content-Type: text/html');
     header('Cache-Control: max-age=86400'); // one day
+
     (new View)->render('/star', [
         'id' => $id,
         'type' => $type,
@@ -181,6 +194,7 @@ $router->post('/star', function () use ($account) {
     $folders = new Folders($account, []);
     $type = Url::postParam('type', MAILBOX);
     $actions = new Actions($folders, $_POST + $_GET);
+
     $actions->runAction(
         'on' === Url::postParam('state', 'on')
             ? Actions::FLAG
@@ -190,6 +204,7 @@ $router->post('/star', function () use ($account) {
         ], [], [
             Message::ALL_SIBLINGS => MAILBOX === $type
         ]);
+
     (new View)->render('/star', [
         'id' => Url::postParam('id', 0),
         'type' => Url::postParam('type'),
@@ -208,16 +223,20 @@ $router->get('/thread/(\d+)/(\d+)', function ($folderId, $threadId) use ($accoun
     // the thread is not found. Do this BEFORE we mark as read
     // so that we know which message to take the user to.
     $thread = new Thread($account, $folders, $threadId);
+
     // Mark this thread as read
     (new MarkReadAction)->run([$threadId], $folders);
+
     // Re-compute the un-read totals, as this may be changed now
     // Render the message thread
+    session_start();
     $view->render('thread', [
         'view' => $view,
         'thread' => $thread,
         'folders' => $folders,
         'folderId' => $folderId,
         'meta' => Meta::getAll(),
+        'alertMessage' => getSession('alert'),
         'totals' => (new Message)->getSizeCounts($account->id)
     ]);
 });
@@ -249,10 +268,10 @@ catch (ClientException $e) {
     echo '<p>'.$e->getMessage().'</p>';
 }
 catch (Exception $e) {
-    if ($config['APP_DEBUG'] !== true) {
+    if (true !== $config['APP_DEBUG']) {
         header('HTTP/1.1 500 Server Error');
         echo '<h1>500 Server Error</h1>';
-        echo '<p>'. $e->getMessage() .'</p>';
+        echo '<p>'.$e->getMessage().'</p>';
     } else {
         throw $e;
     }

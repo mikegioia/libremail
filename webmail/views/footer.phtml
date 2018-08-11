@@ -41,5 +41,19 @@
             </ul>
         </div>
     </div>
+<?php
+if (isset($alertMessage) && $alertMessage): ?>
+    <div class="notifications">
+        <input type="checkbox" id="notif-1" />
+        <div class="notif" for="notif-1">
+            <span class="message"><?php echo $alertMessage; ?></span>
+            <label for="notif-1">
+                <i class="fa fa-times"></i>
+            </label>
+            <!--<a href="#">Undo</a>-->
+        </div>
+    </div>
+<?php
+endif; ?>
 </body>
 </html>

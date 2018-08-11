@@ -1,5 +1,6 @@
 <!-- Contextual menu for selected messages -->
 <div class="actions menu<?php echo isset($sticky) ? ' sticky' : ''; ?>">
+    <div class="inline-blocked">
 <?php
 if (isset($threadView)): ?>
     <a href="<?php echo App\Url::getBackUrl(); ?>" class="icon button control" data-tooltip="Back" tabindex="4">
@@ -35,36 +36,37 @@ else: ?>
     </div>
 <?php
 endif; ?>
-    <button name="action" value="archive" class="icon button control" data-tooltip="Archive">
+    </div><!--
+    --><button name="action" value="archive" class="icon button control pill pill-left" data-tooltip="Archive">
         <i class="fa fa-archive"></i>
-    </button>
-    <button name="action" value="spam" class="icon button control" data-tooltip="Mark as spam" data-wide>
+    </button><!--
+    --><button name="action" value="spam" class="icon button control pill pill-middle" data-tooltip="Mark as spam" data-wide>
         <i class="fa fa-exclamation-triangle"></i>
-    </button>
-    <button name="action" value="delete" class="icon button control" data-tooltip="Delete">
+    </button><!--
+    --><button name="action" value="delete" class="icon button control pill <?php echo isset($threadView) ? 'pill-middle' : 'pill-right'; ?>" data-tooltip="Delete">
         <i class="fa fa-trash-alt"></i>
-    </button>
+    </button><!--
 <?php
 if (isset($threadView)): ?>
-    <button name="action" value="mark_unread" class="icon button control" data-tooltip="Mark unread" data-wide>
+    --><button name="action" value="mark_unread" class="icon button control pill pill-right" data-tooltip="Mark unread" data-wide>
         <i class="far fa-envelope"></i>
-    </button>
+    </button><!--
 <?php
 else: ?>
-    <button name="action" value="mark_read" class="icon button control">
+    --><button name="action" value="mark_read" class="icon button control">
         <span class="normal">Mark as read</span>
-    </button>
+    </button><!--
 <?php
 endif; ?>
-    <a href="#move-messages" class="icon button control" data-tooltip="Move to">
+    --><a href="#move-messages" class="icon button control pill pill-left" data-tooltip="Move to">
         <i class="far fa-folder"></i>
         <i class="fa fa-plus"></i>
-    </a>
-    <a href="#apply-labels" class="icon button control" data-tooltip="Labels">
+    </a><!--
+    --><a href="#apply-labels" class="icon button control pill pill-right" data-tooltip="Labels">
         <i class="fa fa-tag"></i>
         <i class="fa fa-plus"></i>
-    </a>
-    <div class="dropdown inline-blocked control">
+    </a><!--
+    --><div class="dropdown inline-blocked control">
         <a href="#" class="icon button">
             <span class="normal">More</span>
             <i class="fa fa-caret-down"></i>

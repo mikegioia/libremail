@@ -1,0 +1,63 @@
+/**
+ * Notifications
+ * This is the gray box at the bottom left of the screen after
+ * an action is performed in the app
+ *
+ * z-index range: 31-35
+*/
+.notifications input[type="checkbox"] {
+  display: none;
+}
+
+.notifications .notif {
+  animation: slideUpDown 8s 0s ease forwards;
+  background-color: #333;
+  border-radius: 0.375rem;
+  bottom: 2rem;
+  box-shadow: 0 0.25rem 0.5rem #ccc;
+  color: white;
+  font-family: sans-serif;
+  font-size: 1.625rem;
+  left: 2rem;
+  line-height: 1;
+  padding: 1.5rem 4.75rem 1.5rem 1.5rem;
+  position: fixed;
+  transform: translateY(7rem);
+  z-index: 31;
+}
+
+.notifications .notif span {
+  position: relative;
+  transform: translateY(0.125rem);
+}
+
+.notifications .notif a {
+  color: white;
+  float: right;
+  margin-left: 1rem;
+  transform: translateY(0.125rem);
+}
+
+.notifications .notif label {
+  color: white;
+  cursor: pointer;
+  font-size: 2rem;
+  position: absolute;
+  right: 1.5rem;
+  top: 1.25rem;
+}
+
+.notifications input[type="checkbox"]:checked+.notif {
+  display: none;
+}
+
+@keyframes slideUpDown {
+  0%,
+  100% {
+    transform: translateY(7rem);
+  }
+  5%,
+  95% {
+    transform: translateY(0);
+  }
+}
