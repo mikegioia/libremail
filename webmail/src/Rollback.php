@@ -2,8 +2,6 @@
 
 namespace App;
 
-use App\Model;
-use PDOException;
 use App\Model\Task as TaskModel;
 use App\Exceptions\ServerException;
 use App\Model\Message as MessageModel;
