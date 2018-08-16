@@ -27,15 +27,31 @@
 }
 
 .notifications .notif span {
-  position: relative;
-  transform: translateY(0.125rem);
+  display: inline-block;
+  transform: translateY(0.0625rem);
 }
 
-.notifications .notif a {
-  color: white;
+.notifications .notif a,
+.notifications .notif form {
   float: right;
-  margin-left: 1rem;
-  transform: translateY(0.125rem);
+}
+
+.notifications .notif form {
+  margin: 0;
+}
+
+.notifications .notif a,
+.notifications .notif input[type="submit"] {
+  background: none;
+  border: none;
+  color: white;
+  font-size: inherit;
+  font-weight: normal;
+  height: 1.75rem;
+  line-height: 1.75rem;
+  margin: 0 0 0 1.75rem;
+  padding: 0;
+  text-decoration: underline;
 }
 
 .notifications .notif label {
@@ -44,7 +60,7 @@
   font-size: 2rem;
   position: absolute;
   right: 1.5rem;
-  top: 1.25rem;
+  top: 1.33rem;
 }
 
 .notifications input[type="checkbox"]:checked+.notif {

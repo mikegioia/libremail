@@ -51,6 +51,11 @@ class Url
         die();
     }
 
+    public static function redirectBack(int $code = 303)
+    {
+        return self::redirectRaw(self::getBackUrl(), $code);
+    }
+
     public static function postParam(string $key, $default = null)
     {
         return $_POST[$key] ?? $default;

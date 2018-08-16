@@ -1,17 +1,12 @@
 <?php
 
-use App\Url;
-use App\View;
-use App\Model;
-use App\Router;
-use App\Thread;
-use App\Folders;
-use App\Actions;
-use App\Messages;
+namespace App;
+
 use App\Model\Meta;
 use App\Model\Account;
 use App\Model\Message;
 use App\Exceptions\ClientException;
+use App\Exceptions\ServerException;
 use App\Exceptions\NotFoundException;
 use App\Actions\MarkRead as MarkReadAction;
 
@@ -36,6 +31,7 @@ define('VIEWEXT', '.phtml');
 define('STARRED', 'starred');
 define('MAILBOX', 'mailbox');
 define('BASEDIR', __DIR__.'/..');
+define('ERR_TASK_ROLLBACK', 1010);
 define('DIR', DIRECTORY_SEPARATOR);
 define('VIEWDIR', BASEDIR.'/views');
 define('DATE_DATABASE', 'Y-m-d h:i:s');
@@ -48,14 +44,6 @@ function getConfig($file) {
 // Helper function to get an item from an array
 function get(array $list, string $key, $default = null) {
     return $list[$key] ?? $default;
-}
-
-// Retrieve and remove a session value
-function getSession(string $key, $default = null) {
-    $value = $_SESSION[$key] ?? $default;
-    unset($_SESSION[$key]);
-
-    return $value;
 }
 
 // Load environment config
@@ -143,7 +131,7 @@ $renderMailbox = function ($id, $page = 1, $limit = 25) use ($account) {
         'mainHeading' => INBOX === $id
             ? 'Everything else'
             : $folder->name,
-        'alertMessage' => getSession('alert')
+        'alert' => Session::get('alert')
     ]);
 };
 
@@ -175,6 +163,12 @@ $router->post('/update', function () use ($account) {
 
     session_start();
     $actions->run();
+});
+
+// Undo an action or collection of actions
+$router->post('/undo/(\d+)', function ($batchId) {
+    session_start();
+    (new Rollback)->run($batchId);
 });
 
 // Get the star HTML for a message
@@ -236,7 +230,7 @@ $router->get('/thread/(\d+)/(\d+)', function ($folderId, $threadId) use ($accoun
         'folders' => $folders,
         'folderId' => $folderId,
         'meta' => Meta::getAll(),
-        'alertMessage' => getSession('alert'),
+        'alert' => Session::get('alert'),
         'totals' => (new Message)->getSizeCounts($account->id)
     ]);
 });
@@ -267,11 +261,16 @@ catch (ClientException $e) {
     echo '<h1>400 Bad Request</h1>';
     echo '<p>'.$e->getMessage().'</p>';
 }
+catch (ServerException $e) {
+    header('HTTP/1.1 500 Server Error');
+    echo '<h1>500 Server Error</h1>';
+    echo '<p>'.$e->getMessage().' [#'.$e->getCode().']</p>';
+}
 catch (Exception $e) {
     if (true !== $config['APP_DEBUG']) {
         header('HTTP/1.1 500 Server Error');
         echo '<h1>500 Server Error</h1>';
-        echo '<p>'.$e->getMessage().'</p>';
+        echo '<p>'.$e->getMessage().' [#'.$e->getCode().']</p>';
     } else {
         throw $e;
     }

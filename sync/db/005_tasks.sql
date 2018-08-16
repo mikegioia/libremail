@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS `tasks` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `batch_id` int(10) unsigned NOT NULL,
   `account_id` int(10) unsigned NOT NULL,
   `message_id` int(10) unsigned NOT NULL,
   `type` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -9,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   INDEX (`status`),
+  INDEX (`batch_id`),
   INDEX (`account_id`),
   INDEX (`message_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

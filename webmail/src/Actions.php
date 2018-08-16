@@ -8,6 +8,7 @@
 
 namespace App;
 
+use App\Model\Task as TaskModel;
 use App\Actions\Copy as CopyAction;
 use App\Actions\Delete as DeleteAction;
 use App\Actions\MarkRead as MarkReadAction;
@@ -285,14 +286,15 @@ class Actions
             $message = 'archived';
         }
 
-        if (! $message ) {
+        if (! $message) {
             return;
         }
 
-        $_SESSION['alert'] = sprintf('%s %s.',
+        $message = sprintf("%s $message.",
             1 === $count
                 ? 'Conversation'
-                : $count.' conversations',
-            $message);
+                : $count.' conversations');
+
+        Session::notify($message, TaskModel::getBatchId());
     }
 }

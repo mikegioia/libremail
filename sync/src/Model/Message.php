@@ -637,14 +637,10 @@ class Message extends Model
     /**
      * Saves a flag value for a message by ID.
      *
-     * @param int $id
-     * @param string $flag
-     * @param string $value
-     *
      * @throws ValidationException
      * @throws DatabaseUpdateException
      */
-    public function setFlag($id, $flag, $value)
+    public function setFlag(int $id, string $flag, string $value)
     {
         $this->requireInt($id, 'Message ID');
         $this->requireValue($flag, [

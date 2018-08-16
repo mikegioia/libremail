@@ -536,14 +536,14 @@ class Message extends Model
     /**
      * Updates a flag on the message.
      */
-    public function setFlag(string $flag, bool $state)
+    public function setFlag(string $flag, bool $state, int $id = null)
     {
         $updated = $this->db()
             ->update([
                 $flag => $state ? 1 : 0
             ])
             ->table('messages')
-            ->where('id', '=', $this->id)
+            ->where('id', '=', $id ?? $this->id)
             ->execute();
 
         return is_numeric($updated) ? $updated : false;
@@ -595,5 +595,34 @@ class Message extends Model
         $data['id'] = $newMessageId;
 
         return new static($data);
+    }
+
+    /**
+     * Removes any message from the specified folder that is missing
+     * a message_no and unique_id. These messages were copied by the
+     * client and not synced yet.
+     *
+     * @throws ValidationException
+     */
+    public function deleteCopiedMessages(int $messageId, int $folderId)
+    {
+        $message = $this->getById($messageId);
+
+        if (! $message) {
+            throw new ValidationException(
+                'No message found when deleting copies');
+        }
+
+        $deleted = $this->db()
+            ->delete()
+            ->from('messages')
+            ->whereNull('unique_id')
+            ->where('folder_id', '=', $folderId)
+            ->where('thread_id', '=', $message->thread_id)
+            ->where('message_id', '=', $message->message_id)
+            ->where('account_id', '=', $message->account_id)
+            ->execute();
+
+        return is_numeric($deleted);
     }
 }

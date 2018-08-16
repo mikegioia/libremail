@@ -1,24 +1,24 @@
 <input type="checkbox" id="<?php echo $id; ?>-checkbox" class="mailbox-checkbox" />
 <h5>
 <?php
-if ( ! $showPaging ): ?>
+if (! $showPaging): ?>
     <label for="<?php echo $id; ?>-checkbox">
         <i class="fa fa-caret-down arrow"></i>
         <i class="fa fa-caret-right arrow"></i>
     </label>
-    <span><?php $view->clean( $heading ); ?></span>
+    <span><?php $view->clean($heading); ?></span>
 <?php
 else: ?>
-    <?php $view->clean( $heading ); ?><?php if ( $urlId === STARRED ): ?>&nbsp;&mdash;&nbsp;Starred<?php endif; ?>
+    <?php $view->clean($heading); ?><?php if ($urlId === STARRED): ?>&nbsp;&mdash;&nbsp;Starred<?php endif; ?>
 <?php
 endif;
-if ( $showPaging ): ?>
+if ($showPaging): ?>
     <span class="paging-counts">
     <?php
-    if ( $counts->prevPage ):
-        $url = ( $urlId === STARRED )
-            ? App\Url::make( '/starred/%s', $counts->prevPage )
-            : App\Url::make( '/folder/%s/%s', $folderId, $counts->prevPage ); ?>
+    if ($counts->prevPage):
+        $url = $urlId === STARRED
+            ? App\Url::make('/starred/%s', $counts->prevPage)
+            : App\Url::make('/folder/%s/%s', $folderId, $counts->prevPage); ?>
         <a class="page prev" href="<?php echo $url; ?>"><i class="fa fa-chevron-left"></i>&nbsp;Prev</a>
     <?php
     endif;
@@ -31,7 +31,7 @@ if ( $showPaging ): ?>
     <?php
     endif;
     if ( $counts->nextPage ):
-        $url = ( $urlId === STARRED )
+        $url = $urlId === STARRED
             ? App\Url::make( '/starred/%s', $counts->nextPage )
             : App\Url::make( '/folder/%s/%s', $folderId, $counts->nextPage ); ?>
         <a class="page next" href="<?php echo $url; ?>">Next&nbsp;<i class="fa fa-chevron-right"></i></a>
@@ -39,10 +39,10 @@ if ( $showPaging ): ?>
     endif; ?>
     </span>
 <?php
-elseif ( $counts->total ):
-    $url = ( $urlId === STARRED )
-        ? App\Url::make( '/starred/%s', $counts->page )
-        : App\Url::make( '/folder/%s/%s', $folderId, $counts->page ); ?>
+elseif ($counts->total):
+    $url = $urlId === STARRED
+        ? App\Url::make('/starred/%s', $counts->page)
+        : App\Url::make('/folder/%s/%s', $folderId, $counts->page); ?>
     <a class="paging-counts" href="<?php echo $url; ?>">
         <strong><?php echo $counts->start; ?></strong>
         <var>&ndash;</var>
@@ -55,15 +55,15 @@ endif; ?>
 </h5>
 <div id="<?php echo $id; ?>" class="mailbox">
 <?php
-if ( $messages ):
-    $view->render( 'messages/messages', [
+if ($messages):
+    $view->render('messages/messages', [
         'view' => $view,
         'select' => $select,
         'folderId' => $folderId,
         'messages' => $messages
     ]);
-    $view->render( 'nav/actions-menu' );
+    $view->render('nav/actions-menu');
 else:
-    $view->render( 'messages/no-messages' );
+    $view->render('messages/no-messages');
 endif; ?>
 </div>

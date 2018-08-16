@@ -42,15 +42,21 @@
         </div>
     </div>
 <?php
-if (isset($alertMessage) && $alertMessage): ?>
+if (isset($alert) && $alert): ?>
     <div class="notifications">
         <input type="checkbox" id="notif-1" />
         <div class="notif" for="notif-1">
-            <span class="message"><?php echo $alertMessage; ?></span>
+            <span class="message"><?php echo $alert['message']; ?></span>
             <label for="notif-1">
                 <i class="fa fa-times"></i>
             </label>
-            <!--<a href="#">Undo</a>-->
+        <?php
+        if ($alert['batch_id']): ?>
+            <form method="post" action="<?php echo App\Url::make('/undo/%s', $alert['batch_id']); ?>">
+                <input type="submit" value="Undo" />
+            </form>
+        <?php
+        endif; ?>
         </div>
     </div>
 <?php

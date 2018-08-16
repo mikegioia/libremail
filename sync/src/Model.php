@@ -20,12 +20,12 @@ class Model
     const DESC = 'desc';
 
     /**
-     * @var bool mode for returning new DB instance
+     * @var bool Mode for returning new DB instance
      */
     protected static $factoryMode = false;
 
     /**
-     * @var Database local reference if in factory mode
+     * @var Database Local reference if in factory mode
      */
     protected static $localDb;
 

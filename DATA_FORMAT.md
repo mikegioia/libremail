@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `folders` (
 - `ignored` Boolean flag denoting if the folder should be ignored from sycning
    locally. Any folder with this flag set to 1 should not have its messages
    downloaded.
-- `created_at` Timestamp denoting when the account was added to the database.
+- `created_at` Timestamp denoting when the folder was added to the database.
 
 ## Messages
 
@@ -191,3 +191,52 @@ CREATE TABLE IF NOT EXISTS `messages` (
 - `date_rcv` Date-time fields represending the processed `recv_str` from the
    message.
 - `created_at` Timestamp denoting when the message was added to the database.
+
+## Tasks
+
+```SQL
+CREATE TABLE IF NOT EXISTS `tasks` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `batch_id` int(10) unsigned NOT NULL,
+  `account_id` int(10) unsigned NOT NULL,
+  `message_id` int(10) unsigned NOT NULL,
+  `type` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` tinyint(1) unsigned NOT NULL,
+  `old_value` tinyint(1) unsigned DEFAULT NULL,
+  `folder_id` int(10) unsigned DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX (`status`),
+  INDEX (`batch_id`),
+  INDEX (`account_id`),
+  INDEX (`message_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+- `id` Unique integer identifying the task.
+- `batch_id` Foreign key referencing the batch of tasks it's a part of.
+- `account_id` Foreign key referencing the account from the `accounts` table.
+- `message_id` Foreign key referencing the message this task affects.
+- `type` String denoting the type of task it is.
+- `status` The current state of the task. 0 new, 1 done, 2 error, 3 reverted.
+- `old_value` The previous value before the task is performed. Used for rolling
+   back any changes.
+- `folder_id` Optional reference to a folder if the task applies to one.
+- `created_at` Timestamp denoting when the task was added to the database.
+
+## Batches
+
+```SQL
+CREATE TABLE IF NOT EXISTS `batches` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+```
+
+- `id` Unique integer identifying the batch of one or more tasks. This is
+  used for rolling back or undoing the most recent action. If that action
+  contains more than one background task, the batch ID is used to reference
+  all of those background tasks.
+- `created_at` Timestamp denoting when the batch was added to the database.
