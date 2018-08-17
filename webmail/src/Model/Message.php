@@ -572,7 +572,12 @@ class Message extends Model
         }
 
         $query = $this->db()
-            ->select()
+            ->select([
+                'id', 'account_id', 'folder_id', 'subject',
+                'message_id', 'thread_id', 'seen', 'draft',
+                'recent', 'flagged', 'deleted', 'answered',
+                'synced', 'date'
+            ])
             ->from('messages')
             ->where('deleted', '=', 0)
             ->where('thread_id', '=', $this->thread_id)
@@ -633,6 +638,7 @@ class Message extends Model
 
         $data = $this->getData();
         unset($data['id']);
+        $data['synced'] = 0;
         $data['unique_id'] = null;
         $data['message_no'] = null;
         $data['folder_id'] = $folderId;

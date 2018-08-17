@@ -28,4 +28,13 @@ class Session
             'batch_id' => $batchId
         ];
     }
+
+    public static function getToken()
+    {
+        if (! isset($_SESSION['token'])) {
+            $_SESSION['token'] = bin2hex(random_bytes(32));
+        }
+
+        return $_SESSION['token'];
+    }
 }

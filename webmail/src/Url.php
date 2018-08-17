@@ -22,6 +22,12 @@ class Url
         return self::$base.vsprintf($path, $parts);
     }
 
+    public static function makeToken(string $path, ...$parts)
+    {
+        return self::$base.vsprintf($path, $parts)
+            .'?token='.Session::getToken();
+    }
+
     public static function starred(string $page)
     {
         return self::make('/starred/%s', $page);
@@ -83,6 +89,7 @@ class Url
         if (THREAD === $urlId) {
             if (Actions::MARK_UNREAD !== $action
                 && Actions::DELETE !== $action
+                && Actions::TRASH !== $action
                 && Actions::SPAM !== $action)
             {
                 self::redirectRaw(self::thread($folderId, $page));

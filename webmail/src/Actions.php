@@ -10,6 +10,7 @@ namespace App;
 
 use App\Model\Task as TaskModel;
 use App\Actions\Copy as CopyAction;
+use App\Actions\Flag as FlagAction;
 use App\Actions\Delete as DeleteAction;
 use App\Actions\MarkRead as MarkReadAction;
 use App\Actions\MarkUnread as MarkUnreadAction;
@@ -23,6 +24,7 @@ class Actions
     const FLAG = 'flag';
     const MOVE = 'move';
     const SPAM = 'spam';
+    const TRASH = 'trash';
     const UNCOPY = 'uncopy';
     const UNFLAG = 'unflag';
     const UNSPAM = 'unspam';
@@ -65,7 +67,6 @@ class Actions
         'unspam' => 'App\Actions\Unspam',
         'restore' => 'App\Actions\Restore',
         'archive' => 'App\Actions\Archive',
-        'untrash' => 'App\Actions\Untrash',
         'mark_read' => 'App\Actions\MarkRead',
         'mark_unread' => 'App\Actions\MarkUnread'
     ];
@@ -162,6 +163,12 @@ class Actions
         elseif (self::MARK_ALL_UNREAD === $action) {
             return (new MarkUnreadAction)->run($allMessageIds, $this->folders);
         }
+        elseif (self::FLAG === $action) {
+            return (new FlagAction)->run(
+                [end($allMessageIds)],
+                $this->folders,
+                $options);
+        }
         elseif (array_key_exists($action, self::ACTION_CLASSES)) {
             $class = self::ACTION_CLASSES[$action];
             $actionHandler = new $class;
@@ -189,16 +196,14 @@ class Actions
     {
         if (! $copyTo) {
             return;
-        }
-
-        // If remove folders was selected, then remove the folders
-        // from the selected messages. Otherwise, add them.
-        if (self::UNCOPY === $action) {
+        } else if (self::UNCOPY === $action) {
             $action = new DeleteAction;
             $param = self::FROM_FOLDER_ID;
-        } else {
+        } else if (self::COPY === $action) {
             $action = new CopyAction;
             $param = self::TO_FOLDER_ID;
+        } else {
+            return;
         }
 
         foreach ($copyTo as $nameOrId) {

@@ -7,6 +7,7 @@ use App\Model\Account;
 use App\Model\Message;
 use App\Exceptions\ClientException;
 use App\Esception\NotFoundException;
+use App\Actions\MarkRead as MarkReadAction;
 
 class Controller
 {

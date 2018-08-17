@@ -15,6 +15,8 @@ require __DIR__.'/../vendor/autoload.php';
 // Turn on error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+// Sessions last ~24 hours
+ini_set('session.gc_maxlifetime', 86400);
 // Tell PHP that we'll be outputting UTF-8 to the browser
 mb_http_output('UTF-8');
 // Tell PHP that we're using UTF-8 strings until the end
@@ -35,7 +37,8 @@ define('VIEWDIR', BASEDIR.'/views');
 define('DATE_DATABASE', 'Y-m-d h:i:s');
 // Error constants
 define('ERR_NO_TRASH_FOLDER', 1010);
-define('ERR_NO_SPAM_FOLDER', 1011);
+define('ERR_NO_STARRED_FOLDER', 1011);
+define('ERR_NO_SPAM_FOLDER', 1012);
 define('ERR_TASK_ROLLBACK', 1020);
 
 // Helper to load config files

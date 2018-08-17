@@ -37,7 +37,7 @@
 }
 
 .dropdown ul.right-menu {
-  border-radius: 4px 0 4px 4px;
+  border-radius: 0.25rem 0 0.25rem 0.25rem;
   right: 0;
 }
 
@@ -67,10 +67,11 @@
 .dropdown li {
   margin: 0;
   padding: 0;
+  position: relative;
 }
 
 .dropdown li a,
-.dropdown li input[type="submit"] {
+.dropdown li [type="submit"] {
   background: #fff;
   border: none;
   border-radius: 0;
@@ -83,7 +84,7 @@
   text-decoration: none;
 }
 
-.dropdown li input[type="submit"] {
+.dropdown li [type="submit"] {
   font-weight: normal;
   height: 2.5rem;
   letter-spacing: normal;
@@ -92,7 +93,7 @@
 }
 
 .dropdown li a:hover,
-.dropdown li input[type="submit"]:hover {
+.dropdown li [type="submit"]:hover {
   background-color: #eee;
 }
 
@@ -108,10 +109,15 @@
 .dropdown li .left-icon {
   color: #444;
   display: inline-block;
-  float: left;
+  left: 0.125rem;
   line-height: 3.25rem;
-  position: relative;
+  position: absolute;
   text-align: center;
   top: 0.125rem;
   width: 3.5rem;
+}
+
+.dropdown li .left-icon + a,
+.dropdown li .left-icon + [type="submit"] {
+  padding-left: 3.5rem;
 }

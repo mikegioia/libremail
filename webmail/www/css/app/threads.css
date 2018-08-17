@@ -257,10 +257,14 @@ input[type="checkbox"].thread-msg-more-checkbox {
   border-top-left-radius: 0;
 }
 
-.thread-msg .actions .button-group .dropdown ul a {
+.thread-msg .actions .button-group .dropdown ul a,
+.thread-msg .actions .button-group .dropdown ul [type="submit"] {
   font-weight: 400;
-  height: 2rem;
   line-height: 2rem;
+}
+
+.thread-msg .actions .button-group .dropdown ul [type="submit"] {
+  height: 3rem;
 }
 
 .thread-msg .actions .button-group .dropdown li .left-icon {

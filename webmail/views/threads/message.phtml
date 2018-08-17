@@ -60,12 +60,12 @@
                                 <a href="<?php echo App\Url::make('/original/%s', $message->id); ?>" target="_blank">Show original message</a>
                             </li>
                             <li>
-                                <i class="fa left-icon fa-trash"></i>
-                                <a href="#">Delete this message</a>
+                                <i class="fa left-icon fa-glasses"></i>
+                                <a href="<?php echo App\Url::makeToken('/unread/%s', $message->id); ?>">Mark unread from here</a>
                             </li>
                             <li>
-                                <i class="fa left-icon fa-exclamation-circle"></i>
-                                <a href="#">Mark as spam</a>
+                                <i class="fa left-icon fa-trash"></i>
+                                <a href="#">Delete this message</a>
                             </li>
                         </ul>
                     </span>
