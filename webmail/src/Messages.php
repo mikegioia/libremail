@@ -28,7 +28,11 @@ class Messages
      *
      * @return [Message array, Message array, object, object]
      */
-    public function getThreads(int $folderId, int $page = 1, int $limit = 25, array $options = [])
+    public function getThreads(
+        int $folderId,
+        int $page = 1,
+        int $limit = 25,
+        array $options = [])
     {
         $flagged = [];
         $unflagged = [];
@@ -41,10 +45,12 @@ class Messages
             $folderId,
             $limit,
             ($page - 1) * $limit,
+            $this->folders->getSkipIds(),
             $options);
         $messageCounts = $messageModel->getThreadCountsByFolder(
             $this->accountId,
-            $folderId);
+            $folderId,
+            $this->folders->getSkipIds());
         $splitFlagged = isset($options[Message::SPLIT_FLAGGED])
             && true === $options[Message::SPLIT_FLAGGED];
         usort($messages, function ($a, $b) {

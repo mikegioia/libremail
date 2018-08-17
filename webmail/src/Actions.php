@@ -49,6 +49,7 @@ class Actions
         'Add star' => 'flag',
         'Remove star' => 'unflag',
         'Move to Inbox' => 'restore',
+        'Mark as read' => 'mark_read',
         'Mark as unread' => 'mark_unread',
         'Mark all as read' => 'mark_all_read',
         'Mark all as unread' => 'mark_all_unread'
@@ -56,10 +57,12 @@ class Actions
     // Lookup of actions to action classes
     const ACTION_CLASSES = [
         'flag' => 'App\Actions\Flag',
+        'trash' => 'App\Actions\Trash',
         'unflag' => 'App\Actions\Unflag',
         'delete' => 'App\Actions\Delete',
         'restore' => 'App\Actions\Restore',
         'archive' => 'App\Actions\Archive',
+        'untrash' => 'App\Actions\Untrash',
         'mark_read' => 'App\Actions\MarkRead',
         'mark_unread' => 'App\Actions\MarkUnread'
     ];
@@ -120,6 +123,8 @@ class Actions
             // Copy and/or move any messages that were sent in
             $this->copyMessages($messageIds, $copyTo, $action);
             $this->moveMessages($messageIds, $moveTo, $folderId);
+            // Move any messages to the Spam folder
+            $this->spamMessages($messageIds, $folderId, $action);
         }
         catch (Exception $e) {
             Model::getDb()->rollBack();
@@ -195,9 +200,11 @@ class Actions
             $param = self::TO_FOLDER_ID;
         }
 
-        foreach ($copyTo as $name) {
+        foreach ($copyTo as $nameOrId) {
             $action->run($messageIds, $this->folders, [
-                $param => $this->folders->findIdByName($name)
+                $param => is_numeric($nameOrId)
+                    ? $nameOrId
+                    : $this->folders->findIdByName($nameOrId)
             ]);
         }
     }
@@ -214,7 +221,7 @@ class Actions
         }
 
         // First copy them
-        $this->copyMessages($messageIds, $moveTo);
+        $this->copyMessages($messageIds, $moveTo, self::COPY);
 
         // Then delete all of the messages
         $deleteAction = new DeleteAction;
@@ -229,6 +236,18 @@ class Actions
         $deleteAction->run($messageIds, $this->folders, [
             self::FROM_FOLDER_ID => $fromFolderId
         ]);
+    }
+
+    private function spamMessages(array $messageIds, int $fromFolderId, string $action)
+    {
+        if (self::SPAM === $action) {
+            return $this->moveMessages($messageIds, [
+                $this->folders->getSpamId()
+            ], $fromFolderId);
+        }
+        elseif (self::UNSPAM === $action) {
+            //
+        }
     }
 
     /**

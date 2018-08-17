@@ -46,10 +46,12 @@ class Message extends Model
     public $raw_content;
     // Computed properties
     public $thread_count;
+
     // Cache for threading info
     private $threadCache = [];
     // Cache for attachments
     private $unserializedAttachments;
+
     // Flags
     const FLAG_SEEN = 'seen';
     const FLAG_FLAGGED = 'flagged';
@@ -167,13 +169,14 @@ class Message extends Model
 
     /**
      * Returns two counts of messages, by flagged and un-flagged.
-     *
-     * @param int $accountId
-     * @param int $folderId
+     * Also returns the thread IDs that belong to both groups.
      *
      * @return object
      */
-    public function getThreadCountsByFolder(int $accountId, int $folderId)
+    public function getThreadCountsByFolder(
+        int $accountId,
+        int $folderId,
+        array $skipFolderIds)
     {
         if ($this->threadCache($accountId, $folderId)) {
             return $this->threadCache($accountId, $folderId);
@@ -205,8 +208,19 @@ class Message extends Model
             ->execute()
             ->fetchAll(PDO::FETCH_CLASS);
 
+        // If the threads have any messages in the spam or trash folders,
+        // then exclude them entirely unless we're viewing one of those
+        // folders. This list is all of the thread IDs to skip.
+        $skipIds = $this->getIgnoredThreadIds(
+            $threadIds,
+            $accountId,
+            $folderId,
+            $skipFolderIds);
+
         foreach ($results as $result) {
-            if ($result->flagged_count > 0) {
+            if (in_array($result->thread_id, $skipIds)) {
+                continue;
+            } elseif ($result->flagged_count > 0) {
                 ++$counts->flagged;
                 $counts->flaggedIds[] = $result->thread_id;
             } else {
@@ -249,6 +263,40 @@ class Message extends Model
     }
 
     /**
+     * Returns a set of thread IDs that should be ignored because they
+     * contain messages in any of the trash or spam folders.
+     */
+    private function getIgnoredThreadIds(
+        array $threadIds,
+        int $accountId,
+        int $folderId,
+        array $skipFolderIds)
+    {
+        $skipIds = [];
+        $skipFolderIds = array_diff($skipFolderIds, [$folderId]);
+
+        if (! count($skipFolderIds)) {
+            return [];
+        }
+
+        $skip = $this->db()
+            ->select(['thread_id'])
+            ->from('messages')
+            ->where('deleted', '=', 0)
+            ->where('account_id', '=', $accountId)
+            ->whereIn('thread_id', $threadIds)
+            ->whereIn('folder_id', $skipFolderIds)
+            ->execute()
+            ->fetchAll(PDO::FETCH_CLASS);
+
+        foreach ($skip as $row) {
+            $skipIds[] = $row->thread_id;
+        }
+
+        return array_values(array_unique($skipIds));
+    }
+
+    /**
      * Returns a list of messages by folder and account.
      *
      * @return Message array
@@ -258,11 +306,12 @@ class Message extends Model
         int $folderId,
         int $limit = 50,
         int $offset = 0,
-        $options = [])
+        array $skipFolderIds,
+        array $options = [])
     {
         $threads = [];
         $messageIds = [];
-        $meta = $this->getThreadCountsByFolder($accountId, $folderId);
+        $meta = $this->getThreadCountsByFolder($accountId, $folderId, $skipFolderIds);
         $threadIds = array_merge($meta->flaggedIds, $meta->unflaggedIds);
         $options = array_merge(self::DEFAULTS, $options);
 
@@ -388,10 +437,10 @@ class Message extends Model
             ->fetchAll(PDO::FETCH_CLASS, get_class());
     }
 
-    public function getUnreadCounts(int $accountId)
+    public function getUnreadCounts(int $accountId, array $skipFolderIds)
     {
         $indexed = [];
-        $unseenThreadIds = $this->getUnseenThreads($accountId);
+        $unseenThreadIds = $this->getUnseenThreads($accountId, $skipFolderIds);
 
         if ($unseenThreadIds) {
             $folderThreads = $this->db()
@@ -416,10 +465,10 @@ class Message extends Model
         return $indexed;
     }
 
-    public function getUnseenThreads(int $accountId)
+    private function getUnseenThreads(int $accountId, array $skipFolderIds)
     {
-        $threads = [];
-        $threadIds = $this->db()
+        $threadIds = [];
+        $threads = $this->db()
             ->select(['thread_id'])
             ->from('messages')
             ->where('seen', '=', 0)
@@ -428,15 +477,22 @@ class Message extends Model
             ->execute()
             ->fetchAll(PDO::FETCH_CLASS);
 
-        if (! $threadIds) {
+        if (! $threads) {
             return [];
         }
 
-        foreach ($threadIds as $row) {
-            $threads[] = $row->thread_id;
+        foreach ($threads as $row) {
+            $threadIds[] = $row->thread_id;
         }
 
-        return array_values(array_unique($threads));
+        $threadIds = array_values(array_unique($threadIds));
+        $skipIds = $this->getIgnoredThreadIds(
+            $threadIds,
+            $accountId,
+            0,
+            $skipFolderIds);
+
+        return array_values(array_diff($threadIds, $skipIds));
     }
 
     public function getSizeCounts(int $accountId)

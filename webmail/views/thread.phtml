@@ -14,7 +14,9 @@ $view->render('nav', [
             <?php
             $view->render('nav/actions-menu', [
                 'sticky' => true,
-                'threadView' => true
+                'threadView' => true,
+                'folders' => $folders,
+                'folderId' => $folderId
             ]); ?>
         </div>
 
@@ -23,7 +25,8 @@ $view->render('nav', [
             $view->render('threads/message-list', [
                 'i' => 0,
                 'view' => $view,
-                'thread' => $thread
+                'thread' => $thread,
+                'folders' => $folders
             ]);
 
             $view->render('messages/footer', [

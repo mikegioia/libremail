@@ -111,6 +111,14 @@ class Folders
         return $this->{$mailbox};
     }
 
+    public function getSkipIds()
+    {
+        return array_filter([
+            $this->getSpamId(),
+            $this->getTrashId()
+        ]);
+    }
+
     public function get($withMeta = false)
     {
         if ($this->loaded) {
@@ -278,7 +286,9 @@ class Folders
     private function loadMetaTree()
     {
         $this->loadFolders();
-        $this->folderCounts = (new Message)->getUnreadCounts($this->accountId);
+        $this->folderCounts = (new Message)->getUnreadCounts(
+            $this->accountId,
+            $this->getSkipIds());
 
         // Add meta info to the folders
         foreach ($this->folders as $folder) {

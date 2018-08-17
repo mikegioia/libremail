@@ -22,7 +22,7 @@ if ($showPaging): ?>
         <a class="page prev" href="<?php echo $url; ?>"><i class="fa fa-chevron-left"></i>&nbsp;Prev</a>
     <?php
     endif;
-    if ( $counts->total ): ?>
+    if ($counts->total): ?>
         <strong><?php echo $counts->start; ?></strong>
         <var>&ndash;</var>
         <strong><?php echo $counts->end; ?></strong>
@@ -30,10 +30,10 @@ if ($showPaging): ?>
         <strong><?php echo $counts->total; ?></strong>
     <?php
     endif;
-    if ( $counts->nextPage ):
+    if ($counts->nextPage):
         $url = $urlId === STARRED
-            ? App\Url::make( '/starred/%s', $counts->nextPage )
-            : App\Url::make( '/folder/%s/%s', $folderId, $counts->nextPage ); ?>
+            ? App\Url::make('/starred/%s', $counts->nextPage)
+            : App\Url::make('/folder/%s/%s', $folderId, $counts->nextPage); ?>
         <a class="page next" href="<?php echo $url; ?>">Next&nbsp;<i class="fa fa-chevron-right"></i></a>
     <?php
     endif; ?>
@@ -62,7 +62,10 @@ if ($messages):
         'folderId' => $folderId,
         'messages' => $messages
     ]);
-    $view->render('nav/actions-menu');
+    $view->render('nav/actions-menu', [
+        'folders' => $folders,
+        'folderId' => $folderId
+    ]);
 else:
     $view->render('messages/no-messages');
 endif; ?>

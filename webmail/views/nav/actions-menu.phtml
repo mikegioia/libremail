@@ -1,58 +1,77 @@
 <!-- Contextual menu for selected messages -->
 <div class="actions menu<?php echo isset($sticky) ? ' sticky' : ''; ?>">
     <div class="inline-blocked">
-<?php
-if (isset($threadView)): ?>
-    <a href="<?php echo App\Url::getBackUrl(); ?>" class="icon button control" data-tooltip="Back" tabindex="4">
-        <i class="fa fa-arrow-left"></i>
-    </a>
-<?php
-else: ?>
-    <div class="dropdown inline-blocked control">
-        <a href="#" class="icon button" data-tooltip="Select">
-            <i class="far fa-minus-square"></i>
-            <i class="fa fa-caret-down"></i>
+    <?php
+    if (isset($threadView)): ?>
+        <a href="<?php echo App\Url::getBackUrl(); ?>" class="icon button control" data-tooltip="Back" tabindex="4">
+            <i class="fa fa-arrow-left"></i>
         </a>
-        <ul>
-            <li>
-                <input type="submit" name="select" value="All" />
-            </li>
-            <li>
-                <input type="submit" name="select" value="None" />
-            </li>
-            <li>
-                <input type="submit" name="select" value="Read" />
-            </li>
-            <li>
-                <input type="submit" name="select" value="Unread" />
-            </li>
-            <li>
-                <input type="submit" name="select" value="Starred" />
-            </li>
-            <li>
-                <input type="submit" name="select" value="Unstarred" />
-            </li>
-        </ul>
-    </div>
-<?php
-endif; ?>
+    <?php
+    else: ?>
+        <div class="dropdown inline-blocked control">
+            <a href="#" class="icon button" data-tooltip="Select">
+                <i class="far fa-minus-square"></i>
+                <i class="fa fa-caret-down"></i>
+            </a>
+            <ul>
+                <li>
+                    <input type="submit" name="select" value="All" />
+                </li>
+                <li>
+                    <input type="submit" name="select" value="None" />
+                </li>
+                <li>
+                    <input type="submit" name="select" value="Read" />
+                </li>
+                <li>
+                    <input type="submit" name="select" value="Unread" />
+                </li>
+                <li>
+                    <input type="submit" name="select" value="Starred" />
+                </li>
+                <li>
+                    <input type="submit" name="select" value="Unstarred" />
+                </li>
+            </ul>
+        </div>
+    <?php
+    endif; ?>
     </div><!--
-    --><button name="action" value="archive" class="icon button control pill pill-left" data-tooltip="Archive">
-        <i class="fa fa-archive"></i>
-    </button><!--
-    --><button name="action" value="spam" class="icon button control pill pill-middle" data-tooltip="Mark as spam" data-wide>
-        <i class="fa fa-exclamation-triangle"></i>
-    </button><!--
-    --><button name="action" value="delete" class="icon button control pill <?php echo isset($threadView) ? 'pill-middle' : 'pill-right'; ?>" data-tooltip="Delete">
-        <i class="fa fa-trash-alt"></i>
-    </button><!--
+    --><div class="inline-blocked">
+    <?php
+    if ($folders->getSpamId() === $folderId): ?>
+        <button name="action" value="delete" class="icon button control">
+            <span class="normal">Delete forever</span>
+        </button><!--
+        --><button name="action" value="unspam" class="icon button control">
+            <span class="normal">Not spam</span>
+        </button>
+    <?php
+    elseif ($folders->getTrashId() === $folderId): ?>
+        <button name="action" value="delete" class="icon button control">
+            <span class="normal">Delete forever</span>
+        </button>
+    <?php
+    else: ?>
+        <button name="action" value="archive" class="icon button control pill pill-left" data-tooltip="Archive">
+            <i class="fa fa-archive"></i>
+        </button><!--
+        --><button name="action" value="spam" class="icon button control pill pill-middle" data-tooltip="Mark as spam" data-wide>
+            <i class="fa fa-exclamation-triangle"></i>
+        </button><!--
+        --><button name="action" value="trash" class="icon button control pill <?php echo isset($threadView) ? 'pill-middle' : 'pill-right'; ?>" data-tooltip="Delete">
+            <i class="fa fa-trash-alt"></i>
+        </button>
+    <?php
+    endif; ?>
+    </div><!--
 <?php
 if (isset($threadView)): ?>
     --><button name="action" value="mark_unread" class="icon button control pill pill-right" data-tooltip="Mark unread" data-wide>
         <i class="far fa-envelope"></i>
     </button><!--
 <?php
-else: ?>
+elseif ($folders->getSpamId() !== $folderId && $folders->getTrashId() !== $folderId): ?>
     --><button name="action" value="mark_read" class="icon button control">
         <span class="normal">Mark as read</span>
     </button><!--
@@ -72,6 +91,13 @@ endif; ?>
             <i class="fa fa-caret-down"></i>
         </a>
         <ul class="more-actions">
+        <?php
+        if ($folders->getSpamId() === $folderId || $folders->getTrashId() === $folderId): ?>
+            <li>
+                <input type="submit" name="action" value="Mark as read" />
+            </li>
+        <?php
+        endif; ?>
             <li>
                 <input type="submit" name="action" value="Mark as unread" />
             </li>
