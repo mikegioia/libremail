@@ -187,16 +187,18 @@ class Stats
      */
     public function log()
     {
+        $jsonStats = json_encode($this->getStats(true));
+
         (new MetaModel)->update([
             MetaModel::HEARTBEAT => time(),
             MetaModel::SYNC_PID => $this->pid,
             MetaModel::START_TIME => $this->startTime,
             MetaModel::ASLEEP => $this->asleep ? 1 : 0,
+            MetaModel::FOLDER_STATS => $jsonStats ?: '',
             MetaModel::RUNNING => $this->running ? 1 : 0,
-            MetaModel::LAST_SYNC_TIME => $this->stopTime,
+            MetaModel::LAST_SYNC_TIME => $this->stopTime ?: 0,
             MetaModel::ACTIVE_FOLDER => $this->activeFolder ?: '',
-            MetaModel::ACTIVE_ACCOUNT => $this->activeAccount ?: '',
-            MetaModel::FOLDER_STATS => json_encode($this->getStats(true))
+            MetaModel::ACTIVE_ACCOUNT => $this->activeAccount ?: ''
         ]);
     }
 }
