@@ -30,10 +30,13 @@ define('VIEWEXT', '.phtml');
 define('STARRED', 'starred');
 define('MAILBOX', 'mailbox');
 define('BASEDIR', __DIR__.'/..');
-define('ERR_TASK_ROLLBACK', 1010);
 define('DIR', DIRECTORY_SEPARATOR);
 define('VIEWDIR', BASEDIR.'/views');
 define('DATE_DATABASE', 'Y-m-d h:i:s');
+// Error constants
+define('ERR_NO_TRASH_FOLDER', 1010);
+define('ERR_NO_SPAM_FOLDER', 1011);
+define('ERR_TASK_ROLLBACK', 1020);
 
 // Helper to load config files
 function getConfig($file) {

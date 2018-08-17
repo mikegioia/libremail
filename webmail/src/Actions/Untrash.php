@@ -5,11 +5,13 @@ namespace App\Actions;
 use App\Actions;
 use App\Folders;
 use App\Model\Message as MessageModel;
+use App\Actions\Delete as DeleteAction;
 
-class Trash extends Copy
+class Untrash extends DeleteAction
 {
     /**
-     * Copies a message to the Trash folder.
+     * Removing from Trash is just deleting the trashed message. All other
+     * copies remain in tact.
      *
      * @see Base for params
      */
@@ -19,7 +21,8 @@ class Trash extends Copy
             throw new ServerException('No Trash folder found', ERR_NO_TRASH_FOLDER);
         }
 
-        $options[Actions::TO_FOLDER_ID] = $folders->getTrashId();
+        $options[Actions::FROM_FOLDER_ID] = $folders->getTrashId();
+
         parent::update($message, $folders, $options);
     }
 }

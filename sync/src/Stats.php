@@ -191,7 +191,7 @@ class Stats
             MetaModel::HEARTBEAT => time(),
             MetaModel::SYNC_PID => $this->pid,
             MetaModel::START_TIME => $this->startTime,
-            MetaModel::ASLEEP => $this->asleep ? 1: 0,
+            MetaModel::ASLEEP => $this->asleep ? 1 : 0,
             MetaModel::RUNNING => $this->running ? 1 : 0,
             MetaModel::LAST_SYNC_TIME => $this->stopTime,
             MetaModel::ACTIVE_FOLDER => $this->activeFolder ?: '',

@@ -2,7 +2,6 @@
 
 namespace App\Model;
 
-use PDO;
 use App\Model;
 use Belt\Belt;
 use App\Traits\Model as ModelTrait;

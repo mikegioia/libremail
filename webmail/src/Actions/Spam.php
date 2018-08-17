@@ -4,22 +4,23 @@ namespace App\Actions;
 
 use App\Actions;
 use App\Folders;
+use App\Exceptions\ServerException;
 use App\Model\Message as MessageModel;
 
-class Trash extends Copy
+class Spam extends Copy
 {
     /**
-     * Copies a message to the Trash folder.
+     * Copies a message to the Spam folder.
      *
      * @see Base for params
      */
     public function update(MessageModel $message, Folders $folders, array $options = [])
     {
-        if (! $folders->getTrashId()) {
-            throw new ServerException('No Trash folder found', ERR_NO_TRASH_FOLDER);
+        if (! $folders->getSpamId()) {
+            throw new ServerException('No Spam folder found', ERR_NO_SPAM_FOLDER);
         }
 
-        $options[Actions::TO_FOLDER_ID] = $folders->getTrashId();
+        $options[Actions::TO_FOLDER_ID] = $folders->getSpamId();
         parent::update($message, $folders, $options);
     }
 }
