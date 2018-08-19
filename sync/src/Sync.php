@@ -37,6 +37,7 @@ class Sync
     private $halt;
     private $stop;
     private $wake;
+    private $once;
     private $sleep;
     private $quick;
     private $config;
@@ -86,6 +87,7 @@ class Sync
             $this->stats = $di['stats'];
             $this->config = $di['config'];
             $this->threader = $di['threader'];
+            $this->once = $di['console']->once;
             $this->log = $di['log']->getLogger();
             $this->quick = $di['console']->quick;
             $this->sleep = $di['console']->sleep;
@@ -152,6 +154,10 @@ class Sync
 
             if (! $this->run()) {
                 throw new TerminateException('Sync was prevented from running');
+            }
+
+            if (true === $this->once) {
+                throw new TerminateException('Sync self-terminating after one run');
             }
 
             $wakeTime = Fn\timeFromNow($sleepMinutes);

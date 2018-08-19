@@ -45,12 +45,14 @@ class Messages
             $folderId,
             $limit,
             ($page - 1) * $limit,
-            $this->folders->getSkipIds(),
+            $this->folders->getSkipIds($folderId),
+            $this->folders->getRestrictIds($folderId),
             $options);
         $messageCounts = $messageModel->getThreadCountsByFolder(
             $this->accountId,
             $folderId,
-            $this->folders->getSkipIds());
+            $this->folders->getSkipIds($folderId),
+            $this->folders->getRestrictIds($folderId));
         $splitFlagged = isset($options[Message::SPLIT_FLAGGED])
             && true === $options[Message::SPLIT_FLAGGED];
         usort($messages, function ($a, $b) {

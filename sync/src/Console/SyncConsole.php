@@ -16,6 +16,7 @@ class SyncConsole extends Console
 
     // Command line arguments
     public $help;
+    public $once;
     public $quick;
     public $sleep;
     public $create;
@@ -85,6 +86,13 @@ class SyncConsole extends Console
                 'defaultValue' => true,
                 'noValue' => true
             ],
+            'once' => [
+                'prefix' => 'o',
+                'longPrefix' => 'once',
+                'description' => 'Run once and then terminate',
+                'defaultValue' => true,
+                'noValue' => true
+            ],
             'quick' => [
                 'prefix' => 'q',
                 'longPrefix' => 'quick',
@@ -125,6 +133,7 @@ class SyncConsole extends Console
     {
         $this->cli->arguments->parse();
         $this->help = $this->cli->arguments->get('help');
+        $this->once = $this->cli->arguments->get('once');
         $this->quick = $this->cli->arguments->get('quick');
         $this->sleep = $this->cli->arguments->get('sleep');
         $this->create = $this->cli->arguments->get('create');
@@ -140,6 +149,7 @@ class SyncConsole extends Console
 
         // If background is set, turn off interactive
         if (true === $this->background) {
+            $this->once = false;
             $this->interactive = false;
         }
 

@@ -111,12 +111,40 @@ class Folders
         return $this->{$mailbox};
     }
 
-    public function getSkipIds()
+    /**
+     * Most queries for messages want to ignore certain folders.
+     * For example, if a single message in a thread was trashed
+     * we still want to display the rest of the messages in the
+     * inbox.
+     */
+    public function getSkipIds(int $folderId = null)
     {
-        return array_filter([
+        $skipIds = array_filter([
             $this->getSpamId(),
             $this->getTrashId()
         ]);
+
+        if ($folderId) {
+            $skipIds = array_diff($skipIds, [$folderId]);
+        }
+
+        return array_values(array_filter($skipIds));
+    }
+
+    /**
+     * Returns an array of folder IDs to restrict a query by.
+     * For example, when viewing the trash folder, we only want
+     * to pull messages from that folder.
+     */
+    public function getRestrictIds(int $folderId = null)
+    {
+        if ($folderId === $this->getTrashId()
+            || $folderId === $this->getSpamId())
+        {
+            return [$folderId];
+        }
+
+        return [];
     }
 
     public function get($withMeta = false)

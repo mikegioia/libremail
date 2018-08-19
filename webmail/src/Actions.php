@@ -111,6 +111,8 @@ class Actions
         // Prepare the options
         $options = [
             self::ALL_MESSAGES => 1 == $this->param('apply_to_all')
+                || self::TRASH === $action
+                || self::FLAG === $action
         ];
 
         // If a selection was made, return to the previous page
