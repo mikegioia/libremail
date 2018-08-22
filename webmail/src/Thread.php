@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Model\Account;
 use App\Model\Message;
 use Zend\Escaper\Escaper;
 use App\Exceptions\NotFoundException;

@@ -22,15 +22,21 @@ class Trash extends Delete
             throw new ServerException('No Trash folder found', ERR_NO_TRASH_FOLDER);
         }
 
+        $thread = Thread::constructFromMessage($message, $folders);
         $options = array_merge([
             Actions::TO_FOLDER_ID => $folders->getTrashId()
         ], $options);
 
         // For this operation, we're going to perform the actions
-        // on every message in the thread.
-        $thread = Thread::constructFromMessage($message, $folders);
+        // on every message in the thread unless the option to only
+        // remove this one message is set.
+        if (true === $options[Actions::SINGLE_MESSAGE] ?? false) {
+            $messages = [$message];
+        } else {
+            $messages = $thread->getMessages();
+        }
 
-        foreach ($thread->getMessages() as $threadMessage) {
+        foreach ($messages as $threadMessage) {
             // Copy to trash
             (new CopyAction)->update($threadMessage, $folders, $options);
 
@@ -41,7 +47,9 @@ class Trash extends Delete
                 $thread->getFolderIds(),
                 [$folders->getTrashId()]);
 
-            parent::update($threadMessage, $folders, $options);
+            if (count($options[Actions::FROM_FOLDER_ID]) > 0) {
+                parent::update($threadMessage, $folders, $options);
+            }
         }
     }
 }

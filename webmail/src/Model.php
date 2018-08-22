@@ -23,7 +23,11 @@ class Model
             return;
         }
 
-        $this->setData($data);
+        if (is_scalar($data)) {
+            $this->id = $data;
+        } else {
+            $this->setData($data);
+        }
     }
 
     public function setData($data)

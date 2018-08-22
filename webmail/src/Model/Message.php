@@ -132,7 +132,7 @@ class Message extends Model
     public function loadById()
     {
         if (! $this->id) {
-            throw new NotFoundException(MESSAGE);
+            throw new NotFoundException;
         }
 
         $message = $this->getById($this->id);

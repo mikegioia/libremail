@@ -48,6 +48,7 @@ class Actions
     const ALL_MESSAGES = 'all_messages';
     const TO_FOLDER_ID = 'to_folder_id';
     const FROM_FOLDER_ID = 'from_folder_id';
+    const SINGLE_MESSAGE = 'single_message';
     // Convert these action names
     const ACTION_CONVERSIONS = [
         'Add star' => 'flag',
@@ -112,7 +113,8 @@ class Actions
         $action = $this->convertAction($action);
         // Prepare the options
         $options = [
-            self::ALL_MESSAGES => 1 == $this->param('apply_to_all')
+            self::ALL_MESSAGES => 1 == $this->param('apply_to_all'),
+            self::SINGLE_MESSAGE => 1 == $this->param('single_message')
         ];
 
         // If a selection was made, return to the previous page
@@ -198,10 +200,10 @@ class Actions
     {
         if (! $copyTo) {
             return;
-        } else if (self::UNCOPY === $action) {
+        } elseif (self::UNCOPY === $action) {
             $action = new DeleteAction;
             $param = self::FROM_FOLDER_ID;
-        } else if (self::COPY === $action) {
+        } elseif (self::COPY === $action) {
             $action = new CopyAction;
             $param = self::TO_FOLDER_ID;
         } else {

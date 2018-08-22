@@ -53,7 +53,6 @@ class Controller
         session_start();
         Session::validateToken();
 
-
         (new Actions(
             new Folders($this->account, getConfig('colors')),
             $_GET + ['url_id' => THREAD]

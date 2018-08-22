@@ -68,11 +68,22 @@
                                 ]); ?>">Mark unread from here</a>
                             </li>
                             <li>
-                                <i class="fa left-icon fa-trash"></i>
+                                <i class="fa left-icon fa-exclamation-triangle"></i>
+                                <a href="<?php echo App\Url::makeToken('/action', [
+                                    'message' => [$message->id],
+                                    'action' => App\Actions::SPAM,
+                                    'apply_to_all' => 0,
+                                    'single_message' => 1,
+                                    'folder_id' => $folders->getInboxId()
+                                ]); ?>">Mark message as spam</a>
+                            </li>
+                            <li>
+                                <i class="fa left-icon fa-trash-alt"></i>
                                 <a href="<?php echo App\Url::makeToken('/action', [
                                     'message' => [$message->id],
                                     'action' => App\Actions::TRASH,
                                     'apply_to_all' => 0,
+                                    'single_message' => 1,
                                     'folder_id' => $folders->getInboxId()
                                 ]); ?>">Delete this message</a>
                             </li>

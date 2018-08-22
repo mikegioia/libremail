@@ -106,10 +106,10 @@ abstract class Base
                     [], [], true, TaskModel::TYPE_DELETE);
                 // Copy additional flags
                 $this->setFlag(
-                    $restore, MessageModel::FLAG_SEEN, $trashed->seen == 1,
+                    $restore, MessageModel::FLAG_SEEN, 1 == $trashed->seen,
                     [], [], true, TaskModel::TYPE_READ);
                 $this->setFlag(
-                    $restore, MessageModel::FLAG_FLAGGED, $trashed->flagged == 1,
+                    $restore, MessageModel::FLAG_FLAGGED, 1 == $trashed->flagged,
                     [], [], true, TaskModel::TYPE_FLAG);
             }
 
