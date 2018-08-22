@@ -13,6 +13,7 @@ class Thread
     private $folders;
     private $messages;
     private $threadId;
+    private $folderId;
     private $folderIds;
     private $accountId;
     private $messageCount;
@@ -33,18 +34,29 @@ class Thread
      *   will throw an exception if no thread is found.
      */
     public function __construct(
-        Account $account,
         Folders $folders,
         int $threadId,
+        int $folderId,
+        int $accountId,
         bool $load = true)
     {
         $this->folders = $folders;
         $this->threadId = $threadId;
-        $this->accountId = $account->id;
+        $this->folderId = $folderId;
+        $this->accountId = $accountId;
 
         if ($load) {
             $this->load();
         }
+    }
+
+    public static function constructFromMessage(Message $message, Folders $folders)
+    {
+        return new static(
+            $folders,
+            $message->thread_id,
+            $message->folder_id,
+            $message->account_id);
     }
 
     /**
@@ -60,7 +72,9 @@ class Thread
 
         $allMessages = (new Message)->getThread(
             $this->accountId,
-            $this->threadId);
+            $this->threadId,
+            $this->folders->getSkipIds($this->folderId),
+            $this->folders->getRestrictIds($this->folderId));
 
         if (! $allMessages) {
             throw new NotFoundException;

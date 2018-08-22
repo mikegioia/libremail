@@ -10,11 +10,11 @@ class Batch extends Model
     public $id;
     public $created_at;
 
-    public function create()
+    public static function create()
     {
         $createdAt = (new DateTime)->format(DATE_DATABASE);
 
-        $newBatchId = $this->db()
+        $newBatchId = self::getDb()
             ->insert(['created_at'])
             ->into('batches')
             ->values([$createdAt])

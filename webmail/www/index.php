@@ -46,11 +46,6 @@ function getConfig($file) {
     return include BASEDIR.'/config/'.$file.'.php';
 }
 
-// Helper function to get an item from an array
-function get(array $list, string $key, $default = null) {
-    return $list[$key] ?? $default;
-}
-
 // Load environment config
 $config = parse_ini_file(BASEDIR.'/.env');
 
@@ -103,6 +98,9 @@ $router->get('/folder/(\d+)/(\d+)', [$controller, 'folderPage']);
 
 // Update messages
 $router->post('/update', [$controller, 'update']);
+
+// Update messages via GET but require a CSRF token
+$router->get('/action', [$controller, 'action']);
 
 // Undo an action or collection of actions
 $router->post('/undo/(\d+)', [$controller, 'undo']);

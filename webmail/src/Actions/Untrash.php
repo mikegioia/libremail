@@ -4,14 +4,14 @@ namespace App\Actions;
 
 use App\Actions;
 use App\Folders;
+use App\Exceptions\ServerException;
 use App\Model\Message as MessageModel;
-use App\Actions\Delete as DeleteAction;
 
-class Untrash extends DeleteAction
+class Untrash extends Delete
 {
     /**
-     * Removing from Trash is just deleting the trashed message. All other
-     * copies remain in tact.
+     * Removing from Trash requires deleting the trashed message and
+     * copying the message back to any folders it was removed from.
      *
      * @see Base for params
      */
@@ -23,6 +23,6 @@ class Untrash extends DeleteAction
 
         $options[Actions::FROM_FOLDER_ID] = $folders->getTrashId();
 
-        parent::update($message, $folders, $options);
+        $this->restore($message, $folders, $options);
     }
 }

@@ -31,10 +31,12 @@ class Actions
     const DELETE = 'delete';
     const RESTORE = 'restore';
     const ARCHIVE = 'archive';
+    const UNTRASH = 'untrash';
     const MARK_READ = 'mark_read';
     const MARK_UNREAD = 'mark_unread';
     const MARK_ALL_READ = 'mark_all_read';
     const MARK_ALL_UNREAD = 'mark_all_unread';
+    const MARK_UNREAD_FROM_HERE = 'mark_unread_from_here';
     // Selections
     const SELECT_ALL = 'all';
     const SELECT_NONE = 'none';
@@ -67,8 +69,10 @@ class Actions
         'unspam' => 'App\Actions\Unspam',
         'restore' => 'App\Actions\Restore',
         'archive' => 'App\Actions\Archive',
+        'untrash' => 'App\Actions\Untrash',
         'mark_read' => 'App\Actions\MarkRead',
-        'mark_unread' => 'App\Actions\MarkUnread'
+        'mark_unread' => 'App\Actions\MarkUnread',
+        'mark_unread_from_here' => 'App\Actions\MarkUnreadFromHere'
     ];
 
     public function __construct(Folders $folders, array $params)
@@ -99,20 +103,16 @@ class Actions
         $page = $this->param('page', '');
         $action = $this->param('action');
         $select = $this->param('select');
-        $folderId = $this->param('folder_id');
+        $folderId = $this->param('folder_id', 0);
         $messageIds = $this->param('message', []);
         $allMessageIds = $this->param('message_all', []);
         $moveTo = array_filter($this->param('move_to', []));
         $copyTo = array_filter($this->param('copy_to', []));
-
         // Some actions have names that need to be converted
         $action = $this->convertAction($action);
-
         // Prepare the options
         $options = [
             self::ALL_MESSAGES => 1 == $this->param('apply_to_all')
-                || self::TRASH === $action
-                || self::FLAG === $action
         ];
 
         // If a selection was made, return to the previous page
@@ -174,7 +174,7 @@ class Actions
         elseif (array_key_exists($action, self::ACTION_CLASSES)) {
             $class = self::ACTION_CLASSES[$action];
             $actionHandler = new $class;
-            $ids = true === get($options, self::ALL_MESSAGES)
+            $ids = true === ($options[self::ALL_MESSAGES] ?? false)
                 ? $allMessageIds
                 : $messageIds;
             $actionHandler->run($ids, $this->folders, $options);
@@ -266,7 +266,8 @@ class Actions
             $message = 'marked as read';
         }
         elseif (self::MARK_ALL_UNREAD === $action
-            || self::MARK_UNREAD === $action)
+            || self::MARK_UNREAD === $action
+            || self::MARK_UNREAD_FROM_HERE === $action)
         {
             $message = 'marked as unread';
         }
@@ -299,6 +300,12 @@ class Actions
         }
         elseif (self::ARCHIVE === $action) {
             $message = 'archived';
+        }
+        elseif (self::TRASH === $action) {
+            $message = 'moved to trash';
+        }
+        elseif (self::UNTRASH === $action) {
+            $message = 'removed from trash';
         }
 
         if (! $message) {

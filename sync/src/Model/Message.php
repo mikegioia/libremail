@@ -12,6 +12,7 @@ use ForceUTF8\Encoding;
 use Particle\Validator\Validator;
 use Pb\Imap\Message as ImapMessage;
 use App\Traits\Model as ModelTrait;
+use App\Exceptions\NotFound as NotFoundException;
 use App\Exceptions\Validation as ValidationException;
 use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 use App\Exceptions\DatabaseInsert as DatabaseInsertException;
@@ -140,6 +141,21 @@ class Message extends Model
         $this->unserializedAttachments = @unserialize($this->attachments);
 
         return $this->unserializedAttachments;
+    }
+
+    public function loadById()
+    {
+        if (! $this->id) {
+            throw new NotFoundException(MESSAGE);
+        }
+
+        $message = $this->getById($this->id);
+
+        if ($message) {
+            $this->setData($message);
+        }
+
+        return $this;
     }
 
     public function getById($id)
@@ -640,9 +656,9 @@ class Message extends Model
      * @throws ValidationException
      * @throws DatabaseUpdateException
      */
-    public function setFlag(int $id, string $flag, string $value)
+    public function setFlag(string $flag, string $value)
     {
-        $this->requireInt($id, 'Message ID');
+        $this->requireInt($this->id, 'Message ID');
         $this->requireValue($flag, [
             self::FLAG_SEEN, self::FLAG_FLAGGED,
             self::FLAG_DELETED
@@ -658,7 +674,7 @@ class Message extends Model
                 $flag => $value
             ])
             ->table('messages')
-            ->where('id', '=', $id)
+            ->where('id', '=', $this->id)
             ->execute();
 
         if (! Belt::isNumber($updated)) {
@@ -673,34 +689,25 @@ class Message extends Model
      * a message_no and unique_id. These messages were copied by the
      * client and not synced yet.
      *
-     * @param int $messageId
-     * @param int $folderId
-     *
      * @throws ValidationException
      */
-    public function deleteCopiedMessages($messageId, $folderId)
+    public function deleteCopiesFrom(int $folderId)
     {
-        $this->requireInt($folderId, 'Folder ID');
-        $this->requireInt($messageId, 'Message ID');
-
-        $message = $this->getById($messageId);
-
-        if (! $message) {
-            throw new ValidationException(
-                'No message found when deleting copies');
-        }
+        $this->requireInt($this->thread_id, 'Thread ID');
+        $this->requireInt($this->account_id, 'Account ID');
+        $this->requireString($this->message_id, 'Message ID');
 
         $deleted = $this->db()
             ->delete()
             ->from('messages')
             ->whereNull('unique_id')
             ->where('folder_id', '=', $folderId)
-            ->where('thread_id', '=', $message->thread_id)
-            ->where('message_id', '=', $message->message_id)
-            ->where('account_id', '=', $message->account_id)
+            ->where('thread_id', '=', $this->thread_id)
+            ->where('message_id', '=', $this->message_id)
+            ->where('account_id', '=', $this->account_id)
             ->execute();
 
-        return is_numeric($deleted);
+        return is_numeric($deleted); // To catch 0s
     }
 
     /**

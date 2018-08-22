@@ -50,6 +50,9 @@
     elseif ($folders->getTrashId() === $folderId): ?>
         <button name="action" value="delete" class="icon button control">
             <span class="normal">Delete forever</span>
+        </button><!--
+        --><button name="action" value="untrash" class="icon button control">
+            <span class="normal">Not trash</span>
         </button>
     <?php
     else: ?>
@@ -101,9 +104,13 @@ endif; ?>
             <li>
                 <input type="submit" name="action" value="Mark as unread" />
             </li>
+        <?php
+        if ($folders->getSpamId() !== $folderId && $folders->getTrashId() !== $folderId): ?>
             <li>
                 <input type="submit" name="action" value="Move to Inbox" />
             </li>
+        <?php
+        endif; ?>
             <li>
                 <input type="submit" name="action" value="Add star" />
             </li>

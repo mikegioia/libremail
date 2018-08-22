@@ -59,12 +59,18 @@ class Message extends Model
     // Options
     const ALL_SIBLINGS = 'all_siblings';
     const ONLY_FLAGGED = 'only_flagged';
+    const ONLY_DELETED = 'only_deleted';
     const SPLIT_FLAGGED = 'split_flagged';
+    const INCLUDE_DELETED = 'include_deleted';
+    const ONLY_FUTURE_SIBLINGS = 'only_future';
     // Default options
     const DEFAULTS = [
+        'only_future' => false,
         'all_siblings' => false,
         'only_flagged' => false,
-        'split_flagged' => false
+        'only_deleted' => false,
+        'split_flagged' => false,
+        'include_deleted' => false
     ];
 
     public function getData()
@@ -123,6 +129,21 @@ class Message extends Model
         return $this->raw_headers."\r\n".$this->raw_content;
     }
 
+    public function loadById()
+    {
+        if (! $this->id) {
+            throw new NotFoundException(MESSAGE);
+        }
+
+        $message = $this->getById($this->id);
+
+        if ($message) {
+            $this->setData($message);
+        }
+
+        return $this;
+    }
+
     public function getById(int $id, bool $throwExceptionOnNotFound = false)
     {
         $message = $this->db()
@@ -154,15 +175,31 @@ class Message extends Model
     /**
      * Returns the data for an entire thread.
      */
-    public function getThread(int $accountId, int $threadId)
+    public function getThread(
+        int $accountId,
+        int $threadId,
+        array $skipFolderIds = [],
+        array $onlyFolderIds = [])
     {
-        return $this->db()
+        $query = $this->db()
             ->select()
             ->from('messages')
             ->where('deleted', '=', 0)
             ->where('thread_id', '=', $threadId)
             ->where('account_id', '=', $accountId)
-            ->orderBy('date', Model::ASC)
+            ->orderBy('date', Model::ASC);
+
+        // Some requests, like viewing the trash folder, want to
+        // restrict all messages to that folder ID
+        if ($onlyFolderIds) {
+            $query->whereIn('folder_id', $onlyFolderIds);
+        }
+        // Most requests want to skip the spam and trash folders
+        elseif ($skipFolderIds) {
+            $query->whereNotIn('folder_id', $skipFolderIds);
+        }
+
+        return $query
             ->execute()
             ->fetchAll(PDO::FETCH_CLASS, get_class());
     }
@@ -179,10 +216,6 @@ class Message extends Model
         array $skipFolderIds = [],
         array $onlyFolderIds = [])
     {
-        if ($this->threadCache($accountId, $folderId)) {
-            return $this->threadCache($accountId, $folderId);
-        }
-
         $counts = (object) [
             'flagged' => 0,
             'unflagged' => 0,
@@ -229,8 +262,6 @@ class Message extends Model
             }
         }
 
-        $this->setThreadCache($accountId, $folderId, $counts);
-
         return $counts;
     }
 
@@ -259,7 +290,7 @@ class Message extends Model
             $threadIds[] = $result->thread_id;
         }
 
-        return $threadIds;
+        return array_values(array_unique($threadIds));
     }
 
     /**
@@ -306,29 +337,27 @@ class Message extends Model
         // last message in the thread.
         $query = $this->db()
             ->select([
-                '`from`', 'thread_id', 'message_id',
-                'folder_id', 'subject', '`date`',
-                'seen', 'date_recv'
+                'id', '`from`', 'thread_id',
+                'message_id', 'folder_id', 'seen',
+                'subject', '`date`', 'date_recv'
             ])
             ->from('messages')
-            ->where('deleted', '=', 0)
             ->whereIn('thread_id', $threadIds)
             ->where('account_id', '=', $accountId)
             ->orderBy('`date`', Model::ASC);
 
-        // Some requests, like viewing the trash folder, want to
-        // restrict all messages to that folder ID
-        if ($onlyFolderIds) {
-            $query->whereIn('folder_id', $onlyFolderIds);
-        }
-        // Most requests want to skip the spam and trash folders
-        elseif ($skipFolderIds) {
-            $query->whereNotIn('folder_id', $skipFolderIds);
+        if (false === $options[self::INCLUDE_DELETED]) {
+            $query->where('deleted', '=', 0);
         }
 
         $threadMessages = $query->execute()->fetchAll(PDO::FETCH_CLASS);
 
-        $messages = $this->buildThreadMessages($meta, $threadMessages, $messages);
+        $messages = $this->buildThreadMessages(
+            $meta,
+            $threadMessages,
+            $messages,
+            $skipFolderIds,
+            $onlyFolderIds);
 
         return $messages ?: [];
     }
@@ -348,7 +377,7 @@ class Message extends Model
             ->select([
                 'id', '`to`', 'cc', '`from`', '`date`',
                 'seen', 'subject', 'flagged', 'thread_id',
-                'text_plain', 'charset'
+                'text_plain', 'charset', 'message_id'
             ])
             ->from('messages')
             ->where('deleted', '=', 0)
@@ -370,7 +399,9 @@ class Message extends Model
     private function buildThreadMessages(
         stdClass $meta,
         array $threadMessages,
-        array $messages)
+        array $messages,
+        array $skipFolderIds,
+        array $onlyFolderIds)
     {
         $threads = [];
         $messageIds = [];
@@ -382,9 +413,22 @@ class Message extends Model
                     'names' => [],
                     'seens' => [],
                     'folders' => [],
+                    'id' => $row->id,
                     'unseen' => false,
                     'subject' => $row->subject
                 ];
+            }
+
+            if ($onlyFolderIds) {
+                $threads[$row->thread_id]->folders[$row->folder_id] = true;
+
+                if (! in_array($row->folder_id, $onlyFolderIds)) {
+                    continue;
+                }
+            }
+
+            if ($skipFolderIds && in_array($row->folder_id, $skipFolderIds)) {
+                continue;
             }
 
             $threads[$row->thread_id]->folders[$row->folder_id] = true;
@@ -398,6 +442,7 @@ class Message extends Model
 
                 $name = $this->getName($row->from);
                 ++$threads[$row->thread_id]->count;
+                $threads[$row->thread_id]->id = $row->id;
                 $threads[$row->thread_id]->names[] = $name;
                 $threads[$row->thread_id]->seens[] = $row->seen;
                 $threads[$row->thread_id]->date = $row->date_recv ?: $row->date;
@@ -413,6 +458,7 @@ class Message extends Model
 
             if (isset($threads[$message->thread_id])) {
                 $found = $threads[$message->thread_id];
+                $message->id = $found->id;
                 $message->date = $found->date;
                 $message->names = $found->names;
                 $message->seens = $found->seens;
@@ -557,10 +603,6 @@ class Message extends Model
             $ids[] = $this->id;
         }
 
-        if (! $this->message_id) {
-            return $ids;
-        }
-
         $query = $this->db()
             ->select([
                 'id', 'account_id', 'folder_id', 'subject',
@@ -569,16 +611,32 @@ class Message extends Model
                 'synced', 'date'
             ])
             ->from('messages')
-            ->where('deleted', '=', 0)
+            ->whereIn('deleted', true === $options[self::ONLY_DELETED]
+                ? [1]
+                : (true === $options[self::INCLUDE_DELETED]
+                    ? [0, 1]
+                    : [0]))
             ->where('thread_id', '=', $this->thread_id)
             ->where('account_id', '=', $this->account_id);
 
-        if (! $options[self::ALL_SIBLINGS]) {
-            $query->where('message_id', '=', $this->message_id);
+        if (false === $options[self::ALL_SIBLINGS]) {
+            if (! $this->message_id) {
+                $query->where('id', '=', $this->id);
+            } else {
+                $query->where('message_id', '=', $this->message_id);
+            }
+        }
+
+        if (true === $options[self::ONLY_FUTURE_SIBLINGS]) {
+            $query->where('date', '>=', $this->date);
         }
 
         foreach ($filters as $key => $value) {
-            $query->where($key, '=', $value);
+            if (is_array($value)) {
+                $query->whereIn($key, $value);
+            } else {
+                $query->where($key, '=', $value);
+            }
         }
 
         return $query->execute()->fetchAll(PDO::FETCH_CLASS, get_class());
@@ -589,6 +647,8 @@ class Message extends Model
      */
     public function setFlag(string $flag, bool $state, int $id = null)
     {
+        $this->$flag = $state;
+
         $updated = $this->db()
             ->update([
                 $flag => $state ? 1 : 0
@@ -629,9 +689,12 @@ class Message extends Model
         $data = $this->getData();
         unset($data['id']);
         $data['synced'] = 0;
+        $data['deleted'] = 0;
         $data['unique_id'] = null;
         $data['message_no'] = null;
+        $data['seen'] = $this->seen;
         $data['folder_id'] = $folderId;
+        $data['flagged'] = $this->flagged;
 
         $newMessageId = $this->db()
             ->insert(array_keys($data))
@@ -656,25 +719,18 @@ class Message extends Model
      *
      * @throws ValidationException
      */
-    public function deleteCopiedMessages(int $messageId, int $folderId)
+    public function deleteCopiesFrom(int $folderId)
     {
-        $message = $this->getById($messageId);
-
-        if (! $message) {
-            throw new ValidationException(
-                'No message found when deleting copies');
-        }
-
         $deleted = $this->db()
             ->delete()
             ->from('messages')
             ->whereNull('unique_id')
             ->where('folder_id', '=', $folderId)
-            ->where('thread_id', '=', $message->thread_id)
-            ->where('message_id', '=', $message->message_id)
-            ->where('account_id', '=', $message->account_id)
+            ->where('thread_id', '=', $this->thread_id)
+            ->where('message_id', '=', $this->message_id)
+            ->where('account_id', '=', $this->account_id)
             ->execute();
 
-        return is_numeric($deleted);
+        return is_numeric($deleted); // To catch 0s
     }
 }

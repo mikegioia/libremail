@@ -29,13 +29,16 @@ class Copy extends Base
             throw new Exception('Invalid folder ID in copy action');
         }
 
-        (new TaskModel)->create(
-            $message->id,
-            $message->account_id,
-            $this->getType(),
-            null,
-            $options[Actions::TO_FOLDER_ID]);
-        $message->copyTo($options[Actions::TO_FOLDER_ID]);
+        $copied = $message->copyTo($options[Actions::TO_FOLDER_ID]);
+
+        if (is_a($copied, 'App\Model\Message')) {
+            TaskModel::create(
+                $message->id,
+                $message->account_id,
+                $this->getType(),
+                null,
+                $options[Actions::TO_FOLDER_ID]);
+        }
     }
 
     public function getType()

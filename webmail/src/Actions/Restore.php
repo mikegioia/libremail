@@ -17,6 +17,7 @@ class Restore extends Copy
     public function update(MessageModel $message, Folders $folders, array $options = [])
     {
         $options[Actions::TO_FOLDER_ID] = $folders->getInboxId();
+
         parent::update($message, $folders, $options);
     }
 }

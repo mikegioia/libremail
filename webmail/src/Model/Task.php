@@ -42,7 +42,7 @@ class Task extends Model
      *
      * @return Task
      */
-    public function create(
+    public static function create(
         int $messageId,
         int $accountId,
         string $type,
@@ -60,7 +60,7 @@ class Task extends Model
             'created_at' => (new DateTime)->format(DATE_DATABASE)
         ];
 
-        $newTaskId = $this->db()
+        $newTaskId = self::getDb()
             ->insert(array_keys($data))
             ->into('tasks')
             ->values(array_values($data))
@@ -100,7 +100,7 @@ class Task extends Model
             return self::$batchId;
         }
 
-        $batch = (new Batch)->create();
+        $batch = Batch::create();
 
         self::$batchId = $batch->id;
 

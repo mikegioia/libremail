@@ -23,6 +23,11 @@ class Model
             return;
         }
 
+        $this->setData($data);
+    }
+
+    public function setData($data)
+    {
         foreach ($data as $key => $value) {
             $this->$key = $value;
         }

@@ -40,12 +40,24 @@ class Controller
 
     public function update()
     {
-        $colors = getConfig('colors');
-        $folders = new Folders($this->account, $colors);
-        $actions = new Actions($folders, $_POST + $_GET);
-
         session_start();
-        $actions->run();
+
+        (new Actions(
+            new Folders($this->account, getConfig('colors')),
+            $_POST + $_GET
+        ))->run();
+    }
+
+    public function action()
+    {
+        session_start();
+        Session::validateToken();
+
+
+        (new Actions(
+            new Folders($this->account, getConfig('colors')),
+            $_GET + ['url_id' => THREAD]
+        ))->run();
     }
 
     public function undo(int $batchId)
@@ -99,7 +111,7 @@ class Controller
         // Load the thread object, this will throw an exception if
         // the thread is not found. Do this BEFORE we mark as read
         // so that we know which message to take the user to.
-        $thread = new Thread($this->account, $folders, $threadId);
+        $thread = new Thread($folders, $threadId, $folderId, $this->account->id);
 
         // Mark this thread as read
         (new MarkReadAction)->run([$threadId], $folders);
@@ -160,7 +172,8 @@ class Controller
             $page,
             $limit, [
                 Message::SPLIT_FLAGGED => INBOX === $id,
-                Message::ONLY_FLAGGED => STARRED === $id
+                Message::ONLY_FLAGGED => STARRED === $id,
+                Message::INCLUDE_DELETED => $folderId === $folders->getTrashId()
             ]);
 
         session_start();

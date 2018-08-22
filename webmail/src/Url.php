@@ -22,10 +22,11 @@ class Url
         return self::$base.vsprintf($path, $parts);
     }
 
-    public static function makeToken(string $path, ...$parts)
+    public static function makeToken(string $path, array $params = [])
     {
-        return self::$base.vsprintf($path, $parts)
-            .'?token='.Session::getToken();
+        $params['token'] = Session::getToken();
+
+        return self::get($path, $params);
     }
 
     public static function starred(string $page)
@@ -87,7 +88,8 @@ class Url
         }
 
         if (THREAD === $urlId) {
-            if (Actions::MARK_UNREAD !== $action
+            if (Actions::MARK_UNREAD_FROM_HERE !== $action
+                && Actions::MARK_UNREAD !== $action
                 && Actions::DELETE !== $action
                 && Actions::TRASH !== $action
                 && Actions::SPAM !== $action)

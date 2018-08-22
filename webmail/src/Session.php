@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Exceptions\ClientException;
+
 class Session
 {
     /**
@@ -36,5 +38,23 @@ class Session
         }
 
         return $_SESSION['token'];
+    }
+
+    /**
+     * @throws ClientException
+     */
+    public static function validateToken()
+    {
+        $token = $_GET['token'] ?? null;
+
+        if (! $token || ! isset($_SESSION['token'])) {
+            throw new ClientException(
+                'Missing token! Did you click the right link?');
+        }
+
+        if ($token !== $_SESSION['token']) {
+            throw new ClientException(
+                'Invalid token! Did your session expire?');
+        }
     }
 }

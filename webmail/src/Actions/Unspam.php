@@ -4,10 +4,10 @@ namespace App\Actions;
 
 use App\Actions;
 use App\Folders;
+use App\Exceptions\ServerException;
 use App\Model\Message as MessageModel;
-use App\Actions\Delete as DeleteAction;
 
-class Unspam extends DeleteAction
+class Unspam extends Delete
 {
     /**
      * Removing from Spam is just deleting the spam message. All other
@@ -23,6 +23,6 @@ class Unspam extends DeleteAction
 
         $options[Actions::FROM_FOLDER_ID] = $folders->getSpamId();
 
-        parent::update($message, $folders, $options);
+        $this->restore($message, $folders, $options);
     }
 }

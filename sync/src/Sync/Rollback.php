@@ -26,7 +26,6 @@ class Rollback
     {
         $count = 0;
         $taskModel = new TaskModel;
-        $messageModel = new MessageModel;
         $this->cli->info('Starting rollback');
         $tasks = $taskModel->getTasksForRollback();
 
@@ -40,10 +39,9 @@ class Rollback
 
         try {
             foreach ($tasks as $task) {
-                if ($this->revertAction($task, $messageModel)) {
-                    $task->revert();
-                    ++$count;
-                }
+                $this->revertAction($task);
+                $task->revert();
+                ++$count;
             }
         } catch (Exception $e) {
             $this->cli->whisper(
@@ -63,37 +61,34 @@ class Rollback
     /**
      * Reverts a message to it's previous state.
      */
-    private function revertAction(TaskModel $task, MessageModel $message)
+    private function revertAction(TaskModel $task)
     {
         switch ($task->type) {
             case TaskModel::TYPE_READ:
             case TaskModel::TYPE_UNREAD:
-                return $message->setFlag(
-                    $task->message_id,
-                    MessageModel::FLAG_SEEN,
-                    $task->old_value);
+                return (new MessageModel($task->message_id))
+                    ->loadById()
+                    ->setFlag(MessageModel::FLAG_SEEN, $task->old_value);
 
             case TaskModel::TYPE_FLAG:
             case TaskModel::TYPE_UNFLAG:
-                return $message->setFlag(
-                    $task->message_id,
-                    MessageModel::FLAG_FLAGGED,
-                    $task->old_value);
+                return (new MessageModel($task->message_id))
+                    ->loadById()
+                    ->setFlag(MessageModel::FLAG_FLAGGED, $task->old_value);
 
             case TaskModel::TYPE_DELETE:
             case TaskModel::TYPE_UNDELETE:
-                return $message->setFlag(
-                    $task->message_id,
-                    MessageModel::FLAG_DELETED,
-                    $task->old_value);
+                return (new MessageModel($task->message_id))
+                    ->loadById()
+                    ->setFlag(MessageModel::FLAG_DELETED, $task->old_value);
 
             case TaskModel::TYPE_COPY:
                 // Mark as deleted any messages with this message-id
                 // that are in the specified folder and that do not
                 // have a unique ID field.
-                return $message->deleteCopiedMessages(
-                    $task->message_id,
-                    $task->folder_id);
+                return (new MessageModel($task->message_id))
+                    ->loadById()
+                    ->deleteCopiesFrom($task->folder_id);
         }
     }
 }
