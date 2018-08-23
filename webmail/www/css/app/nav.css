@@ -121,6 +121,13 @@ body > header a.icon.button {
   text-transform: uppercase;
 }
 
+#collapse-mailboxes {
+  color: #e1e1e1;
+  display: inline-block;
+  font-size: 2rem;
+  margin-left: 1.5rem;
+}
+
 nav {
   bottom: 0;
   box-sizing: border-box;

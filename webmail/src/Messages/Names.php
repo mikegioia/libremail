@@ -137,10 +137,11 @@ class Names
             if ($list[1]->seen && $list[3]->seen) {
                 $list[3] = $this->getEmptyRow();
             }
-            // or if the last one is seen then mark the whole thread
-            // as seen.
+            // or if the last one is seen but the first is not, preserve
+            // the unseen nature of the thread, but collapse the two
             elseif (! $list[1]->seen && $list[3]->seen) {
                 $list[1] = $list[3];
+                $list[1]->seen = false;
                 $list[3] = $this->getEmptyRow();
             }
         }
