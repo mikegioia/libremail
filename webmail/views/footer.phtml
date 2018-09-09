@@ -32,22 +32,22 @@
             <ul class="right-menu size-medium">
                 <li>
                     <i class="fa left-icon fa-wrench"></i>
-                    <a href="#settings">Settings &amp; Preferences</a>
+                    <a href="settings">Settings &amp; Preferences</a>
                 </li>
                 <li>
                     <i class="fa left-icon fa-envelope"></i>
-                    <a href="#account">Configure Email</a>
+                    <a href="account">Configure Email</a>
                 </li>
             </ul>
         </div>
     </div>
 <?php
 if (isset($alert) && $alert): ?>
-    <div class="notifications">
-        <input type="checkbox" id="notif-1" />
-        <div class="notif" for="notif-1">
+    <div class="alerts">
+        <input type="checkbox" id="alert-1" />
+        <div class="alert">
             <span class="message"><?php echo $alert['message']; ?></span>
-            <label for="notif-1">
+            <label for="alert-1">
                 <i class="fa fa-times"></i>
             </label>
         <?php

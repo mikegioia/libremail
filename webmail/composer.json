@@ -10,7 +10,8 @@
         "ext-mbstring": "*",
         "particlebits/pdo": "@dev",
         "ezyang/htmlpurifier": "^4.10",
-        "zendframework/zend-escaper": "^2.5"
+        "zendframework/zend-escaper": "^2.5",
+        "zendframework/zend-mail": "^2.10"
     },
     "scripts": {
         "fix": "php-cs-fixer fix",

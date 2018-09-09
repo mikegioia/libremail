@@ -1,0 +1,78 @@
+<?php
+
+$view->render('header');
+
+$view->render('nav', [
+    'view' => $view,
+    'activeId' => 0,
+    'folders' => $folders
+]); ?>
+
+<section id="main" class="settings">
+    <?php
+    $view->render('notifications', [
+        'messages' => $notifications
+    ]); ?>
+
+    <h5>Configure Email Account</h5>
+    <div class="help-text">
+        Set your account email address, password, and the IMAP connection settings.
+        Once you save your email address you cannot edit it here! Common settings for
+        GMail are <code>imap.google.com</code> for the host, and port <code>993</code>.
+    </div>
+    <form action="/account" method="post">
+        <div class="row">
+            <div class="three columns label">
+                <label class="align-right" for="settings-email">Email</label>
+            </div>
+            <div class="seven columns input">
+            <?php
+            if ($account->email): ?>
+                <input type="email" id="settings-email" name="email" value="<?php $view->clean($account->email ?: ''); ?>" title="Can't be changed!" required readonly />
+            <?php
+            else: ?>
+                <input type="email" id="settings-email" name="email" value="" placeholder="you@gmail.com" required />
+            <?php
+            endif; ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="three columns label">
+                <label class="align-right" for="settings-password">Password</label>
+            </div>
+            <div class="seven columns input">
+                <input type="password" id="settings-password" name="password" value="<?php $view->clean($account->password ?: ''); ?>" required />
+                <div class="note align-right">
+                    It's wise to
+                    <a href="https://security.google.com/settings/security/apppasswords" target="_blank" title="Opens a new tab">use a token</a>
+                    here!
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="three columns label">
+                <label class="align-right" for="settings-host">IMAP Address</label>
+            </div>
+            <div class="seven columns input">
+                <input type="text" id="settings-host" name="host" value="<?php $view->clean($account->imap_host ?: ''); ?>" placeholder="imap.gmail.com" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="three columns label">
+                <label class="align-right" for="settings-host">IMAP Port</label>
+            </div>
+            <div class="three columns input">
+                <input type="text" id="settings-port" name="port" value="<?php $view->clean($account->imap_port ?: ''); ?>" placeholder="993" />
+            </div>
+        </div>
+        <div class="buttons row">
+            <div class="seven columns offset-by-three input">
+                <button type="submit" class="button button-secondary">
+                    Save Account
+                </button>
+                <span>or</span>
+                <a href="/">Go back</a>
+            </div>
+        </div>
+    </form>
+</section>

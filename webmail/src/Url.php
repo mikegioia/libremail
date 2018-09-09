@@ -58,9 +58,9 @@ class Url
         die();
     }
 
-    public static function redirectBack(int $code = 303)
+    public static function redirectBack($default = '/', int $code = 303)
     {
-        return self::redirectRaw(self::getBackUrl(), $code);
+        return self::redirectRaw(self::getBackUrl($default), $code);
     }
 
     public static function postParam(string $key, $default = null)
@@ -128,7 +128,7 @@ class Url
         $refUrl = self::getRefUrl($default);
         $currentUrl = self::getCurrentUrl();
 
-        return $refUrl === $currentUrl
+        return $refUrl === $currentUrl && ! $ignoreSame
             ? self::get($default)
             : $refUrl;
     }

@@ -117,8 +117,6 @@ class Task extends Model
 
     /**
      * Updates the status of the message.
-     *
-     * @throws DatabaseUpdateException
      */
     private function updateStatus(string $status)
     {

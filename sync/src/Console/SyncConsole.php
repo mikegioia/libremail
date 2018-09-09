@@ -90,7 +90,7 @@ class SyncConsole extends Console
                 'prefix' => 'o',
                 'longPrefix' => 'once',
                 'description' => 'Run once and then terminate',
-                'defaultValue' => true,
+                'defaultValue' => false,
                 'noValue' => true
             ],
             'quick' => [

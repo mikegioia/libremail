@@ -1,0 +1,67 @@
+/**
+ * Settings and Accounts
+ */
+
+.settings h5 {
+  border-bottom: 1px solid #ddd;
+  font-weight: 400;
+  margin: 0 2rem 2rem 0;
+  padding-bottom: 0.3rem;
+}
+
+.settings h5 + .help-text {
+  color: #555;
+  font-size: 1.125rem;
+  margin: -1rem 2rem 2.5rem 0;
+  max-width: calc(22% + 50rem);
+}
+
+.settings .row label {
+  transform: translateY(0.3125rem);
+}
+
+.settings .row input[type="text"],
+.settings .row input[type="email"],
+.settings .row input[type="password"] {
+  height: 3.25rem;
+  width: 100%;
+}
+
+.settings .row input[readonly] {
+  border-color: #ccc;
+  color: #777;
+}
+
+.settings .row .note {
+  color: #999;
+  font-size: 75%;
+  transform: translateY(-1.25rem);
+}
+
+.settings .row .note:hover {
+  color: #666;
+}
+
+.settings .row .input {
+  margin-left: 1.5rem;
+  max-width: 40rem;
+}
+
+.settings .row .offset-by-three {
+  margin-left: calc(22% + 1.5rem);
+}
+
+.settings .buttons.row {
+  margin-top: 2rem;
+}
+
+.settings .buttons.row a,
+.settings .buttons.row span {
+  display: inline-block;
+  transform: translateY(-0.125rem);
+}
+
+.settings .buttons.row span {
+  color: #aaa;
+  margin: 0 0.25rem 0 0.5rem;
+}

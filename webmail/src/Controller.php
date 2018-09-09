@@ -6,7 +6,8 @@ use App\Model\Meta;
 use App\Model\Account;
 use App\Model\Message;
 use App\Exceptions\ClientException;
-use App\Esception\NotFoundException;
+use App\Exceptions\ServerException;
+use App\Exceptions\NotFoundException;
 use App\Actions\MarkRead as MarkReadAction;
 
 class Controller
@@ -124,7 +125,7 @@ class Controller
             'folders' => $folders,
             'folderId' => $folderId,
             'meta' => Meta::getAll(),
-            'alert' => Session::get('alert'),
+            'alert' => Session::get(Session::ALERT),
             'totals' => (new Message)->getSizeCounts($this->account->id)
         ]);
     }
@@ -137,6 +138,63 @@ class Controller
         $message = (new Message)->getById($messageId, true);
 
         (new View)->clean($message->getOriginal());
+    }
+
+    public function account()
+    {
+        $view = new View;
+
+        session_start();
+        header('Content-Type: text/html');
+        header('Cache-Control: private, max-age=0, no-cache, no-store');
+
+        $view->render('account', [
+            'view' => $view,
+            'account' => $this->account,
+            'notifications' => Session::get(Session::NOTIFICATIONS, []),
+            'folders' => new Folders($this->account, getConfig('colors'))
+        ]);
+    }
+
+    public function updateAccount()
+    {
+        session_start();
+
+        $port = $_POST['port'] ?? 993;
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $host = $_POST['host'] ?? 'imap.gmail.com';
+
+        try {
+            (new Imap)->connect($email, $password, $host, $port);
+
+            // Save the new account info
+            $this->account->update($email, $password, $host, $port);
+
+            // @TODO Restart the sync process via pkill
+            Session::notify(
+                'Your account configuration has been updated! You will'.
+                'most likely need to restart the sync process.',
+                Session::SUCCESS);
+        }
+        catch (ServerException $e) {
+            Session::notify(
+                'There was a problem with your account configuration. '.
+                $e->getMessage(),
+                Session::ERROR);
+        }
+
+        Url::redirectBack('/account');
+    }
+
+    public function settings()
+    {
+        $view = new View;
+        $colors = getConfig('colors');
+        $folders = new Folders($this->account, $colors);
+
+        $view->render('settings', [
+        ]);
     }
 
     public function error404()
@@ -196,7 +254,7 @@ class Controller
             'mainHeading' => INBOX === $id
                 ? 'Everything else'
                 : $folder->name,
-            'alert' => Session::get('alert')
+            'alert' => Session::get(Session::ALERT)
         ]);
     }
 }

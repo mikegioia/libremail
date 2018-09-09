@@ -1,0 +1,80 @@
+/**
+ * Alerts
+ * This is the gray box at the bottom left of the screen after
+ * an action is performed in the app
+ *
+ * z-index range: 31-35
+*/
+
+.alerts input[type="checkbox"] {
+  display: none;
+}
+
+.alerts .alert {
+  animation: slideUpDown 8s 0s ease forwards;
+  background-color: #333;
+  border-radius: 0.375rem;
+  bottom: 2rem;
+  box-shadow: 0 0.25rem 0.5rem #ccc;
+  color: white;
+  font-family: sans-serif;
+  font-size: 1.625rem;
+  left: 2rem;
+  line-height: 1;
+  padding: 1.5rem 4.75rem 1.5rem 1.5rem;
+  position: fixed;
+  transform: translateY(7rem);
+  z-index: 31;
+}
+
+.alerts .alert span {
+  display: inline-block;
+  transform: translateY(0.0625rem);
+}
+
+.alerts .alert a,
+.alerts .alert form {
+  float: right;
+}
+
+.alerts .alert form {
+  margin: 0;
+}
+
+.alerts .alert a,
+.alerts .alert input[type="submit"] {
+  background: none;
+  border: none;
+  color: white;
+  font-size: inherit;
+  font-weight: normal;
+  height: 1.75rem;
+  line-height: 1.75rem;
+  margin: 0 0 0 1.75rem;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.alerts .alert label {
+  color: white;
+  cursor: pointer;
+  font-size: 2rem;
+  position: absolute;
+  right: 1.5rem;
+  top: 1.33rem;
+}
+
+.alerts input[type="checkbox"]:checked + .alert {
+  display: none;
+}
+
+@keyframes slideUpDown {
+  0%,
+  100% {
+    transform: translateY(7rem);
+  }
+  5%,
+  95% {
+    transform: translateY(0);
+  }
+}

@@ -4,6 +4,7 @@ namespace App\Model;
 
 use PDO;
 use App\Model;
+use App\Exceptions\DatabaseUpdateException;
 
 class Account extends Model
 {
@@ -32,7 +33,7 @@ class Account extends Model
         $active = $this->getActive();
 
         return $active
-            ? new self(current($active))
+            ? current($active)
             : null;
     }
 
@@ -48,5 +49,28 @@ class Account extends Model
         return $account
             ? new self($account)
             : null;
+    }
+
+    /**
+     * Updates the account configuration.
+     */
+    public function update(
+        string $email,
+        string $password,
+        string $imapHost,
+        int $imapPort)
+    {
+        $updated = $this->db()
+            ->update([
+                'email' => trim($email),
+                'password' => trim($password),
+                'imap_host' => trim($imapHost),
+                'imap_port' => trim($imapPort)
+            ])
+            ->table('accounts')
+            ->where('id', '=', $this->id)
+            ->execute();
+
+        return is_numeric($updated) ? $updated : false;
     }
 }

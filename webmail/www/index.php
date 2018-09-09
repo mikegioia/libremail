@@ -86,37 +86,32 @@ $controller = new Controller($account);
 
 // Inbox
 $router->get('/', [$controller, 'inbox']);
-
 // Folder
 $router->get('/folder/(\d+)', [$controller, 'folder']);
-
 // Starred messages in the inbox
 $router->get('/starred/(\d+)', [$controller, 'starred']);
-
 // Folder page
 $router->get('/folder/(\d+)/(\d+)', [$controller, 'folderPage']);
-
 // Update messages
 $router->post('/update', [$controller, 'update']);
-
 // Update messages via GET but require a CSRF token
 $router->get('/action', [$controller, 'action']);
-
 // Undo an action or collection of actions
 $router->post('/undo/(\d+)', [$controller, 'undo']);
-
 // Get the star HTML for a message
 $router->get('/star/(\w+)/(\d+)/(\w+).html', [$controller, 'getStar']);
-
 // Set star flag on a message
 $router->post('/star', [$controller, 'setStar']);
-
 // Message thread
 $router->get('/thread/(\d+)/(\d+)', [$controller, 'thread']);
-
 // Original message
 $router->get('/original/(\d+)', [$controller, 'original']);
-
+// Account configuration
+$router->get('/account', [$controller, 'account']);
+// Updating account data
+$router->post('/account', [$controller, 'updateAccount']);
+// Settings and preferences
+$router->get('/settings', [$controller, 'settings']);
 // Handle 404s
 $router->set404([$controller, 'error404']);
 

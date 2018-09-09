@@ -25,13 +25,19 @@ input[type="button"] {
   top: -0.35rem;
 }
 
+.button.button-primary,
+.button.button-secondary,
+.button.button-danger {
+  color: #fff;
+  font-size: 1.75rem;
+  height: 3.5rem;
+  line-height: 3.3125rem;
+  padding: 0 1.25rem;
+}
+
 .button.button-primary {
   background-color: #ab51c4;
   border-color: #ab51c4;
-  font-size: 1.75rem;
-  height: 3.5rem;
-  line-height: 3.4rem;
-  padding: 0 1.25rem;
 }
 
 button.button-primary:hover,
@@ -46,6 +52,19 @@ input[type="button"].button-primary:hover,
 input[type="button"].button-primary:focus {
   background-color: #9238ab;
   border-color: #9238ab;
+}
+
+.button.button-secondary {
+  background-color: #1eaedb;
+  border-color: #1eaedb;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.button.button-secondary:hover,
+.button.button-secondary:focus {
+  background-color: #0fa0ce;
+  border-color: #0fa0ce;
 }
 
 .button.button-danger {

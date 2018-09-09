@@ -1,0 +1,17 @@
+<?php
+if (count($messages) > 0): ?>
+<div id="notifications" class="notifications">
+    <?php
+    foreach ($messages as $i => $notification): ?>
+    <input type="checkbox" id="notif-<?php echo $i; ?>" />
+    <div class="notification <?php echo $notification['type']; ?>">
+        <span><?php echo $notification['message']; ?></span>
+        <label for="notif-<?php echo $i; ?>">
+            <i class="fa fa-times"></i>
+        </label>
+    </div>
+    <?php
+    endforeach; ?>
+</div>
+<?php
+endif; ?>

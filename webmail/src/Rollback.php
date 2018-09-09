@@ -44,7 +44,7 @@ class Rollback
         }
 
         Model::getDb()->commit();
-        Session::notify('Action'.(1 === $count ? '' : 's').' undone.');
+        Session::alert('Action'.(1 === $count ? '' : 's').' undone.');
         Url::redirectBack();
     }
 

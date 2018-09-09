@@ -6,6 +6,12 @@ use App\Exceptions\ClientException;
 
 class Session
 {
+    const ERROR = 'error';
+    const SUCCESS = 'success';
+
+    const ALERT = 'alert';
+    const NOTIFICATIONS = 'notifications';
+
     /**
      * Retrieve and optionally remove a session value.
      */
@@ -21,14 +27,37 @@ class Session
     }
 
     /**
-     * Add a notification message to the session.
+     * Add a notification message to the session. This is the
+     * small black alert in the bottom left of a mailbox.
      */
-    public static function notify(string $message, int $batchId = null)
+    public static function alert(string $message, int $batchId = null)
     {
-        $_SESSION['alert'] = [
+        $_SESSION[self::ALERT] = [
             'message' => $message,
             'batch_id' => $batchId
         ];
+    }
+
+    /**
+     * Add a generic notification to the session. This will add
+     * the message to a stack of messages, or create the new stack
+     * if it doesn't exist.
+     */
+    public static function notify(
+        string $message,
+        string $type = self::SUCCESS,
+        array $params = [])
+    {
+        $notifications = self::get(self::NOTIFICATIONS, [], false);
+        $newNotification = array_merge($params, [
+            'type' => $type,
+            'message' => $message
+        ]);
+
+        // Add to the stack
+        $notifications[] = $newNotification;
+
+        $_SESSION[self::NOTIFICATIONS] = $notifications;
     }
 
     public static function getToken()

@@ -319,6 +319,6 @@ class Actions
                 ? 'Conversation'
                 : $count.' conversations');
 
-        Session::notify($message, TaskModel::getBatchId());
+        Session::alert($message, TaskModel::getBatchId());
     }
 }
