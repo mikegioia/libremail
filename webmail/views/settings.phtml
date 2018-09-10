@@ -1,0 +1,91 @@
+<?php
+
+$view->render('header', [
+    'pageTitle' => 'Settings &amp; Preferences',
+]);
+
+$view->render('nav', [
+    'view' => $view,
+    'activeId' => 0,
+    'folders' => $folders
+]); ?>
+
+<section id="main" class="settings">
+    <?php
+    $view->render('notifications', [
+        'messages' => $notifications
+    ]); ?>
+
+    <h5>Settings &amp; Preferences</h5>
+    <div class="help-text">
+        Customize your LibreMail experience! Make sure to click <code>Save Preferences</code>
+        when done.
+    </div>
+    <form action="/settings" method="post">
+        <div class="row">
+            <div class="three columns label">
+                <label class="align-right" for="settings-email">Theme</label>
+            </div>
+            <div class="seven columns input">
+                <div class="row">
+                    <div class="four columns theme-default">
+                        <div class="theme">
+                            <div class="theme-header"></div>
+                            <div class="theme-body">
+                                <span class="theme-button"></span>
+                                <span class="theme-text">Abc</span>
+                                <span class="theme-links"><a href="#">Link</a></span>
+                            </div>
+                        </div>
+                        <label>
+                            <input type="radio" name="<?php echo App\Model\Meta::THEME; ?>" value="default" <?php echo App\Model\Meta::get(App\Model\Meta::THEME, 'default', $meta) === 'default' ? 'checked' : ''; ?>>
+                            <span>LibreMail Classic</span>
+                        </label>
+                    </div>
+                    <div class="four columns theme-warmlight">
+                        <div class="theme">
+                            <div class="theme-header"></div>
+                            <div class="theme-body">
+                                <span class="theme-button"></span>
+                                <span class="theme-text">Abc</span>
+                                <span class="theme-links"><a href="#">Link</a></span>
+                            </div>
+                        </div>
+                        <label>
+                            <input type="radio" name="<?php echo App\Model\Meta::THEME; ?>" value="warmlight"<?php echo App\Model\Meta::get(App\Model\Meta::THEME, 'default', $meta) === 'warmlight' ? 'checked' : ''; ?>>
+                            <span>Warm Light</span>
+                        </label>
+                    </div>
+                    <div class="four columns theme-coolnight">
+                        <div class="theme">
+                            <div class="theme-header"></div>
+                            <div class="theme-body">
+                                <span class="theme-button"></span>
+                                <span class="theme-text">Abc</span>
+                                <span class="theme-links"><a href="#">Link</a></span>
+                            </div>
+                        </div>
+                        <label>
+                            <input type="radio" name="<?php echo App\Model\Meta::THEME; ?>" value="coolnight"<?php echo App\Model\Meta::get(App\Model\Meta::THEME, 'default', $meta) === 'coolnight' ? 'checked' : ''; ?>>
+                            <span>Cool Night</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="buttons row">
+            <div class="seven columns offset-by-three input">
+                <button type="submit" class="button button-secondary">
+                    Save Preferences
+                </button>
+                <span>or</span>
+                <a href="/">Go back</a>
+            </div>
+        </div>
+    </form>
+</section>
+
+<?php
+$view->render('footer', [
+    'meta' => $meta
+]); ?>

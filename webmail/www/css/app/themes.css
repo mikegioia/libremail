@@ -1,0 +1,181 @@
+/**
+ * Warm Light
+ * Easier on the eyes
+ */
+
+.settings .theme-warmlight .theme-body,
+.settings .theme-warmlight .theme-header {
+  background-color: #f5e7dc;
+}
+
+body.theme-warmlight,
+body.theme-warmlight > header,
+body.theme-warmlight .menu.actions,
+body.theme-warmlight .menu.default {
+  background-color: #f5e7dc;
+}
+
+body.theme-warmlight .msg-contents {
+  background-color: #f5e7dc;
+  border-bottom: 1px solid #dcc5b3;
+  border-top: 1px solid #dcc5b3;
+}
+
+body.theme-warmlight .msg-label {
+  background-color: #f5e7dc;
+}
+
+body.theme-warmlight .msg-label:after {
+  border-color: #b19c8c;
+}
+
+body.theme-warmlight .msg-label.unseen,
+body.theme-warmlight .msg-contents.unseen {
+  background-color: #fdf5ef;
+}
+
+body.theme-warmlight .msg-checkbox:checked + .msg-label {
+  background-color: #ffda6d; /* original yellow */
+}
+
+body.theme-warmlight .msg-contents .subject {
+  color: #94877d;
+}
+
+body.theme-warmlight .dropdown ul,
+body.theme-warmlight .button:not(.button-primary):not(.button-secondary),
+body.theme-warmlight button:not(.button-primary):not(.button-secondary),
+body.theme-warmlight input[type="submit"]:not(.button-primary):not(.button-secondary),
+body.theme-warmlight input[type="reset"]:not(.button-primary):not(.button-secondary),
+body.theme-warmlight input[type="button"]:not(.button-primary):not(.button-secondary),
+body.theme-warmlight .settings .theme {
+  border-color: #b19c8c;
+}
+
+body.theme-warmlight .msg-label,
+body.theme-warmlight .settings h5,
+body.theme-warmlight section #msg-actions,
+body.theme-warmlight .dropdown li.notice {
+  border-color: #dcc5b3;
+}
+
+body.theme-warmlight #search .icon.button,
+body.theme-warmlight input[type="search"],
+body.theme-warmlight input[type="text"],
+body.theme-warmlight input[type="email"],
+body.theme-warmlight input[type="password"],
+body.theme-warmlight .settings .row input[readonly],
+body.theme-warmlight textarea,
+body.theme-warmlight select {
+  background-color: #fdf5ef;
+  border-color: #dcc5b3;
+}
+
+body.theme-warmlight .dropdown a,
+body.theme-warmlight .dropdown ul,
+body.theme-warmlight .dropdown li a,
+body.theme-warmlight .dropdown li input[type="submit"] {
+  background: #f5e7dc;
+}
+
+body.theme-warmlight nav #mailboxes-divider {
+  border-color: #e8d3c2;
+}
+
+body.theme-warmlight nav a.mailbox:hover,
+body.theme-warmlight nav a.mailbox:hover + .folder-label,
+body.theme-warmlight .dropdown li a:hover,
+body.theme-warmlight .dropdown li [type="submit"]:hover {
+  background-color: #e8d3c2;
+}
+
+body.theme-warmlight code {
+  background-color: #fff3eb;
+  border-color: #dcc9bd;
+}
+
+/* Overwrite #aaa */
+body.theme-warmlight .folder-selector h4 .close,
+body.theme-warmlight .settings .buttons.row span,
+body.theme-warmlight section #msg-list footer span.bg {
+  color: #b19c8c;
+}
+
+/* Overwrite #999 */
+body.theme-warmlight .msg-label:after,
+body.theme-warmlight .dropdown li.notice,
+body.theme-warmlight .settings .row .note {
+  color: #ad9888;
+}
+
+/* Overwrite #777 */
+body.theme-warmlight section #msg-list footer,
+body.theme-warmlight .settings .row input[readonly] {
+  color: #a08672;
+}
+
+/* Overwrite #666 */
+body.theme-warmlight .settings .row .note:hover,
+body.theme-warmlight #topnav-actions .status > div > span {
+  color: #846b58;
+}
+
+/* Overwrite #555 */
+body.theme-warmlight .settings h5 + .help-text,
+body.theme-warmlight .msg-checkbox:checked + .msg-label + .msg-contents .subject {
+  color: #614937;
+}
+
+body.theme-warmlight .settings .theme {
+  box-shadow: 0 2px 2px #e8d3c2;
+}
+
+
+/**
+ * Cool Night
+ * Dark theme
+ */
+
+.settings .theme-coolnight .theme-body,
+.settings .theme-coolnight .theme-header {
+  background-color: #3b3b3b;
+  color: #ccc;
+}
+
+.settings .theme-coolnight > .theme {
+  border-color: #222 !important;
+}
+
+body.theme-coolnight,
+body.theme-coolnight .menu.actions,
+body.theme-coolnight .menu.default {
+  background-color: #3b3b3b;
+  color: #ccc;
+}
+
+body.theme-coolnight > header {
+  background-color: #2b2b2b;
+  border-color: #2e7f9e;
+  color: #ccc;
+}
+
+body.theme-coolnight nav a,
+body.theme-coolnight nav li:not(.active):hover > a,
+body.theme-coolnight #logo a,
+body.theme-coolnight #topnav-actions .status > div > span > strong,
+body.theme-coolnight .dropdown ul,
+body.theme-coolnight .dropdown li a,
+body.theme-coolnight .dropdown li [type="submit"],
+body.theme-coolnight section #msg-list h5 .paging-counts a.page,
+body.theme-coolnight .msg-contents .names,
+body.theme-coolnight .msg-contents .subject span,
+body.theme-coolnight .msg-contents .date {
+  color: #ccc;
+}
+
+
+
+
+body.theme-coolnight .settings .theme {
+  box-shadow: 0 2px 2px #222;
+}

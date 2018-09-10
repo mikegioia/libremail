@@ -5,6 +5,7 @@ namespace App;
 use App\Model\Meta;
 use App\Model\Account;
 use App\Model\Message;
+use App\Model\settings;
 use App\Exceptions\ClientException;
 use App\Exceptions\ServerException;
 use App\Exceptions\NotFoundException;
@@ -150,6 +151,7 @@ class Controller
 
         $view->render('account', [
             'view' => $view,
+            'meta' => Meta::getAll(),
             'account' => $this->account,
             'notifications' => Session::get(Session::NOTIFICATIONS, []),
             'folders' => new Folders($this->account, getConfig('colors'))
@@ -190,11 +192,26 @@ class Controller
     public function settings()
     {
         $view = new View;
-        $colors = getConfig('colors');
-        $folders = new Folders($this->account, $colors);
+
+        session_start();
+        header('Content-Type: text/html');
+        header('Cache-Control: private, max-age=0, no-cache, no-store');
 
         $view->render('settings', [
+            'view' => $view,
+            'meta' => Meta::getAll(),
+            'account' => $this->account,
+            'notifications' => Session::get(Session::NOTIFICATIONS, []),
+            'folders' => new Folders($this->account, getConfig('colors'))
         ]);
+    }
+
+    public function updateSettings()
+    {
+        session_start();
+        Meta::update($_POST);
+        Session::notify('Your preferences have been saved!', Session::SUCCESS);
+        Url::redirectBack('/settings');
     }
 
     public function error404()

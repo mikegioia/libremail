@@ -1,6 +1,8 @@
 <?php
 
-$view->render('header');
+$view->render('header', [
+    'pageTitle' => 'Account Configuration',
+]);
 
 $view->render('nav', [
     'view' => $view,
@@ -76,3 +78,8 @@ $view->render('nav', [
         </div>
     </form>
 </section>
+
+<?php
+$view->render('footer', [
+    'meta' => $meta
+]); ?>

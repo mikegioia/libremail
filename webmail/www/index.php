@@ -112,6 +112,8 @@ $router->get('/account', [$controller, 'account']);
 $router->post('/account', [$controller, 'updateAccount']);
 // Settings and preferences
 $router->get('/settings', [$controller, 'settings']);
+// Updating settings
+$router->post('/settings', [$controller, 'updateSettings']);
 // Handle 404s
 $router->set404([$controller, 'error404']);
 

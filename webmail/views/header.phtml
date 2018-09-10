@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>LibreMail</title>
+    <title>LibreMail<?php echo isset($pageTitle) ? ' &bull; '.$pageTitle : ''; ?></title>
     <meta name="author" content="">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,9 +20,11 @@
         </style>
     </noscript>
 </head>
-<body>
+<body class="theme-<?php echo App\Model\Meta::get(App\Model\Meta::THEME, 'default', $meta ?? null); ?>">
     <header class="u-cf">
-        <h4 id="logo">LibreMail</h4>
+        <h4 id="logo">
+            <a href="/">LibreMail</a>
+        </h4>
         <div id="search">
             <input type="search" value="" placeholder="Search..." tabindex="1" /><!--
             --><a class="icon button" href="#"><i class="fa fa-search"></i></a>

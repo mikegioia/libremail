@@ -6,7 +6,7 @@
 
 body > header {
   background: #f1f1f1;
-  border-bottom: 4px solid #c56bde;
+  border-bottom: 0.3125rem solid #c56bde;
   height: 5rem;
   position: fixed;
   width: 100%;
@@ -24,6 +24,11 @@ body > header a.icon.button {
   margin-bottom: 0;
   padding-left: 2rem;
   width: 18rem;
+}
+
+#logo a {
+  text-decoration: none;
+  color: #333;
 }
 
 #search {
@@ -47,8 +52,8 @@ body > header a.icon.button {
 #search .icon.button {
   background-color: #fff;
   border-color: #d1d1d1;
-  border-radius: 0 4px 4px 0;
-  left: -4px;
+  border-radius: 0 0.3125rem 0.3125rem 0;
+  left: -0.3125rem;
   line-height: 3.2rem;
   padding: 0;
   position: relative;
@@ -146,7 +151,7 @@ nav a {
 }
 
 nav a.mailbox {
-  border-radius: 2px;
+  border-radius: 0.15625rem;
   box-sizing: border-box;
   display: block;
   height: 2.1rem;

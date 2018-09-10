@@ -65,3 +65,52 @@
   color: #aaa;
   margin: 0 0.25rem 0 0.5rem;
 }
+
+.settings .theme {
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 2px #eee;
+  height: 5rem;
+}
+
+.settings .theme .theme-header {
+  background-color: #f1f1f1;
+  border-bottom: 0.3125rem solid #c56bde;
+  border-radius: 0.25rem 0.25rem 0 0;
+  box-sizing: border-box;
+  height: 2.25rem;
+}
+
+.settings .theme .theme-body {
+  background-color: #fff;
+  border-radius: 0 0 0.25rem 0.25rem;
+  box-sizing: border-box;
+  height: 2.75rem;
+  line-height: 1.6rem;
+  padding: 0.5rem 0.625rem;
+  text-align: center;
+}
+
+.settings .theme .theme-body span {
+  display: inline-block;
+  float: left;
+  margin: 0 1rem 0 0;
+}
+
+.settings .theme .theme-body .theme-button {
+  background-color: #1eaedb;
+  border-radius: 0.125rem;
+  height: 1.75rem;
+  width: 1.75rem;
+}
+
+.settings .theme + label {
+  font-size: 1.25rem;
+  margin: 0.5rem 0;
+}
+
+.settings .theme + label span {
+  display: inline-block;
+  margin-left: 0.25rem;
+  transform: translateY(-0.0625rem);
+}
