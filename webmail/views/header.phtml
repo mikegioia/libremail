@@ -20,7 +20,7 @@
         </style>
     </noscript>
 </head>
-<body class="theme-<?php echo App\Model\Meta::get(App\Model\Meta::THEME, 'default', $meta ?? null); ?>">
+<body class="theme-<?php echo $view->meta(PREF_THEME, 'default'); ?>">
     <header class="u-cf">
         <h4 id="logo">
             <a href="/">LibreMail</a>

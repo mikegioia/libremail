@@ -1,6 +1,7 @@
 <?php
 
 $view->render('header', [
+    'view' => $view,
     'pageTitle' => 'Settings &amp; Preferences',
 ]);
 
@@ -38,7 +39,7 @@ $view->render('nav', [
                             </div>
                         </div>
                         <label>
-                            <input type="radio" name="<?php echo App\Model\Meta::THEME; ?>" value="default" <?php echo App\Model\Meta::get(App\Model\Meta::THEME, 'default', $meta) === 'default' ? 'checked' : ''; ?>>
+                            <input type="radio" name="<?php echo PREF_THEME; ?>" value="default" <?php echo $view->meta(PREF_THEME, 'default') === 'default' ? 'checked' : ''; ?>>
                             <span>LibreMail Classic</span>
                         </label>
                     </div>
@@ -52,7 +53,7 @@ $view->render('nav', [
                             </div>
                         </div>
                         <label>
-                            <input type="radio" name="<?php echo App\Model\Meta::THEME; ?>" value="warmlight"<?php echo App\Model\Meta::get(App\Model\Meta::THEME, 'default', $meta) === 'warmlight' ? 'checked' : ''; ?>>
+                            <input type="radio" name="<?php echo PREF_THEME; ?>" value="warmlight"<?php echo $view->meta(PREF_THEME, 'default') === 'warmlight' ? 'checked' : ''; ?>>
                             <span>Warm Light</span>
                         </label>
                     </div>
@@ -66,7 +67,7 @@ $view->render('nav', [
                             </div>
                         </div>
                         <label>
-                            <input type="radio" name="<?php echo App\Model\Meta::THEME; ?>" value="coolnight"<?php echo App\Model\Meta::get(App\Model\Meta::THEME, 'default', $meta) === 'coolnight' ? 'checked' : ''; ?>>
+                            <input type="radio" name="<?php echo PREF_THEME; ?>" value="coolnight"<?php echo $view->meta(PREF_THEME, 'default') === 'coolnight' ? 'checked' : ''; ?>>
                             <span>Cool Night</span>
                         </label>
                     </div>

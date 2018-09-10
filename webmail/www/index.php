@@ -40,6 +40,8 @@ define('ERR_NO_TRASH_FOLDER', 1010);
 define('ERR_NO_STARRED_FOLDER', 1011);
 define('ERR_NO_SPAM_FOLDER', 1012);
 define('ERR_TASK_ROLLBACK', 1020);
+// Application preferences
+define('PREF_THEME', 'wm.theme');
 
 // Helper to load config files
 function getConfig($file) {

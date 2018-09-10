@@ -1,6 +1,8 @@
 <?php
 
-$view->render('header');
+$view->render('header', [
+    'view' => $view
+]);
 
 $view->render('nav', [
     'view' => $view,

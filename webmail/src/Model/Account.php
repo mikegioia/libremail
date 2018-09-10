@@ -4,7 +4,6 @@ namespace App\Model;
 
 use PDO;
 use App\Model;
-use App\Exceptions\DatabaseUpdateException;
 
 class Account extends Model
 {

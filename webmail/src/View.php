@@ -10,6 +10,7 @@ namespace App;
 use DateTime;
 use Exception;
 use DateTimeZone;
+use App\Model\Meta;
 
 class View
 {
@@ -180,5 +181,13 @@ class View
         }
 
         return $count.' '.$noun.(1 == $count ? '' : 's').' ago';
+    }
+
+    /**
+     * Retrieves a value from the meta table by key.
+     */
+    public function meta(string $key, $default = null)
+    {
+        return Meta::get($key, $default);
     }
 }

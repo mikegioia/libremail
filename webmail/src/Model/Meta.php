@@ -12,11 +12,10 @@ class Meta extends Model
     public $value;
     public $updated_at;
 
-    // Namespaced constants
-    const THEME = 'wm.theme';
+    private static $cache;
 
     const ALLOWED = [
-        self::THEME
+        PREF_THEME
     ];
 
     /**
@@ -26,6 +25,7 @@ class Meta extends Model
     public static function get(string $key, $default = null, $source = null)
     {
         $setting = null;
+        $source = $source ?: self::$cache;
 
         if (null === $source) {
             $setting = self::getDb()
@@ -57,6 +57,10 @@ class Meta extends Model
      */
     public static function getAll()
     {
+        if (null !== self::$cache) {
+            return self::$cache;
+        }
+
         $list = new stdClass;
         $items = self::getDb()
             ->select()
@@ -67,6 +71,8 @@ class Meta extends Model
         foreach ($items as $item) {
             $list->{$item->key} = $item->value;
         }
+
+        self::$cache = $list;
 
         return $list;
     }
@@ -91,7 +97,7 @@ class Meta extends Model
 
             // Update the value if one exists, but only if
             // the value has changed.
-            if ($currentValue !== null) {
+            if (null !== $currentValue) {
                 if ((string) $currentValue === (string) $value) {
                     continue;
                 }
@@ -110,6 +116,12 @@ class Meta extends Model
                     ->values([$key, $value])
                     ->execute();
             }
+
+            if (is_null(self::$cache)) {
+                self::$cache = new stdClass;
+            }
+
+            self::$cache->$key = $value;
         }
     }
 }
