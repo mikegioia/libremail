@@ -286,7 +286,11 @@ body.theme-coolnight .msg-checkbox:checked + .msg-label:after {
   background-color: #eee;
 }
 
-body.theme-coolnight .msg-contents.unseen .subject span
+body.theme-coolnight .msg-contents.unseen .subject span,
+body.theme-coolnight .msg-contents.unseen .date,
+body.theme-coolnight .msg-contents.unseen strong {
+  font-weight: 600;
+}
 
 body.theme-coolnight .msg-label.unseen,
 body.theme-coolnight .msg-contents.unseen,
