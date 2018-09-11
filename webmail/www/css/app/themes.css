@@ -382,6 +382,10 @@ body.theme-coolnight ::placeholder {
   color: #aaa;
 }
 
+body.theme-coolnight #notifications .notification {
+  color: #333;
+}
+
 /* Shadows */
 body.theme-coolnight .dropdown ul {
   box-shadow: 0 0.125rem 0.25rem #2b2b2b;
