@@ -273,13 +273,13 @@ class Actions
         {
             $message = 'marked as unread';
         }
-        elseif (self::COPY === $action) {
+        elseif (self::COPY === $action && $folderName) {
             $message = "copied to {$folderName}";
         }
-        elseif (self::UNCOPY === $action) {
+        elseif (self::UNCOPY === $action && $folderName) {
             $message = "removed from {$folderName}";
         }
-        elseif (self::MOVE === $action) {
+        elseif (self::MOVE === $action && $folderName) {
             $message = "moved to {$folderName}";
         }
         elseif (self::FLAG === $action) {

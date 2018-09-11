@@ -22,8 +22,15 @@
 body.theme-warmlight,
 body.theme-warmlight > header,
 body.theme-warmlight .menu.actions,
-body.theme-warmlight .menu.default {
+body.theme-warmlight .menu.default,
+body.theme-warmlight .folder-selector,
+body.theme-warmlight .folder-selector h4 {
   background-color: #f5e7dc;
+}
+
+/* Slightly darker */
+body.theme-warmlight .folder-selector .actions {
+  background-color: #efd8c6;
 }
 
 /* Message lists */
@@ -63,7 +70,10 @@ body.theme-warmlight .thread-msg-more-checkbox + label span {
 
 body.theme-warmlight section #msg-list h5.thread-title,
 body.theme-warmlight .thread-msg-row label.thread-msg-label,
-body.theme-warmlight .thread-msg-group .placeholder {
+body.theme-warmlight .thread-msg-group .placeholder,
+body.theme-warmlight .folder-selector h4,
+body.theme-warmlight .folder-selector .actions,
+body.theme-warmlight .folder-selector .list label {
   border-color: #e2cbba;
 }
 
@@ -75,12 +85,13 @@ body.theme-warmlight .thread-msg label.thread-msg-header .from span {
 
 /* Buttons and dropdowns */
 body.theme-warmlight .dropdown ul,
-body.theme-warmlight .button:not(.button-primary):not(.button-secondary),
-body.theme-warmlight button:not(.button-primary):not(.button-secondary),
-body.theme-warmlight input[type="submit"]:not(.button-primary):not(.button-secondary),
-body.theme-warmlight input[type="reset"]:not(.button-primary):not(.button-secondary),
-body.theme-warmlight input[type="button"]:not(.button-primary):not(.button-secondary),
-body.theme-warmlight .settings .theme {
+body.theme-warmlight .button:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-warmlight button:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-warmlight input[type="submit"]:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-warmlight input[type="reset"]:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-warmlight input[type="button"]:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-warmlight .settings .theme,
+body.theme-warmlight .folder-selector {
   border-color: #b19c8c;
 }
 
@@ -173,6 +184,10 @@ body.theme-warmlight .settings .theme {
   box-shadow: 0 2px 2px #e8d3c2;
 }
 
+body.theme-warmlight .folder-selector {
+  box-shadow: 0px 0px 1rem #b19c8c
+}
+
 /* Overwrite #aaa */
 body.theme-warmlight .folder-selector h4 .close,
 body.theme-warmlight .settings .buttons.row span,
@@ -238,9 +253,16 @@ body.theme-warmlight .msg-checkbox:checked + .msg-label + .msg-contents .subject
 /* Default background */
 body.theme-coolnight,
 body.theme-coolnight .menu.actions,
-body.theme-coolnight .menu.default {
+body.theme-coolnight .menu.default,
+body.theme-coolnight .folder-selector,
+body.theme-coolnight .folder-selector h4 {
   background-color: #3b3b3b;
   color: #ccc;
+}
+
+/* Slightly darker */
+body.theme-coolnight .folder-selector .actions {
+  background-color: #323232;
 }
 
 /* Header */
@@ -318,14 +340,39 @@ body.theme-coolnight .msg-contents .subject {
   color: #6b6b6b;
 }
 
-/* Buttons and dropdowns */
+/* Threads */
+body.theme-coolnight .thread-msg-row label.thread-msg-label,
+body.theme-coolnight .thread-msg-group .placeholder,
+body.theme-coolnight .thread-msg-more-checkbox + label span {
+  background: #4b4b4b;
+}
+
+body.theme-coolnight section #msg-list h5.thread-title,
+body.theme-coolnight .thread-msg-row label.thread-msg-label,
+body.theme-coolnight .thread-msg-group .placeholder,
+body.theme-coolnight .folder-selector h4,
+body.theme-coolnight .folder-selector .actions,
+body.theme-coolnight .folder-selector .list label {
+  border-color: #323232;
+}
+
+body.theme-coolnight .thread-msg-row label .snippet,
+body.theme-coolnight .thread-msg-more-checkbox + label span,
+body.theme-coolnight .thread-msg label.thread-msg-header .from span,
+body.theme-coolnight .thread-msg-row label .snippet strong,
+body.theme-coolnight .thread-msg-row label .date {
+  color: #aaa;
+}
+
+/* Default buttons and dropdowns */
 body.theme-coolnight .dropdown ul,
-body.theme-coolnight .button:not(.button-primary):not(.button-secondary),
-body.theme-coolnight button:not(.button-primary):not(.button-secondary),
-body.theme-coolnight input[type="submit"]:not(.button-primary):not(.button-secondary),
-body.theme-coolnight input[type="reset"]:not(.button-primary):not(.button-secondary),
-body.theme-coolnight input[type="button"]:not(.button-primary):not(.button-secondary),
-body.theme-coolnight .settings .theme {
+body.theme-coolnight .button:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-coolnight button:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-coolnight input[type="submit"]:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-coolnight input[type="reset"]:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-coolnight input[type="button"]:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-coolnight .settings .theme,
+body.theme-coolnight .folder-selector {
   background-color: #3b3b3b;
   border-color: #0b0b0b;
   color: #999;
@@ -353,7 +400,9 @@ body.theme-coolnight .settings .row input[readonly] {
 body.theme-coolnight .settings h5,
 body.theme-coolnight section #msg-actions,
 body.theme-coolnight .dropdown li.notice,
-body.theme-coolnight article.thread-msg {
+body.theme-coolnight .folder-selector h4,
+body.theme-coolnight .folder-selector .actions,
+body.theme-coolnight .folder-selector .list label {
   border-color: #1b1b1b;
 }
 
@@ -370,7 +419,8 @@ body.theme-coolnight .msg-label {
   border-color: #2b2b2b;
 }
 
-body.theme-coolnight nav #mailboxes-divider {
+body.theme-coolnight nav #mailboxes-divider,
+body.theme-coolnight article.thread-msg {
   border-color: #323232;
 }
 
@@ -384,37 +434,6 @@ body.theme-coolnight nav a.mailbox:hover + .folder-label,
 body.theme-coolnight .dropdown li a:hover,
 body.theme-coolnight .dropdown li [type="submit"]:hover {
   background-color: #2b2b2b;
-}
-
-/* Misc elements */
-body.theme-coolnight code {
-  background-color: #2b2b2b;
-  border-color: #1b1b1b;
-}
-
-body.theme-coolnight ::placeholder {
-  color: #aaa;
-}
-
-body.theme-coolnight #notifications .notification {
-  color: #333;
-}
-
-/* Shadows */
-body.theme-coolnight .dropdown ul {
-  box-shadow: 0 0.125rem 0.25rem #2b2b2b;
-}
-
-body.theme-coolnight .settings .theme {
-  box-shadow: 0 2px 2px #323232;
-}
-
-/* Update blue links */
-body.theme-coolnight .thread-msg .message a:hover,
-body.theme-coolnight .thread-msg .message a:focus,
-body.theme-coolnight .settings a:hover,
-body.theme-coolnight .settings a:focus {
-  color: #35c2ef;
 }
 
 /* Buttons */
@@ -440,6 +459,65 @@ body.theme-coolnight .button.button-secondary:focus,
 body.theme-coolnight .button.button-secondary:hover {
   background-color: #1280a2;
   border-color: #1280a2;
+}
+
+body.theme-coolnight .button.button-danger {
+  background-color: #d05b5b;
+  border-color: #5a0d0d;
+  box-shadow: 0 2px 2px #383838;
+}
+
+body.theme-coolnight .button.button-danger:hover,
+body.theme-coolnight .button.button-danger:focus {
+  background-color: #b74b4b;  
+}
+
+/* Alerts */
+body.theme-coolnight .alerts .alert {
+  background: #0b0b0b;
+  box-shadow: none;
+  color: #eee;
+}
+
+body.theme-coolnight .alerts .alert input[type="submit"],
+body.theme-coolnight .alerts .alert label {
+  background-color: #0b0b0b !important;
+  color: #aaa !important;
+}
+
+/* Misc elements */
+body.theme-coolnight code {
+  background-color: #2b2b2b;
+  border-color: #1b1b1b;
+}
+
+body.theme-coolnight ::placeholder {
+  color: #aaa;
+}
+
+body.theme-coolnight #notifications .notification {
+  color: #333;
+}
+
+/* Shadows */
+body.theme-coolnight .dropdown ul {
+  box-shadow: 0 0.125rem 0.25rem #2b2b2b;
+}
+
+body.theme-coolnight .settings .theme {
+  box-shadow: 0 2px 2px #323232;
+}
+
+body.theme-coolnight .folder-selector {
+  box-shadow: 0px 0px 1rem #2b2b2b
+}
+
+/* Update blue links */
+body.theme-coolnight .thread-msg .message a:hover,
+body.theme-coolnight .thread-msg .message a:focus,
+body.theme-coolnight .settings a:hover,
+body.theme-coolnight .settings a:focus {
+  color: #35c2ef;
 }
 
 /* Overwrite #aaa */
