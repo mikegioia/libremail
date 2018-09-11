@@ -16,7 +16,7 @@
   max-width: calc(22% + 50rem);
 }
 
-.settings .row label {
+.settings .row .three.columns label {
   transform: translateY(0.3125rem);
 }
 
@@ -73,6 +73,11 @@
   height: 5rem;
 }
 
+.settings .theme > label {
+  cursor: pointer;
+  font-weight: 400;
+}
+
 .settings .theme .theme-header {
   background-color: #f1f1f1;
   border-bottom: 0.3125rem solid #c56bde;
@@ -99,9 +104,14 @@
 
 .settings .theme .theme-body .theme-button {
   background-color: #1eaedb;
+  background-image: linear-gradient(90deg, #ab51c4 50%, #1eaedb 50%);
   border-radius: 0.125rem;
   height: 1.75rem;
-  width: 1.75rem;
+  width: 2rem;
+}
+
+.settings .theme .theme-body .theme-links {
+  color: #1eaedb;
 }
 
 .settings .theme + label {

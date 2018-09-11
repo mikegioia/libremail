@@ -3,11 +3,22 @@
  * Easier on the eyes
  */
 
+/* Theme page */
 .settings .theme-warmlight .theme-body,
 .settings .theme-warmlight .theme-header {
   background-color: #f5e7dc;
 }
 
+.settings .theme-warmlight .theme-links {
+  color: #178eb3;
+}
+
+.settings .theme-warmlight .theme-button {
+  background-color: #178eb3 !important;
+  background-image: linear-gradient(90deg, #ab51c4 50%, #178eb3 50%) !important;
+}
+
+/* Default background */
 body.theme-warmlight,
 body.theme-warmlight > header,
 body.theme-warmlight .menu.actions,
@@ -15,6 +26,7 @@ body.theme-warmlight .menu.default {
   background-color: #f5e7dc;
 }
 
+/* Message lists */
 body.theme-warmlight .msg-contents {
   background-color: #f5e7dc;
   border-bottom: 1px solid #dcc5b3;
@@ -42,6 +54,26 @@ body.theme-warmlight .msg-contents .subject {
   color: #94877d;
 }
 
+/* Threads */
+body.theme-warmlight .thread-msg-row label.thread-msg-label,
+body.theme-warmlight .thread-msg-group .placeholder,
+body.theme-warmlight .thread-msg-more-checkbox + label span {
+  background: #ecd9cb;
+}
+
+body.theme-warmlight section #msg-list h5.thread-title,
+body.theme-warmlight .thread-msg-row label.thread-msg-label,
+body.theme-warmlight .thread-msg-group .placeholder {
+  border-color: #e2cbba;
+}
+
+body.theme-warmlight .thread-msg-row label .snippet,
+body.theme-warmlight .thread-msg-more-checkbox + label span,
+body.theme-warmlight .thread-msg label.thread-msg-header .from span {
+  color: #846b58;
+}
+
+/* Buttons and dropdowns */
 body.theme-warmlight .dropdown ul,
 body.theme-warmlight .button:not(.button-primary):not(.button-secondary),
 body.theme-warmlight button:not(.button-primary):not(.button-secondary),
@@ -52,13 +84,7 @@ body.theme-warmlight .settings .theme {
   border-color: #b19c8c;
 }
 
-body.theme-warmlight .msg-label,
-body.theme-warmlight .settings h5,
-body.theme-warmlight section #msg-actions,
-body.theme-warmlight .dropdown li.notice {
-  border-color: #dcc5b3;
-}
-
+/* Form inputs */
 body.theme-warmlight #search .icon.button,
 body.theme-warmlight input[type="search"],
 body.theme-warmlight input[type="text"],
@@ -71,6 +97,16 @@ body.theme-warmlight select {
   border-color: #dcc5b3;
 }
 
+/* Light borders */
+body.theme-warmlight .msg-label,
+body.theme-warmlight .settings h5,
+body.theme-warmlight section #msg-actions,
+body.theme-warmlight .dropdown li.notice,
+body.theme-warmlight article.thread-msg {
+  border-color: #dcc5b3;
+}
+
+/* Dropdown item background */
 body.theme-warmlight .dropdown a,
 body.theme-warmlight .dropdown ul,
 body.theme-warmlight .dropdown li a,
@@ -78,10 +114,12 @@ body.theme-warmlight .dropdown li input[type="submit"] {
   background: #f5e7dc;
 }
 
+/* Very light border */
 body.theme-warmlight nav #mailboxes-divider {
   border-color: #e8d3c2;
 }
 
+/* Dropdown item hover */
 body.theme-warmlight nav a.mailbox:hover,
 body.theme-warmlight nav a.mailbox:hover + .folder-label,
 body.theme-warmlight .dropdown li a:hover,
@@ -89,9 +127,40 @@ body.theme-warmlight .dropdown li [type="submit"]:hover {
   background-color: #e8d3c2;
 }
 
+/* Misc elements */
 body.theme-warmlight code {
   background-color: #fff3eb;
   border-color: #dcc9bd;
+}
+
+/* Update blue links */
+body.theme-warmlight .thread-msg .message a,
+body.theme-warmlight .settings a {
+  color: #178eb3;
+}
+
+body.theme-warmlight .thread-msg .message a:hover,
+body.theme-warmlight .thread-msg .message a:focus,
+body.theme-warmlight .settings a:hover,
+body.theme-warmlight .settings a:focus {
+  color: #005c86;
+}
+
+/* Buttons */
+body.theme-warmlight .button.button-secondary {
+  background-color: #178eb3;
+  border-color: #178eb3;
+}
+
+body.theme-warmlight .button.button-secondary:focus,
+body.theme-warmlight .button.button-secondary:hover {
+  background-color: #005c86;
+  border-color: #005c86;
+}
+
+/* Shadows */
+body.theme-warmlight .settings .theme {
+  box-shadow: 0 2px 2px #e8d3c2;
 }
 
 /* Overwrite #aaa */
@@ -126,26 +195,37 @@ body.theme-warmlight .msg-checkbox:checked + .msg-label + .msg-contents .subject
   color: #614937;
 }
 
-body.theme-warmlight .settings .theme {
-  box-shadow: 0 2px 2px #e8d3c2;
-}
-
 
 /**
  * Cool Night
  * Dark theme
  */
 
+/* Theme page */
 .settings .theme-coolnight .theme-body,
 .settings .theme-coolnight .theme-header {
   background-color: #3b3b3b;
   color: #ccc;
 }
 
+.settings .theme-coolnight .theme-header {
+  border-color: #2e7f9e;
+}
+
+.settings .theme-coolnight .theme-button {
+  background-color: #178eb3 !important;
+  background-image: linear-gradient(90deg, #7952b3 50%, #178eb3 50%) !important;
+}
+
+.settings  .theme-coolnight .theme-links a {
+  color: #1eaedb !important;
+}
+
 .settings .theme-coolnight > .theme {
   border-color: #222 !important;
 }
 
+/* Default background */
 body.theme-coolnight,
 body.theme-coolnight .menu.actions,
 body.theme-coolnight .menu.default {
@@ -153,12 +233,14 @@ body.theme-coolnight .menu.default {
   color: #ccc;
 }
 
+/* Header */
 body.theme-coolnight > header {
-  background-color: #2b2b2b;
+  background-color: #3b3b3b;
   border-color: #2e7f9e;
   color: #ccc;
 }
 
+/* Default text color */
 body.theme-coolnight nav a,
 body.theme-coolnight nav li:not(.active):hover > a,
 body.theme-coolnight #logo a,
@@ -173,9 +255,206 @@ body.theme-coolnight .msg-contents .date {
   color: #ccc;
 }
 
+/* Message lists */
+body.theme-coolnight .msg-contents {
+  background-color: #3b3b3b;
+  border-bottom: 1px solid #2b2b2b;
+  border-top: 1px solid #2b2b2b;
+}
 
+body.theme-coolnight .msg-label {
+  background-color: #3b3b3b;
+  border-color: #2b2b2b;
+}
 
+body.theme-coolnight .msg-label:after {
+  background-color: #9b9b9b;
+  border-color: #2b2b2b;
+}
+
+body.theme-coolnight .msg-checkbox:checked + .msg-label:after {
+  background-color: #eee;
+}
+
+body.theme-coolnight .msg-contents.unseen .subject span
+
+body.theme-coolnight .msg-label.unseen,
+body.theme-coolnight .msg-contents.unseen,
+body.theme-coolnight .msg-contents.unseen .names,
+body.theme-coolnight .msg-contents.unseen .subject span,
+body.theme-coolnight .msg-contents.unseen .date {
+  background-color: #6b6b6b;
+  color: #ddd;
+}
+
+body.theme-coolnight .msg-checkbox:checked + .msg-label,
+body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents {
+  border-color: #674f00;
+}
+
+body.theme-coolnight .msg-checkbox:checked + .msg-label,
+body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents .names,
+body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents .date,
+body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents .subject span {
+  background-color: #ffda6d; /* original yellow */
+  color: #4b4b4b;
+}
+
+body.theme-coolnight .msg-contents .subject {
+  color: #6b6b6b;
+}
+
+/* Buttons and dropdowns */
+body.theme-coolnight .dropdown ul,
+body.theme-coolnight .button:not(.button-primary):not(.button-secondary),
+body.theme-coolnight button:not(.button-primary):not(.button-secondary),
+body.theme-coolnight input[type="submit"]:not(.button-primary):not(.button-secondary),
+body.theme-coolnight input[type="reset"]:not(.button-primary):not(.button-secondary),
+body.theme-coolnight input[type="button"]:not(.button-primary):not(.button-secondary),
+body.theme-coolnight .settings .theme {
+  background-color: #3b3b3b;
+  border-color: #0b0b0b;
+  color: #999;
+}
+
+/* Form inputs */
+body.theme-coolnight #search .icon.button,
+body.theme-coolnight input[type="search"],
+body.theme-coolnight input[type="text"],
+body.theme-coolnight input[type="email"],
+body.theme-coolnight input[type="password"],
+body.theme-coolnight .settings .row input[readonly],
+body.theme-coolnight textarea,
+body.theme-coolnight select {
+  background-color: #6b6b6b;
+  border-color: #1b1b1b;
+  color: #ddd;
+}
+
+body.theme-coolnight .settings .row input[readonly] {
+  color: #9b9b9b;
+}
+
+/* Light borders */
+body.theme-coolnight .settings h5,
+body.theme-coolnight section #msg-actions,
+body.theme-coolnight .dropdown li.notice,
+body.theme-coolnight article.thread-msg {
+  border-color: #1b1b1b;
+}
+
+/* Dropdown item background */
+body.theme-coolnight .dropdown a,
+body.theme-coolnight .dropdown ul,
+body.theme-coolnight .dropdown li a,
+body.theme-coolnight .dropdown li input[type="submit"] {
+  background: #3b3b3b;
+}
+
+/* Very light borders */
+body.theme-coolnight .msg-label {
+  border-color: #2b2b2b;
+}
+
+body.theme-coolnight nav #mailboxes-divider {
+  border-color: #323232;
+}
+
+body.theme-coolnight .msg-label.unseen {
+  background-color: #6b6b6b;
+}
+
+/* Dropdown item hover */
+body.theme-coolnight nav a.mailbox:hover,
+body.theme-coolnight nav a.mailbox:hover + .folder-label,
+body.theme-coolnight .dropdown li a:hover,
+body.theme-coolnight .dropdown li [type="submit"]:hover {
+  background-color: #2b2b2b;
+}
+
+/* Misc elements */
+body.theme-coolnight code {
+  background-color: #2b2b2b;
+  border-color: #1b1b1b;
+}
+
+body.theme-coolnight ::placeholder {
+  color: #aaa;
+}
+
+/* Shadows */
+body.theme-coolnight .dropdown ul {
+  box-shadow: 0 0.125rem 0.25rem #2b2b2b;
+}
 
 body.theme-coolnight .settings .theme {
-  box-shadow: 0 2px 2px #222;
+  box-shadow: 0 2px 2px #323232;
+}
+
+/* Update blue links */
+body.theme-coolnight .thread-msg .message a:hover,
+body.theme-coolnight .thread-msg .message a:focus,
+body.theme-coolnight .settings a:hover,
+body.theme-coolnight .settings a:focus {
+  color: #35c2ef;
+}
+
+/* Buttons */
+body.theme-coolnight .button.button-primary {
+  background-color: #7952b3;
+  border-color: #321a54;
+  box-shadow: 0 2px 2px #383838;
+}
+
+body.theme-coolnight .button.button-primary:focus,
+body.theme-coolnight .button.button-primary:hover {
+  background-color: #8e63ce;
+  border-color: #321a54;
+}
+
+body.theme-coolnight .button.button-secondary {
+  background-color: #178eb3;
+  border-color: #178eb3;
+  box-shadow: 0 2px 2px #383838;
+}
+
+body.theme-coolnight .button.button-secondary:focus,
+body.theme-coolnight .button.button-secondary:hover {
+  background-color: #1280a2;
+  border-color: #1280a2;
+}
+
+/* Overwrite #aaa */
+body.theme-coolnight .folder-selector h4 .close,
+body.theme-coolnight .settings .buttons.row span,
+body.theme-coolnight section #msg-list footer span.bg {
+  color: #6b6b6b;
+}
+
+/* Overwrite #999 */
+body.theme-coolnight .msg-label:after,
+body.theme-coolnight .dropdown li.notice,
+body.theme-coolnight .settings .row .note {
+  color: #9b9b9b;
+}
+
+/* Overwrite #777 */
+body.theme-coolnight section #msg-list footer {
+  color: #8b8b8b;
+}
+
+/* Overwrite #666 */
+body.theme-coolnight .settings .row .note:hover,
+body.theme-coolnight #topnav-actions .status > div > span {
+  color: #8b8b8b;
+}
+
+/* Overwrite #555 */
+body.theme-coolnight .settings h5 + .help-text {
+  color: #9b9b9b;
+}
+
+/* Overwrite #444 */
+body.theme-coolnight .dropdown li .left-icon {
+  color: #7b7b7b;
 }

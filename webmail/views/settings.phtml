@@ -31,43 +31,49 @@ $view->render('nav', [
                 <div class="row">
                     <div class="four columns theme-default">
                         <div class="theme">
-                            <div class="theme-header"></div>
-                            <div class="theme-body">
-                                <span class="theme-button"></span>
-                                <span class="theme-text">Abc</span>
-                                <span class="theme-links"><a href="#">Link</a></span>
-                            </div>
+                            <label for="theme-default">
+                                <div class="theme-header"></div>
+                                <div class="theme-body">
+                                    <span class="theme-button"></span>
+                                    <span class="theme-text">Abc</span>
+                                    <span class="theme-links"><a href="#">Link</a></span>
+                                </div>
+                            </label>
                         </div>
                         <label>
-                            <input type="radio" name="<?php echo PREF_THEME; ?>" value="default" <?php echo $view->meta(PREF_THEME, 'default') === 'default' ? 'checked' : ''; ?>>
+                            <input id="theme-default" type="radio" name="<?php echo PREF_THEME; ?>" value="default" <?php echo $view->meta(PREF_THEME, 'default') === 'default' ? 'checked' : ''; ?>>
                             <span>LibreMail Classic</span>
                         </label>
                     </div>
                     <div class="four columns theme-warmlight">
                         <div class="theme">
-                            <div class="theme-header"></div>
-                            <div class="theme-body">
-                                <span class="theme-button"></span>
-                                <span class="theme-text">Abc</span>
-                                <span class="theme-links"><a href="#">Link</a></span>
-                            </div>
+                            <label for="theme-warmlight">
+                                <div class="theme-header"></div>
+                                <div class="theme-body">
+                                    <span class="theme-button"></span>
+                                    <span class="theme-text">Abc</span>
+                                    <span class="theme-links"><a href="#">Link</a></span>
+                                </div>
+                            </label>
                         </div>
                         <label>
-                            <input type="radio" name="<?php echo PREF_THEME; ?>" value="warmlight"<?php echo $view->meta(PREF_THEME, 'default') === 'warmlight' ? 'checked' : ''; ?>>
+                            <input id="theme-warmlight" type="radio" name="<?php echo PREF_THEME; ?>" value="warmlight"<?php echo $view->meta(PREF_THEME, 'default') === 'warmlight' ? 'checked' : ''; ?>>
                             <span>Warm Light</span>
                         </label>
                     </div>
                     <div class="four columns theme-coolnight">
                         <div class="theme">
-                            <div class="theme-header"></div>
-                            <div class="theme-body">
-                                <span class="theme-button"></span>
-                                <span class="theme-text">Abc</span>
-                                <span class="theme-links"><a href="#">Link</a></span>
-                            </div>
+                            <label for="theme-coolnight">
+                                <div class="theme-header"></div>
+                                <div class="theme-body">
+                                    <span class="theme-button"></span>
+                                    <span class="theme-text">Abc</span>
+                                    <span class="theme-links"><a href="#">Link</a></span>
+                                </div>
+                            </label>
                         </div>
                         <label>
-                            <input type="radio" name="<?php echo PREF_THEME; ?>" value="coolnight"<?php echo $view->meta(PREF_THEME, 'default') === 'coolnight' ? 'checked' : ''; ?>>
+                            <input id="theme-coolnight" type="radio" name="<?php echo PREF_THEME; ?>" value="coolnight"<?php echo $view->meta(PREF_THEME, 'default') === 'coolnight' ? 'checked' : ''; ?>>
                             <span>Cool Night</span>
                         </label>
                     </div>
