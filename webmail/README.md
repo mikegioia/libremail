@@ -11,7 +11,7 @@ Read below of you want to check it out.
        star/unstar actions for messages and threads.~
  - [ ] Reply to and forward messages
  - [ ] Compose new message
- - [ ] Edit account credentials and settings
+ - [x] ~Edit account credentials and settings~
  - [ ] Search and display search results
  - [ ] Sync all actions with IMAP/SMTP server
 
