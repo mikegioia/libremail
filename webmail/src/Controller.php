@@ -138,7 +138,7 @@ class Controller
         // Load the message, this will throw an exception if not found
         $message = (new Message)->getById($messageId, true);
 
-        (new View)->clean($message->getOriginal());
+        (new View)->raw($message->getOriginal());
     }
 
     public function account()

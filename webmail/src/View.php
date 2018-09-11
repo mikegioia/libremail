@@ -83,6 +83,11 @@ class View
         echo htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
     }
 
+    public function raw(string $value)
+    {
+        echo $value;
+    }
+
     /**
      * Renders a date, formatted for the timezone.
      */
