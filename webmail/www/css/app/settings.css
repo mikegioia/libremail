@@ -122,5 +122,5 @@
 .settings .theme + label span {
   display: inline-block;
   margin-left: 0.25rem;
-  transform: translateY(-0.0625rem);
+  transform: translateY(0.0625rem);
 }

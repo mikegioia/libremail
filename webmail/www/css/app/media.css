@@ -75,6 +75,7 @@
   .settings form > .row > .seven.columns .four.columns {
     width: 48%;
     max-width: 14rem;
+    margin: 0 4% 0 0;
   }
 }
 

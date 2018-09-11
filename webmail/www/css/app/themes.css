@@ -133,6 +133,16 @@ body.theme-warmlight code {
   border-color: #dcc9bd;
 }
 
+body.theme-warmlight #notifications .notification.success {
+  background-color: #4da74d;
+  color: #fff;
+}
+
+body.theme-warmlight #notifications .notification.error {
+  background-color: #d05b5b;
+  color: #fff;
+}
+
 /* Update blue links */
 body.theme-warmlight .thread-msg .message a,
 body.theme-warmlight .settings a {
