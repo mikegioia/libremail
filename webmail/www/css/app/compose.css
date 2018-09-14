@@ -42,6 +42,8 @@ form.compose {
 
 .compose .addresses .ten.columns input[type="text"] {
   margin-bottom: 0.5rem;
+  transition: margin-bottom 200ms ease-in-out, opacity 200ms ease-in-out;
+  transition-delay: 100ms;
 }
 
 .compose .addresses input[type="text"]:nth-child(n+2) {
