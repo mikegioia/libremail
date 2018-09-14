@@ -1,3 +1,10 @@
+/* Venfor files */
+@import 'font-awesome.css';
+@import 'open-sans.css';
+@import 'normalize.css';
+@import 'skeleton.css';
+
+/* Application files */
 @import 'app/base.css';
 @import 'app/nav.css';
 @import 'app/actions.css';
@@ -8,6 +15,10 @@
 @import 'app/dropdowns.css';
 @import 'app/messages.css';
 @import 'app/threads.css';
+@import 'app/compose.css';
 @import 'app/settings.css';
 @import 'app/media.css';
-@import 'app/themes.css';
+
+/* Theme files */
+@import 'themes/warmlight.css';
+@import 'themes/coolnight.css';

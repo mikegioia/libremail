@@ -16,12 +16,20 @@ class View
 {
     private $data = [];
 
+    private static $config;
     private static $timezone;
 
     const UTC = 'UTC';
     const TIME = 'g:i a';
     const DATE_SHORT = 'M j';
     const DATE_FULL = 'Y-m-d';
+    const DEFAULT_TZ = 'America/New_York';
+
+    public static function setConfig(array $config)
+    {
+        self::$config = $config;
+        self::setTimezone($config['APP_TIMEZONE'] ?? self::DEFAULT_TZ);
+    }
 
     public static function setTimezone(string $timezone)
     {
@@ -72,6 +80,19 @@ class View
     }
 
     /**
+     * Send HTML headers and optionally start the session.
+     */
+    public function htmlHeaders(bool $startSession = true)
+    {
+        if ($startSession) {
+            session_start();
+        }
+
+        header('Content-Type: text/html');
+        header('Cache-Control: private, max-age=0, no-cache, no-store');
+    }
+
+    /**
      * Sanitizes and prints a value for a view.
      */
     public function clean(string $value, bool $return = false)
@@ -86,6 +107,13 @@ class View
     public function raw(string $value)
     {
         echo $value;
+    }
+
+    public function env(string $key, $default = null)
+    {
+        return isset(self::$config[$key])
+            ? self::$config[$key]
+            : $default;
     }
 
     /**

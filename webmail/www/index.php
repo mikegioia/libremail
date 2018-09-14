@@ -43,7 +43,7 @@ define('ERR_TASK_ROLLBACK', 1020);
 // Application preferences
 define('PREF_THEME', 'wm.theme');
 
-// Helper to load config files
+// Helper to load external config files
 function getConfig($file) {
     return include BASEDIR.'/config/'.$file.'.php';
 }
@@ -68,8 +68,8 @@ Model::initDb(
 // Pass the routes into the URL service
 Url::setBase($config['APP_URL']);
 
-// Save the timezone to the view library
-View::setTimezone($config['APP_TIMEZONE']);
+// View class utilizes the config
+View::setConfig($config);
 
 // Get the email address from the cookie (if set) and
 // fetch the account. Otherwise, load the first active
@@ -116,6 +116,8 @@ $router->post('/account', [$controller, 'updateAccount']);
 $router->get('/settings', [$controller, 'settings']);
 // Updating settings
 $router->post('/settings', [$controller, 'updateSettings']);
+// Compose a new message
+$router->get('/compose', [$controller, 'compose']);
 // Handle 404s
 $router->set404([$controller, 'error404']);
 

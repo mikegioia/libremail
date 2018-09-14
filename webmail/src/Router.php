@@ -183,17 +183,17 @@ class Router
     public function getRequestMethod()
     {
         // Take the method as found in $_SERVER
-        $method = $_SERVER['REQUEST_METHOD'];
+        $method = $_SERVER['REQUEST_METHOD'] ?? null;
 
         // If it's a HEAD request override it to being GET and prevent
         // any output, as per HTTP Specification
         // @url http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.4
-        if ('HEAD' === $_SERVER['REQUEST_METHOD']) {
+        if ('HEAD' === $method) {
             ob_start();
             $method = 'GET';
         }
         // If it's a POST request, check for a method override header
-        elseif ('POST' === $_SERVER['REQUEST_METHOD']) {
+        elseif ('POST' === $method) {
             $headers = $this->getRequestHeaders();
             $headerSet = isset($headers['X-HTTP-Method-Override']);
             $methodExists = $headerSet

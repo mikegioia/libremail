@@ -22,13 +22,22 @@ body > header a.icon.button {
   height: 5rem;
   line-height: 5rem;
   margin-bottom: 0;
-  padding-left: 2rem;
-  width: 18rem;
+  padding-left: 1rem;
+  width: 19rem;
 }
 
-#logo a {
+#logo a.link {
   text-decoration: none;
   color: #333;
+}
+
+#logo a.icon.button {
+  margin: 0 0.125rem 1rem 0;
+  transform: translateY(-0.375rem);
+}
+
+#logo a.icon.button:not(:hover):not(:focus) {
+  color: #999;
 }
 
 #search {

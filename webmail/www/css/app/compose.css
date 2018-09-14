@@ -1,0 +1,86 @@
+/**
+ * New message and reply to message
+ */
+
+form.compose {
+  margin: 0 2rem 2.5rem 0;
+}
+
+.compose .row:not(.message) {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 1rem;
+}
+
+.compose .ten.columns {
+  margin-left: 2rem;
+  padding-bottom: 1rem;
+}
+
+.compose .ten.columns input[type="text"] {
+  margin-bottom: 0;
+}
+
+.compose .ten.columns textarea,
+.compose .ten.columns input[type="text"] {
+  max-width: 50rem;
+}
+
+.compose .row.hidden {
+  display: none;
+}
+
+.compose .addresses .ten.columns {
+  padding-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.compose .addresses input[type="text"] {
+  font-size: 1.5rem;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.compose .addresses .ten.columns input[type="text"] {
+  margin-bottom: 0.5rem;
+}
+
+.compose .addresses input[type="text"]:nth-child(n+2) {
+  display: none;
+}
+
+.compose .addresses input[type="text"]:valid,
+.compose .addresses input[type="text"]:valid + input {
+  display: block;
+}
+
+.compose .addresses input[type="text"]:valid:not(:focus) + input:not(:valid):not(:focus) {
+  opacity: 0.5;
+  margin-bottom: -2.25rem;
+}
+
+.compose .addresses input[type="text"]:focus {
+  opacity: 1;
+  margin-bottom: 0.5rem;
+}
+
+.compose .message textarea {
+  height: 30vh;
+  min-height: 15rem;
+  resize: vertical;
+  width: 100%;
+}
+
+.compose .offset-by-two.ten.columns {
+  margin-left: calc(13.333% + 2rem);
+}
+
+.compose .buttons a,
+.compose .buttons span {
+  display: inline-block;
+  transform: translateY(-0.125rem);
+}
+
+.compose .buttons span {
+  color: #aaa;
+  margin: 0 0.25rem 0 0.5rem;
+}

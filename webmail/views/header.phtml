@@ -6,11 +6,14 @@
     <meta name="author" content="">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="/css/font-awesome.css" rel="stylesheet" type="text/css">
-    <link href="/css/open-sans.css" rel="stylesheet" type="text/css">
-    <link href="/css/normalize.css" rel="stylesheet" type="text/css">
-    <link href="/css/skeleton.css" rel="stylesheet" type="text/css">
+    <?php
+    if (false == $view->env('APP_WEB_BUILD', true)): ?>
     <link href="/css/site.css" rel="stylesheet" type="text/css">
+    <?php
+    else: ?>
+    <link href="/build/libremail.css" rel="stylesheet" type="text/css">
+    <?php
+    endif; ?>
     <link href="/favicon.ico" rel="icon" type="image/png">
     <noscript>
         <style type="text/css">
@@ -23,7 +26,10 @@
 <body class="theme-<?php echo $view->meta(PREF_THEME, 'default'); ?>">
     <header class="u-cf">
         <h4 id="logo">
-            <a href="/">LibreMail</a>
+            <a class="icon button" href="#" tabindex="3">
+                <i class="fa fa-bars"></i>
+            </a>
+            <a href="/" class="link">LibreMail</a>
         </h4>
         <div id="search">
             <input type="search" value="" placeholder="Search..." tabindex="1" /><!--

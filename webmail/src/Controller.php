@@ -119,13 +119,10 @@ class Controller
 
         // Re-compute the un-read totals, as this may be changed now
         // Render the message thread
-        session_start();
-        $view->render('thread', [
-            'view' => $view,
+        $this->page('thread', [
             'thread' => $thread,
             'folders' => $folders,
             'folderId' => $folderId,
-            'meta' => Meta::getAll(),
             'alert' => Session::get(Session::ALERT),
             'totals' => (new Message)->getSizeCounts($this->account->id)
         ]);
@@ -143,19 +140,7 @@ class Controller
 
     public function account()
     {
-        $view = new View;
-
-        session_start();
-        header('Content-Type: text/html');
-        header('Cache-Control: private, max-age=0, no-cache, no-store');
-
-        $view->render('account', [
-            'view' => $view,
-            'meta' => Meta::getAll(),
-            'account' => $this->account,
-            'notifications' => Session::get(Session::NOTIFICATIONS, []),
-            'folders' => new Folders($this->account, getConfig('colors'))
-        ]);
+        $this->page('account');
     }
 
     public function updateAccount()
@@ -191,19 +176,7 @@ class Controller
 
     public function settings()
     {
-        $view = new View;
-
-        session_start();
-        header('Content-Type: text/html');
-        header('Cache-Control: private, max-age=0, no-cache, no-store');
-
-        $view->render('settings', [
-            'view' => $view,
-            'meta' => Meta::getAll(),
-            'account' => $this->account,
-            'notifications' => Session::get(Session::NOTIFICATIONS, []),
-            'folders' => new Folders($this->account, getConfig('colors'))
-        ]);
+        $this->page('settings');
     }
 
     public function updateSettings()
@@ -212,6 +185,11 @@ class Controller
         Meta::update($_POST);
         Session::notify('Your preferences have been saved!', Session::SUCCESS);
         Url::redirectBack('/settings');
+    }
+
+    public function compose()
+    {
+        $this->page('compose');
     }
 
     public function error404()
@@ -250,9 +228,7 @@ class Controller
                 Message::INCLUDE_DELETED => $folderId === $folders->getTrashId()
             ]);
 
-        session_start();
-        header('Content-Type: text/html');
-        header('Cache-Control: private, max-age=0, no-cache, no-store');
+        $view->htmlHeaders();
 
         // Render the inbox
         $view->render('mailbox', [
@@ -273,5 +249,24 @@ class Controller
                 : $folder->name,
             'alert' => Session::get(Session::ALERT)
         ]);
+    }
+
+    private function page(string $viewPath, array $data = [])
+    {
+        $view = new View;
+
+        if (! isset($data['folders'])) {
+            $data['folders'] = new Folders($this->account, getConfig('colors'));
+        }
+
+        $view->htmlHeaders();
+        $view->render(
+            $viewPath,
+            array_merge([
+                'view' => $view,
+                'meta' => Meta::getAll(),
+                'account' => $this->account,
+                'notifications' => Session::get(Session::NOTIFICATIONS, [])
+            ], $data));
     }
 }

@@ -1,0 +1,222 @@
+/**
+ * Warm Light
+ * Easier on the eyes
+ */
+
+/* Theme page */
+.settings .theme-warmlight .theme-body,
+.settings .theme-warmlight .theme-header {
+  background-color: #f5e7dc;
+}
+
+.settings .theme-warmlight .theme-links {
+  color: #178eb3;
+}
+
+.settings .theme-warmlight .theme-button {
+  background-color: #178eb3 !important;
+  background-image: linear-gradient(90deg, #ab51c4 50%, #178eb3 50%) !important;
+}
+
+/* Default background */
+body.theme-warmlight,
+body.theme-warmlight > header,
+body.theme-warmlight .menu.actions,
+body.theme-warmlight .menu.default,
+body.theme-warmlight .folder-selector,
+body.theme-warmlight .folder-selector h4 {
+  background-color: #f5e7dc;
+}
+
+/* Slightly darker */
+body.theme-warmlight .folder-selector .actions {
+  background-color: #efd8c6;
+}
+
+/* Message lists */
+body.theme-warmlight .msg-contents {
+  background-color: #f5e7dc;
+  border-bottom: 1px solid #dcc5b3;
+  border-top: 1px solid #dcc5b3;
+}
+
+body.theme-warmlight .msg-label {
+  background-color: #f5e7dc;
+}
+
+body.theme-warmlight .msg-label:after {
+  border-color: #b19c8c;
+}
+
+body.theme-warmlight .msg-label.unseen,
+body.theme-warmlight .msg-contents.unseen {
+  background-color: #fdf5ef;
+}
+
+body.theme-warmlight .msg-checkbox:checked + .msg-label {
+  background-color: #ffda6d; /* original yellow */
+}
+
+body.theme-warmlight .msg-contents .subject {
+  color: #94877d;
+}
+
+/* Threads */
+body.theme-warmlight .thread-msg-row label.thread-msg-label,
+body.theme-warmlight .thread-msg-group .placeholder,
+body.theme-warmlight .thread-msg-more-checkbox + label span {
+  background: #ecd9cb;
+}
+
+body.theme-warmlight section #msg-list h5.thread-title,
+body.theme-warmlight .thread-msg-row label.thread-msg-label,
+body.theme-warmlight .thread-msg-group .placeholder,
+body.theme-warmlight .folder-selector h4,
+body.theme-warmlight .folder-selector .actions,
+body.theme-warmlight .folder-selector .list label {
+  border-color: #e2cbba;
+}
+
+body.theme-warmlight .thread-msg-row label .snippet,
+body.theme-warmlight .thread-msg-more-checkbox + label span,
+body.theme-warmlight .thread-msg label.thread-msg-header .from span {
+  color: #846b58;
+}
+
+/* Buttons and dropdowns */
+body.theme-warmlight .dropdown ul,
+body.theme-warmlight .button:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-warmlight button:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-warmlight input[type="submit"]:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-warmlight input[type="reset"]:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-warmlight input[type="button"]:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-warmlight .settings .theme,
+body.theme-warmlight .folder-selector {
+  border-color: #b19c8c;
+}
+
+/* Form inputs */
+body.theme-warmlight #search .icon.button,
+body.theme-warmlight input[type="search"],
+body.theme-warmlight input[type="text"],
+body.theme-warmlight input[type="email"],
+body.theme-warmlight input[type="password"],
+body.theme-warmlight .settings .row input[readonly],
+body.theme-warmlight textarea,
+body.theme-warmlight select {
+  background-color: #fdf5ef;
+  border-color: #dcc5b3;
+}
+
+/* Light borders */
+body.theme-warmlight .msg-label,
+body.theme-warmlight .settings h5,
+body.theme-warmlight section #msg-actions,
+body.theme-warmlight .dropdown li.notice,
+body.theme-warmlight article.thread-msg {
+  border-color: #dcc5b3;
+}
+
+/* Dropdown item background */
+body.theme-warmlight .dropdown a,
+body.theme-warmlight .dropdown ul,
+body.theme-warmlight .dropdown li a,
+body.theme-warmlight .dropdown li input[type="submit"] {
+  background: #f5e7dc;
+}
+
+/* Very light border */
+body.theme-warmlight nav #mailboxes-divider,
+body.theme-warmlight .compose .row:not(.message) {
+  border-color: #e8d3c2;
+}
+
+/* Dropdown item hover */
+body.theme-warmlight nav a.mailbox:hover,
+body.theme-warmlight nav a.mailbox:hover + .folder-label,
+body.theme-warmlight .dropdown li a:hover,
+body.theme-warmlight .dropdown li [type="submit"]:hover {
+  background-color: #e8d3c2;
+}
+
+/* Misc elements */
+body.theme-warmlight code {
+  background-color: #fff3eb;
+  border-color: #dcc9bd;
+}
+
+body.theme-warmlight #notifications .notification.success {
+  background-color: #4da74d;
+  color: #fff;
+}
+
+body.theme-warmlight #notifications .notification.error {
+  background-color: #d05b5b;
+  color: #fff;
+}
+
+/* Update blue links */
+body.theme-warmlight .thread-msg .message a,
+body.theme-warmlight .settings a {
+  color: #178eb3;
+}
+
+body.theme-warmlight .thread-msg .message a:hover,
+body.theme-warmlight .thread-msg .message a:focus,
+body.theme-warmlight .settings a:hover,
+body.theme-warmlight .settings a:focus {
+  color: #005c86;
+}
+
+/* Buttons */
+body.theme-warmlight .button.button-secondary {
+  background-color: #178eb3;
+  border-color: #178eb3;
+}
+
+body.theme-warmlight .button.button-secondary:focus,
+body.theme-warmlight .button.button-secondary:hover {
+  background-color: #005c86;
+  border-color: #005c86;
+}
+
+/* Shadows */
+body.theme-warmlight .settings .theme {
+  box-shadow: 0 2px 2px #e8d3c2;
+}
+
+body.theme-warmlight .folder-selector {
+  box-shadow: 0px 0px 1rem #b19c8c
+}
+
+/* Overwrite #aaa */
+body.theme-warmlight .folder-selector h4 .close,
+body.theme-warmlight .settings .buttons.row span,
+body.theme-warmlight section #msg-list footer span.bg {
+  color: #b19c8c;
+}
+
+/* Overwrite #999 */
+body.theme-warmlight .msg-label:after,
+body.theme-warmlight .dropdown li.notice,
+body.theme-warmlight .settings .row .note {
+  color: #ad9888;
+}
+
+/* Overwrite #777 */
+body.theme-warmlight section #msg-list footer,
+body.theme-warmlight .settings .row input[readonly] {
+  color: #a08672;
+}
+
+/* Overwrite #666 */
+body.theme-warmlight .settings .row .note:hover,
+body.theme-warmlight #topnav-actions .status > div > span {
+  color: #846b58;
+}
+
+/* Overwrite #555 */
+body.theme-warmlight .settings h5 + .help-text,
+body.theme-warmlight .msg-checkbox:checked + .msg-label + .msg-contents .subject {
+  color: #614937;
+}
