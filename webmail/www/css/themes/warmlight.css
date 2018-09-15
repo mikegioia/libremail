@@ -180,6 +180,15 @@ body.theme-warmlight .button.button-secondary:hover {
   border-color: #005c86;
 }
 
+body.theme-warmlight #logo a.icon.button:not(:hover):not(:focus) {
+  border-color: #caad97;
+  color: #dcc5b3;
+}
+
+body.theme-warmlight #logo a.icon.button:hover {
+  color: #94877d;
+}
+
 /* Shadows */
 body.theme-warmlight .settings .theme {
   box-shadow: 0 2px 2px #e8d3c2;

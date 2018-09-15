@@ -54,6 +54,11 @@ input[type="button"].button-primary:focus {
   border-color: #9238ab;
 }
 
+.button.button-primary:not(#compose) {
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
 .button.button-secondary {
   background-color: #1eaedb;
   border-color: #1eaedb;

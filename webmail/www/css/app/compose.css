@@ -11,6 +11,10 @@ form.compose {
   margin-bottom: 1rem;
 }
 
+.compose .two.columns label {
+  margin: 0.25rem 0 0
+}
+
 .compose .ten.columns {
   margin-left: 2rem;
   padding-bottom: 1rem;

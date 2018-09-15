@@ -230,11 +230,6 @@ body.theme-coolnight .button.button-primary:hover {
   border-color: #321a54;
 }
 
-body.theme-coolnight .button.button-primary:not(#compose) {
-  font-weight: 400;
-  letter-spacing: 0;
-}
-
 body.theme-coolnight .button.button-secondary {
   background-color: #178eb3;
   border-color: #053544;

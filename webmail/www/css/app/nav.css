@@ -37,7 +37,7 @@ body > header a.icon.button {
 }
 
 #logo a.icon.button:not(:hover):not(:focus) {
-  color: #999;
+  color: #bbb;
 }
 
 #search {
