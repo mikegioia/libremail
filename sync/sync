@@ -16,8 +16,8 @@ use App\Message;
 use App\Startup;
 use App\Constants;
 use App\Diagnostics;
+use Pb\PDO\Database;
 use Pimple\Container;
-use Slim\PDO\Database;
 use Exception as Exception;
 use App\Console\SyncConsole;
 use PDOException as PDOException;
@@ -148,7 +148,7 @@ pcntl_signal(SIGURG, function ($signo) use ($di) {
     }
 });
 
-// PDO factory, this uses Slim-PDO as a wrapper
+// PDO factory, this uses a wrapper around PDO
 $di['db_factory'] = $di->factory(function ($c, $config = null) {
     $dbConfig = $config ?: $c['config']['sql'];
     $dsn = sprintf(

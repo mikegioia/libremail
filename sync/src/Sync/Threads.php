@@ -23,6 +23,7 @@ use App\Sync;
 use Monolog\Logger;
 use League\CLImate\CLImate;
 use App\Model\Account as AccountModel;
+use App\Model\Contact as ContactModel;
 use App\Model\Message as MessageModel;
 use Evenement\EventEmitter as Emitter;
 use App\Sync\Threads\Meta as ThreadMeta;
@@ -47,6 +48,8 @@ class Threads
     private $currentId;
     // Master index of messages and references
     private $messages = [];
+    // Master collection of addresses
+    private $addresses = [];
     // Index of new, unthreaded messages
     private $unthreaded = [];
     // Index of all threads for subject matching
@@ -57,6 +60,8 @@ class Threads
     private $groupedThreads = [];
     // List of dirty message IDs to update
     private $dirtyMessageIds = [];
+    // Flag used when storing addresses
+    private $prevAddressCount = 0;
 
     // How many messages to fetch at once
     const BATCH_SIZE = 1000;
@@ -93,7 +98,9 @@ class Threads
             $this->account = $account;
         }
 
+        $this->addresses = [];
         $this->emitter = $emitter;
+
         $this->updateEmitter();
         $this->storeMessageIdBounds();
         $this->storeTotalMessageIds();
@@ -105,6 +112,7 @@ class Threads
         $this->setThreadIds();
         $this->combineThreads();
         $this->commitThreadIds();
+        $this->commitAddressList();
     }
 
     /**
@@ -113,6 +121,7 @@ class Threads
     private function storeMessageIdBounds()
     {
         $model = new MessageModel;
+
         $this->maxId = $model->getMaxMessageId($this->account->id);
 
         if (! $this->currentId) {
@@ -146,6 +155,7 @@ class Threads
         $currentId = $this->currentId;
         $total = $this->maxId - $minId;
         $messageModel = new MessageModel;
+
         $this->log->debug(
             "Threading: storing {$total} messages for threading for ".
             "{$this->account->email}");
@@ -204,6 +214,7 @@ class Threads
         $count = 0;
         $total = count($this->messages);
         $noun = Fn\plural('message', $total);
+
         $this->log->debug(
             "Threading Pass 2: updating {$total} {$noun} for ".
             "{$this->account->email}");
@@ -363,6 +374,7 @@ class Threads
         $transactionStarted = false;
         $messageModel = new MessageModel;
         $total = count($this->messages);
+
         $this->log->debug(
             "Threading: saving new thread IDs for {$this->account->email}");
         $this->printMemory();
@@ -392,6 +404,10 @@ class Threads
                 $updateCount = 0;
             }
 
+            $this->addresses = array_merge(
+                $this->addresses,
+                $message->getAddresses());
+
             $this->updateProgress(++$count, $total);
 
             if (0 === $count % self::BATCH_SIZE) {
@@ -404,7 +420,44 @@ class Threads
             $messageModel->db()->commit();
         }
 
+        // We can safely clear this now
         $this->groupedThreads = [];
+    }
+
+    /**
+     * Stores meta information for each contact among all
+     * messages in the account. To and From are stored
+     * separately because they're weighted differently.
+     */
+    private function commitAddressList()
+    {
+        // Only store these in SQL if the total count changed
+        if (count($this->addresses) === $this->prevAddressCount) {
+            return;
+        }
+
+        $this->prevAddressCount = count($this->addresses);
+
+        $contacts = [];
+        $counts = array_filter(
+            array_count_values($this->addresses),
+            function ($value) {
+                return $value > 1;
+            });
+        $keys = [
+            'name', 'tally', 'account_id'
+        ];
+
+        foreach ($counts as $name => $tally) {
+            $contacts[] = [
+                'name' => $name,
+                'tally' => $tally,
+                'account_id' => $this->account->id
+            ];
+        }
+
+        // Store these in SQL
+        (new ContactModel)->store($keys, $contacts);
     }
 
     private function startProgress($pass, $total)

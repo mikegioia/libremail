@@ -3,8 +3,8 @@
 namespace App;
 
 use Monolog\Logger;
+use Pb\PDO\Database;
 use Pimple\Container;
-use Slim\PDO\Database;
 use League\CLImate\CLImate;
 use Particle\Validator\Validator;
 

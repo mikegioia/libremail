@@ -90,12 +90,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/pdo.git",
-                "reference": "f3ae3fbae9dc2aa2fe6674fb3ad1134b0811ff3e"
+                "reference": "c65110221ca2e06c0baa5821395fb00c57d66452"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/pdo/zipball/f3ae3fbae9dc2aa2fe6674fb3ad1134b0811ff3e",
-                "reference": "f3ae3fbae9dc2aa2fe6674fb3ad1134b0811ff3e",
+                "url": "https://api.github.com/repos/ParticleBits/pdo/zipball/c65110221ca2e06c0baa5821395fb00c57d66452",
+                "reference": "c65110221ca2e06c0baa5821395fb00c57d66452",
                 "shasum": ""
             },
             "require": {
@@ -105,7 +105,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Slim\\PDO\\": "src/PDO/"
+                    "Pb\\PDO\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -114,24 +114,27 @@
             ],
             "authors": [
                 {
-                    "name": "Fabian de Laender",
-                    "email": "fabian@faapz.nl",
-                    "homepage": "http://faapz.nl",
+                    "name": "Mike Gioia",
+                    "email": "mike@particlebits.com",
+                    "homepage": "https://particlebits.com",
                     "role": "Developer"
                 },
                 {
-                    "name": "Mike Gioia",
-                    "email": "mike@particlebits.com",
-                    "homepage": "https://particlebits.com"
+                    "name": "Fabian de Laender",
+                    "email": "fabian@faapz.nl",
+                    "homepage": "http://faapz.nl",
+                    "role": "Original Developer"
                 }
             ],
-            "description": "PDO database library for Slim Framework",
+            "description": "Smallest possible PDO database while being super useful",
             "homepage": "https://github.com/particlebits/pdo",
             "keywords": [
                 "database",
-                "pdo"
+                "micro pdo",
+                "pdo",
+                "tiny pdo"
             ],
-            "time": "2018-07-28T01:16:31+00:00"
+            "time": "2018-09-16T21:18:50+00:00"
         },
         {
             "name": "psr/container",

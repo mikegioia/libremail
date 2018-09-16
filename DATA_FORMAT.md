@@ -240,3 +240,24 @@ CREATE TABLE IF NOT EXISTS `batches` (
   contains more than one background task, the batch ID is used to reference
   all of those background tasks.
 - `created_at` Timestamp denoting when the batch was added to the database.
+
+## Contacts
+
+```SQL
+CREATE TABLE IF NOT EXISTS `contacts` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `account_id` int(10) unsigned NOT NULL,
+  `name` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tally` int(10) unsigned DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `account_id_name` (`account_id`, `name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+```
+
+- `id` Unique integer identifying the contact.
+- `account_id` Foreign key referencing the account from the `accounts` table.
+- `name` Name of the contact with email address
+- `tally` Count of different messages this contact was a part of.
+- `created_at` Timestamp denoting when the batch was added to the database.

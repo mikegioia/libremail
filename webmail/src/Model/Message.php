@@ -236,7 +236,7 @@ class Message extends Model
             ->where('deleted', '=', 0)
             ->where('account_id', '=', $accountId)
             ->whereIn('thread_id', $threadIds)
-            ->groupBy('thread_id');
+            ->groupBy(['thread_id']);
 
         // Some requests, like viewing the trash folder, want to
         // restrict all messages to that folder ID
@@ -383,7 +383,7 @@ class Message extends Model
             ->where('deleted', '=', 0)
             ->where('account_id', '=', $accountId)
             ->whereIn('thread_id', $threadIds)
-            ->groupBy('thread_id')
+            ->groupBy(['thread_id'])
             ->orderBy('date', Model::DESC)
             ->limit($limit, $offset)
             ->execute()
@@ -491,7 +491,7 @@ class Message extends Model
                 ->where('deleted', '=', 0)
                 ->where('seen', '=', 0)
                 ->whereIn('thread_id', $unseenThreadIds)
-                ->groupBy('folder_id, thread_id')
+                ->groupBy(['folder_id', 'thread_id'])
                 ->execute()
                 ->fetchAll(PDO::FETCH_CLASS);
 

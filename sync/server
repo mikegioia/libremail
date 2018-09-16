@@ -16,8 +16,8 @@ use App\Startup;
 use App\Constants;
 use App\RatchetApp;
 use App\Diagnostics;
+use Pb\PDO\Database;
 use Pimple\Container;
-use Slim\PDO\Database;
 use App\Server\WebServer;
 use App\Server\StatsServer;
 use Exception as Exception;
@@ -108,7 +108,7 @@ $pcntl->on(SIGINT, $HALT);
 $pcntl->on(SIGTERM, $HALT);
 $pcntl->on(SIGQUIT, $HALT);
 
-// PDO factory, this uses Slim-PDO as a wrapper
+// PDO factory, this uses a wrapper around PDO
 $di['db_factory'] = $di->factory(function ($c, $config = null) {
     $dbConfig = ($config) ?: $c['config']['sql'];
     $dsn = sprintf(

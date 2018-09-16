@@ -199,7 +199,8 @@ class Message extends Model
         return $this->db()
             ->select([
                 'id', 'thread_id', 'message_id', '`date`',
-                'in_reply_to', '`references`', 'subject'
+                'in_reply_to', '`references`', 'subject',
+                '`to`', 'cc', 'bcc', '`from`'
             ])
             ->from('messages')
             ->where('id', '>=', $minId)

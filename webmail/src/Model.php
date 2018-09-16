@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Slim\PDO\Database;
+use Pb\PDO\Database;
 
 class Model
 {

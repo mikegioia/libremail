@@ -16,6 +16,8 @@ class Message
     public $timestamp;
     // Unique hash of the simplified subject line
     public $subjectHash;
+    // Collection of to, cc, bcc, and from addresses
+    public $addresses = [];
     // Indexed by message ID to be used as a set
     public $references = [];
     // Dirty flag, for updating database
@@ -41,6 +43,9 @@ class Message
 
         // Stores the initial set of message references
         $this->storeReferences($message);
+
+        // Stores all the address fields in an array
+        $this->storeAddresses($message);
     }
 
     public function getThreadId()
@@ -78,6 +83,20 @@ class Message
         }
     }
 
+    public function getAddresses()
+    {
+        // Only ones that have an email address
+        $addresses = array_filter(
+            $this->addresses,
+            function ($value) {
+                return strlen($value) > 0
+                    && false !== strpos($value, '@');
+            });
+
+        // Only unique addresses
+        return array_values(array_unique($addresses));
+    }
+
     /**
      * Save the thread ID for any internal IDs.
      *
@@ -93,6 +112,25 @@ class Message
 
         if ($this->ids) {
             $model->saveThreadId($this->ids, $this->threadId);
+        }
+    }
+
+    /**
+     * Merge another Message object into this one.
+     *
+     * @param Message $message
+     */
+    public function merge(Message $message)
+    {
+        $this->ids = array_unique(
+            array_merge($this->ids, $message->ids));
+        $this->references = $this->references + $message->references;
+        $this->addresses = array_merge($this->addresses, $message->addresses);
+
+        // If any message in this thread is missing a thread ID, then
+        // we want to update the whole collection
+        if (! $message->threadId) {
+            $this->dirty = true;
         }
     }
 
@@ -126,21 +164,15 @@ class Message
         $this->references = array_flip(array_unique($this->references));
     }
 
-    /**
-     * Merge another Message object into this one.
-     *
-     * @param Message $message
-     */
-    public function merge(Message $message)
+    private function storeAddresses(MessageModel $message)
     {
-        $this->ids = array_unique(
-            array_merge($this->ids, $message->ids));
-        $this->references = $this->references + $message->references;
-
-        // If any message in this thread is missing a thread ID, then
-        // we want to update the whole collection
-        if (! $message->threadId) {
-            $this->dirty = true;
-        }
+        $this->addresses = array_map(
+            'trim',
+            array_merge(
+                explode(',', $message->to),
+                explode(',', $message->cc),
+                explode(',', $message->bcc)
+            ));
+        $this->addresses[] = trim($message->from);
     }
 }
