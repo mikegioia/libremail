@@ -280,6 +280,16 @@ body.theme-coolnight #notifications .notification {
   color: #333;
 }
 
+body.theme-coolnight #notifications .notification.success {
+  border: 1px solid #193114;
+  box-shadow: 0 1px 2px #2b2b2b;
+}
+
+body.theme-coolnight #notifications .notification.error {
+  border: 1px solid #2d1414;
+  box-shadow: 0 1px 2px #2b2b2b;
+}
+
 /* Shadows */
 body.theme-coolnight .dropdown ul {
   box-shadow: 0 0.125rem 0.25rem #2b2b2b;

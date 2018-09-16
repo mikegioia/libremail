@@ -123,7 +123,6 @@ class Controller
             'thread' => $thread,
             'folders' => $folders,
             'folderId' => $folderId,
-            'alert' => Session::get(Session::ALERT),
             'totals' => (new Message)->getSizeCounts($this->account->id)
         ]);
     }
@@ -266,6 +265,7 @@ class Controller
                 'view' => $view,
                 'meta' => Meta::getAll(),
                 'account' => $this->account,
+                'alert' => Session::get(Session::ALERT),
                 'notifications' => Session::get(Session::NOTIFICATIONS, [])
             ], $data));
     }
