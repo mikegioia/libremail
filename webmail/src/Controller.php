@@ -4,6 +4,7 @@ namespace App;
 
 use App\Model\Meta;
 use App\Model\Account;
+use App\Model\Contact;
 use App\Model\Message;
 use App\Model\settings;
 use App\Exceptions\ClientException;
@@ -188,7 +189,9 @@ class Controller
 
     public function compose()
     {
-        $this->page('compose');
+        $this->page('compose', [
+            'contacts' => Contact::getByAccount($this->account->id)
+        ]);
     }
 
     public function error404()

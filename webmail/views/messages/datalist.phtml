@@ -1,8 +1,8 @@
 <!-- Datalist for folders -->
 <datalist id="folder-list">
 <?php
-foreach ( $folders as $folder ): ?>
-    <option value="<?php $view->clean( $folder->name ); ?>"><?php $view->clean( $folder->full_name ); ?></option>
+foreach ($folders as $folder): ?>
+    <option value="<?php $view->clean($folder->name); ?>"><?php $view->clean($folder->full_name); ?></option>
 <?php
 endforeach; ?>
 </datalist>

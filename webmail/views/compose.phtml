@@ -83,11 +83,13 @@ $view->render('nav', [
     </form>
 </section>
 
+<!-- Datalist for contacts -->
 <datalist id="contacts">
-    <option value="Mike Gioia <mikegioia@gmail.com>">
-    <option value="Mike Gioia <mike@teachboost.com>">
-    <option value="Ashley Gioia <sjsauln@gmail.com>">
-    <option value="Cindy Sauln <ccss@cs.com>">
+<?php
+foreach ($contacts as $contact): ?>
+    <option value="<?php $view->clean($contact->name); ?>"><?php $view->clean($contact->name); ?></option>
+<?php
+endforeach; ?>
 </datalist>
 
 <?php
