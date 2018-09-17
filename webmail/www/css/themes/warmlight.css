@@ -180,6 +180,16 @@ body.theme-warmlight .button.button-secondary:hover {
   border-color: #005c86;
 }
 
+body.theme-warmlight .button[disabled],
+body.theme-warmlight button[disabled],
+body.theme-warmlight input[type="submit"][disabled],
+body.theme-warmlight input[type="reset"][disabled],
+body.theme-warmlight input[type="button"][disabled] {
+  background-color: #efd8c6 !important;
+  border-color: #efd8c6 !important;
+  color: #caad97 !important;
+}
+
 body.theme-warmlight #logo a.icon.button:not(:hover):not(:focus) {
   border-color: #caad97;
   color: #dcc5b3;

@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS `outbox` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `account_id` int(10) unsigned NOT NULL,
+  `parent_id` int(10) unsigned NOT NULL,
+  `to` text COLLATE utf8mb4_unicode_ci,
+  `from` text COLLATE utf8mb4_unicode_ci,
+  `cc` text COLLATE utf8mb4_unicode_ci,
+  `bcc` text COLLATE utf8mb4_unicode_ci,
+  `reply_to` text COLLATE utf8mb4_unicode_ci,
+  `text_plain` longtext COLLATE utf8mb4_unicode_ci,
+  `text_html` longtext COLLATE utf8mb4_unicode_ci,
+  `sent` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `locked` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `attempts` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `update_history` text COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`id`),
+  INDEX (`account_id`),
+  INDEX (`sent`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

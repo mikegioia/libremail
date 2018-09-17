@@ -28,7 +28,7 @@ class View
     public static function setConfig(array $config)
     {
         self::$config = $config;
-        self::setTimezone($config['APP_TIMEZONE'] ?? self::DEFAULT_TZ);
+        self::setTimezone($config['TIMEZONE'] ?? self::DEFAULT_TZ);
     }
 
     public static function setTimezone(string $timezone)

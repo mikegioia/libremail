@@ -7,6 +7,16 @@ input[type="button"] {
   text-transform: none;
 }
 
+.button[disabled],
+button[disabled],
+input[type="submit"][disabled],
+input[type="reset"][disabled],
+input[type="button"][disabled] {
+  background-color: #eee !important;
+  border-color: #eee !important;
+  color: #bbb !important;
+}
+
 .icon.button {
   height: 3.5rem;
   line-height: 3.4rem;

@@ -73,7 +73,8 @@ $view->render('nav', [
                 <button type="submit" name="send_outbox" class="button button-primary" formnovalidate>
                     Send
                 </button>
-                <button type="submit" name="send_now" class="button button-secondary" formnovalidate>
+                <button type="submit" name="send_now" class="button button-secondary" formnovalidate
+                    <?php echo $view->env('COMPOSE_SEND_NOW') ? '' : 'disabled title="Not available"'; ?>>
                     Send Immediately
                 </button>
                 <span>or</span>

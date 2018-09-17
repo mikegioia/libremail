@@ -52,7 +52,7 @@ function getConfig($file) {
 $config = parse_ini_file(BASEDIR.'/.env');
 
 // Set the timezone now
-date_default_timezone_set($config['APP_TIMEZONE']);
+date_default_timezone_set($config['TIMEZONE']);
 
 // Set up the database connection
 Model::initDb(
@@ -66,7 +66,7 @@ Model::initDb(
     $config['DB_PASSWORD']);
 
 // Pass the routes into the URL service
-Url::setBase($config['APP_URL']);
+Url::setBase($config['WEB_URL']);
 
 // View class utilizes the config
 View::setConfig($config);
@@ -140,7 +140,7 @@ catch (ServerException $e) {
     echo '<p>'.$e->getMessage().' [#'.$e->getCode().']</p>';
 }
 catch (Exception $e) {
-    if (true !== $config['APP_DEBUG']) {
+    if (true !== $config['DEBUG']) {
         header('HTTP/1.1 500 Server Error');
         echo '<h1>500 Server Error</h1>';
         echo '<p>'.$e->getMessage().' [#'.$e->getCode().']</p>';

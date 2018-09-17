@@ -5,5 +5,6 @@ CREATE TABLE IF NOT EXISTS `contacts` (
   `tally` int(10) unsigned DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `account_id_name` (`account_id`, `name`)
+  UNIQUE KEY `account_id_name` (`account_id`, `name`),
+  INDEX (`account_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
