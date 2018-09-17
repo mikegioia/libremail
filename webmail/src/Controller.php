@@ -92,7 +92,9 @@ class Controller
                 : Actions::UNFLAG,
             [
                 Url::postParam('id', 0)
-            ], [], [
+            ], [
+                Url::postParam('id', 0)
+            ], [
                 Message::ALL_SIBLINGS => MAILBOX === $type
             ]);
 
