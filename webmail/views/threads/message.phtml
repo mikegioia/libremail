@@ -12,7 +12,7 @@
             --><span><?php $view->clean($message->snippet); ?></span>
         </span>
         <span class="date" title="<?php echo $message->datetime_string; ?>"><?php echo $message->date_string; ?></span>
-        <iframe src="<?php echo App\Url::make( '/star/thread/%s/%s.html', $message->id, $message->flagged == 1 ? 'on' : 'off' ); ?>" class="star"></iframe>
+        <iframe src="<?php echo App\Url::make( '/star/thread/%s/%s/%s.html', $view->meta(PREF_THEME, 'default'), $message->id, $message->flagged == 1 ? 'on' : 'off' ); ?>" class="star"></iframe>
     </label>
     <article id="message-<?php echo $message->id; ?>" class="thread-msg">
         <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-header u-cf">
@@ -32,7 +32,7 @@
                 </span>
             </span>
             <span class="date" title="<?php echo $message->datetime_string; ?>"><?php echo $message->date_string; ?></span>
-            <iframe src="<?php echo App\Url::make('/star/thread/%s/%s.html', $message->id, $message->flagged == 1 ? 'on' : 'off'); ?>" class="star"></iframe>
+            <iframe src="<?php echo App\Url::make('/star/thread/%s/%s/%s.html', $view->meta(PREF_THEME, 'default'), $message->id, $message->flagged == 1 ? 'on' : 'off'); ?>" class="star"></iframe>
             <span class="actions">
                 <span class="button-group">
                     <a href="#" class="button">

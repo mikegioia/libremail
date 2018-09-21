@@ -1,3 +1,7 @@
+<?php
+$yellow = $theme === 'coolnight'
+     ? '#a98304'
+     : '#d6a70e'; ?>
 <style type="text/css">
     html {
         overflow: hidden;
@@ -44,12 +48,12 @@
                 <g>
                 <?php
                 if ( $flagged ): ?>
-                    <path d="M13.938,61.064 L17.483,40.395 L2.466,25.757 L23.219,22.741 L32.5,3.936 L41.781,22.741 L62.534,25.757 L47.517,40.395 L51.062,61.064 L32.5,51.306 z" fill="#D6A70E"/>
-                    <path d="M13.938,61.064 L17.483,40.395 L2.466,25.757 L23.219,22.741 L32.5,3.936 L41.781,22.741 L62.534,25.757 L47.517,40.395 L51.062,61.064 L32.5,51.306 z" fill-opacity="0" stroke="#D6A70E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M13.938,61.064 L17.483,40.395 L2.466,25.757 L23.219,22.741 L32.5,3.936 L41.781,22.741 L62.534,25.757 L47.517,40.395 L51.062,61.064 L32.5,51.306 z" fill="<?php echo $yellow; ?>"/>
+                    <path d="M13.938,61.064 L17.483,40.395 L2.466,25.757 L23.219,22.741 L32.5,3.936 L41.781,22.741 L62.534,25.757 L47.517,40.395 L51.062,61.064 L32.5,51.306 z" fill-opacity="0" stroke="<?php echo $yellow; ?>" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                 <?php
                 else: ?>
                     <path d="M13.938,61.064 L17.483,40.395 L2.466,25.757 L23.219,22.741 L32.5,3.936 L41.781,22.741 L62.534,25.757 L47.517,40.395 L51.062,61.064 L32.5,51.306 z" fill="transparent"/>
-                    <path d="M13.938,61.064 L17.483,40.395 L2.466,25.757 L23.219,22.741 L32.5,3.936 L41.781,22.741 L62.534,25.757 L47.517,40.395 L51.062,61.064 L32.5,51.306 z" fill-opacity="0" stroke="#D6A70E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M13.938,61.064 L17.483,40.395 L2.466,25.757 L23.219,22.741 L32.5,3.936 L41.781,22.741 L62.534,25.757 L47.517,40.395 L51.062,61.064 L32.5,51.306 z" fill-opacity="0" stroke="<?php echo $yellow; ?>" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                 <?php
                 endif; ?>
                 </g>
@@ -57,6 +61,7 @@
         </button>
         <input type="hidden" name="id" value="<?php echo $id; ?>" />
         <input type="hidden" name="type" value="<?php echo $type; ?>" />
+        <input type="hidden" name="theme" value="<?php echo $theme; ?>" />
         <input type="hidden" name="state" value="<?php echo $flagged ? 'off' : 'on'; ?>" />
     </form>
 </div>

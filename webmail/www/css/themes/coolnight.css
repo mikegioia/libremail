@@ -76,6 +76,10 @@ body.theme-coolnight .msg-label {
   border-color: #2b2b2b;
 }
 
+body.theme-coolnight .msg-label.unseen {
+  background-color: #5b5b5b;
+}
+
 body.theme-coolnight .msg-label:after {
   background-color: #9b9b9b;
   border-color: #2b2b2b;
@@ -88,7 +92,7 @@ body.theme-coolnight .msg-checkbox:checked + .msg-label:after {
 body.theme-coolnight .msg-contents.unseen .subject span,
 body.theme-coolnight .msg-contents.unseen .date,
 body.theme-coolnight .msg-contents.unseen strong {
-  font-weight: 600;
+  font-weight: 400;
 }
 
 body.theme-coolnight .msg-label.unseen,
@@ -96,8 +100,8 @@ body.theme-coolnight .msg-contents.unseen,
 body.theme-coolnight .msg-contents.unseen .names,
 body.theme-coolnight .msg-contents.unseen .subject span,
 body.theme-coolnight .msg-contents.unseen .date {
-  background-color: #6b6b6b;
-  color: #ddd;
+  background-color: #5b5b5b;
+  color: #ebebeb;
 }
 
 body.theme-coolnight .msg-checkbox:checked + .msg-label,
@@ -106,15 +110,16 @@ body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents {
 }
 
 body.theme-coolnight .msg-checkbox:checked + .msg-label,
+body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents,
 body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents .names,
 body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents .date,
 body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents .subject span {
-  background-color: #ffda6d; /* original yellow */
+  background-color: #f1c953; /* original yellow */
   color: #4b4b4b;
 }
 
 body.theme-coolnight .msg-contents .subject {
-  color: #6b6b6b;
+  color: #8b8b8b8;
 }
 
 /* Threads */
@@ -200,10 +205,6 @@ body.theme-coolnight nav #mailboxes-divider,
 body.theme-coolnight article.thread-msg,
 body.theme-coolnight .compose .row:not(.message) {
   border-color: #323232;
-}
-
-body.theme-coolnight .msg-label.unseen {
-  background-color: #6b6b6b;
 }
 
 /* Dropdown item hover */
