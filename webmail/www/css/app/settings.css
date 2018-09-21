@@ -2,20 +2,6 @@
  * Settings and Accounts
  */
 
-.settings h5 {
-  border-bottom: 1px solid #ddd;
-  font-weight: 400;
-  margin: 0 2rem 2rem 0;
-  padding-bottom: 0.3rem;
-}
-
-.settings h5 + .help-text {
-  color: #555;
-  font-size: 1.125rem;
-  margin: -1rem 2rem 2.5rem 0;
-  max-width: calc(22% + 50rem);
-}
-
 .settings .row .three.columns label {
   transform: translateY(0.3125rem);
 }
@@ -112,6 +98,7 @@
 
 .settings .theme .theme-body .theme-links {
   color: #1eaedb;
+  text-decoration: underline;
 }
 
 .settings .theme + label {

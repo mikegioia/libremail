@@ -54,6 +54,14 @@ $view->render('nav', [
         </div>
         <div class="row">
             <div class="three columns label">
+                <label class="align-right" for="settings-name">Name</label>
+            </div>
+            <div class="seven columns input">
+                <input type="text" id="settings-name" name="name" value="<?php $view->clean($account->name ?: ''); ?>" placeholder="Your Name" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="three columns label">
                 <label class="align-right" for="settings-host">IMAP Address</label>
             </div>
             <div class="seven columns input">

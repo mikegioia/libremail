@@ -153,6 +153,7 @@ class Controller
     {
         session_start();
 
+        $name = $_POST['name'] ?? '';
         $port = $_POST['port'] ?? 993;
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
@@ -162,7 +163,7 @@ class Controller
             (new Imap)->connect($email, $password, $host, $port);
 
             // Save the new account info
-            $this->account->update($email, $password, $host, $port);
+            $this->account->update($email, $password, $name, $host, $port);
 
             // @TODO Restart the sync process via pkill
             Session::notify(
@@ -193,9 +194,15 @@ class Controller
         Url::redirectBack('/settings');
     }
 
-    public function compose()
+    public function compose(int $outboxId = null)
     {
+        $message = new Outbox($this->account);
+
         $this->page('compose', [
+            'previewing' => false,
+            'message' => $outboxId
+                ? $message->getById($outboxId)
+                : $message,
             'contacts' => Contact::getByAccount($this->account->id)
         ]);
     }
@@ -207,15 +214,20 @@ class Controller
         try {
             $outbox = new Outbox($this->account, $_POST);
             $outbox->save();
-        }
-        catch (ValidationException $e) {
-            //Session::notify('Errors during save!', Session::ERROR);
-            Session::formErrors($e->getErrors());
-            // Store the POST data back in the session
-            Session::formData($_POST);
-        }
 
-        Url::redirectBack('/compose');
+            if ($outbox->draft) {
+                Url::redirect('/compose/'.$outbox->id);
+            } else {
+                Url::redirect('/preview/'.$outbox->id);
+            }
+        }
+        // Store the POST data back in the session and set the
+        // errors in the session for the page to display
+        catch (ValidationException $e) {
+            Session::formErrors($e->getErrors());
+            Session::formData($_POST);
+            Url::redirect('/compose');
+        }
     }
 
     public function error404()

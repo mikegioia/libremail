@@ -37,14 +37,14 @@ class Outbox extends Model
      */
     public function __construct(
         Account $account,
-        array $data,
+        array $data = [],
         Message $message = null)
     {
-        $this->to = $data['to'] ?? [];
-        $this->cc = $data['cc'] ?? [];
-        $this->bcc = $data['bcc'] ?? [];
         $this->subject = $data['subject'] ?? '';
         $this->text_plain = $data['text_plain'] ?? '';
+        $this->to = $this->parseAddresses($data['to'] ?? []);
+        $this->cc = $this->parseAddresses($data['cc'] ?? []);
+        $this->bcc = $this->parseAddresses($data['bcc'] ?? []);
 
         if (isset($data['send_draft'])) {
             $this->draft = true;
@@ -60,6 +60,18 @@ class Outbox extends Model
         if ($message) {
             $this->parent_id = $message->id;
         }
+    }
+
+    public function getById(int $id)
+    {
+        $message = $this->db()
+            ->select()
+            ->from('outbox')
+            ->where('id', '=', $id)
+            ->execute()
+            ->fetchObject();
+
+        return new self($this->account, $message ?: []);
     }
 
     /**
@@ -88,7 +100,8 @@ class Outbox extends Model
                 ->table('outbox')
                 ->where('id', '=', $this->id)
                 ->execute();
-        } else {
+        }
+        elseif (! $this->isEmpty()) {
             $newOutboxId = $this->db()
                 ->insert(array_keys($data))
                 ->into('outbox')
@@ -114,21 +127,29 @@ class Outbox extends Model
     {
         $e = new ValidationException;
 
-        if (! $this->to) {
-            $e->addError('to', 'To');
+        if (! array_filter($this->to)) {
+            $e->addError('to', null, 'Specify at least one recipient', 0);
         }
 
         foreach (['to', 'cc', 'bcc'] as $field) {
             $this->validateAddresses($field, $e);
         }
 
-        if (! strlen(trim($this->text_plain))) {
-            $e->addError('text_plain', 'Message');
-        }
-
         if ($e->hasError() && ! $this->draft) {
             throw $e;
         }
+    }
+
+    /**
+     * Determines if this message is completely empty.
+     */
+    public function isEmpty()
+    {
+        return ! $this->to
+            && ! $this->cc
+            && ! $this->bcc
+            && ! $this->subject
+            && ! $this->text_plain;
     }
 
     /**
@@ -144,21 +165,36 @@ class Outbox extends Model
     }
 
     /**
+     * @param array|string $addresses This should always come in
+     *   as an array from the client, but since it's POST data we
+     *   we can't type hint it.
+     */
+    private function parseAddresses($addresses)
+    {
+        $addresses = is_array($addresses)
+            ? $addresses
+            : explode(',', $addresses);
+        $addresses = array_map('trim', $addresses);
+
+        return array_values(array_filter($addresses));
+    }
+
+    /**
      * Checks if an address field contains proper addresses.
      */
     private function validateAddresses(string $field, ValidationException $e)
     {
         $addresses = [];
 
-        foreach ($this->$field as $address) {
-            $address = $this->validAddress($address);
+        foreach ($this->$field as $i => $address) {
+            $parsedAddress = $this->validAddress($address);
 
-            if (! $address) {
-                $e->addError($field, null, 'Malformed email address!');
-                continue;
+            if (! $parsedAddress) {
+                $e->addError($field, null, 'Malformed email address!', $i);
+                $addresses[] = $address;
+            } else {
+                $addresses[] = $parsedAddress;
             }
-
-            $addresses[] = $address;
         }
 
         $this->$field = $addresses;

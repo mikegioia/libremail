@@ -110,7 +110,7 @@ body.theme-warmlight select {
 
 /* Light borders */
 body.theme-warmlight .msg-label,
-body.theme-warmlight .settings h5,
+body.theme-warmlight #main > h5,
 body.theme-warmlight section #msg-actions,
 body.theme-warmlight .dropdown li.notice,
 body.theme-warmlight article.thread-msg {
@@ -235,7 +235,7 @@ body.theme-warmlight #topnav-actions .status > div > span {
 }
 
 /* Overwrite #555 */
-body.theme-warmlight .settings h5 + .help-text,
+body.theme-warmlight #main > h5 + .help-text,
 body.theme-warmlight .msg-checkbox:checked + .msg-label + .msg-contents .subject {
   color: #614937;
 }

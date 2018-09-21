@@ -179,7 +179,7 @@ body.theme-coolnight .settings .row input[readonly] {
 }
 
 /* Light borders */
-body.theme-coolnight .settings h5,
+body.theme-coolnight #main > h5,
 body.theme-coolnight section #msg-actions,
 body.theme-coolnight .dropdown li.notice,
 body.theme-coolnight .folder-selector h4,
@@ -248,7 +248,7 @@ body.theme-coolnight .button.button-danger {
 
 body.theme-coolnight .button.button-danger:hover,
 body.theme-coolnight .button.button-danger:focus {
-  background-color: #b74b4b;  
+  background-color: #b74b4b;
 }
 
 body.theme-coolnight .button[disabled],
@@ -282,6 +282,15 @@ body.theme-coolnight .alerts .alert input[type="submit"],
 body.theme-coolnight .alerts .alert label {
   background-color: #0b0b0b !important;
   color: #aaa !important;
+}
+
+/* Form errors */
+body.theme-coolnight .compose .has-error label,
+body.theme-coolnight .compose .has-error .error-message {
+  color: #d05b5b;
+}
+body.theme-coolnight .compose .has-error input[type="text"] {
+  border-color: #d05b5b;
 }
 
 /* Misc elements */
@@ -355,7 +364,7 @@ body.theme-coolnight #topnav-actions .status > div > span {
 }
 
 /* Overwrite #555 */
-body.theme-coolnight .settings h5 + .help-text {
+body.theme-coolnight #main > h5 + .help-text {
   color: #9b9b9b;
 }
 

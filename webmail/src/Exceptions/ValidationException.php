@@ -6,9 +6,23 @@ class ValidationException extends \Exception
 {
     private $errors = [];
 
-    public function addError(string $key, string $label, string $message = null)
+    public function addError(
+        string $key,
+        string $label = null,
+        string $message = null,
+        int $index = null)
     {
-        $this->errors[$key] = $message ?: $label.' must not be empty';
+        $message ?: ($label ?: 'Field').' must not be empty';
+
+        if (! is_null($index)) {
+            if (! isset($this->errors[$key]) || ! is_array($this->errors[$key])) {
+                $this->errors[$key] = [];
+            }
+
+            $this->errors[$key][$index] = $message;
+        } else {
+            $this->errors[$key] = $message;
+        }
     }
 
     public function getErrors()

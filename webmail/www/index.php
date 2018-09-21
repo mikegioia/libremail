@@ -90,10 +90,10 @@ $controller = new Controller($account);
 $router->get('/', [$controller, 'inbox']);
 // Folder
 $router->get('/folder/(\d+)', [$controller, 'folder']);
-// Starred messages in the inbox
-$router->get('/starred/(\d+)', [$controller, 'starred']);
 // Folder page
 $router->get('/folder/(\d+)/(\d+)', [$controller, 'folderPage']);
+// Starred messages in the inbox
+$router->get('/starred/(\d+)', [$controller, 'starred']);
 // Update messages
 $router->post('/update', [$controller, 'update']);
 // Update messages via GET but require a CSRF token
@@ -118,6 +118,8 @@ $router->get('/settings', [$controller, 'settings']);
 $router->post('/settings', [$controller, 'updateSettings']);
 // Compose a new message
 $router->get('/compose', [$controller, 'compose']);
+// Edit an existing message
+$router->get('/compose/(\d+)', [$controller, 'compose']);
 // Send a new message
 $router->post('/compose', [$controller, 'send']);
 // Handle 404s

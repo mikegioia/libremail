@@ -283,7 +283,7 @@ CREATE TABLE IF NOT EXISTS `outbox` (
   `sent` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `locked` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `attempts` tinyint(1) unsigned NOT NULL DEFAULT 0,
-  `send_after` timestamp DEFAULT NULL,
+  `send_after` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `update_history` text COLLATE utf8mb4_unicode_ci,
