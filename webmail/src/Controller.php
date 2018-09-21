@@ -68,7 +68,7 @@ class Controller
         (new Rollback)->run($batchId);
     }
 
-    public function getStar(string $type, int $id, string $state)
+    public function getStar(string $type, string $theme, int $id, string $state)
     {
         header('Content-Type: text/html');
         header('Cache-Control: max-age=86400'); // one day
@@ -76,6 +76,7 @@ class Controller
         (new View)->render('/star', [
             'id' => $id,
             'type' => $type,
+            'theme' => $theme,
             'flagged' => 'on' === $state
         ]);
     }
@@ -101,6 +102,7 @@ class Controller
         (new View)->render('/star', [
             'id' => Url::postParam('id', 0),
             'type' => Url::postParam('type'),
+            'theme' => Url::postParam('theme'),
             'flagged' => 'on' === Url::postParam('state', 'on')
         ]);
     }

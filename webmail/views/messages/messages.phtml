@@ -15,7 +15,7 @@ foreach ($messages as $message):
     <label for="msg-checkbox-<?php echo $message->id; ?>"
         class="msg-label <?php echo $message->seen == 1 ? 'seen' : 'unseen'; ?>"></label>
     <div class="msg-contents <?php echo $message->seen == 1 ? 'seen' : 'unseen'; ?>" id="msg-contents-<?php echo $message->id; ?>">
-        <iframe src="<?php echo App\Url::make('/star/mailbox/%s/%s.html', $message->id, $message->flagged == 1 ? 'on' : 'off'); ?>" class="star"></iframe>
+        <iframe src="<?php echo App\Url::make('/star/mailbox/%s/%s/%s.html', $view->meta(PREF_THEME, 'default'), $message->id, $message->flagged == 1 ? 'on' : 'off'); ?>" class="star"></iframe>
         <a href="<?php echo $url; ?>" class="names">
             <?php echo $message->names; // cleaned already ?>
         </a>
