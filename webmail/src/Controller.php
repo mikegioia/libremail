@@ -3,13 +3,15 @@
 namespace App;
 
 use App\Model\Meta;
+use App\Model\Outbox;
 use App\Model\Account;
 use App\Model\Contact;
 use App\Model\Message;
-use App\Model\settings;
+use App\Model\Settings;
 use App\Exceptions\ClientException;
 use App\Exceptions\ServerException;
 use App\Exceptions\NotFoundException;
+use App\Exceptions\ValidationException;
 use App\Actions\MarkRead as MarkReadAction;
 
 class Controller
@@ -196,6 +198,24 @@ class Controller
         ]);
     }
 
+    public function send()
+    {
+        session_start();
+
+        try {
+            $outbox = new Outbox($this->account, $_POST);
+            $outbox->save();
+        }
+        catch (ValidationException $e) {
+            //Session::notify('Errors during save!', Session::ERROR);
+            Session::formErrors($e->getErrors());
+            // Store the POST data back in the session
+            Session::formData($_POST);
+        }
+
+        Url::redirectBack('/compose');
+    }
+
     public function error404()
     {
         throw new NotFoundException;
@@ -271,6 +291,8 @@ class Controller
                 'meta' => Meta::getAll(),
                 'account' => $this->account,
                 'alert' => Session::get(Session::ALERT),
+                'formData' => Session::get(Session::FORM_DATA, []),
+                'formErrors' => Session::get(Session::FORM_ERRORS, []),
                 'notifications' => Session::get(Session::NOTIFICATIONS, [])
             ], $data));
     }

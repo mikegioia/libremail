@@ -41,7 +41,11 @@ $view->render('nav', [
                 <label class="align-right" for="settings-email">CC</label>
             </div>
             <div class="ten columns">
-                asdasd
+            <?php
+            for ($i = 1; $i <= 10; $i++): ?>
+                <input type="text" value="" list="contacts" required />
+            <?php
+            endfor; ?>
             </div>
         </div>
         <div class="row hidden addresses">
@@ -49,7 +53,11 @@ $view->render('nav', [
                 <label class="align-right" for="settings-email">Bcc</label>
             </div>
             <div class="ten columns">
-                asdasd
+            <?php
+            for ($i = 1; $i <= 10; $i++): ?>
+                <input type="text" value="" list="contacts" required />
+            <?php
+            endfor; ?>
             </div>
         </div>
         <div class="row subject">
@@ -57,7 +65,7 @@ $view->render('nav', [
                 <label class="align-right" for="settings-email">Subject</label>
             </div>
             <div class="ten columns">
-                <input type="text" name="subject" value="" required />
+                <input type="text" name="subject" value="<?php echo $formData['subject'] ?? ''; ?>" required />
             </div>
         </div>
         <div class="row message">
@@ -65,18 +73,23 @@ $view->render('nav', [
                 <label class="align-right" for="settings-email">Message</label>
             </div>
             <div class="ten columns">
-                <textarea></textarea>
+                <textarea name="text_plain"><?php echo $formData['text_plain'] ?? ''; ?></textarea>
             </div>
         </div>
         <div class="buttons">
             <div class="ten columns offset-by-two">
+                <button type="submit" name="send_draft" class="button button-secondary" formnovalidate>
+                    Save Draft
+                </button>
                 <button type="submit" name="send_outbox" class="button button-primary" formnovalidate>
                     Send
                 </button>
+                <!--
                 <button type="submit" name="send_now" class="button button-secondary" formnovalidate
                     <?php echo $view->env('COMPOSE_SEND_NOW') ? '' : 'disabled title="Not available"'; ?>>
                     Send Immediately
                 </button>
+                -->
                 <span>or</span>
                 <a href="/">Go back</a>
             </div>

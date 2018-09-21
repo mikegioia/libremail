@@ -8,6 +8,7 @@ use App\Model;
 class Account extends Model
 {
     public $id;
+    public $name;
     public $email;
     public $service;
     public $password;

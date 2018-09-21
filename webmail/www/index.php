@@ -118,6 +118,8 @@ $router->get('/settings', [$controller, 'settings']);
 $router->post('/settings', [$controller, 'updateSettings']);
 // Compose a new message
 $router->get('/compose', [$controller, 'compose']);
+// Send a new message
+$router->post('/compose', [$controller, 'send']);
 // Handle 404s
 $router->set404([$controller, 'error404']);
 
