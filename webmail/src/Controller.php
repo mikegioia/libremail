@@ -194,17 +194,37 @@ class Controller
         Url::redirectBack('/settings');
     }
 
+    /**
+     * @throws NotFoundException Sends back a 404 if message
+     *   is sent or if it doesn't exist
+     */
     public function compose(int $outboxId = null)
     {
         $message = new Outbox($this->account);
 
+        if ($outboxId) {
+            $message = $message->getById($outboxId);
+
+            if (! $message->exists() || $message->sent) {
+                throw new NotFoundException;
+            }
+        }
+
         $this->page('compose', [
             'previewing' => false,
-            'message' => $outboxId
-                ? $message->getById($outboxId)
-                : $message,
+            'message' => $message,
             'contacts' => Contact::getByAccount($this->account->id)
         ]);
+    }
+
+    public function preview(int $outboxId)
+    {
+        $message = (new Outbox($this->account))->getById($outboxId);
+
+        if (! $message->exists() || $message->sent) {
+            throw new NotFoundException;
+        }
+exit('preview');
     }
 
     public function send()
@@ -212,7 +232,8 @@ class Controller
         session_start();
 
         try {
-            $outbox = new Outbox($this->account, $_POST);
+            $outbox = new Outbox($this->account);
+            $outbox->setPostData($_POST);
             $outbox->save();
 
             if ($outbox->draft) {
@@ -226,7 +247,12 @@ class Controller
         catch (ValidationException $e) {
             Session::formErrors($e->getErrors());
             Session::formData($_POST);
-            Url::redirect('/compose');
+
+            if (isset($outbox->id) && $outbox->exists()) {
+                Url::redirect('/compose/'.$outbox->id);
+            } else {
+                Url::redirect('/compose');
+            }
         }
     }
 

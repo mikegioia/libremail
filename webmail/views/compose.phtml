@@ -33,7 +33,7 @@ $view->render('nav', [
             <?php
             for ($i = 0; $i < 10; $i++): ?>
                 <input type="text" name="to[]" list="contacts" required
-                    value="<?php echo isset($formData['to'][$i]) ? $formData['to'][$i] : ''; ?>"
+                    value="<?php echo $formData['to'][$i] ?? ($message->to[$i] ?? ''); ?>"
                     class="<?php echo isset($formErrors['to'][$i]) ? 'with-error' : ''; ?>" />
                 <?php
                 if (isset($formErrors['to'][$i])): ?>
@@ -52,7 +52,8 @@ $view->render('nav', [
             <?php
             for ($i = 0; $i < 10; $i++): ?>
                 <input type="text" name="cc[]" list="contacts" required
-                    value="<?php echo isset($formData['cc'][$i]) ? $formData['cc'][$i] : ''; ?>" />
+                    value="<?php echo $formData['cc'][$i] ?? ($message->cc[$i] ?? ''); ?>"
+                    class="<?php echo isset($formErrors['cc'][$i]) ? 'with-error' : ''; ?>" />
             <?php
             endfor; ?>
             </div>
@@ -66,7 +67,8 @@ $view->render('nav', [
             <?php
             for ($i = 0; $i < 10; $i++): ?>
                 <input type="text" name="bcc[]" list="contacts" required
-                    value="<?php echo isset($formData['bcc'][$i]) ? $formData['bcc'][$i] : ''; ?>" />
+                    value="<?php echo $formData['bcc'][$i] ?? ($message->bcc[$i] ?? ''); ?>"
+                    class="<?php echo isset($formErrors['bcc'][$i]) ? 'with-error' : ''; ?>" />
             <?php
             endfor; ?>
             </div>
@@ -131,6 +133,7 @@ $view->render('nav', [
             endif; ?>
                 <span>or</span>
                 <a href="/">Go back</a>
+                <input type="hidden" name="id" value="<?php echo $message->id ?? ''; ?>" />
             </div>
         </div>
     </form>

@@ -19,6 +19,7 @@ class Outbox extends Model
     public $sent;
     public $draft;
     public $locked;
+    public $subject;
     public $reply_to;
     public $attempts;
     public $parent_id;
@@ -29,6 +30,9 @@ class Outbox extends Model
     public $updated_at;
     public $update_history;
 
+    private $parent;
+    private $account;
+
     const CREATED = 'created';
     const UPDATED = 'updated';
 
@@ -37,8 +41,32 @@ class Outbox extends Model
      */
     public function __construct(
         Account $account,
-        array $data = [],
-        Message $message = null)
+        Message $message = null,
+        array $data = null)
+    {
+        $this->parent = $message;
+        $this->account = $account;
+
+        $this->account_id = $this->account->id;
+        $this->from = $account->name
+            ? sprintf('%s <%s>', $account->name, $account->email)
+            : $account->email;
+
+        // If a message came in, set the message as the parent
+        if ($this->parent) {
+            $this->parent_id = $message->id;
+        }
+
+        if ($data) {
+            $this->setData($data);
+            // Converts strings to arrays
+            $this->to = $this->parseAddresses($this->to);
+            $this->cc = $this->parseAddresses($this->cc);
+            $this->bcc = $this->parseAddresses($this->bcc);
+        }
+    }
+
+    public function setPostData(array $data)
     {
         $this->subject = $data['subject'] ?? '';
         $this->text_plain = $data['text_plain'] ?? '';
@@ -46,32 +74,25 @@ class Outbox extends Model
         $this->cc = $this->parseAddresses($data['cc'] ?? []);
         $this->bcc = $this->parseAddresses($data['bcc'] ?? []);
 
-        if (isset($data['send_draft'])) {
-            $this->draft = true;
-        }
+        // When saving the message, it defaults to 'draft'
+        $this->draft = 1;
 
-        // Account fields
-        $this->account_id = $account->id;
-        $this->from = $account->name
-            ? sprintf('%s <%s>', $account->name, $account->email)
-            : $account->email;
-
-        // If a message came in, set the message as the parent
-        if ($message) {
-            $this->parent_id = $message->id;
+        // If the user approves the preview, remove draft flag
+        if (isset($data['send_outbox'])) {
+            $this->draft = 0;
         }
     }
 
     public function getById(int $id)
     {
-        $message = $this->db()
+        $data = $this->db()
             ->select()
             ->from('outbox')
             ->where('id', '=', $id)
             ->execute()
-            ->fetchObject();
+            ->fetch();
 
-        return new self($this->account, $message ?: []);
+        return new self($this->account, null, $data ?: null);
     }
 
     /**
@@ -80,17 +101,18 @@ class Outbox extends Model
     public function save()
     {
         $this->validate();
-        $this->updateHistory($this->id ? self::CREATED : self::UPDATED);
+        $this->updateHistory($this->id ? self::UPDATED : self::CREATED);
 
         $data = [
             'from' => $this->from,
+            'subject' => $this->subject,
             'draft' => $this->draft ? 1 : 0,
             'parent_id' => $this->parent_id,
             'account_id' => $this->account_id,
-            'to' => implode(', ', $this->to),
-            'cc' => implode(', ', $this->cc),
-            'bcc' => implode(', ', $this->bcc),
             'text_plain' => $this->text_plain,
+            'to' => $this->addressString($this->to),
+            'cc' => $this->addressString($this->cc),
+            'bcc' => $this->addressString($this->bcc),
             'update_history' => $this->update_history
         ];
 
@@ -152,6 +174,11 @@ class Outbox extends Model
             && ! $this->text_plain;
     }
 
+    public function exists()
+    {
+        return is_numeric($this->id) && $this->id;
+    }
+
     /**
      * Logs a new item to the history text.
      */
@@ -179,6 +206,11 @@ class Outbox extends Model
         return array_values(array_filter($addresses));
     }
 
+    private function addressString(array $addresses)
+    {
+        return implode(', ', array_filter($addresses));
+    }
+
     /**
      * Checks if an address field contains proper addresses.
      */
@@ -187,12 +219,22 @@ class Outbox extends Model
         $addresses = [];
 
         foreach ($this->$field as $i => $address) {
+            // Skip blank ones but maintain index association
+            if (! strlen(trim($address))) {
+                $addresses[] = '';
+                continue;
+            }
+
             $parsedAddress = $this->validAddress($address);
 
             if (! $parsedAddress) {
                 $e->addError($field, null, 'Malformed email address!', $i);
                 $addresses[] = $address;
             } else {
+                if (strpos($parsedAddress, '<') === 0) {
+                    $parsedAddress = trim($parsedAddress, '<>');
+                }
+
                 $addresses[] = $parsedAddress;
             }
         }

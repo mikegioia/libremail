@@ -122,6 +122,8 @@ $router->get('/compose', [$controller, 'compose']);
 $router->get('/compose/(\d+)', [$controller, 'compose']);
 // Send a new message
 $router->post('/compose', [$controller, 'send']);
+// Preview a message
+$router->get('/preview/(\d+)', [$controller, 'preview']);
 // Handle 404s
 $router->set404([$controller, 'error404']);
 

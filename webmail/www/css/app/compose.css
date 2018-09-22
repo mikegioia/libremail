@@ -41,7 +41,7 @@ section.compose {
   font-size: 1.5rem;
   margin-bottom: 0;
   max-width: 50rem;
-  padding: 0.5rem;
+  padding: 0.5rem 0.75rem;
   width: 100%;
 }
 
@@ -126,6 +126,7 @@ blank address input between two valid inputs.
 
 .compose .message textarea {
   height: 30vh;
+  line-height: 2.125rem;
   min-height: 15rem;
   resize: vertical;
 }
