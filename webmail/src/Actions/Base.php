@@ -30,8 +30,6 @@ abstract class Base
      */
     abstract public function getType();
 
-    abstract public function validate($data);
-
     abstract public function update(
         MessageModel $message,
         Folders $folders,
