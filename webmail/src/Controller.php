@@ -237,9 +237,9 @@ exit('preview');
             $outbox->save();
 
             if ($outbox->draft) {
-                Url::redirect('/compose/'.$outbox->id);
+                Url::redirect(Url::make('/compose/%s', $outbox->id));
             } else {
-                Url::redirect('/preview/'.$outbox->id);
+                Url::redirect(Url::make('/preview/%s', $outbox->id));
             }
         }
         // Store the POST data back in the session and set the
@@ -249,7 +249,7 @@ exit('preview');
             Session::formData($_POST);
 
             if (isset($outbox->id) && $outbox->exists()) {
-                Url::redirect('/compose/'.$outbox->id);
+                Url::redirect(Url::make('/compose/', $outbox->id));
             } else {
                 Url::redirect('/compose');
             }

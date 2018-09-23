@@ -4,7 +4,7 @@
  * an action is performed in the app
  *
  * z-index range: 31-35
-*/
+ */
 
 .alerts input[type="checkbox"] {
   display: none;

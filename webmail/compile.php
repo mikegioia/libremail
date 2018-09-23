@@ -18,6 +18,7 @@ $css = [
     'app/buttons.css',
     'app/tooltips.css',
     'app/alerts.css',
+    'app/dialogs.css',
     'app/notifications.css',
     'app/dropdowns.css',
     'app/messages.css',

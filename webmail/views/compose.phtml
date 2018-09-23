@@ -10,6 +10,14 @@ $view->render('nav', [
     'view' => $view,
     'activeId' => 0,
     'folders' => $folders
+]);
+
+$view->render('confirm', [
+    'id' => 'confirm-delete',
+    'confirmLabel' => 'Yes, delete it',
+    'cancelLabel' => 'No!',
+    'action' => '', //Url::make()
+    'message' => 'Are you sure you want to delete this message?'
 ]); ?>
 
 <section id="main" class="compose">
@@ -18,7 +26,14 @@ $view->render('nav', [
         'messages' => $notifications
     ]); ?>
 
-    <h5>Compose Message</h5>
+    <h5>
+        <span>Compose Message</span>
+    <?php
+    if ($message->id): ?>
+        <a href="#confirm-delete">Delete this message</a>
+    <?php
+    endif; ?>
+    </h5>
     <div class="help-text">
         When you click Send, your message will be moved to the <code>Outbox</code>.
         Messages stay in the Outbox for 5-10 minutes before being sent. You can edit

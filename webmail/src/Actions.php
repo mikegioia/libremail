@@ -120,7 +120,9 @@ class Actions
         // If a selection was made, return to the previous page
         // with the key in the query params.
         if ($select) {
-            Url::redirect('/?select='.strtolower($select));
+            Url::redirect('/', [
+                'select' => strtolower($select)
+            ]);
         }
 
         Model::getDb()->beginTransaction();

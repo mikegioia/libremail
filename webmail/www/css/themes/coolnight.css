@@ -27,6 +27,12 @@
   border-color: #222 !important;
 }
 
+/* Base elements */
+body.theme-coolnight a:hover,
+body.theme-coolnight a:focus {
+  color: #36cfff;
+}
+
 /* Default background */
 body.theme-coolnight,
 body.theme-coolnight .menu.actions,
@@ -92,7 +98,7 @@ body.theme-coolnight .msg-checkbox:checked + .msg-label:after {
 body.theme-coolnight .msg-contents.unseen .subject span,
 body.theme-coolnight .msg-contents.unseen .date,
 body.theme-coolnight .msg-contents.unseen strong {
-  font-weight: 400;
+  /*font-weight: 400;*/
 }
 
 body.theme-coolnight .msg-label.unseen,
@@ -212,7 +218,7 @@ body.theme-coolnight nav a.mailbox:hover,
 body.theme-coolnight nav a.mailbox:hover + .folder-label,
 body.theme-coolnight .dropdown li a:hover,
 body.theme-coolnight .dropdown li [type="submit"]:hover {
-  background-color: #2b2b2b;
+  background-color: #2b2b2b !important;
 }
 
 /* Buttons */
@@ -241,14 +247,14 @@ body.theme-coolnight .button.button-secondary:hover {
 }
 
 body.theme-coolnight .button.button-danger {
-  background-color: #d05b5b;
-  border-color: #5a0d0d;
+  background-color: #b74b4b;
+  border-color: #480707;
   box-shadow: 0 2px 2px #383838;
 }
 
 body.theme-coolnight .button.button-danger:hover,
 body.theme-coolnight .button.button-danger:focus {
-  background-color: #b74b4b;
+  background-color: #d05b5b;
 }
 
 body.theme-coolnight .button[disabled],
@@ -282,6 +288,12 @@ body.theme-coolnight .alerts .alert input[type="submit"],
 body.theme-coolnight .alerts .alert label {
   background-color: #0b0b0b !important;
   color: #aaa !important;
+}
+
+/* Dialogs */
+body.theme-coolnight .dialog {
+  background: #4b4b4b;
+  border: 1px solid #0b0b0b;
 }
 
 /* Form errors */
