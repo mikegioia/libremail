@@ -14,8 +14,15 @@
                 <label class="folder-label"></label>
             </li>
         <?php
-        endif;
-        if ( $folders->getStarredId() ): ?>
+        endif; ?>
+            <li class="">
+                <a href="/outbox" class="mailbox">
+                    Outbox
+                </a>
+                <label class="folder-label"></label>
+            </li>
+        <?php
+        if ($folders->getStarredId()): ?>
             <li class="<?php echo $folders->getNavClassString($folders->getStarredId(), $activeId); ?>">
                 <a href="<?php echo App\Url::folder($folders->getStarredId()); ?>" class="mailbox">
                     Starred<?php echo $folders->getUnreadCount($folders->getStarredId(), true); ?>
@@ -24,7 +31,7 @@
             </li>
         <?php
         endif;
-        if ( $folders->getSentId() ): ?>
+        if ($folders->getSentId()): ?>
             <li class="<?php echo $folders->getNavClassString($folders->getSentId(), $activeId); ?>">
                 <a href="<?php echo App\Url::folder($folders->getSentId()); ?>" class="mailbox">
                     Sent<?php echo $folders->getUnreadCount($folders->getSentId(), true); ?>
@@ -33,7 +40,7 @@
             </li>
         <?php
         endif;
-        if ( $folders->getDraftsId() ): ?>
+        if ($folders->getDraftsId()): ?>
             <li class="<?php echo $folders->getNavClassString($folders->getDraftsId(), $activeId); ?>">
                 <a href="<?php echo App\Url::folder($folders->getDraftsId()); ?>" class="mailbox">
                     Drafts<?php echo $folders->getUnreadCount($folders->getDraftsId(), true); ?>
@@ -42,7 +49,7 @@
             </li>
         <?php
         endif;
-        if ( $folders->getAllId() ): ?>
+        if ($folders->getAllId()): ?>
             <li class="<?php echo $activeId == $folders->getAllId() ? 'active' : ''; ?>">
                 <a href="<?php echo App\Url::folder($folders->getAllId()); ?>" class="mailbox">All Mail</a>
                 <label class="folder-label"></label>
@@ -76,7 +83,7 @@
             </li>
         <?php
         endif;
-        if ( $folders->getTrashId() ): ?>
+        if ($folders->getTrashId()): ?>
             <li class="<?php echo $activeId == $folders->getTrashId() ? 'active' : ''; ?>">
                 <a href="<?php echo App\Url::folder($folders->getTrashId()); ?>" class="mailbox">
                     Trash<?php echo $folders->getUnreadCount($folders->getTrashId(), true); ?>
