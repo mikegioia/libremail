@@ -2,13 +2,29 @@
  * New message and reply to message
  */
 
-form.compose {
+body.page-compose header {
+  z-index: 2;
+}
+
+section.compose {
+  overflow-y: auto;
+}
+
+.compose form {
   margin: 0 2rem 2.5rem 0;
 }
 
 .compose .row:not(.message) {
   border-bottom: 1px solid #eee;
   margin-bottom: 1rem;
+}
+
+.compose input[type="radio"] {
+  display: none;
+}
+
+.compose input[type="radio"]:checked + .hidden {
+  display: block !important;
 }
 
 .compose .two.columns label {
@@ -20,13 +36,13 @@ form.compose {
   padding-bottom: 1rem;
 }
 
-.compose .ten.columns input[type="text"] {
-  margin-bottom: 0;
-}
-
 .compose .ten.columns textarea,
 .compose .ten.columns input[type="text"] {
+  font-size: 1.5rem;
+  margin-bottom: 0;
   max-width: 50rem;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
 }
 
 .compose .row.hidden {
@@ -36,12 +52,6 @@ form.compose {
 .compose .addresses .ten.columns {
   padding-bottom: 0.5rem;
   overflow: hidden;
-}
-
-.compose .addresses input[type="text"] {
-  font-size: 1.5rem;
-  padding: 0.5rem;
-  width: 100%;
 }
 
 .compose .addresses .ten.columns input[type="text"] {
@@ -54,25 +64,71 @@ form.compose {
 }
 
 .compose .addresses input[type="text"]:valid,
-.compose .addresses input[type="text"]:valid + input {
+.compose .addresses input[type="text"]:valid + input,
+.compose .addresses input[type="text"]:valid + div + input {
   display: block;
 }
 
-.compose .addresses input[type="text"]:valid:not(:focus) + input:not(:valid):not(:focus) {
+/*
+This is a nice effect but it causes problems if there is a
+blank address input between two valid inputs.
+
+.compose .addresses input[type="text"]:valid:not(:focus) + input:not(:valid):not(:focus),
+.compose .addresses input[type="text"]:valid:not(:focus) + div + input:not(:valid):not(:focus) {
   opacity: 0.5;
   margin-bottom: -2.25rem;
 }
+*/
 
 .compose .addresses input[type="text"]:focus {
   opacity: 1;
   margin-bottom: 0.5rem;
 }
 
+.compose .addresses.from {
+  padding-bottom: 0.5rem;
+}
+
+.compose .addresses.from label {
+  margin: 0;
+}
+
+.compose .addresses.from .show-hidden-addresses {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.compose .addresses.from .show-hidden-addresses label + label {
+  margin-left: 0.5rem;
+}
+
+.compose #toggle-cc:checked ~ .from label[for="toggle-cc"] {
+  display: none;
+}
+
+.compose #toggle-bcc:checked ~ .from label[for="toggle-bcc"] {
+  display: none;
+}
+
+.compose .addresses.from .ten.columns {
+  max-width: 50rem;
+  padding-right: 6rem;
+  position: relative;
+}
+
+.compose .addresses.from .ten.columns label {
+  cursor: pointer;
+  display: inline-block;
+  font-weight: 400;
+  text-decoration: underline;
+}
+
 .compose .message textarea {
   height: 30vh;
+  line-height: 2.125rem;
   min-height: 15rem;
   resize: vertical;
-  width: 100%;
 }
 
 .compose .offset-by-two.ten.columns {
@@ -85,7 +141,26 @@ form.compose {
   transform: translateY(-0.125rem);
 }
 
+.compose .buttons button {
+  margin-right: 0.25rem;
+}
+
 .compose .buttons span {
   color: #aaa;
-  margin: 0 0.25rem 0 0.5rem;
+  margin: 0 0.25rem;
+}
+
+.compose .has-error label {
+  color: #d43633;
+}
+
+.compose .has-error .error-message {
+  color: #d43633;
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+  transform: translateY(-0.125rem);
+}
+
+.compose .has-error input[type="text"].with-error {
+  border-color: #d43633;
 }

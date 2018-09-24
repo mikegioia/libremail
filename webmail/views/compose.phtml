@@ -2,6 +2,7 @@
 
 $view->render('header', [
     'view' => $view,
+    'pageClass' => 'compose',
     'pageTitle' => 'Compose Message',
 ]);
 
@@ -11,45 +12,95 @@ $view->render('nav', [
     'folders' => $folders
 ]); ?>
 
-<section id="main" class="settings">
+<section id="main" class="compose">
     <?php
     $view->render('notifications', [
         'messages' => $notifications
-    ]); ?>
+    ]);
 
-    <h5>Compose Message</h5>
+    if ($message->id): ?>
+    <h5>
+        <span>Edit Message</span>
+        <a href="#confirm-delete">Delete this message</a>
+    </h5>
+    <?php
+    else: ?>
+    <h5>
+        <span>Compose Message</span>
+    </h5>
     <div class="help-text">
         When you click Send, your message will be moved to the <code>Outbox</code>.
         Messages stay in the Outbox for 5-10 minutes before being sent. You can edit
         the message, schedule a specific time, or trash it before it gets sent.
     </div>
-    <form action="/compose" method="post" class="compose">
-        <div class="row addresses">
+    <?php
+    endif; ?>
+    <form action="/compose" method="post">
+        <div class="row addresses<?php echo isset($formErrors['to']) ? ' has-error' : ''; ?>">
             <div class="two columns label">
-                <label class="align-right" for="settings-email">To</label>
+                <label class="align-right">To</label>
             </div>
             <div class="ten columns">
             <?php
-            for ($i = 1; $i <= 10; $i++): ?>
-                <input type="text" value="" list="contacts" required />
+            for ($i = 0; $i < 10; $i++): ?>
+                <input type="text" name="to[]" list="contacts" required
+                    value="<?php echo $formData['to'][$i] ?? ($message->to[$i] ?? ''); ?>"
+                    class="<?php echo isset($formErrors['to'][$i]) ? 'with-error' : ''; ?>" />
+                <?php
+                if (isset($formErrors['to'][$i])): ?>
+                <div class="error-message"><?php echo $formErrors['to'][$i]; ?></div>
+                <?php
+                endif;
+            endfor; ?>
+            </div>
+        </div>
+        <input type="radio" id="toggle-cc" />
+        <div class="row addresses <?php echo isset($formErrors['cc']) ? 'has-error' : 'hidden'; ?>">
+            <div class="two columns label">
+                <label class="align-right">Cc</label>
+            </div>
+            <div class="ten columns">
+            <?php
+            for ($i = 0; $i < 10; $i++): ?>
+                <input type="text" name="cc[]" list="contacts" required
+                    value="<?php echo $formData['cc'][$i] ?? ($message->cc[$i] ?? ''); ?>"
+                    class="<?php echo isset($formErrors['cc'][$i]) ? 'with-error' : ''; ?>" />
             <?php
             endfor; ?>
             </div>
         </div>
-        <div class="row hidden addresses">
-            <div class="two columns label">
-                <label class="align-right" for="settings-email">CC</label>
-            </div>
-            <div class="ten columns">
-                asdasd
-            </div>
-        </div>
-        <div class="row hidden addresses">
+        <input type="radio" id="toggle-bcc" />
+        <div class="row addresses <?php echo isset($formErrors['bcc']) ? 'has-error' : 'hidden'; ?>">
             <div class="two columns label">
                 <label class="align-right" for="settings-email">Bcc</label>
             </div>
             <div class="ten columns">
-                asdasd
+            <?php
+            for ($i = 0; $i < 10; $i++): ?>
+                <input type="text" name="bcc[]" list="contacts" required
+                    value="<?php echo $formData['bcc'][$i] ?? ($message->bcc[$i] ?? ''); ?>"
+                    class="<?php echo isset($formErrors['bcc'][$i]) ? 'with-error' : ''; ?>" />
+            <?php
+            endfor; ?>
+            </div>
+        </div>
+        <div class="row addresses from">
+            <div class="two columns label">
+                <label class="align-right">From</label>
+            </div>
+            <div class="ten columns">
+                <span><?php $view->clean($account->fromAddress()); ?></span>
+                <span class="show-hidden-addresses">
+                <?php
+                if (! isset($formErrors['cc'])): ?>
+                    <label for="toggle-cc"><a>Cc</a></label>
+                <?php
+                endif;
+                if (! isset($formErrors['bcc'])): ?>
+                    <label for="toggle-bcc"><a>Bcc</a></label>
+                <?php
+                endif; ?>
+                </span>
             </div>
         </div>
         <div class="row subject">
@@ -57,7 +108,7 @@ $view->render('nav', [
                 <label class="align-right" for="settings-email">Subject</label>
             </div>
             <div class="ten columns">
-                <input type="text" name="subject" value="" required />
+                <input type="text" name="subject" value="<?php echo $formData['subject'] ?? $message->subject; ?>" />
             </div>
         </div>
         <div class="row message">
@@ -65,20 +116,35 @@ $view->render('nav', [
                 <label class="align-right" for="settings-email">Message</label>
             </div>
             <div class="ten columns">
-                <textarea></textarea>
+                <textarea name="text_plain"><?php echo $formData['text_plain'] ?? $message->text_plain; ?></textarea>
             </div>
         </div>
         <div class="buttons">
             <div class="ten columns offset-by-two">
+            <?php
+            if ($previewing): ?>
                 <button type="submit" name="send_outbox" class="button button-primary" formnovalidate>
-                    Send
+                    Looks good, send it!
                 </button>
+            <?php
+            else: ?>
+                <button type="submit" name="send_draft" class="button button-secondary" formnovalidate>
+                    Save Draft
+                </button>
+                <button type="submit" name="send_preview" class="button button-primary" formnovalidate>
+                    Preview + Send
+                </button>
+                <!--
                 <button type="submit" name="send_now" class="button button-secondary" formnovalidate
                     <?php echo $view->env('COMPOSE_SEND_NOW') ? '' : 'disabled title="Not available"'; ?>>
-                    Send Immediately
+                    Blind Send
                 </button>
+                -->
+            <?php
+            endif; ?>
                 <span>or</span>
                 <a href="/">Go back</a>
+                <input type="hidden" name="id" value="<?php echo $message->id ?? ''; ?>" />
             </div>
         </div>
     </form>
@@ -94,6 +160,17 @@ endforeach; ?>
 </datalist>
 
 <?php
+$view->render('confirm', [
+    'id' => 'confirm-delete',
+    'confirmLabel' => 'Yes, delete it',
+    'cancelLabel' => 'No!',
+    'action' => App\Url::make('/outbox/delete'),
+    'message' => 'Are you sure you want to delete this message?',
+    'data' => [
+        'id' => $message->id
+    ]
+]);
+
 $view->render('footer', [
     'meta' => $meta
 ]); ?>

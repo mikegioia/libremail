@@ -8,6 +8,7 @@ use App\Model;
 class Account extends Model
 {
     public $id;
+    public $name;
     public $email;
     public $service;
     public $password;
@@ -50,17 +51,26 @@ class Account extends Model
             : null;
     }
 
+    public function fromAddress()
+    {
+        return $this->name
+            ? sprintf("%s <%s>", $this->name, $this->email)
+            : $this->email;
+    }
+
     /**
      * Updates the account configuration.
      */
     public function update(
         string $email,
         string $password,
+        string $name,
         string $imapHost,
         int $imapPort)
     {
         $updated = $this->db()
             ->update([
+                'name' => trim($name),
                 'email' => trim($email),
                 'password' => trim($password),
                 'imap_host' => trim($imapHost),

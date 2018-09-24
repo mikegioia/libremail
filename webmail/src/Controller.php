@@ -3,13 +3,15 @@
 namespace App;
 
 use App\Model\Meta;
+use App\Model\Outbox;
 use App\Model\Account;
 use App\Model\Contact;
 use App\Model\Message;
-use App\Model\settings;
+use App\Model\Settings;
 use App\Exceptions\ClientException;
 use App\Exceptions\ServerException;
 use App\Exceptions\NotFoundException;
+use App\Exceptions\ValidationException;
 use App\Actions\MarkRead as MarkReadAction;
 
 class Controller
@@ -151,6 +153,7 @@ class Controller
     {
         session_start();
 
+        $name = $_POST['name'] ?? '';
         $port = $_POST['port'] ?? 993;
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
@@ -160,7 +163,7 @@ class Controller
             (new Imap)->connect($email, $password, $host, $port);
 
             // Save the new account info
-            $this->account->update($email, $password, $host, $port);
+            $this->account->update($email, $password, $name, $host, $port);
 
             // @TODO Restart the sync process via pkill
             Session::notify(
@@ -191,11 +194,85 @@ class Controller
         Url::redirectBack('/settings');
     }
 
-    public function compose()
+    /**
+     * @throws NotFoundException Sends back a 404 if message
+     *   is sent or if it doesn't exist
+     */
+    public function compose(int $outboxId = null)
     {
+        $message = new Outbox($this->account);
+
+        if ($outboxId) {
+            $message = $message->getById($outboxId);
+
+            if (! $message->exists() || $message->sent) {
+                throw new NotFoundException;
+            }
+        }
+
         $this->page('compose', [
+            'previewing' => false,
+            'message' => $message,
             'contacts' => Contact::getByAccount($this->account->id)
         ]);
+    }
+
+    public function preview(int $outboxId)
+    {
+        $message = (new Outbox($this->account))->getById($outboxId);
+
+        if (! $message->exists() || $message->sent) {
+            throw new NotFoundException;
+        }
+exit('preview');
+    }
+
+    public function outbox()
+    {
+        $this->page('outbox', [
+            'folderId' => OUTBOX,
+            'messages' => []
+        ]);
+    }
+
+    public function deleteDraft()
+    {
+        (new Outbox($this->account))
+            ->getById(intval($_POST['id'] ?? 0))
+            ->delete();
+
+        Session::notify('Draft message deleted.', Session::SUCCESS);
+        Url::redirect('/outbox');
+    }
+
+    public function send()
+    {
+        session_start();
+
+        try {
+            $outbox = new Outbox($this->account);
+            $outbox->setPostData($_POST);
+            $outbox->save();
+
+            if ($outbox->draft) {
+                Session::notify('Draft message saved.', Session::SUCCESS);
+                Url::redirectRaw(Url::make('/compose/%s', $outbox->id));
+            } else {
+                Url::redirectRaw(Url::make('/preview/%s', $outbox->id));
+            }
+        }
+        // Store the POST data back in the session and set the
+        // errors in the session for the page to display
+        catch (ValidationException $e) {
+            Session::formErrors($e->getErrors());
+            Session::formData($_POST);
+
+            if (isset($outbox->id) && $outbox->exists()) {
+                Url::redirectRaw(Url::make('/compose/%s', $outbox->id));
+            } else {
+                Url::redirectRaw('/compose');
+            }
+        }
     }
 
     public function error404()
@@ -273,6 +350,8 @@ class Controller
                 'meta' => Meta::getAll(),
                 'account' => $this->account,
                 'alert' => Session::get(Session::ALERT),
+                'formData' => Session::get(Session::FORM_DATA, []),
+                'formErrors' => Session::get(Session::FORM_ERRORS, []),
                 'notifications' => Session::get(Session::NOTIFICATIONS, [])
             ], $data));
     }

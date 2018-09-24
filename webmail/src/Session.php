@@ -10,6 +10,8 @@ class Session
     const SUCCESS = 'success';
 
     const ALERT = 'alert';
+    const FORM_DATA = 'form_data';
+    const FORM_ERRORS = 'form_errors';
     const NOTIFICATIONS = 'notifications';
 
     /**
@@ -58,6 +60,22 @@ class Session
         $notifications[] = $newNotification;
 
         $_SESSION[self::NOTIFICATIONS] = $notifications;
+    }
+
+    /**
+     * Stores a form's data for re-population in a view.
+     */
+    public static function formData(array $data)
+    {
+        $_SESSION[self::FORM_DATA] = $data;
+    }
+
+    /**
+     * Stores validation errors for a form.
+     */
+    public static function formErrors(array $errors)
+    {
+        $_SESSION[self::FORM_ERRORS] = $errors;
     }
 
     public static function getToken()

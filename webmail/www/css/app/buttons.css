@@ -86,6 +86,7 @@ input[type="button"].button-primary:focus {
   background: #ff524e;
   border-color: #ff524e;
   color: #fff;
+  font-weight: 400;
 }
 
 .button.button-danger:hover,

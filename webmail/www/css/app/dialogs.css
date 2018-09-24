@@ -1,0 +1,59 @@
+/**
+ * Dialogs
+ * These small overlays display to alert or confirm an action.
+ *
+ * z-index range: 36-40
+*/
+
+
+/* Confirm dialogs */
+.dialog {
+  background: #ddd;
+  border-radius: 0.375rem;
+  border: 1px solid #ccc;
+  display: none;
+  left: calc(50% - 20rem);
+  padding: 1.5rem;
+  position: fixed;
+  top: 10%;
+  width: 40rem;
+  z-index: 40;
+}
+
+.dialog-overlay {
+  display: none;
+}
+
+.dialog:target {
+  display: block;
+}
+
+.dialog:target + .dialog-overlay {
+  background: rgba(0, 0, 0, 0.75);
+  bottom: 0;
+  content: ' ';
+  display: block;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 36;
+}
+
+.dialog form {
+  margin: 0;
+}
+
+.dialog .dialog-controls {
+  text-align: right;
+}
+
+.dialog .dialog-controls .button {
+  margin-bottom: 0;
+}
+
+/* Confirm dialogs */
+.dialog .confirm-message {
+  margin-bottom: 2.5rem;
+  padding: 0.5rem;
+}

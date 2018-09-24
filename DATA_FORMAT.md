@@ -17,6 +17,7 @@ use the LibreMail clients, than you must adhere to these data structures.
 CREATE TABLE IF NOT EXISTS `accounts` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `service` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `password` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `imap_host` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -31,6 +32,8 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 - `id` Unique integer identifying the account.
 - `service` Optional string referencing the IMAP service. For example, this
    could say 'gmail', 'outlook', 'yahoo', etc.
+- `name` Display name (human name) for the email account. This is used in the
+   from address when sending mail.
 - `email` String containing the email address for the IMAP account
 - `password` IMAP password for the account. This is stored in plain text. It's
    advised that the user stores an access key or application password.
@@ -260,4 +263,58 @@ CREATE TABLE IF NOT EXISTS `contacts` (
 - `account_id` Foreign key referencing the account from the `accounts` table.
 - `name` Name of the contact with email address
 - `tally` Count of different messages this contact was a part of.
-- `created_at` Timestamp denoting when the batch was added to the database.
+- `created_at` Timestamp denoting when the contact was added to the database.
+
+## Outbox
+
+```SQL
+CREATE TABLE IF NOT EXISTS `outbox` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `account_id` int(10) unsigned NOT NULL,
+  `parent_id` int(10) unsigned NOT NULL,
+  `to` text COLLATE utf8mb4_unicode_ci,
+  `from` text COLLATE utf8mb4_unicode_ci,
+  `cc` text COLLATE utf8mb4_unicode_ci,
+  `bcc` text COLLATE utf8mb4_unicode_ci,
+  `reply_to` text COLLATE utf8mb4_unicode_ci,
+  `subject` varchar(270) COLLATE utf8mb4_unicode_ci,
+  `text_plain` longtext COLLATE utf8mb4_unicode_ci,
+  `text_html` longtext COLLATE utf8mb4_unicode_ci,
+  `draft` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `sent` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `locked` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `attempts` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `send_after` datetime DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `update_history` text COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`id`),
+  INDEX (`account_id`),
+  INDEX (`sent`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+```
+
+- `id` Unique integer identifying the outbox message.
+- `account_id` Foreign key referencing the account from the `accounts` table.
+- `account_id` Foreign key referencing the message that this message is replying
+  to. Not used if the message is starting a new thread.
+- `to` Comma separated list of addresses to send the message to.
+- `from` Address used in the from header.
+- `cc` Comma separated list of addresses for the cc.
+- `bcc` Comma separated list of addresses for the bcc.
+- `reply_to` Reply-To header string.
+- `subject` Subject line of the message.
+- `text_plain` String containing the plain text version of the message.
+- `text_html` String containing the HTML formatted version of the message.
+- `draft` Flag denoting if the message is a draft.
+- `sent` Flag denoting if this message has been sent. No further action neeeded
+  if it has been.
+- `locked` Flag denoting if the message is locked. This is used so that two actions
+  aren't performed on the same outbox message at once.
+- `attempts` Integer counting the number of send attempts for this message.
+- `send_after` Optional timestamp to delay the sending of a message.
+- `created_at` Timestamp denoting when the message was added to the database.
+- `updated_at` Timestamp denoting when the message was last updated.
+- `update_history` String log of all actions performed on this message. Each action
+  is separated by a new line.
