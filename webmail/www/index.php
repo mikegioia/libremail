@@ -27,6 +27,7 @@ mb_internal_encoding('UTF-8');
 define('GET', 'GET');
 define('POST', 'POST');
 define('INBOX', 'inbox');
+define('OUTBOX', 'outbox');
 define('THREAD', 'thread');
 define('VIEWEXT', '.phtml');
 define('STARRED', 'starred');
@@ -122,6 +123,10 @@ $router->get('/compose', [$controller, 'compose']);
 $router->get('/compose/(\d+)', [$controller, 'compose']);
 // Send a new message
 $router->post('/compose', [$controller, 'send']);
+// View the outbox messages
+$router->get('/outbox', [$controller, 'outbox']);
+// Delete draft
+$router->post('/outbox/delete', [$controller, 'deleteDraft']);
 // Preview a message
 $router->get('/preview/(\d+)', [$controller, 'preview']);
 // Handle 404s

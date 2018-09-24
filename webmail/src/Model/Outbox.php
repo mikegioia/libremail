@@ -6,6 +6,7 @@ use PDO;
 use stdClass;
 use App\Model;
 use Zend\Mail\Address;
+use App\Exceptions\NotFoundException;
 use App\Exceptions\ValidationException;
 use Zend\Mail\Exception\InvalidArgumentException;
 
@@ -19,6 +20,7 @@ class Outbox extends Model
     public $sent;
     public $draft;
     public $locked;
+    public $deleted;
     public $subject;
     public $reply_to;
     public $attempts;
@@ -68,6 +70,7 @@ class Outbox extends Model
 
     public function setPostData(array $data)
     {
+        $this->id = $data['id'] ?? 0;
         $this->subject = $data['subject'] ?? '';
         $this->text_plain = $data['text_plain'] ?? '';
         $this->to = $this->parseAddresses($data['to'] ?? []);
@@ -89,6 +92,7 @@ class Outbox extends Model
             ->select()
             ->from('outbox')
             ->where('id', '=', $id)
+            ->where('deleted', '=', 0)
             ->execute()
             ->fetch();
 
@@ -176,7 +180,29 @@ class Outbox extends Model
 
     public function exists()
     {
-        return is_numeric($this->id) && $this->id;
+        return is_numeric($this->id)
+            && $this->id
+            && $this->deleted != 1;
+    }
+
+    /**
+     * @throws NotFoundException
+     */
+    public function delete()
+    {
+        if (! $this->exists()) {
+            throw new NotFoundException;
+        }
+
+        $deleted = $this->db()
+            ->update([
+                'deleted' => 1
+            ])
+            ->table('outbox')
+            ->where('id', '=', $this->id)
+            ->execute();
+
+        return is_numeric($deleted) ? $deleted : false;
     }
 
     /**

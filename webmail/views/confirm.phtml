@@ -5,6 +5,13 @@
             <a href="#" class="button button-danger"><?php echo $cancelLabel ?? 'Cancel'; ?></a>
             <button type="submit" class="button button-secondary"><?php echo $confirmLabel ?? 'Okay'; ?></button>
         </div>
+        <?php
+    if (isset($data)):
+        foreach ($data as $key => $value): ?>
+        <input type="hidden" name="<?php echo $key; ?>" value="<?php echo $value; ?>" />
+        <?php
+        endforeach;
+    endif; ?>
     </form>
 </div>
 <div class="dialog-overlay"></div>

@@ -10,35 +10,31 @@ $view->render('nav', [
     'view' => $view,
     'activeId' => 0,
     'folders' => $folders
-]);
-
-$view->render('confirm', [
-    'id' => 'confirm-delete',
-    'confirmLabel' => 'Yes, delete it',
-    'cancelLabel' => 'No!',
-    'action' => '', //Url::make()
-    'message' => 'Are you sure you want to delete this message?'
 ]); ?>
 
 <section id="main" class="compose">
     <?php
     $view->render('notifications', [
         'messages' => $notifications
-    ]); ?>
+    ]);
 
+    if ($message->id): ?>
+    <h5>
+        <span>Edit Message</span>
+        <a href="#confirm-delete">Delete this message</a>
+    </h5>
+    <?php
+    else: ?>
     <h5>
         <span>Compose Message</span>
-    <?php
-    if ($message->id): ?>
-        <a href="#confirm-delete">Delete this message</a>
-    <?php
-    endif; ?>
     </h5>
     <div class="help-text">
         When you click Send, your message will be moved to the <code>Outbox</code>.
         Messages stay in the Outbox for 5-10 minutes before being sent. You can edit
         the message, schedule a specific time, or trash it before it gets sent.
     </div>
+    <?php
+    endif; ?>
     <form action="/compose" method="post">
         <div class="row addresses<?php echo isset($formErrors['to']) ? ' has-error' : ''; ?>">
             <div class="two columns label">
@@ -164,6 +160,17 @@ endforeach; ?>
 </datalist>
 
 <?php
+$view->render('confirm', [
+    'id' => 'confirm-delete',
+    'confirmLabel' => 'Yes, delete it',
+    'cancelLabel' => 'No!',
+    'action' => App\Url::make('/outbox/delete'),
+    'message' => 'Are you sure you want to delete this message?',
+    'data' => [
+        'id' => $message->id
+    ]
+]);
+
 $view->render('footer', [
     'meta' => $meta
 ]); ?>

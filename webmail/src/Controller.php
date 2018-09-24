@@ -227,6 +227,24 @@ class Controller
 exit('preview');
     }
 
+    public function outbox()
+    {
+        $this->page('outbox', [
+            'folderId' => OUTBOX,
+            'messages' => []
+        ]);
+    }
+
+    public function deleteDraft()
+    {
+        (new Outbox($this->account))
+            ->getById(intval($_POST['id'] ?? 0))
+            ->delete();
+
+        Session::notify('Draft message deleted.', Session::SUCCESS);
+        Url::redirect('/outbox');
+    }
+
     public function send()
     {
         session_start();
@@ -237,9 +255,10 @@ exit('preview');
             $outbox->save();
 
             if ($outbox->draft) {
-                Url::redirect(Url::make('/compose/%s', $outbox->id));
+                Session::notify('Draft message saved.', Session::SUCCESS);
+                Url::redirectRaw(Url::make('/compose/%s', $outbox->id));
             } else {
-                Url::redirect(Url::make('/preview/%s', $outbox->id));
+                Url::redirectRaw(Url::make('/preview/%s', $outbox->id));
             }
         }
         // Store the POST data back in the session and set the
@@ -249,9 +268,9 @@ exit('preview');
             Session::formData($_POST);
 
             if (isset($outbox->id) && $outbox->exists()) {
-                Url::redirect(Url::make('/compose/', $outbox->id));
+                Url::redirectRaw(Url::make('/compose/%s', $outbox->id));
             } else {
-                Url::redirect('/compose');
+                Url::redirectRaw('/compose');
             }
         }
     }

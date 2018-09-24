@@ -1,0 +1,21 @@
+<?php
+
+$view->render('header', [
+    'view' => $view
+]);
+
+$view->render('nav', [
+    'view' => $view,
+    'folders' => $folders,
+    'activeId' => $folderId
+]); ?>
+
+<section id="main">
+
+</section>
+
+<?php
+$view->render('footer', [
+    'meta' => $meta,
+    'alert' => $alert
+]); ?>
