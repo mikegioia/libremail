@@ -280,12 +280,11 @@ class Thread
 
         // Cleanse it
         $body = htmlspecialchars($message->text_plain, ENT_QUOTES, 'UTF-8');
+
         // Convert any links
-        // $body = preg_replace(
-        //     self::EMAIL_REGEX,
-        //     '<a href="http$2://$4" target="_blank" title="$0">$0</a>',
-        //     $body);
-        $body = (new Linkify)->process($body, [
+        $linkify = new Linkify;
+        $body = $linkify->processEmails($body);
+        $body = $linkify->processUrls($body, [
             'attr' => [
                 'target' => '_blank'
             ]
