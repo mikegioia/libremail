@@ -8,10 +8,11 @@
         "php": ">=7.0",
         "ext-pdo": "*",
         "ext-mbstring": "*",
+        "misd/linkify": "^1.1",
         "particlebits/pdo": "@dev",
         "ezyang/htmlpurifier": "^4.10",
-        "zendframework/zend-escaper": "^2.5",
-        "zendframework/zend-mail": "^2.10"
+        "zendframework/zend-mail": "^2.10",
+        "zendframework/zend-escaper": "^2.5"
     },
     "scripts": {
         "fix": "php-cs-fixer fix",

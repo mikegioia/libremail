@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Model\Message;
+use Misd\Linkify\Linkify;
 use Zend\Escaper\Escaper;
 use App\Exceptions\NotFoundException;
 
@@ -280,10 +281,15 @@ class Thread
         // Cleanse it
         $body = htmlspecialchars($message->text_plain, ENT_QUOTES, 'UTF-8');
         // Convert any links
-        $body = preg_replace(
-            self::EMAIL_REGEX,
-            '<a href="http$2://$4" target="_blank" title="$0">$0</a>',
-            $body);
+        // $body = preg_replace(
+        //     self::EMAIL_REGEX,
+        //     '<a href="http$2://$4" target="_blank" title="$0">$0</a>',
+        //     $body);
+        $body = (new Linkify)->process($body, [
+            'attr' => [
+                'target' => '_blank'
+            ]
+        ]);
 
         $message->body = nl2br(trim($body));
     }

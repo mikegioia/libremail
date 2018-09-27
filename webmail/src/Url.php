@@ -128,7 +128,7 @@ class Url
         $refUrl = self::getRefUrl($default);
         $currentUrl = self::getCurrentUrl();
 
-        return $refUrl === $currentUrl && ! $ignoreSame
+        return $refUrl === $currentUrl
             ? self::get($default)
             : $refUrl;
     }
