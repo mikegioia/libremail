@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "c938907f8cbc17ec5e8d71d20fb24c3f",
+    "content-hash": "a19a8bc5e08ee532e9022e1fefc4ab96",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -131,16 +131,16 @@
         },
         {
             "name": "particlebits/pdo",
-            "version": "dev-master",
+            "version": "2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/pdo.git",
-                "reference": "c65110221ca2e06c0baa5821395fb00c57d66452"
+                "reference": "5d3a4e2c575ede767753ac518c876933bc08088d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/pdo/zipball/c65110221ca2e06c0baa5821395fb00c57d66452",
-                "reference": "c65110221ca2e06c0baa5821395fb00c57d66452",
+                "url": "https://api.github.com/repos/ParticleBits/pdo/zipball/5d3a4e2c575ede767753ac518c876933bc08088d",
+                "reference": "5d3a4e2c575ede767753ac518c876933bc08088d",
                 "shasum": ""
             },
             "require": {
@@ -179,7 +179,7 @@
                 "pdo",
                 "tiny pdo"
             ],
-            "time": "2018-09-16T21:18:50+00:00"
+            "time": "2018-10-25T17:34:33+00:00"
         },
         {
             "name": "psr/container",
@@ -659,9 +659,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "particlebits/pdo": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

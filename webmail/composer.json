@@ -9,7 +9,7 @@
         "ext-pdo": "*",
         "ext-mbstring": "*",
         "misd/linkify": "^1.1",
-        "particlebits/pdo": "@dev",
+        "particlebits/pdo": "^2.0",
         "ezyang/htmlpurifier": "^4.10",
         "zendframework/zend-mail": "^2.10",
         "zendframework/zend-escaper": "^2.5"
