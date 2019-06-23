@@ -1419,6 +1419,7 @@ section.notifications .notification .success {
   background-color: #28a94c;
   color: #fff;
 }
+
 @media (max-width: 720px) {
   header section.accounts {
     display: none;

@@ -88,6 +88,7 @@ LibreMail.Components = {};
 // Vendor dependencies follow this message!
 // --------------------------------------------------------------------
 ;
+
 // MIT License:
 //
 // Copyright (c) 2010-2012, Joe Walnes
@@ -453,6 +454,7 @@ LibreMail.Components = {};
 
     return ReconnectingWebSocket;
 });;
+
 /*!
  * mustache.js - Logic-less {{mustache}} templates with JavaScript
  * http://github.com/janl/mustache.js
@@ -1084,6 +1086,7 @@ LibreMail.Components = {};
 
   return mustache;
 }));;
+
 /**
  * Event Emitter
  */
@@ -1149,6 +1152,7 @@ LibreMail.Emitter = (function () {
         fire: fire
     };
 }());;
+
 /**
  * Socket Manager
  */
@@ -1196,6 +1200,7 @@ LibreMail.Socket = (function ( ReconnectingWebSocket, JSON, Const, Emitter ) {
 
     return ws;
 }( ReconnectingWebSocket, JSON, LibreMail.Const, LibreMail.Emitter ));;
+
 /**
  * Global Page Controller
  */
@@ -1334,6 +1339,7 @@ return function () {
     LibreMail.Emitter,
     LibreMail.Components
 ));;
+
 /**
  * Stats Page Controller
  */
@@ -1434,13 +1440,14 @@ return function () {
     LibreMail.Emitter,
     LibreMail.Components
 ));;
+
 /**
- * Header Component
+ * Accounts Component
  */
-LibreMail.Components.Accounts = (function ( Const, Socket, Emitter, Mustache ) {
-'use strict';
+LibreMail.Components.Accounts = (function (Const, Socket, Emitter, Mustache) {
 // Returns a new instance
-return function ( $root ) {
+return function ($root) {
+    'use strict';
     // Event namespace
     var namespace = '.accounts';
     // DOM template nodes
@@ -1564,14 +1571,15 @@ return function ( $root ) {
         update: update,
         tearDown: tearDown
     };
-}}( LibreMail.Const, LibreMail.Socket, LibreMail.Emitter, Mustache ));;
+}}(LibreMail.Const, LibreMail.Socket, LibreMail.Emitter, Mustache));;
+
 /**
  * Folders Component
  */
-LibreMail.Components.Folders = (function ( Mustache ) {
-'use strict';
+LibreMail.Components.Folders = (function (Mustache) {
 // Returns a new instance
 return function ( $root ) {
+    'use strict';
     // Event namespace
     var namespace = '.folders';
     // Flag if the system is "auto-scrolling"
@@ -1886,7 +1894,8 @@ return function ( $root ) {
         render: render,
         tearDown: tearDown
     };
-}}( Mustache ));;
+}}(Mustache));;
+
 /**
  * Header Component
  */
@@ -2104,13 +2113,14 @@ return function ( $root ) {
         tearDown: tearDown
     };
 }}( LibreMail.Const, LibreMail.Socket, LibreMail.Emitter, Mustache ));;
+
 /**
- * Header Component
+ * Notifications Component
  */
 LibreMail.Components.Notifications = (function ( Const, Socket, Mustache ) {
-'use strict';
 // Returns a new instance
 return function ( $root ) {
+    'use strict';
     // Event namespace
     var namespace = '.notifications';
     // DOM template nodes
@@ -2151,13 +2161,14 @@ return function ( $root ) {
         closeAll: closeAll
     };
 }}( LibreMail.Const, LibreMail.Socket, Mustache ));;
+
 /**
- * Header Component
+ * Status Message Component
  */
 LibreMail.Components.StatusMessage = (function ( Const, Socket, Mustache ) {
-'use strict';
 // Returns a new instance
 return function ( $root ) {
+    'use strict';
     // Event namespace
     var namespace = '.statusmessage';
     // DOM template nodes
