@@ -37,31 +37,33 @@ the different ways with which you can run the application continuously
 
 ### 2. JavaScript-free HTML Email Client
 
-![Started](https://img.shields.io/badge/status-started-yellow.svg?style=flat-square)
+![Very Soon](https://img.shields.io/badge/status-very%20soon-green.svg?style=flat-square)
 
-As both a case-study and for usability's sake, one of the primary goals of this
-project is to create a web-based email client and server application that's
-completely devoid of JavaScript. Modern web development has fallen into a
-pattern of not only requiring JavaScript to function, but also bundling large
-script files on every page request.
+One of the primary goals of this project is to create a web-based email client
+that is completely free of JavaScript or browser code. Modern web development
+has fallen into a pattern of using JavaScript to do everything. It can be very
+advantageous, from a security and privacy perspective, to disable JavaScript for
+any email web applications. Having a mail client that works without JavaScript
+can be a huge blessing!
 
-This has implications for anyone who disables JavaScript by default, anyone who
-may not want to run JavaScript on their Internet connection, or anyone who may
-be using a mobile or antique browser, or a browser over a slow Internet
-connection. Even managing a JavaScript white-list is problematic because you're
-still trusting the website and application to never be compromised.
+It's recommended and encouraged to disable JavaScript when using LibreMail. This
+can avoid a very large class of security vulnerabilities. While most problems
+are encountered upon clicking external links or downloading and opening files,
+disabling JavaScript for LibreMail can prevent malicious activity from other
+websites you have open, browser extensions, and more.
+
 
 Web applications and pages can not only function, but thrive in a JavaScript-
 free environment. The [`webmail`](webmail) application in this project provides
 a rich GMail-style interface for interacting with the local email saved in a SQL
-database from the [`sync`](sync) app. It's mobile-friendly, extremely light-
-weight, and provides almost full parity to GMail's email client.
-
-Please see the [`webmail`](webmail) directory for full documentation on running
-the app. This requires your remote mail to be stored in a local SQL database.
-The [`sync`](sync) app does this for you, but you're free to use anything that
-saves data in the way outlined in [`DATA_FORMAT.md`](DATA_FORMAT.md).
+database from the [`sync`](sync) app (this is a pre-requisite). It's
+mobile-friendly, extremely light-weight, and provides almost full parity to
+GMail's email client.
 
 ### 3. Kanban-style Email Client
 
 ![Not Started](https://img.shields.io/badge/status-not%20started-lightgrey.svg?style=flat-square)
+
+The final goal of LibreMail is to create a modern and safe email client that
+works _with_ and _for_ the user, not against them. The Kanban client is meant to
+help organize and manage email for anyone who thinks of email as a "todo".
