@@ -87,17 +87,32 @@ class Task extends Model
     }
 
     /**
-     * Updates the status of the message.
-     *
-     * @param string $status
+     * Marks a message as done.
      *
      * @throws DatabaseUpdateException
      */
-    private function updateStatus(string $status, string $reason = null)
+    public function done()
     {
+        $this->updateStatus(self::STATUS_DONE, null, true);
+    }
+
+    /**
+     * Updates the status of the message.
+     *
+     * @param string $status
+     * @param string $reason Optional reason string
+     * @param bool $force If set, forces all fields to update
+     *
+     * @throws DatabaseUpdateException
+     */
+    private function updateStatus(
+        string $status,
+        string $reason = null,
+        bool $force = false
+    ) {
         $updates = ['status' => $status];
 
-        if ($reason) {
+        if ($reason || $force) {
             $updates['reason'] = $reason;
         }
 

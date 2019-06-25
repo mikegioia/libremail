@@ -11,6 +11,8 @@ use App\Sync;
 use Exception;
 use Monolog\Logger;
 use Pb\Imap\Mailbox;
+use Pb\Imap\Message;
+use RuntimeException;
 use League\CLImate\CLImate;
 use App\Model\Task as TaskModel;
 use App\Model\Folder as FolderModel;
@@ -28,17 +30,29 @@ class Actions
     private $interactive;
 
     private static $dupeLookup = [
-        TaskModel::TYPE_READ => TaskModel::TYPE_UNREAD,
-        TaskModel::TYPE_UNREAD => TaskModel::TYPE_READ,
-        TaskModel::TYPE_FLAG => TaskModel::TYPE_UNFLAG,
-        TaskModel::TYPE_UNFLAG => TaskModel::TYPE_FLAG,
         TaskModel::TYPE_DELETE => TaskModel::TYPE_UNDELETE,
-        TaskModel::TYPE_UNDELETE => TaskModel::TYPE_DELETE
+        TaskModel::TYPE_FLAG => TaskModel::TYPE_UNFLAG,
+        TaskModel::TYPE_READ => TaskModel::TYPE_UNREAD,
+        TaskModel::TYPE_UNDELETE => TaskModel::TYPE_DELETE,
+        TaskModel::TYPE_UNFLAG => TaskModel::TYPE_FLAG,
+        TaskModel::TYPE_UNREAD => TaskModel::TYPE_READ
     ];
 
+    // Lookup of actions to action classes
+    private static $actionLookup = [
+        TaskModel::TYPE_COPY => 'App\Sync\Actions\Copy',
+        TaskModel::TYPE_DELETE => 'App\Sync\Actions\Delete',
+        TaskModel::TYPE_FLAG => 'App\Sync\Actions\Flag',
+        TaskModel::TYPE_READ => 'App\Sync\Actions\Read',
+        TaskModel::TYPE_UNDELETE => 'App\Sync\Actions\Undelete',
+        TaskModel::TYPE_UNFLAG => 'App\Sync\Actions\Unflag',
+        TaskModel::TYPE_UNREAD => 'App\Sync\Actions\Unread'
+    ];
+
+    const ERR_FAIL_IMAP_SYNC = 'Failed IMAP sync';
+    const ERR_NO_IMAP_MESSAGE = 'No message found in IMAP mailbox';
     const ERR_NO_SQL_FOLDER = 'No folder found in SQL';
     const ERR_NO_SQL_MESSAGE = 'No message found in SQL';
-    const ERR_NO_IMAP_MESSAGE = 'No message found in IMAP mailbox';
 
     public function __construct(
         Logger $log,
@@ -56,8 +70,6 @@ class Actions
 
     public function run(AccountModel $account)
     {
-        $this->log->debug("Syncing tasks for {$account->email}");
-
         $tasks = (new TaskModel)->getTasksForSync($account->id);
         $count = count($tasks);
 
@@ -65,7 +77,8 @@ class Actions
             return;
         }
 
-        $this->log->info("Found $count ".Fn\plural('task', $count).' to sync');
+        $noun = Fn\plural('task', $count);
+        $this->log->info("Syncing $count $noun for {$account->email}");
 
         // Compress them by removing any redundant tasks
         // Redundant tasks are marked as `ignored`
@@ -171,11 +184,32 @@ class Actions
         }
 
         // Check if the unique ID is the same; halt if not
-        if (! Fn\ntEq($imapMessage->uid, $sqlMessage->unique_id)) {
+        if (! Fn\intEq($imapMessage->uid, $sqlMessage->unique_id)) {
             return $task->fail(self::ERR_UID_MISMATCH);
         }
 
-        //
+        $actionClass = self::$actionLookup[$task->type] ?? null;
+
+        if (! $actionClass) {
+            throw new RuntimeException(
+                "Task type {$task->type} not found in action classes lookup"
+            );
+        }
+
+        try {
+            (new $actionClass(
+                $task, $sqlFolder, $sqlMessage, $imapMessage
+            ))->run($this->mailbox);
+        } catch (Exception $e) {
+            $this->log->warning(
+                "Failed syncing IMAP action for task {$task->id}: ".
+                $e->getMessage());
+            $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
+
+            return $task->fail(self::ERR_FAIL_IMAP_SYNC);
+        }
+
+        $task->done();
     }
 
     private function startProgress(int $total)

@@ -262,7 +262,7 @@ class Message extends Model
      * @param int $folderId
      *
      * @return array of ints The index is the message_no and
-     *   the value is the unique_id.
+     *   the value is the unique_id
      */
     public function getSyncedIdsByFolder(int $accountId, int $folderId)
     {

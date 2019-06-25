@@ -147,10 +147,9 @@ class Sync
                 $this->wake = false;
             }
 
-            // Un-comment to do a pre-run that only syncs actions
-            // $this->run(null, [ self::OPT_ONLY_SYNC_ACTIONS => true ]);
-
             if ((new DateTime)->getTimestamp() < $wakeUnix) {
+                // Run action sync every minute
+                $this->run(null, [self::OPT_ONLY_SYNC_ACTIONS => true]);
                 $this->setAsleep();
                 sleep(60);
                 continue;

@@ -433,7 +433,7 @@ class Message extends Model
             if ($row->message_id) {
                 if (isset($messageIds[$row->message_id])) {
                     continue;
-                } elseif (1 != $row->seen) {
+                } elseif (1 !== (int) $row->seen) {
                     $threads[$row->thread_id]->unseen = true;
                 }
 
@@ -462,10 +462,8 @@ class Message extends Model
                 $message->subject = $found->subject;
                 $message->thread_count = $found->count;
                 $message->folders = array_keys($found->folders);
-
-                if ($found->unseen) {
-                    $message->seen = 0;
-                }
+                // Update master seen flag
+                $message->seen = $found->unseen ? 0 : 1;
             }
 
             if (in_array($message->thread_id, $meta->flaggedIds)) {

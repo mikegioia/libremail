@@ -104,7 +104,8 @@ class Messages
         $message->snippet = substr(
             ltrim($text, '<>-_='),
             0,
-            self::SNIPPET_LENGTH);
+            self::SNIPPET_LENGTH
+        );
     }
 
     /**
@@ -120,7 +121,8 @@ class Messages
         $unique = array_values(array_unique($message->names));
         $message->names = $messageNames->get(
             $message->names,
-            $message->seens);
+            $message->seens
+        );
 
         if ($message->thread_count > 1) {
             $message->names .= ' ('.$message->thread_count.')';
@@ -133,7 +135,7 @@ class Messages
     private function setDisplayDate(Message &$message)
     {
         $today = View::getDate(null, View::DATE_FULL);
-        $messageTime = ($message->date_recv)
+        $messageTime = $message->date_recv
             ? strtotime($message->date_recv)
             : strtotime($message->date);
         $messageDate = View::getDate($message->date, View::DATE_FULL);
@@ -149,7 +151,8 @@ class Messages
     {
         $message->folders = array_intersect_key(
             $folders,
-            array_flip($message->folders));
+            array_flip($message->folders)
+        );
     }
 
     /**
