@@ -14,6 +14,7 @@ class Task extends Model
     public $type;
     public $status;
     public $reason;
+    public $retries;
     public $old_value;
     public $folder_id;
     public $account_id;
@@ -34,6 +35,8 @@ class Task extends Model
     const TYPE_UNREAD = 'unread';
     const TYPE_UNDELETE = 'undelete';
 
+    const MAX_ATTEMPTS = 3;
+
     use ModelTrait;
 
     public function getData()
@@ -43,6 +46,7 @@ class Task extends Model
             'type' => $this->type,
             'status' => $this->status,
             'reason' => $this->reason,
+            'retries' => $this->retries,
             'old_value' => $this->old_value,
             'folder_id' => $this->folder_id,
             'account_id' => $this->account_id,
@@ -94,6 +98,33 @@ class Task extends Model
     public function done()
     {
         $this->updateStatus(self::STATUS_DONE, null, true);
+    }
+
+    /**
+     * Increments the retry counter.
+     *
+     * @throws DatabaseUpdateException
+     */
+    public function retry()
+    {
+        $retries = $this->retries ?: 0;
+
+        if ($retries + 1 > self::MAX_ATTEMPTS) {
+            return $this->fail('Exceeded retry attempts');
+        }
+
+        $updated = $this->db()
+            ->update(['retries' => $retries + 1])
+            ->table('tasks')
+            ->where('id', '=', $this->id)
+            ->execute();
+
+        if (! Belt::isNumber($updated)) {
+            throw new DatabaseUpdateException(
+                TASK,
+                $this->db()->getError()
+            );
+        }
     }
 
     /**

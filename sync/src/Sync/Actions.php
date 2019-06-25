@@ -171,6 +171,13 @@ class Actions
             return $task->fail(self::ERR_NO_SQL_FOLDER);
         }
 
+        // Skip messages without a message number. These were added during
+        // a copy command and do not have a corresponding server message.
+        // They'll be purged after the message is copied to the mailbox.
+        if (! $sqlMessage->message_no) {
+            return $task->ignore();
+        }
+
         try {
             $this->mailbox->select($sqlFolder->name);
             $imapMessage = $this->mailbox->getMessage($sqlMessage->message_no);

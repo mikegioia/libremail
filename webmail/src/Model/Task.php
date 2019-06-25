@@ -14,6 +14,7 @@ class Task extends Model
     public $type;
     public $status;
     public $reason;
+    public $retries;
     public $folder_id;
     public $old_value;
     public $account_id;

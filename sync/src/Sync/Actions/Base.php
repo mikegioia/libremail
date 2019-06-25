@@ -32,4 +32,21 @@ abstract class Base
     abstract public function getType();
 
     abstract public function run(Mailbox $mailbox);
+
+    /**
+     * Checks if the SQL message is "real", i.e. that it has
+     * a message number and unique ID. We only want to perform
+     * mailbox actions on real messages, otherwise, we want to
+     * mark them as "purged" and have them removed.
+     *
+     * @return bool True if purged
+     */
+    public function checkPurge()
+    {
+        if (! $this->message->message_no) {
+            return (new MessageModel)->markPurged($this->task->message_id);
+        }
+
+        return false;
+    }
 }

@@ -28,6 +28,7 @@ class Message extends Model
     public $size;
     public $seen;
     public $draft;
+    public $purge;
     public $synced;
     public $recent;
     public $flagged;
@@ -79,6 +80,7 @@ class Message extends Model
             'size' => $this->size,
             'seen' => $this->seen,
             'draft' => $this->draft,
+            'purge' => $this->purge,
             'synced' => $this->synced,
             'recent' => $this->recent,
             'flagged' => $this->flagged,
@@ -425,7 +427,7 @@ class Message extends Model
         // Update flags to have the right data type
         $this->updateFlagValues($data, [
             'seen', 'draft', 'recent', 'flagged',
-            'deleted', 'answered'
+            'deleted', 'answered', 'purge'
         ]);
         $this->updateUtf8Values($data, [
             'subject', 'text_html', 'text_plain',
@@ -477,12 +479,7 @@ class Message extends Model
                 }
             }
 
-            if (! Belt::isNumber($updated)) {
-                throw new DatabaseUpdateException(
-                    MESSAGE,
-                    $this->db()->getError()
-                );
-            }
+            $this->errorHandle($updated);
 
             return;
         }
@@ -592,12 +589,7 @@ class Message extends Model
             ->whereIn('unique_id', $uniqueIds)
             ->execute();
 
-        if (! Belt::isNumber($updated)) {
-            throw new DatabaseUpdateException(
-                MESSAGE,
-                $this->getError()
-            );
-        }
+        $this->errorHandle($updated);
     }
 
     /**
@@ -649,12 +641,7 @@ class Message extends Model
 
         $updated = $query->execute();
 
-        if (! Belt::isNumber($updated)) {
-            throw new DatabaseUpdateException(
-                MESSAGE,
-                $this->getError()
-            );
-        }
+        $this->errorHandle($updated);
 
         return $updated;
     }
@@ -687,12 +674,54 @@ class Message extends Model
             ->where('id', '=', $this->id)
             ->execute();
 
-        if (! Belt::isNumber($updated)) {
-            throw new DatabaseUpdateException(
-                MESSAGE,
-                $this->db()->getError()
-            );
-        }
+        $this->errorHandle($updated);
+    }
+
+    /**
+     * Sets a message to be killed during the purge.
+     *
+     * @param int $id Optional, defaults to internal ID
+     *
+     * @throws DatabaseUpdateException
+     */
+    public function markPurged(int $id = null)
+    {
+        $id = $id ?? $this->id;
+        $this->requireInt($id, 'Message ID');
+
+        $updated = $this->db()
+            ->update(['purge' => 1])
+            ->table('messages')
+            ->where('id', '=', $id)
+            ->execute();
+
+        $this->errorHandle($updated);
+    }
+
+    /**
+     * Removes messages from a folder/account that are marked
+     * for purge (removal).
+     *
+     * @param int $accountId
+     * @param int $folderId
+     *
+     * @return int Count of deleted rows
+     */
+    public function deleteMarkedForPurge(int $accountId, int $folderId)
+    {
+        $deleted = $this->db()
+            ->delete()
+            ->from('messages')
+            ->where('folder_id', '=', $folderId)
+            ->where('account_id', '=', $accountId)
+            ->whereNull('unique_id')
+            ->whereNull('message_no')
+            ->where('purge', '=', 1)
+            ->execute();
+
+        return is_numeric($deleted)
+            ? $deleted
+            : 0;
     }
 
     /**
@@ -733,21 +762,13 @@ class Message extends Model
      */
     public function saveThreadId(array $ids, int $threadId)
     {
-        $this->requireArray($ids, 'IDs');
-        $this->requireInt($threadId, 'Thread ID');
-
         $updated = $this->db()
             ->update(['thread_id' => $threadId])
             ->table('messages')
             ->whereIn('id', $ids)
             ->execute();
 
-        if (! Belt::isNumber($updated)) {
-            throw new DatabaseUpdateException(
-                MESSAGE,
-                $this->getError()
-            );
-        }
+        $this->errorHandle($updated);
 
         return $updated;
     }
@@ -772,12 +793,7 @@ class Message extends Model
             ->where('folder_id', '=', $folderId)
             ->execute();
 
-        if (! Belt::isNumber($updated)) {
-            throw new DatabaseUpdateException(
-                MESSAGE,
-                $this->getError()
-            );
-        }
+        $this->errorHandle($updated);
 
         return $updated;
     }
@@ -827,6 +843,21 @@ class Message extends Model
         }
 
         return json_encode($formatted, JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * @param bool | int $updated Response from update operation
+     *
+     * @throws DatabaseUpdateException
+     */
+    private function errorHandle($updated)
+    {
+        if (! Belt::isNumber($updated)) {
+            throw new DatabaseUpdateException(
+                MESSAGE,
+                $this->getError()
+            );
+        }
     }
 
     /**

@@ -3,8 +3,10 @@
 namespace App\Sync\Actions;
 
 use Pb\Imap\Mailbox;
-use Zend\Mail\Storage;
 use App\Model\Task as TaskModel;
+use App\Model\Folder as FolderModel;
+use App\Model\Message as MessageModel;
+use App\Exceptions\NotFound as NotFoundException;
 
 class Copy extends Base
 {
@@ -15,8 +17,18 @@ class Copy extends Base
      */
     public function run(Mailbox $mailbox)
     {
-        // @TODO
-        // new folder ID is on the task
+        $toFolder = (new FolderModel)->getById($this->task->folder_id);
+
+        if (! $toFolder || ! $toFolder->name) {
+            throw new NotFoundException(FOLDER, $this->task->folder_id);
+        }
+
+        $mailbox->copy(
+            $toFolder->name,
+            $this->imapMessage->messageNum
+        );
+
+        $this->checkPurge();
     }
 
     public function getType()

@@ -19,6 +19,7 @@ class Message extends Model
     public $size;
     public $seen;
     public $draft;
+    public $purge;
     public $synced;
     public $recent;
     public $flagged;
@@ -85,6 +86,7 @@ class Message extends Model
             'size' => $this->size,
             'seen' => $this->seen,
             'draft' => $this->draft,
+            'purge' => $this->purge,
             'synced' => $this->synced,
             'recent' => $this->recent,
             'flagged' => $this->flagged,

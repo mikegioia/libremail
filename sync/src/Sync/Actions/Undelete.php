@@ -15,6 +15,10 @@ class Undelete extends Base
      */
     public function run(Mailbox $mailbox)
     {
+        if ($this->checkPurge()) {
+            return;
+        }
+
         return $mailbox->removeFlags(
             [$this->imapMessage->messageNum],
             [Storage::FLAG_DELETED],

@@ -81,6 +81,7 @@ class Messages
         $this->markDeleted($newIds, $savedIds, $folder, $options);
         $this->updateSeenFlags($account, $folder);
         $this->updateFlaggedFlags($account, $folder);
+        $this->flushPurged($account, $folder);
     }
 
     /**
@@ -288,11 +289,6 @@ class Messages
         try {
             foreach ($toUpdate as $uid => $newMsgNo) {
                 if ((int) $savedIds[$uid] !== (int) $newIds[$uid]) {
-                    var_dump($uid);
-                    var_dump($savedIds[$uid]);
-                    var_dump($newIds[$uid]);
-                    var_dump($folder->id);
-                    exit('hit!');
                     $messageModel->saveMessageNo($uid, $folder->id, $newMsgNo);
                     $this->emitter->emit(Sync::EVENT_CHECK_HALT);
                 }
@@ -422,6 +418,38 @@ class Messages
         } catch (ValidationException $e) {
             $this->log->notice(
                 'Failed validation for marking un-flagged messages: '.
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Cleans up any messages in the folder that we're marked for purge.
+     * These are duplicate messages created by the client, and after
+     * they're synced to the mailbox are left as duplicates in SQL. They
+     * have no message number or unique ID and can't be updated during
+     * the sync process.
+     *
+     * @param AccountModel $account
+     * @param FolderModel $model
+     */
+    private function flushPurged(AccountModel $account, FolderModel $folder)
+    {
+        // Mark as seen anything unseen that's not in this collection
+        try {
+            $updated = (new MessageModel)->deleteMarkedForPurge(
+                $account->getId(),
+                $folder->getId()
+            );
+
+            if ($updated) {
+                $this->log->debug(
+                    "Purged {$updated} from {$folder->name}"
+                );
+            }
+        } catch (PDOException $e) {
+            $this->log->notice(
+                'Failed removing purged messages: '.
                 $e->getMessage()
             );
         }

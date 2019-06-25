@@ -15,6 +15,10 @@ class Read extends Base
      */
     public function run(Mailbox $mailbox)
     {
+        if ($this->checkPurge()) {
+            return;
+        }
+
         return $mailbox->addFlags(
             [$this->imapMessage->messageNum],
             [Storage::FLAG_SEEN],

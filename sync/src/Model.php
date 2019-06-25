@@ -159,7 +159,12 @@ class Model
         return $lookup;
     }
 
-    public function getErrorString(Validator $validator, $message)
+    public function getError()
+    {
+        return $this->db()->getError();
+    }
+
+    public function getErrorString(Validator $validator, string $message)
     {
         $return = [];
         $messages = $validator->getMessages();
@@ -169,11 +174,8 @@ class Model
         }
 
         return trim(
-            sprintf(
-                "%s\n\n%s",
-                $message,
-                implode("\n", $return)
-            ),
-            ". \t\n\r\0\x0B").'.';
+            sprintf("%s\n\n%s", $message, implode("\n", $return)),
+            ". \t\n\r\0\x0B"
+        ).'.';
     }
 }

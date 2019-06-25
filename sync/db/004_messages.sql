@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `deleted` tinyint(1) unsigned DEFAULT NULL,
   `answered` tinyint(1) unsigned DEFAULT NULL,
   `synced` tinyint(1) unsigned DEFAULT NULL,
+  `purge` tinyint(1) unsigned DEFAULT NULL,
   `date` datetime DEFAULT NULL,
   `date_recv` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
