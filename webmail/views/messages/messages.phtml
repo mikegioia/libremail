@@ -21,7 +21,7 @@ foreach ($messages as $message):
         </a>
         <a href="<?php echo $url; ?>" class="subject">
         <?php
-        foreach ( $message->folders as $folder ): ?>
+        foreach ($message->folders as $folder): ?>
             <mark style="background-color:<?php echo $folder->color->bg; ?>; color:<?php echo $folder->color->fg; ?>"><?php $view->clean($folder->label); ?></mark>
         <?php
         endforeach; ?>

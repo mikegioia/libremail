@@ -96,11 +96,11 @@ return [
         'bg' => '#3f1994',
         'fg' => '#ffffff'
     ],
-    [
-        'name' => 'light-grey',
-        'bg' => '#bcbdc1',
-        'fg' => '#ffffff'
-    ],
+    // [
+    //     'name' => 'light-grey',
+    //     'bg' => '#bcbdc1',
+    //     'fg' => '#303138'
+    // ],
     [
         'name' => 'rocket-red',
         'bg' => '#ff524e',

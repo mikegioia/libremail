@@ -29,7 +29,9 @@ class Folders
     private $loaded = false;
     // Convert certain folder names
     private $convert = [
-        'INBOX' => 'Inbox'
+        'INBOX' => 'Inbox',
+        '[Gmail]/Trash' => 'Trash',
+        '[Gmail]/Cestino' => 'Cestino'
     ];
     // Mailbox constants
     const INBOX = 'inbox';
@@ -56,6 +58,12 @@ class Folders
     const SENT = [
         '[Gmail]/Sent Mail',
         '[Gmail]/Posta inviata'
+    ];
+    // Color constants
+    const COLOR_GREY = [
+        'name' => 'light-grey',
+        'bg' => '#bcbdc1',
+        'fg' => '#303138'
     ];
 
     public function __construct(Account $account, array $colors)
@@ -103,12 +111,12 @@ class Folders
     private function getMailboxId(string $mailbox)
     {
         if (isset($this->{$mailbox})) {
-            return $this->{$mailbox};
+            return (int) $this->{$mailbox};
         }
 
         $this->loadFolders();
 
-        return $this->{$mailbox};
+        return (int) $this->{$mailbox};
     }
 
     /**
@@ -314,7 +322,8 @@ class Folders
         $this->loadFolders();
         $this->folderCounts = (new Message)->getUnreadCounts(
             $this->accountId,
-            $this->getSkipIds());
+            $this->getSkipIds()
+        );
 
         // Add meta info to the folders
         foreach ($this->folders as $folder) {
@@ -393,8 +402,8 @@ class Folders
         array $branch,
         int &$index,
         int $offset,
-        int $parentOffset)
-    {
+        int $parentOffset
+    ) {
         if ($branch['folder']->is_mailbox) {
             return;
         }
@@ -431,6 +440,10 @@ class Folders
             array_keys($this->convert),
             array_values($this->convert),
             $folder->name);
+        $folder->full_name = str_replace(
+            array_keys($this->convert),
+            array_values($this->convert),
+            $folder->full_name);
 
         // Shortened label for display in the inbox
         $parts = explode('/', $folder->full_name);
@@ -502,6 +515,8 @@ class Folders
     private function setColor(Folder &$folder)
     {
         if (! isset($this->index[$folder->id])) {
+            $folder->color = (object) self::COLOR_GREY;
+
             return;
         }
 

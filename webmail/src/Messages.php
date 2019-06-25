@@ -39,7 +39,7 @@ class Messages
         $messageNames = new Names;
         $messageModel = new Message;
         $escaper = new Escaper(self::UTF8);
-        $folders = $this->getIndexedFolders();
+        $folders = $this->getIndexedFolders($folderId);
         $messages = $messageModel->getThreadsByFolder(
             $this->accountId,
             $folderId,
@@ -158,15 +158,38 @@ class Messages
     /**
      * Returns a set of folders indexed by folder ID.
      */
-    private function getIndexedFolders()
+    private function getIndexedFolders(int $folderId)
     {
         $folders = [];
+        $inboxId = (int) $this->folders->getInboxId();
+        $trashId = (int) $this->folders->getTrashId();
+        $isInbox = $folderId === $inboxId;
+        $isTrash = $folderId === $trashId;
 
         foreach ($this->folders->get() as $folder) {
-            if (! $folder->is_mailbox && 1 != $folder->ignored) {
+            // Normally, hide all mailboxes from showing in the list
+            // of folders (labels). If we're viewing any folder but
+            // the inbox or trash, then show if it's in the inbox.
+            // If we're viewing the trash, show the trash folder.
+            $whitelisted = ($isTrash && (int) $folder->id === $trashId)
+                || (! $isInbox && ! $isTrash && (int) $folder->id === $inboxId);
+
+            if ($whitelisted
+                || (! $folder->is_mailbox
+                    && 1 !== (int) $folder->ignored)
+            ) {
                 $folders[$folder->id] = $folder;
             }
         }
+
+        // Sort the folders first by name
+        uasort($folders, function ($a, $b) {
+            return $a->name <=> $b->name;
+        });
+        // and then put the mailboxes first
+        uasort($folders, function ($a, $b) {
+            return $b->is_mailbox <=> $a->is_mailbox;
+        });
 
         return $folders;
     }
