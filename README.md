@@ -2,7 +2,7 @@
 
 > **Under Active Development**
 >
-> [`Sync`](sync) is ready to use!
+> [`Sync`](sync) is ready to use! [`Webmail`](webmail) is about 90% done!
 
 This project consists of three parts:
 

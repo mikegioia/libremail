@@ -1,7 +1,11 @@
 ### CAVE CANEM
 
-This is under active development and not ready for public use yet!
+This is under active development but very close until public use!
 Read below of you want to check it out.
+
+#### Web Client Admin Interface
+
+![Webmail Client Screenshot](http://mikegioia.github.io/libremail/images/webmail_screenshot.png)
 
 #### Status
 
@@ -9,11 +13,11 @@ Read below of you want to check it out.
  - [x] ~Message thread view~
  - [x] ~Archive, mark read/unread, delete, move (label), copy,
        star/unstar actions for messages and threads.~
+ - [x] ~Edit account credentials and settings~
+ - [x] ~Sync all actions with IMAP/SMTP server~
  - [ ] Reply to and forward messages
  - [ ] Compose new message
- - [x] ~Edit account credentials and settings~
  - [ ] Search and display search results
- - [ ] Sync all actions with IMAP/SMTP server
 
 #### Installation (Developers only)
 
@@ -23,4 +27,4 @@ Read below of you want to check it out.
 2. Copy `.env.example` to `.env` and update the database settings. Feel
    free to change any other settings, like the app's URL, too.
 
-This application is set to run over localhost on port 9899 by default. 
+This application is set to run over localhost on port 9899 by default.
