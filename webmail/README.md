@@ -1,7 +1,9 @@
 ### CAVE CANEM
 
-This is under active development but very close until public use!
-Read below of you want to check it out.
+This is under active development but very close to being done! Read below if
+you want to check it out :D
+
+I'll soon be using this as my daily driver, which should shore up a lot of bugs.
 
 #### Web Client Admin Interface
 
@@ -15,9 +17,9 @@ Read below of you want to check it out.
        star/unstar actions for messages and threads.~
  - [x] ~Edit account credentials and settings~
  - [x] ~Sync all actions with IMAP/SMTP server~
- - [ ] Reply to and forward messages
- - [ ] Compose new message
  - [ ] Search and display search results
+ - [ ] Compose new message
+ - [ ] Reply to and forward messages
 
 #### Installation (Developers only)
 
