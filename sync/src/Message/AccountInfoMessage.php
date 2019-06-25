@@ -11,6 +11,7 @@ class AccountInfoMessage extends AbstractMessage
     public $port;
     public $email;
     public $password;
+
     protected $type = Message::ACCOUNT_INFO;
 
     public function __construct(AccountModel $account)

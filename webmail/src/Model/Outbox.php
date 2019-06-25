@@ -2,8 +2,6 @@
 
 namespace App\Model;
 
-use PDO;
-use stdClass;
 use App\Model;
 use Zend\Mail\Address;
 use App\Exceptions\NotFoundException;
@@ -44,8 +42,8 @@ class Outbox extends Model
     public function __construct(
         Account $account,
         Message $message = null,
-        array $data = null)
-    {
+        array $data = null
+    ) {
         $this->parent = $message;
         $this->account = $account;
 
@@ -126,8 +124,7 @@ class Outbox extends Model
                 ->table('outbox')
                 ->where('id', '=', $this->id)
                 ->execute();
-        }
-        elseif (! $this->isEmpty()) {
+        } elseif (! $this->isEmpty()) {
             $newOutboxId = $this->db()
                 ->insert(array_keys($data))
                 ->into('outbox')
@@ -182,7 +179,7 @@ class Outbox extends Model
     {
         return is_numeric($this->id)
             && $this->id
-            && $this->deleted != 1;
+            && 1 != $this->deleted;
     }
 
     /**
@@ -218,9 +215,9 @@ class Outbox extends Model
     }
 
     /**
-     * @param array|string $addresses This should always come in
+     * @param array | string $addresses this should always come in
      *   as an array from the client, but since it's POST data we
-     *   we can't type hint it.
+     *   we can't type hint it
      */
     private function parseAddresses($addresses)
     {
@@ -257,7 +254,7 @@ class Outbox extends Model
                 $e->addError($field, null, 'Malformed email address!', $i);
                 $addresses[] = $address;
             } else {
-                if (strpos($parsedAddress, '<') === 0) {
+                if (0 === strpos($parsedAddress, '<')) {
                     $parsedAddress = trim($parsedAddress, '<>');
                 }
 
@@ -272,8 +269,7 @@ class Outbox extends Model
     {
         try {
             return (Address::fromString($address))->toString();
-        }
-        catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return false;
         }
     }

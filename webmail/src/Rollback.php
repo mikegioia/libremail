@@ -40,7 +40,8 @@ class Rollback
 
             throw new ServerException(
                 'There was a problem undoing those tasks.',
-                ERR_TASK_ROLLBACK);
+                ERR_TASK_ROLLBACK
+            );
         }
 
         Model::getDb()->commit();

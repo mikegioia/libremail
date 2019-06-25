@@ -45,14 +45,13 @@ class StatsServer implements MessageComponentInterface
      *
      * @param string $message JSON encoded message
      */
-    public function broadcast($message)
+    public function broadcast(string $message)
     {
         $obj = @json_decode($message);
 
         if (! $this->lastMessage
-            || (isset($obj->type)
-                && Message::STATS === $obj->type))
-        {
+            || (isset($obj->type) && Message::STATS === $obj->type)
+        ) {
             $this->lastMessage = $message;
         }
 
@@ -113,11 +112,11 @@ class StatsServer implements MessageComponentInterface
         $this->write = new WritableResourceStream(STDOUT, $this->loop);
     }
 
-    private function processMessage($message, $key)
+    private function processMessage(string $message, string $key = null)
     {
         if (! $this->write
-            || ! ($parsed = $this->parseMessage($message)))
-        {
+            || ! ($parsed = $this->parseMessage($message))
+        ) {
             return;
         }
 
@@ -135,7 +134,7 @@ class StatsServer implements MessageComponentInterface
                 $message = Message::make($parsed);
 
                 if (Message::TASK == $message->getType()) {
-                    $task = Task::make($message->task, $message->data);
+                    $task = Task::make($message->task, (array) $message->data);
                     $response = $task->run($this);
 
                     // The response itself can be a command. If it
@@ -144,22 +143,19 @@ class StatsServer implements MessageComponentInterface
                         $this->write->write($response);
                     }
                 }
-            }
-            // Keep throwing these
-            catch (PDOException $e) {
+            } catch (PDOException $e) {
+                // Keep throwing these
                 throw $e;
-            }
-            catch (TerminateException $e) {
+            } catch (TerminateException $e) {
                 throw $e;
-            }
-            // Otherwise just log and move on
-            catch (Exception $e) {
+            } catch (Exception $e) {
+                // Otherwise just log and move on
                 $this->log->notice($e->getMessage());
             }
         }
     }
 
-    private function handleMessage($json, $key)
+    private function handleMessage(string $json, string $key)
     {
         $this->broadcast($json);
     }

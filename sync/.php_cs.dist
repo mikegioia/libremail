@@ -18,7 +18,6 @@ $finder = PhpCsFixer\Finder::create()
 return PhpCsFixer\Config::create()
     ->setRules([
         '@Symfony' => true,
-        'braces' => false,
         'new_with_braces' => false,
         'trailing_comma_in_multiline_array' => false,
         'not_operator_with_successor_space' => true,

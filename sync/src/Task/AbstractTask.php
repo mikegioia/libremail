@@ -15,11 +15,10 @@ abstract class AbstractTask
      * Constructor takes in a data array and sets the class variables
      * based on the data keys.
      *
-     * @param array|object $data
+     * @param array $data
      */
-    public function __construct($data)
+    public function __construct(array $data)
     {
-        $data = (array) $data;
         $refClass = new ReflectionClass($this);
 
         foreach ($refClass->getProperties() as $property) {

@@ -9,9 +9,10 @@ class HealthMessage extends AbstractMessage
     public $tests;
     public $procs;
     public $no_accounts;
+
     protected $type = Message::HEALTH;
 
-    public function __construct($tests, $procs, $noAccounts)
+    public function __construct(array $tests, array $procs, bool $noAccounts)
     {
         $this->tests = $tests ?: [];
         $this->procs = $procs ?: [];

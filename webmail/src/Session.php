@@ -48,8 +48,8 @@ class Session
     public static function notify(
         string $message,
         string $type = self::SUCCESS,
-        array $params = [])
-    {
+        array $params = []
+    ) {
         $notifications = self::get(self::NOTIFICATIONS, [], false);
         $newNotification = array_merge($params, [
             'type' => $type,
@@ -96,12 +96,14 @@ class Session
 
         if (! $token || ! isset($_SESSION['token'])) {
             throw new ClientException(
-                'Missing token! Did you click the right link?');
+                'Missing token! Did you click the right link?'
+            );
         }
 
         if ($token !== $_SESSION['token']) {
             throw new ClientException(
-                'Invalid token! Did your session expire?');
+                'Invalid token! Did your session expire?'
+            );
         }
     }
 }

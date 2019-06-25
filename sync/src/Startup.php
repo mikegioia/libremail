@@ -52,6 +52,12 @@ class Startup
         }
     }
 
+    public function runLibreMail()
+    {
+        $this->log->debug('Starting LibreMail');
+        $this->log->notice('Process ID: '.$this->pid);
+    }
+
     /**
      * Check if any accounts exist in the database. If not, and
      * if we're in interactive mode, then prompt the user to add

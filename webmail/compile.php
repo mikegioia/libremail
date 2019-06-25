@@ -3,7 +3,6 @@
 /**
  * Compiles asset files into a single file.
  */
-
 $cwd = __DIR__;
 $css = [
     // Vendor files

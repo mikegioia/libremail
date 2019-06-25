@@ -32,13 +32,13 @@ class Stats
         $this->daemon = $console->daemon;
     }
 
-    public function setAsleep($asleep = true)
+    public function setAsleep(bool $asleep = true)
     {
         $this->asleep = $asleep;
         $this->unsetActiveFolder(false);
     }
 
-    public function setRunning($running = true)
+    public function setRunning(bool $running = true)
     {
         $this->running = $running;
 
@@ -49,7 +49,7 @@ class Stats
         $this->log();
     }
 
-    public function setActiveAccount($account)
+    public function setActiveAccount(string $account = null)
     {
         $this->activeAccount = $account;
 
@@ -60,7 +60,7 @@ class Stats
         $this->log();
     }
 
-    public function setActiveFolder($folder)
+    public function setActiveFolder(string $folder)
     {
         $this->activeFolder = $folder;
 
@@ -71,7 +71,7 @@ class Stats
         $this->log();
     }
 
-    public function unsetActiveFolder($setStopTime = true)
+    public function unsetActiveFolder(bool $setStopTime = true)
     {
         $this->activeFolder = null;
 
@@ -97,7 +97,7 @@ class Stats
      *
      * @return array
      */
-    public function getStats($useCache = false)
+    public function getStats(bool $useCache = false)
     {
         if (true === $useCache && ! is_null($this->stats)) {
             return $this->stats;
@@ -168,13 +168,13 @@ class Stats
     /**
      * Prints the statistics as JSON to stdout.
      */
-    public function json($useCache = false)
+    public function json(bool $useCache = false)
     {
         Message::send(
             new StatsMessage(
-                $this->activeFolder,
+                (string) $this->activeFolder,
                 (bool) $this->asleep,
-                $this->activeAccount,
+                (string) $this->activeAccount,
                 (bool) $this->running,
                 time() - $this->startTime,
                 $this->getStats($useCache)

@@ -68,7 +68,8 @@ class Model
         self::$db = new Database(
             self::$dsn,
             self::$username,
-            self::$password);
+            self::$password
+        );
 
         return self::$db;
     }

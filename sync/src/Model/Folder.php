@@ -66,6 +66,16 @@ class Folder extends Model
         return Fn\intEq($this->ignored, 1);
     }
 
+    public function getById(int $id)
+    {
+        return $this->db()
+            ->select()
+            ->from('folders')
+            ->where('id', '=', $id)
+            ->execute()
+            ->fetch(PDO::FETCH_OBJ);
+    }
+
     /**
      * Create a new folder record. Updates a folder to be active
      * if it exists in the system already.
@@ -76,15 +86,18 @@ class Folder extends Model
      * @throws DatabaseUpdateException
      * @throws DatabaseInsertException
      */
-    public function save($data = [])
+    public function save(array $data = [])
     {
         $val = new Validator;
+
         $val->optional('count', 'Count')->integer();
         $val->optional('ignored', 'Ignored')->numeric();
         $val->optional('synced', 'Synced count')->numeric();
         $val->required('account_id', 'Account ID')->numeric();
         $val->required('name', 'Name')->lengthBetween(0, 255);
+
         $this->setData($data);
+
         $data = $this->getData();
 
         if (! $val->validate($data)) {
@@ -110,6 +123,7 @@ class Folder extends Model
             $this->deleted = 0;
             $this->id = $exists->id;
             $this->ignored = $exists->ignored;
+
             $updated = $this->db()
                 ->update([
                     'deleted' => 0,
@@ -170,7 +184,7 @@ class Folder extends Model
      *
      * @return bool
      */
-    public function saveStats($count, $synced)
+    public function saveStats(int $count, int $synced)
     {
         $this->count = $count;
         $this->synced = $synced;
@@ -188,8 +202,11 @@ class Folder extends Model
      *
      * @return bool | FolderModel
      */
-    public function getByName($accountId, $name, $failOnNotFound = false)
-    {
+    public function getByName(
+        int $accountId,
+        string $name,
+        bool $failOnNotFound = false
+    ) {
         $this->requireInt($accountId, 'Account ID');
         $this->requireString($name, 'Folder name');
 
@@ -215,10 +232,11 @@ class Folder extends Model
      *
      * @return FolderModel array
      */
-    public function getByAccount($accountId, $indexByName = true)
+    public function getByAccount(int $accountId, bool $indexByName = true)
     {
-        $indexed = [];
         $this->requireInt($accountId, 'Account ID');
+
+        $indexed = [];
         $folders = $this->db()
             ->select()
             ->from('folders')

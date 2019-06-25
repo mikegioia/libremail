@@ -139,8 +139,8 @@ class Folders
     public function getRestrictIds(int $folderId = null)
     {
         if ($folderId === $this->getTrashId()
-            || $folderId === $this->getSpamId())
-        {
+            || $folderId === $this->getSpamId()
+        ) {
             return [$folderId];
         }
 
@@ -256,9 +256,7 @@ class Folders
             $this->get();
         }
 
-        $count = isset($this->folderCounts[$folderId])
-            ? $this->folderCounts[$folderId]
-            : 0;
+        $count = $this->folderCounts[$folderId] ?? 0;
 
         return $returnString
             ? ($count ? " ($count)" : '')
@@ -377,14 +375,13 @@ class Folders
         if (! $parts) {
             $this->fixName($folder, $part);
             $tree[$part]['folder'] = $folder;
-        }
-        // Recurse again
-        else {
+        } else { // Recurse again
             $this->treeify(
                 $tree[$part]['children'],
                 $parts,
                 $folder,
-                $depth + 1);
+                $depth + 1
+            );
         }
     }
 
@@ -418,7 +415,8 @@ class Folders
                 $child,
                 $childIndex,
                 $offset,
-                $parentOffset);
+                $parentOffset
+            );
         }
     }
 
@@ -454,12 +452,10 @@ class Folders
             $this->inbox = &$folder;
             $folder->is_mailbox = true;
             $this->inboxId = $folder->id;
-        }
-        // Special case for GMail
-        elseif (0 === strpos(strtolower($name), self::GMAIL)) {
+        } elseif (0 === strpos(strtolower($name), self::GMAIL)) {
+            // Special case for GMail
             $folder->is_mailbox = true;
-        }
-        else {
+        } else {
             $folder->is_mailbox = false;
         }
 
@@ -467,20 +463,15 @@ class Folders
         if ($folder->is_mailbox) {
             if (! $this->allId && in_array($name, self::ALL)) {
                 $this->allId = $folder->id;
-            }
-            elseif (! $this->sentId && in_array($name, self::SENT)) {
+            } elseif (! $this->sentId && in_array($name, self::SENT)) {
                 $this->sentId = $folder->id;
-            }
-            elseif (! $this->spamId && in_array($name, self::SPAM)) {
+            } elseif (! $this->spamId && in_array($name, self::SPAM)) {
                 $this->spamId = $folder->id;
-            }
-            elseif (! $this->trashId && in_array($name, self::TRASH)) {
+            } elseif (! $this->trashId && in_array($name, self::TRASH)) {
                 $this->trashId = $folder->id;
-            }
-            elseif (! $this->draftsId && in_array($name, self::DRAFTS)) {
+            } elseif (! $this->draftsId && in_array($name, self::DRAFTS)) {
                 $this->draftsId = $folder->id;
-            }
-            elseif (! $this->starredId && in_array($name, self::STARRED)) {
+            } elseif (! $this->starredId && in_array($name, self::STARRED)) {
                 $this->starredId = $folder->id;
             }
         }

@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
-class ValidationException extends \Exception
+use Exception;
+
+class ValidationException extends Exception
 {
     private $errors = [];
 
@@ -10,8 +12,8 @@ class ValidationException extends \Exception
         string $key,
         string $label = null,
         string $message = null,
-        int $index = null)
-    {
+        int $index = null
+    ) {
         $message ?: ($label ?: 'Field').' must not be empty';
 
         if (! is_null($index)) {

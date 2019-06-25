@@ -78,7 +78,8 @@ $di['log'] = function ($c) {
     return new Log(
         $c['cli'],
         $c['config']['log'],
-        true === $c['console']->interactive);
+        true === $c['console']->interactive
+    );
 };
 
 // Initialize the error and exception handlers
@@ -91,7 +92,8 @@ $di['threader'] = function ($c) {
     return new ThreadSync(
         $c['log']->getLogger(),
         $c['cli'],
-        true === $c['console']->interactive);
+        true === $c['console']->interactive
+    );
 };
 
 // Set up the signal handler to shutdown
@@ -111,7 +113,8 @@ pcntl_signal(SIGQUIT, $HALT);
 // No-op, continue sync if asleep
 pcntl_signal(SIGCONT, function ($signo) use ($di) {
     $di['log']->getLogger()->addInfo(
-        'SIGCONT received, restarting sync');
+        'SIGCONT received, restarting sync'
+    );
 
     if (isset($di['sync']) && $di['sync']) {
         $di['sync']->wake();
@@ -121,7 +124,8 @@ pcntl_signal(SIGCONT, function ($signo) use ($di) {
 // Return back statistics on the current sync
 pcntl_signal(SIGUSR1, function ($signo) use ($di) {
     $di['log']->getLogger()->addDebug(
-        'SIGUSR1 received, printing text stats');
+        'SIGUSR1 received, printing text stats'
+    );
 
     if (isset($di['stats']) && $di['stats']) {
         $di['stats']->text();
@@ -131,7 +135,8 @@ pcntl_signal(SIGUSR1, function ($signo) use ($di) {
 // SIGUSR2 returns JSON
 pcntl_signal(SIGUSR2, function ($signo) use ($di) {
     $di['log']->getLogger()->addDebug(
-        'SIGUSR2 received, printing JSON stats');
+        'SIGUSR2 received, printing JSON stats'
+    );
 
     if (isset($di['stats']) && $di['stats']) {
         $di['stats']->json();
@@ -141,7 +146,8 @@ pcntl_signal(SIGUSR2, function ($signo) use ($di) {
 // SIGURG stops the syncing
 pcntl_signal(SIGURG, function ($signo) use ($di) {
     $di['log']->getLogger()->addInfo(
-        'SIGURG received, stopping sync');
+        'SIGURG received, stopping sync'
+    );
 
     if (isset($di['sync']) && $di['sync']) {
         $di['sync']->stop();
@@ -155,7 +161,8 @@ $di['db_factory'] = $di->factory(function ($c, $config = null) {
         'mysql:host=%s;dbname=%s;charset=%s',
         $dbConfig['hostname'],
         $dbConfig['database'],
-        $dbConfig['charset']);
+        $dbConfig['charset']
+    );
 
     try {
         $db = new Database(
@@ -166,8 +173,7 @@ $di['db_factory'] = $di->factory(function ($c, $config = null) {
         $db->query('SET NAMES '.$dbConfig['charset'].';');
 
         return $db;
-    }
-    catch (PDOException $e) {
+    } catch (PDOException $e) {
         throw new TerminateException(
             'There was a problem connecting to the database. '.
             'Are you sure it exists? Here are the details: '.
@@ -203,30 +209,27 @@ try {
     $startup->run();
 
     runSyncLoop:
-        $di['sync'] = new Sync($di);
-        $di['sync']->loop();
-}
-// If the database connection dropped, kill the database service and
-// try to reconnect. Otherwise terminate.
-catch (PDOException $e) {
+
+    $di['sync'] = new Sync($di);
+    $di['sync']->loop();
+} catch (PDOException $e) {
+    // If the database connection dropped, kill the database service and
+    // try to reconnect; otherwise terminate
     isset($di['sync']) && $di['sync']->disconnect(true);
     $di['sync'] = null;
     $sec = $config['app']['db']['sleep_minutes'] * 60;
     Diagnostics::checkDatabaseException($di, $e, true, $sec);
     goto runSyncLoop;
-}
-// Stop the current sync and re-run it
-catch (StopException $e) {
+} catch (StopException $e) {
+    // Stop the current sync and re-run it
     $di['sync'] = null;
     sleep(5);
     goto runSyncLoop;
-}
-// Gracefully exit if we're terminated
-catch (TerminateException $e) {
+} catch (TerminateException $e) {
+    // Gracefully exit if we're terminated
     $di['log']->getLogger()->addInfo($e->getMessage());
     exit(0);
-}
-// Unhandled exceptions
-catch (Exception $e) {
+} catch (Exception $e) {
+    // Unhandled exceptions
     $di['log']->displayError($e);
 }

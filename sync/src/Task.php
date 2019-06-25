@@ -18,13 +18,13 @@ class Task
      * Takes in a type and a data array and makes a new Task.
      *
      * @param string $type
-     * @param object $data
+     * @param array $data
      *
      * @throws Exception
      *
      * @return AbstractTask
      */
-    public static function make($type, $data)
+    public static function make(string $type, array $data)
     {
         switch ($type) {
             case self::SAVE_ACCOUNT:
@@ -44,6 +44,7 @@ class Task
         }
 
         throw new Exception(
-            'Invalid task type passed to Task::make');
+            'Invalid task type passed to Task::make'
+        );
     }
 }

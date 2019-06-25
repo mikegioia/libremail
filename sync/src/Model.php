@@ -29,6 +29,13 @@ class Model
      */
     protected static $localDb;
 
+    /**
+     * Data could be an integer or an array. For integers,
+     * it will set the ID to that value. For arrays, it will
+     * update the internal properties from the array.
+     *
+     * @param array | int $data
+     */
     public function __construct($data = null)
     {
         if (! $data) {
@@ -46,6 +53,9 @@ class Model
         return [];
     }
 
+    /**
+     * @param array | int $data
+     */
     public function setData($data)
     {
         if (is_scalar($data)) {

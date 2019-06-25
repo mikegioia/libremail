@@ -43,16 +43,14 @@ class SaveAccountTask extends AbstractTask
 
         try {
             $accountModel->validate();
-        }
-        catch (ValidationException $e) {
+        } catch (ValidationException $e) {
             return $this->fail($e->getMessage(), $server);
         }
 
         // Check if the connection works
         try {
             Diagnostics::testImapConnection($accountModel->getData());
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return $this->fail(
                 'There was a problem testing the IMAP connection: '.
                 $e->getMessage().'.',
@@ -62,8 +60,7 @@ class SaveAccountTask extends AbstractTask
         // Save the account
         try {
             $accountModel->save([], true);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return $this->fail($e->getMessage(), $server);
         }
 

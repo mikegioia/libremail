@@ -2,6 +2,8 @@
 
 namespace App\Exceptions;
 
-class ServerException extends \Exception
+use Exception;
+
+class ServerException extends Exception
 {
 }

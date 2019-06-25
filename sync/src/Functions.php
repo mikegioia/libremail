@@ -18,14 +18,14 @@ use DateInterval;
 function get($object, $key, $default = null)
 {
     if (is_array($object)
-        && array_key_exists($key, $object))
-    {
+        && array_key_exists($key, $object)
+    ) {
         return $object[$key];
     }
 
     if (is_object($object)
-        && array_key_exists($key, (array) $object))
-    {
+        && array_key_exists($key, (array) $object)
+    ) {
         return $object->$key;
     }
 
@@ -101,11 +101,9 @@ function plural($word, $count)
 {
     if (1 === $count) {
         return $word;
-    }
-    elseif ('s' === substr($word, -1)) {
+    } elseif ('s' === substr($word, -1)) {
         return $word;
-    }
-    elseif ('y' === substr($word, -1)) {
+    } elseif ('y' === substr($word, -1)) {
         return substr($word, 0 - 1).'ies';
     }
 

@@ -12,6 +12,7 @@ use App\Log;
 use App\Daemon;
 use App\Command;
 use App\Message;
+use App\Startup;
 use App\Constants;
 use Pimple\Container;
 use Exception as Exception;
@@ -59,7 +60,8 @@ $di['log'] = function ($c) {
     return new Log(
         $c['cli'],
         $c['config']['daemonlog'],
-        false);
+        false
+    );
 };
 
 // Initialize the error and exception handlers
@@ -107,7 +109,8 @@ $di['daemon'] = new Daemon(
     $di['emitter'],
     $di['console'],
     $di['command'],
-    $config['daemon']);
+    $config['daemon']
+);
 
 // This event is fired to start or restart the sync process.
 $di['emitter']->addListener(
@@ -182,19 +185,22 @@ $di['emitter']->addListener(
 $di['emitter']->dispatch(EV_START_SYNC);
 $di['emitter']->dispatch(EV_START_SERVER);
 
-// Run the loop until we hit a halt signal
 try {
+    // Kick off the server application
+    $startup = new Startup($di);
+    $startup->runLibreMail();
+
+    // Run the loop until we hit a halt signal
     runLoop:
-        $di['loop']->stop();
-        $di['loop']->run();
-}
-// Gracefully exit if we're terminated
-catch (TerminateException $e) {
+
+    $di['loop']->stop();
+    $di['loop']->run();
+} catch (TerminateException $e) {
+    // Gracefully exit if we're terminated
     $di['log']->getLogger()->addInfo($e->getMessage());
     $HALT();
-}
-// Unhandled exceptions
-catch (Exception $e) {
+} catch (Exception $e) {
+    // Unhandled exceptions
     $di['log']->displayError($e);
     $HALT();
 }

@@ -38,7 +38,8 @@ trait Model
                 '[%s -- %s]: %s',
                 $errorInfo[0],
                 $errorInfo[1],
-                $errorInfo[2]);
+                $errorInfo[2]
+            );
         }
 
         return '';
@@ -48,13 +49,14 @@ trait Model
      * Turns stdClass SQL objects into model objects.
      *
      * @param array $objects
+     * @param string $modelClass
      *
      * @return array
      */
-    public function populate($objects, $modelClass = null)
+    public function populate(array $objects, string $modelClass = null)
     {
         $modelObjects = [];
-        $modelClass = ($modelClass) ?: $this->getClass();
+        $modelClass = $modelClass ?: $this->getClass();
 
         if (! is_array($objects)) {
             return new $modelClass($objects);
@@ -67,44 +69,44 @@ trait Model
         return $modelObjects;
     }
 
-    public function isValidFlag($flag)
+    public function isValidFlag(int $flag)
     {
-        return in_array((int) $flag, [0, 1]);
+        return in_array($flag, [0, 1]);
     }
 
-    public function requireInt($number, $name)
+    public function requireInt($number, string $name)
     {
         if (! Belt::isNumber($number)) {
-            throw new ValidationException(
-                "$name needs to be an integer.");
+            throw new ValidationException("$name needs to be an integer.");
         }
     }
 
-    public function requireString($string, $name)
+    public function requireString($string, string $name)
     {
         if (! Belt::isString($string)) {
-            throw new ValidationException(
-                "$name needs to be a string.");
+            throw new ValidationException("$name needs to be a string.");
         }
     }
 
-    public function requireArray($values, $name)
+    public function requireArray($values, string $name)
     {
         if (! is_array($values) || ! Belt::size($values)) {
             throw new ValidationException(
-                "$name needs to be an array with values.");
+                "$name needs to be an array with values."
+            );
         }
     }
 
-    public function requireValue($value, $collection)
+    public function requireValue($value, array $collection)
     {
         if (! Belt::contains($collection, $value)) {
             throw new ValidationException(
-                "$value must be one of ".implode(', ', $collection).'.');
+                "$value must be one of ".implode(', ', $collection).'.'
+            );
         }
     }
 
-    public function handleNotFound($result, $type, $fail)
+    public function handleNotFound($result, string $type, bool $fail)
     {
         if (! $result && true === $fail) {
             throw new NotFoundException($type);
@@ -118,7 +120,7 @@ trait Model
      * @param array $data
      * @param array $keys
      */
-    private function updateFlagValues(&$data, $keys)
+    private function updateFlagValues(array &$data, array $keys)
     {
         foreach ($keys as $key) {
             if (! isset($data[$key])) {
@@ -136,12 +138,12 @@ trait Model
      * @param array $data
      * @param array $keys
      */
-    private function updateUtf8Values(&$data, $keys)
+    private function updateUtf8Values(array &$data, array $keys)
     {
         foreach ($keys as $key) {
             if (! isset($data[$key])
-                || true === mb_check_encoding($data[$key]))
-            {
+                || true === mb_check_encoding($data[$key])
+            ) {
                 continue;
             }
 

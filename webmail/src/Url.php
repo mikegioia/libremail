@@ -92,8 +92,8 @@ class Url
                 && Actions::MARK_UNREAD !== $action
                 && Actions::DELETE !== $action
                 && Actions::TRASH !== $action
-                && Actions::SPAM !== $action)
-            {
+                && Actions::SPAM !== $action
+            ) {
                 self::redirectRaw(self::thread($folderId, $page));
             } else {
                 self::redirectRaw(self::folder($folderId));

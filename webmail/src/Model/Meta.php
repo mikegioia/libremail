@@ -21,8 +21,14 @@ class Meta extends Model
     /**
      * Get the value for a specific key. If none exists,
      * fallback to the default param.
+     *
+     * @param string $key
+     * @param mixed $default
+     * @param stdClass $source
+     *
+     * @return mixed
      */
-    public static function get(string $key, $default = null, $source = null)
+    public static function get(string $key, $default = null, stdClass $source = null)
     {
         $setting = null;
         $source = $source ?: self::$cache;
@@ -103,9 +109,7 @@ class Meta extends Model
                 }
 
                 self::getDb()
-                    ->update([
-                        'value' => $value
-                    ])
+                    ->update(['value' => $value])
                     ->table('meta')
                     ->where('key', '=', $key)
                     ->execute();

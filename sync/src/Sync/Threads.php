@@ -71,7 +71,7 @@ class Threads
      * @param CLImate $cli
      * @param bool $interactive
      */
-    public function __construct(Logger $log, CLImate $cli, $interactive)
+    public function __construct(Logger $log, CLImate $cli, bool $interactive)
     {
         $this->log = $log;
         $this->cli = $cli;
@@ -167,7 +167,8 @@ class Threads
                 $this->account->id,
                 $minId,
                 $this->maxId,
-                self::BATCH_SIZE);
+                self::BATCH_SIZE
+            );
 
             foreach ($messages as $message) {
                 ++$currentId;
@@ -180,6 +181,7 @@ class Threads
             $this->account->ping();
         }
 
+        $this->updateProgress($total, $total); // Set to complete
         $this->printMemory();
         $this->account->ping();
         $this->emitter->emit(Sync::EVENT_GARBAGE_COLLECT);
@@ -199,8 +201,7 @@ class Threads
             $existingMessage = $this->messages[$messageId];
             $existingMessage->merge($threadMessage);
             $this->messages[$messageId] = $existingMessage;
-        }
-        else {
+        } else {
             $this->unthreaded[] = $messageId;
             $this->messages[$messageId] = $threadMessage;
         }
@@ -279,12 +280,12 @@ class Threads
         ThreadMessage $message,
         array &$refs,
         array &$processed,
-        &$threadId
+        int &$threadId = null
     ) {
         if (! $threadId
             || ($message->getThreadId()
-                && $message->getThreadId() < $threadId))
-        {
+                && $message->getThreadId() < $threadId)
+        ) {
             $threadId = $message->getThreadId();
         }
 
@@ -314,7 +315,8 @@ class Threads
                 $this->messages[$refId],
                 $refs,
                 $processed,
-                $threadId);
+                $threadId
+            );
         }
     }
 
@@ -357,7 +359,8 @@ class Threads
             if (count($master->familyThreadIds) > 1) {
                 $this->groupedThreads += array_fill_keys(
                     $master->familyThreadIds,
-                    $master->threadId);
+                    $master->threadId
+                );
             }
         }
 
@@ -383,7 +386,8 @@ class Threads
         foreach ($this->messages as $message) {
             if (isset($this->groupedThreads[$message->getThreadId()])) {
                 $message->setThreadId(
-                    $this->groupedThreads[$message->getThreadId()]);
+                    $this->groupedThreads[$message->getThreadId()]
+                );
             }
 
             if ($message->hasUpdate()) {
@@ -460,7 +464,7 @@ class Threads
         (new ContactModel)->store($keys, $contacts);
     }
 
-    private function startProgress($pass, $total)
+    private function startProgress(int $pass, int $total)
     {
         if ($this->interactive) {
             $noun = Fn\plural('message', $total);
@@ -471,7 +475,7 @@ class Threads
         }
     }
 
-    private function updateProgress($count, $total)
+    private function updateProgress(int $count, int $total)
     {
         if ($this->interactive && $count <= $total) {
             $this->progress->current(($count / $total) * 100);
@@ -483,6 +487,7 @@ class Threads
         $this->log->debug(
             'Memory usage: '.Fn\formatBytes(memory_get_usage()).
             ', real usage: '.Fn\formatBytes(memory_get_usage(true)).
-            ', peak usage: '.Fn\formatBytes(memory_get_peak_usage()));
+            ', peak usage: '.Fn\formatBytes(memory_get_peak_usage())
+        );
     }
 }

@@ -131,8 +131,8 @@ class View
      */
     public static function getDate(
         string $dateString = null,
-        string $format = self::DATE_SHORT)
-    {
+        string $format = self::DATE_SHORT
+    ) {
         $utc = new DateTimeZone(self::UTC);
         $tz = new DateTimeZone(self::$timezone);
 
@@ -175,7 +175,7 @@ class View
             $fileSize = round($size / 1024 / 1024 / 1024, 1).' GB';
         } elseif ($size >= 1048576) {
             $fileSize = round($size / 1024 / 1024, 1).' MB';
-        } elseif($size >= 1024) {
+        } elseif ($size >= 1024) {
             $fileSize = round($size / 1024, 1).' KB';
         } else {
             $fileSize = $size.' bytes';

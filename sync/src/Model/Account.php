@@ -50,15 +50,17 @@ class Account extends Model
      * Create a new account record.
      *
      * @param array $data
+     * @param bool $updateIfExists
      *
      * @throws AccountExistsException
      * @throws DatabaseInsertException
      * @throws DatabaseUpdateException
      */
-    public function save($data = [], $updateIfExists = false)
+    public function save(array $data = [], bool $updateIfExists = false)
     {
         $this->setData($data);
         $this->validate();
+
         $data = $this->getData();
 
         // Check if this email exists
@@ -103,9 +105,7 @@ class Account extends Model
             ->execute();
 
         if (! $newAccountId) {
-            throw new DatabaseInsertException(
-                ACCOUNT,
-                $this->getError());
+            throw new DatabaseInsertException(ACCOUNT, $this->getError());
         }
 
         $this->id = $newAccountId;
@@ -119,6 +119,7 @@ class Account extends Model
     public function validate()
     {
         $val = new Validator;
+
         $val->required('email', 'Email')->lengthBetween(0, 100);
         $val->required('service', 'Service type')
             ->inArray(
@@ -150,7 +151,7 @@ class Account extends Model
             ->fetchAll(PDO::FETCH_CLASS, $this->getClass());
     }
 
-    public function getByEmail($email)
+    public function getByEmail(string $email)
     {
         $account = $this->db()
             ->select()

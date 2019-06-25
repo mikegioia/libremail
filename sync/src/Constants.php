@@ -9,7 +9,7 @@ class Constants
      *
      * @param array $constants
      */
-    public static function process($constants)
+    public static function process(array $constants)
     {
         foreach ($constants as $constant => $value) {
             define($constant, $value);

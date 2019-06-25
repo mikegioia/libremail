@@ -179,8 +179,8 @@ class Message extends Model
         int $accountId,
         int $threadId,
         array $skipFolderIds = [],
-        array $onlyFolderIds = [])
-    {
+        array $onlyFolderIds = []
+    ) {
         $query = $this->db()
             ->select()
             ->from('messages')
@@ -189,13 +189,12 @@ class Message extends Model
             ->where('account_id', '=', $accountId)
             ->orderBy('date', Model::ASC);
 
-        // Some requests, like viewing the trash folder, want to
-        // restrict all messages to that folder ID
         if ($onlyFolderIds) {
+            // Some requests, like viewing the trash folder, want to
+            // restrict all messages to that folder ID
             $query->whereIn('folder_id', $onlyFolderIds);
-        }
-        // Most requests want to skip the spam and trash folders
-        elseif ($skipFolderIds) {
+        } elseif ($skipFolderIds) {
+            // Most requests want to skip the spam and trash folders
             $query->whereNotIn('folder_id', $skipFolderIds);
         }
 
@@ -214,8 +213,8 @@ class Message extends Model
         int $accountId,
         int $folderId,
         array $skipFolderIds = [],
-        array $onlyFolderIds = [])
-    {
+        array $onlyFolderIds = []
+    ) {
         $counts = (object) [
             'flagged' => 0,
             'unflagged' => 0,
@@ -238,13 +237,12 @@ class Message extends Model
             ->whereIn('thread_id', $threadIds)
             ->groupBy(['thread_id']);
 
-        // Some requests, like viewing the trash folder, want to
-        // restrict all messages to that folder ID
         if ($onlyFolderIds) {
+            // Some requests, like viewing the trash folder, want to
+            // restrict all messages to that folder ID
             $query->whereIn('folder_id', $onlyFolderIds);
-        }
-        // Most requests want to skip the spam and trash folders
-        elseif ($skipFolderIds) {
+        } elseif ($skipFolderIds) {
+            // Most requests want to skip the spam and trash folders
             $query->whereNotIn('folder_id', $skipFolderIds);
         }
 
@@ -305,8 +303,8 @@ class Message extends Model
         int $offset = 0,
         array $skipFolderIds = [],
         array $onlyFolderIds = [],
-        array $options = [])
-    {
+        array $options = []
+    ) {
         $meta = $this->getThreadCountsByFolder(
             $accountId,
             $folderId,
@@ -323,11 +321,9 @@ class Message extends Model
             $flagged = $this->getThreads($meta->flaggedIds, $accountId, $limit, $offset);
             $unflagged = $this->getThreads($meta->unflaggedIds, $accountId, $limit, $offset);
             $messages = array_merge($flagged, $unflagged);
-        }
-        elseif (true === $options[self::ONLY_FLAGGED]) {
+        } elseif (true === $options[self::ONLY_FLAGGED]) {
             $messages = $this->getThreads($meta->flaggedIds, $accountId, $limit, $offset);
-        }
-        else {
+        } else {
             $messages = $this->getThreads($threadIds, $accountId, $limit, $offset);
         }
 
@@ -357,7 +353,8 @@ class Message extends Model
             $threadMessages,
             $messages,
             $skipFolderIds,
-            $onlyFolderIds);
+            $onlyFolderIds
+        );
 
         return $messages ?: [];
     }
@@ -401,8 +398,8 @@ class Message extends Model
         array $threadMessages,
         array $messages,
         array $skipFolderIds,
-        array $onlyFolderIds)
-    {
+        array $onlyFolderIds
+    ) {
         $threads = [];
         $messageIds = [];
 
@@ -704,7 +701,8 @@ class Message extends Model
 
         if (! $newMessageId) {
             throw new Exception(
-                "Failed copying message {$this->id} to Folder #{$folderId}");
+                "Failed copying message {$this->id} to Folder #{$folderId}"
+            );
         }
 
         $data['id'] = $newMessageId;

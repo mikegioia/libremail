@@ -13,6 +13,7 @@ class Task extends Model
     public $id;
     public $type;
     public $status;
+    public $reason;
     public $old_value;
     public $folder_id;
     public $account_id;
@@ -23,6 +24,7 @@ class Task extends Model
     const STATUS_DONE = 1;
     const STATUS_ERROR = 2;
     const STATUS_REVERTED = 3;
+    const STATUS_IGNORED = 4;
 
     const TYPE_COPY = 'copy';
     const TYPE_READ = 'read';
@@ -40,6 +42,7 @@ class Task extends Model
             'id' => $this->id,
             'type' => $this->type,
             'status' => $this->status,
+            'reason' => $this->reason,
             'old_value' => $this->old_value,
             'folder_id' => $this->folder_id,
             'account_id' => $this->account_id,
@@ -56,6 +59,33 @@ class Task extends Model
         $this->updateStatus(self::STATUS_REVERTED);
     }
 
+    public function ignore()
+    {
+        $this->updateStatus(self::STATUS_IGNORED);
+    }
+
+    /**
+     * Marks a message as failed.
+     *
+     * @param string $message
+     * @param int $status
+     * @param mixed $returnValue Value returned from this function;
+     *   Useful for the caller to respond with this function
+     *
+     * @throws DatabaseUpdateException
+     *
+     * @return mixed
+     */
+    public function fail(
+        string $message,
+        int $status = self::STATUS_ERROR,
+        $returnValue = false
+    ) {
+        $this->updateStatus($status, $message);
+
+        return $returnValue;
+    }
+
     /**
      * Updates the status of the message.
      *
@@ -63,12 +93,16 @@ class Task extends Model
      *
      * @throws DatabaseUpdateException
      */
-    private function updateStatus($status)
+    private function updateStatus(string $status, string $reason = null)
     {
+        $updates = ['status' => $status];
+
+        if ($reason) {
+            $updates['reason'] = $reason;
+        }
+
         $updated = $this->db()
-            ->update([
-                'status' => $status
-            ])
+            ->update($updates)
             ->table('tasks')
             ->where('id', '=', $this->id)
             ->execute();
@@ -76,12 +110,33 @@ class Task extends Model
         if (! Belt::isNumber($updated)) {
             throw new DatabaseUpdateException(
                 TASK,
-                $this->db()->getError());
+                $this->db()->getError()
+            );
         }
     }
 
     /**
-     * Returns the last un-synced task to be rolled back.
+     * Returns the un-synced tasks. If there are none,
+     * this returns false.
+     *
+     * @param int $accountId
+     *
+     * @return array | bool
+     */
+    public function getTasksForSync(int $accountId)
+    {
+        return $this->db()
+            ->select()
+            ->from('tasks')
+            ->where('account_id', '=', $accountId)
+            ->where('status', '=', self::STATUS_NEW)
+            ->orderBy('id', Model::ASC)
+            ->execute()
+            ->fetchAll(PDO::FETCH_CLASS, $this->getClass());
+    }
+
+    /**
+     * Returns ALL of the un-synced tasks for a rollback.
      * If there are none, this returns false.
      *
      * @return array | bool

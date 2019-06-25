@@ -2,11 +2,13 @@
 
 namespace App\Exceptions;
 
-class Validation extends \Exception
+use Exception;
+
+class Validation extends Exception
 {
     public $code = 2001;
 
-    public function __construct($message)
+    public function __construct(string $message)
     {
         $this->message = $message;
     }

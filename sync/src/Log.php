@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Error;
 use Exception;
 use Monolog\Logger;
 use App\Log\CLIHandler;
@@ -27,7 +28,7 @@ class Log
     // If we're running in interative mode
     private $interactive;
 
-    public function __construct(CLImate $cli, array $config, $interactive = false)
+    public function __construct(CLImate $cli, array $config, bool $interactive = false)
     {
         $this->cli = $cli;
         $this->config = $config;
@@ -41,7 +42,7 @@ class Log
         @set_error_handler([$this, 'errorHandler']);
         @set_exception_handler([$this, 'exceptionHandler']);
 
-        $this->checkLogPath($this->interactive, $this->path);
+        $this->checkLogPath($this->interactive, $this->path ?: '');
         $this->createLog($this->config, $this->interactive);
     }
 
@@ -50,6 +51,9 @@ class Log
         return $this->logger;
     }
 
+    /**
+     * @param Exception | Error $exception
+     */
     public function exceptionHandler($exception)
     {
         if ($this->stackTrace) {
@@ -57,14 +61,17 @@ class Log
                 $exception->getMessage().
                 PHP_EOL.
                 $exception->getTraceAsString());
-        }
-        else {
+        } else {
             $this->getLogger()->critical($exception->getMessage());
         }
     }
 
-    public function errorHandler($severity, $message, $filename, $lineNo)
-    {
+    public function errorHandler(
+        int $severity,
+        string $message,
+        string $filename,
+        int $lineNo
+    ) {
         if (! (error_reporting() & $severity)) {
             return;
         }
@@ -95,8 +102,7 @@ class Log
         if ($this->stackTrace) {
             $this->getLogger()->$logMethod(
                 $e->getMessage().PHP_EOL.$e->getTraceAsString());
-        }
-        else {
+        } else {
             $this->getLogger()->$logMethod($e->getMessage());
         }
     }
@@ -116,19 +122,17 @@ class Log
             if ($this->config['stacktrace']) {
                 $this->cli->br()->comment($e->getTraceAsString())->br();
             }
-        }
-        else {
+        } else {
             if ($this->config['stacktrace']) {
                 $this->getLogger()->addError(
                     $e->getMessage().PHP_EOL.$e->getTraceAsString());
-            }
-            else {
+            } else {
                 $this->getLogger()->addError($e->getMessage());
             }
         }
     }
 
-    private function parseConfig(array $config, $interactive)
+    private function parseConfig(array $config, bool $interactive)
     {
         // Set up lookup table for log levels
         $levels = [
@@ -157,11 +161,14 @@ class Log
     /**
      * Checks if the log path is writeable by the user.
      *
+     * @param bool $interactive
+     * @param string $path
+     *
      * @throws LogPathNotWriteableException
      *
      * @return bool
      */
-    public static function checkLogPath($interactive, $path)
+    public static function checkLogPath(bool $interactive, string $path)
     {
         if ($interactive) {
             return true;
@@ -183,7 +190,7 @@ class Log
      *
      * @return string
      */
-    public static function preparePath($path)
+    public static function preparePath(string $path)
     {
         if (DIRECTORY_SEPARATOR === substr($path, 0, 1)) {
             return $path;
@@ -192,7 +199,7 @@ class Log
         return BASEPATH.DIRECTORY_SEPARATOR.$path;
     }
 
-    private function createLog(array $config, $interactive)
+    private function createLog(array $config, bool $interactive)
     {
         // Create and configure a new logger
         $log = new Logger($config['name']);
@@ -204,7 +211,8 @@ class Log
                 $this->path,
                 $maxFiles = 0,
                 $this->level,
-                $bubble = true);
+                $bubble = true
+            );
         }
 
         // Allow line breaks and stack traces, and don't show
@@ -228,7 +236,7 @@ class Log
      *
      * @return bool
      */
-    private function isSuppressed($message)
+    private function isSuppressed(string $message)
     {
         $suppressList = [
             'Error while sending STMT_',

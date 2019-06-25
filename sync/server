@@ -69,7 +69,8 @@ $di['log'] = function ($c) {
     return new Log(
         $c['cli'],
         $c['config']['serverlog'],
-        true === $c['console']->interactive);
+        true === $c['console']->interactive
+    );
 };
 
 // Initialize the error and exception handlers
@@ -115,15 +116,15 @@ $di['db_factory'] = $di->factory(function ($c, $config = null) {
         'mysql:host=%s;dbname=%s;charset=%s',
         $dbConfig['hostname'],
         $dbConfig['database'],
-        $dbConfig['charset']);
+        $dbConfig['charset']
+    );
 
     try {
         return new Database(
             $dsn,
             $dbConfig['username'],
             $dbConfig['password']);
-    }
-    catch (PDOException $e) {
+    } catch (PDOException $e) {
         throw new PDOException(
             'There was a problem connecting to the database. '.
             'Are you sure it exists? Here are the details: '.
@@ -140,22 +141,29 @@ $di['ratchet'] = new RatchetApp(
     $config['server']['host'],
     $config['server']['port'],
     $config['server']['address'],
-    $di['loop']);
+    $di['loop']
+);
+
 // Socket route
 $di['ratchet']->route(
     ENDPOINT_STATS,
     $di['server.stats'],
-    $config['server']['allowed_origins']);
+    $config['server']['allowed_origins']
+);
+
 // Web route
 $di['ratchet']->route(
     ENDPOINT_WEB,
     $di['server.web'],
-    $config['server']['allowed_origins']);
+    $config['server']['allowed_origins']
+);
+
 // Catch-all route
 $di['ratchet']->route(
     new Route('/{any}', [], ['any' => '.*']),
     $di['server.web'],
-    $config['server']['allowed_origins']);
+    $config['server']['allowed_origins']
+);
 
 // Run the loop until we hit a halt signal
 try {
@@ -168,22 +176,20 @@ try {
     $startup = new Startup($di);
     $startup->runServer();
 
-    runLoop:
-        $di['loop']->stop();
-        $di['ratchet']->run();
-}
-// Uncaught PDO exceptions, this should only be the
-// connection error.
-catch (PDOException $e) {
+    runServerLoop:
+
+    $di['loop']->stop();
+    $di['ratchet']->run();
+} catch (PDOException $e) {
+    // Uncaught PDO exceptions, this should only be the
+    // connection error
     Diagnostics::checkDatabaseException($di, $e, true);
-    goto runLoop;
-}
-// Gracefully exit if we're terminated
-catch (TerminateException $e) {
+    goto runServerLoop;
+} catch (TerminateException $e) {
+    // Gracefully exit if we're terminated
     $di['log']->getLogger()->addInfo($e->getMessage());
     exit(0);
-}
-// Unhandled exceptions
-catch (Exception $e) {
+} catch (Exception $e) {
+    // Unhandled exceptions
     $di['log']->displayError($e);
 }

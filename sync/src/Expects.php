@@ -12,6 +12,9 @@ class Expects
 {
     private $data;
 
+    /**
+     * @param array | object $data
+     */
     public function __construct($data)
     {
         if (is_object($data)) {
@@ -36,7 +39,8 @@ class Expects
     {
         $intersection = array_intersect_key(
             array_flip($keys),
-            $this->data);
+            $this->data
+        );
 
         if (count($intersection) < count($keys)) {
             $missing = array_diff($keys, array_flip($this->data));
@@ -45,7 +49,8 @@ class Expects
 
             throw new ValidationException(
                 "toHave() expects argument to contain keys '$keys' but ".
-                "was missing '$missing'");
+                "was missing '$missing'"
+            );
         }
 
         return $this;

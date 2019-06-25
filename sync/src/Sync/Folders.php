@@ -25,14 +25,12 @@ class Folders
         '[Gmail]'
     ];
 
-    /**
-     * @param Logger $log
-     * @param CLImate $cli
-     * @param Emitter $emitter
-     * @param bool $interactive
-     */
-    public function __construct(Logger $log, CLImate $cli, Emitter $emitter, $interactive)
-    {
+    public function __construct(
+        Logger $log,
+        CLImate $cli,
+        Emitter $emitter,
+        bool $interactive
+    ) {
         $this->log = $log;
         $this->cli = $cli;
         $this->emitter = $emitter;
@@ -42,14 +40,16 @@ class Folders
     /**
      * Syncs a set of IMAP folders with what we have in SQL.
      *
-     * @param array $folderList
-     * @param FolderModel array $savedFolders
+     * @param iterable $folderList
+     * @param array FolderModel $savedFolders
      * @param AccountModel $account
      */
-    public function run($folderList, $savedFolders, AccountModel $account)
+    public function run(iterable $folderList, array $savedFolders, AccountModel $account)
     {
         $count = iterator_count($folderList);
+
         $this->log->debug("Found $count ".Fn\plural('folder', $count));
+
         $this->addNewFolders($folderList, $savedFolders, $account);
         $this->removeOldFolders($folderList, $savedFolders, $account);
     }
@@ -57,12 +57,15 @@ class Folders
     /**
      * Adds new folders from IMAP to the database.
      *
-     * @param array $folderList
-     * @param FolderModel array $savedFolders
+     * @param iterable $folderList
+     * @param array FolderModel $savedFolders
      * @param AccountModel $account
      */
-    private function addNewFolders($folderList, $savedFolders, AccountModel $account)
-    {
+    private function addNewFolders(
+        iterable $folderList,
+        array $savedFolders,
+        AccountModel $account
+    ) {
         $i = 1;
         $toAdd = [];
 
@@ -82,8 +85,7 @@ class Folders
             $this->cli->whisper(
                 "Adding $count new ".Fn\plural('folder', $count).':');
             $progress = $this->cli->progress()->total($count);
-        }
-        else {
+        } else {
             $this->log->info(
                 "Adding $count new ".Fn\plural('folder', $count));
         }
@@ -108,12 +110,15 @@ class Folders
     /**
      * Removes purged folders no longer in the mailbox from the database.
      *
-     * @param array $folderList
-     * @param FolderModel array $savedFolders
+     * @param iterable $folderList
+     * @param array FolderModel $savedFolders
      * @param AccountModel $account
      */
-    private function removeOldFolders($folderList, $savedFolders, AccountModel $account)
-    {
+    private function removeOldFolders(
+        iterable $folderList,
+        array $savedFolders,
+        AccountModel $account
+    ) {
         $lookup = [];
         $toRemove = [];
 
@@ -143,11 +148,9 @@ class Folders
     /**
      * Certain folders should be automatically ignored.
      *
-     * @param string $folderName
-     *
      * @return int
      */
-    private function getIgnored($folderName)
+    private function getIgnored(string $folderName)
     {
         return in_array($folderName, self::IGNORED_LIST)
             ? 1

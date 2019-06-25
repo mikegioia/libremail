@@ -45,7 +45,8 @@ define('ERR_TASK_ROLLBACK', 1020);
 define('PREF_THEME', 'wm.theme');
 
 // Helper to load external config files
-function getConfig($file) {
+function getConfig($file)
+{
     return include BASEDIR.'/config/'.$file.'.php';
 }
 
@@ -64,7 +65,8 @@ Model::initDb(
         $config['DB_DATABASE'],
         $config['DB_CHARSET']),
     $config['DB_USERNAME'],
-    $config['DB_PASSWORD']);
+    $config['DB_PASSWORD']
+);
 
 // Pass the routes into the URL service
 Url::setBase($config['WEB_URL']);
@@ -135,22 +137,18 @@ $router->set404([$controller, 'error404']);
 // Process route
 try {
     $router->run();
-}
-catch (NotFoundException $e) {
+} catch (NotFoundException $e) {
     header('HTTP/1.1 404 Not Found');
     echo '<h1>404 Page Not Found</h1>';
-}
-catch (ClientException $e) {
+} catch (ClientException $e) {
     header('HTTP/1.1 400 Bad Request');
     echo '<h1>400 Bad Request</h1>';
     echo '<p>'.$e->getMessage().'</p>';
-}
-catch (ServerException $e) {
+} catch (ServerException $e) {
     header('HTTP/1.1 500 Server Error');
     echo '<h1>500 Server Error</h1>';
     echo '<p>'.$e->getMessage().' [#'.$e->getCode().']</p>';
-}
-catch (Exception $e) {
+} catch (Exception $e) {
     if (true !== $config['DEBUG']) {
         header('HTTP/1.1 500 Server Error');
         echo '<h1>500 Server Error</h1>';

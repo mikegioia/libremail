@@ -18,6 +18,7 @@ use App\Model\Account as AccountModel;
 use App\Model\Message as MessageModel;
 use Evenement\EventEmitter as Emitter;
 use App\Exceptions\Validation as ValidationException;
+use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 use Pb\Imap\Exceptions\MessageSizeLimit as MessageSizeLimitException;
 
 class Messages
@@ -46,7 +47,7 @@ class Messages
         CLImate $cli,
         Emitter $emitter,
         Mailbox $mailbox,
-        $interactive,
+        bool $interactive,
         array $options = []
     ) {
         $this->log = $log;
@@ -65,17 +66,17 @@ class Messages
      *
      * @param AccountModel $account
      * @param FolderModel $folder
-     * @param array $newIds New message IDs
-     * @param array $savedIds Existing message IDs
      * @param array $options (see syncMessages)
      */
-    public function run(AccountModel $account, FolderModel $folder, $options)
+    public function run(AccountModel $account, FolderModel $folder, array $options)
     {
         $newIds = $this->mailbox->getUniqueIds();
         $savedIds = (new MessageModel)->getSyncedIdsByFolder(
             $account->getId(),
-            $folder->getId());
+            $folder->getId()
+        );
 
+        $this->updateMessageNumbers($newIds, $savedIds, $folder);
         $this->downloadMessages($newIds, $savedIds, $folder, $options);
         $this->markDeleted($newIds, $savedIds, $folder, $options);
         $this->updateSeenFlags($account, $folder);
@@ -94,8 +95,12 @@ class Messages
      * @param FolderModel $folder
      * @param array $options (see syncMessages)
      */
-    private function downloadMessages($newIds, $savedIds, FolderModel $folder, $options)
-    {
+    private function downloadMessages(
+        array $newIds,
+        array $savedIds,
+        FolderModel $folder,
+        array $options
+    ) {
         // First get the list of messages to download by taking
         // a diff of the arrays. Download all these messages.
         $i = 1;
@@ -164,7 +169,7 @@ class Messages
      * @param int $uniqueId
      * @param FolderModel $folder
      */
-    private function downloadMessage($messageId, $uniqueId, FolderModel $folder)
+    private function downloadMessage(int $messageId, int $uniqueId, FolderModel $folder)
     {
         try {
             $imapMessage = $this->mailbox->getMessage($messageId);
@@ -178,18 +183,16 @@ class Messages
                 MessageModel::OPT_TRUNCATE_FIELDS => true,
                 MessageModel::OPT_SKIP_CONTENT => $this->skipContent
             ]);
-        }
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             throw $e;
-        }
-        catch (MessageSizeLimitException $e) {
+        } catch (MessageSizeLimitException $e) {
             $this->log->notice(
                 "Size exceeded during download of message $messageId: ".
-                $e->getMessage());
+                $e->getMessage()
+            );
 
             return;
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->log->warning(
                 "Failed download for message {$messageId}: ".
                 $e->getMessage());
@@ -202,11 +205,11 @@ class Messages
         // regardless if the record exists.
         try {
             $message->save();
-        }
-        catch (ValidationException $e) {
+        } catch (ValidationException $e) {
             $this->log->notice(
                 "Failed validation for message $messageId: ".
-                $e->getMessage());
+                $e->getMessage()
+            );
         }
     }
 
@@ -218,7 +221,7 @@ class Messages
      * @param array $savedIds
      * @param FolderModel $folder
      */
-    private function markDeleted($newIds, $savedIds, FolderModel $folder)
+    private function markDeleted(array $newIds, array $savedIds, FolderModel $folder)
     {
         $toDelete = array_diff($savedIds, $newIds);
         $count = count($toDelete);
@@ -230,19 +233,75 @@ class Messages
         }
 
         $this->log->info(
-            "Marking $count deletion".(1 == $count ? '' : 's').
-            " in {$folder->name}");
+            "Marking $count deletion".(1 === $count ? '' : 's').
+            " in {$folder->name}"
+        );
 
         try {
             (new MessageModel)->markDeleted(
-                $toDelete,
+                array_values($toDelete),
                 $folder->getAccountId(),
-                $folder->getId());
-        }
-        catch (ValidationException $e) {
+                $folder->getId()
+            );
+        } catch (PDOException $e) {
+            $this->log->notice(
+                "Failed updating deleted messages in {$folder->name}: ".
+                $e->getMessage()
+            );
+        } catch (ValidationException $e) {
             $this->log->notice(
                 'Failed validation for marking deleted messages: '.
-                $e->getMessage());
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Updates the messages with any new message numbers. These numbers
+     * can change and will need their references updated on sync.
+     *
+     * @param array $newIds
+     * @param array $savedIds
+     * @param FolderModel $folder
+     */
+    private function updateMessageNumbers(array $newIds, array $savedIds, FolderModel $folder)
+    {
+        $messageModel = new MessageModel;
+
+        if (! $newIds || ! $savedIds) {
+            return;
+        }
+
+        // Flip these so that unique ID is the index
+        $newIds = array_flip($newIds);
+        $savedIds = array_flip($savedIds);
+        // Only update messages we've stored already
+        $toUpdate = array_intersect_key($newIds, $savedIds);
+        $count = count($toUpdate);
+
+        if ($count) {
+            $this->log->debug(
+                "Updating $count with new message numbers in {$folder->name}"
+            );
+        }
+
+        try {
+            foreach ($toUpdate as $uid => $newMsgNo) {
+                if ((int) $savedIds[$uid] !== (int) $newIds[$uid]) {
+                    var_dump($uid);
+                    var_dump($savedIds[$uid]);
+                    var_dump($newIds[$uid]);
+                    var_dump($folder->id);
+                    exit('hit!');
+                    $messageModel->saveMessageNo($uid, $folder->id, $newMsgNo);
+                    $this->emitter->emit(Sync::EVENT_CHECK_HALT);
+                }
+            }
+        } catch (DatabaseUpdateException $e) {
+            $this->log->notice(
+                "Failed updating message number for UID $uid in ".
+                "folder {$folder->id}: ".$e->getMessage()
+            );
         }
     }
 
@@ -267,17 +326,19 @@ class Messages
                     $folder->getAccountId(),
                     $folder->getId(),
                     MessageModel::FLAG_SEEN,
-                    false);
+                    false
+                );
 
                 if ($updated) {
                     $this->log->info(
-                        "Marking $updated as unseen in {$folder->name}");
+                        "Marking $updated as unseen in {$folder->name}"
+                    );
                 }
-            }
-            catch (ValidationException $e) {
+            } catch (ValidationException $e) {
                 $this->log->notice(
                     'Failed validation for marking unseen messages: '.
-                    $e->getMessage());
+                    $e->getMessage()
+                );
             }
         }
 
@@ -289,17 +350,19 @@ class Messages
                 $folder->getId(),
                 MessageModel::FLAG_SEEN,
                 true,
-                true); // Inverse
+                true
+            ); // Inverse
 
             if ($updated) {
                 $this->log->debug(
-                    "Marking {$updated} as seen in {$folder->name}");
+                    "Marking {$updated} as seen in {$folder->name}"
+                );
             }
-        }
-        catch (ValidationException $e) {
+        } catch (ValidationException $e) {
             $this->log->notice(
                 'Failed validation for marking seen messages: '.
-                $e->getMessage());
+                $e->getMessage()
+            );
         }
     }
 
@@ -324,17 +387,19 @@ class Messages
                     $folder->getAccountId(),
                     $folder->getId(),
                     MessageModel::FLAG_FLAGGED,
-                    true);
+                    true
+                );
 
                 if ($updated) {
                     $this->log->info(
-                        "Marking $updated as flagged in {$folder->name}");
+                        "Marking $updated as flagged in {$folder->name}"
+                    );
                 }
-            }
-            catch (ValidationException $e) {
+            } catch (ValidationException $e) {
                 $this->log->notice(
                     'Failed validation for marking flagged messages: '.
-                    $e->getMessage());
+                    $e->getMessage()
+                );
             }
         }
 
@@ -346,17 +411,19 @@ class Messages
                 $folder->getId(),
                 MessageModel::FLAG_FLAGGED,
                 false,
-                true); // Inverse
+                true
+            ); // Inverse
 
             if ($updated) {
                 $this->log->debug(
-                    "Marking {$updated} as un-flagged in {$folder->name}");
+                    "Marking {$updated} as un-flagged in {$folder->name}"
+                );
             }
-        }
-        catch (ValidationException $e) {
+        } catch (ValidationException $e) {
             $this->log->notice(
                 'Failed validation for marking un-flagged messages: '.
-                $e->getMessage());
+                $e->getMessage()
+            );
         }
     }
 }

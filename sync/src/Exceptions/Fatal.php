@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
-class Fatal extends \Exception
+use Exception;
+
+class Fatal extends Exception
 {
     public $code = EXC_FATAL;
 }

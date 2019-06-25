@@ -38,8 +38,8 @@ class Thread
         int $threadId,
         int $folderId,
         int $accountId,
-        bool $load = true)
-    {
+        bool $load = true
+    ) {
         $this->folders = $folders;
         $this->threadId = $threadId;
         $this->folderId = $folderId;
@@ -56,7 +56,8 @@ class Thread
             $folders,
             $message->thread_id,
             $message->folder_id,
-            $message->account_id);
+            $message->account_id
+        );
     }
 
     /**
@@ -74,7 +75,8 @@ class Thread
             $this->accountId,
             $this->threadId,
             $this->folders->getSkipIds($this->folderId),
-            $this->folders->getRestrictIds($this->folderId));
+            $this->folders->getRestrictIds($this->folderId)
+        );
 
         if (! $allMessages) {
             throw new NotFoundException;
@@ -86,8 +88,8 @@ class Thread
 
         foreach ($this->folders->get() as $folder) {
             if (in_array($folder->id, $this->threadFolderIds)
-                && ! $folder->is_mailbox)
-            {
+                && ! $folder->is_mailbox
+            ) {
                 $this->threadFolders[] = $folder;
             }
         }
@@ -183,8 +185,10 @@ class Thread
      */
     private function setFrom(Message &$message)
     {
-        list($message->from_name, $message->from_email) =
-            $this->getNameParts($message->from);
+        list(
+            $message->from_name,
+            $message->from_email
+        ) = $this->getNameParts($message->from);
     }
 
     /**
@@ -225,8 +229,8 @@ class Thread
             // If the year is different and older than 6 months,
             // show the full date
             if (date('Y', $now) !== date('Y', $timestamp)
-                && $now - $timestamp >= 15552000)
-            {
+                && $now - $timestamp >= 15552000
+            ) {
                 // @TODO MM/DD/YYYY or DD/MM/YYYY user setting
                 $message->date_string = date('j/m/Y', $timestamp);
             } else {
@@ -240,7 +244,8 @@ class Thread
     {
         $message->avatar_url = sprintf(
             'https://www.gravatar.com/avatar/%s?d=identicon',
-            md5(strtolower(trim($message->from_email))));
+            md5(strtolower(trim($message->from_email)))
+        );
     }
 
     /**
@@ -265,7 +270,8 @@ class Thread
         $message->snippet = substr(
             ltrim($text, '<>-_='),
             0,
-            self::SNIPPET_LENGTH);
+            self::SNIPPET_LENGTH
+        );
     }
 
     /**
@@ -331,14 +337,12 @@ class Thread
             if (0 === $i || $i === $count - 2) {
                 $closeGroup($group);
                 $addItem($message, 1 != $message->seen || 1 === $count);
-            }
-            // If it's unread or the last message in the thread,
-            // then display it opened
-            elseif (1 != $message->seen || $i >= $count - 1) {
+            } elseif (1 != $message->seen || $i >= $count - 1) {
+                // If it's unread or the last message in the thread,
+                // then display it opened
                 $closeGroup($group);
                 $addItem($message, true, $i >= $count - 1);
-            }
-            else {
+            } else {
                 $group[] = $message;
             }
 

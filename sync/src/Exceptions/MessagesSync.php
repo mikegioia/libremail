@@ -2,12 +2,14 @@
 
 namespace App\Exceptions;
 
-class MessagesSync extends \Exception
+use Exception;
+
+class MessagesSync extends Exception
 {
     public $code = EXC_MESSAGES_SYNC;
     public $message = "Failed to sync IMAP messages for folder '%s'.";
 
-    public function __construct($folder)
+    public function __construct(string $folder)
     {
         $this->message = sprintf($this->message, $folder);
     }

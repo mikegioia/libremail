@@ -11,6 +11,7 @@ trait GarbageCollection
     {
         // Enable garbage collection
         gc_enable();
+
         $this->gcEnabled = gc_enabled();
         $this->gcMemEnabled = function_exists('gc_mem_caches');
     }

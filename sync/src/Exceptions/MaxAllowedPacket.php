@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
-class MaxAllowedPacket extends \Exception
+use Exception;
+
+class MaxAllowedPacket extends Exception
 {
     public $code = EXC_DB_MAX_PACKET;
     public $message =
@@ -12,7 +14,7 @@ class MaxAllowedPacket extends \Exception
         'the documentation on updating this MySQL setting in your '.
         'configuration file.';
 
-    public function __construct($size, $safe = 16)
+    public function __construct(int $size, int $safe = 16)
     {
         $this->message = sprintf($this->message, $size, $safe);
     }

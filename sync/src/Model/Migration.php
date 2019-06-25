@@ -68,7 +68,7 @@ class Migration extends Model
         }
     }
 
-    public function setMaxAllowedPacket($mb = 16)
+    public function setMaxAllowedPacket(int $mb = 16)
     {
         $value = $this->getMaxAllowedPacket();
         $newSize = (int) ($mb * 1024 * 1024);
@@ -107,7 +107,7 @@ class Migration extends Model
      *
      * @param string $script Filename for the script
      */
-    private function isRunAlready($script)
+    private function isRunAlready(string $script)
     {
         $migrationsExists = $this->db()
             ->query("show tables like 'migrations';")
@@ -130,7 +130,7 @@ class Migration extends Model
      *
      * @param string $script Filename for the script
      */
-    private function markRun($script)
+    private function markRun(string $script)
     {
         $createdAt = new DateTime;
 

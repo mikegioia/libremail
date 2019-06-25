@@ -62,15 +62,15 @@ class Message
      *
      * @return bool
      */
-    public static function isValid($json)
+    public static function isValid(string $json)
     {
         $message = @json_decode($json);
 
         if (! $message
             || ! is_object($message)
             || ! isset($message->type)
-            || ! in_array($message->type, self::$validTypes))
-        {
+            || ! in_array($message->type, self::$validTypes)
+        ) {
             return false;
         }
 
@@ -93,13 +93,13 @@ class Message
         }
     }
 
-    public static function writeJson($json)
+    public static function writeJson(array $json)
     {
         fwrite(STDOUT, self::packJson($json));
         flush();
     }
 
-    public static function packJson($json)
+    public static function packJson(array $json)
     {
         $encoded = json_encode($json);
 
@@ -107,7 +107,8 @@ class Message
             '%s%s%s',
             JSON_HEADER_CHAR,
             pack('i', strlen($encoded)),
-            $encoded);
+            $encoded
+        );
     }
 
     /**
@@ -120,7 +121,7 @@ class Message
      *
      * @return AbstractMessage
      */
-    public static function make($json)
+    public static function make(string $json)
     {
         if (! self::isValid($json)) {
             $error = 'Invalid message object passed to Message::make';
@@ -139,11 +140,11 @@ class Message
                 case self::PID:
                     Fn\expects($m)->toHave(['pid']);
 
-                    return new PidMessage($m->pid);
+                    return new PidMessage((int) $m->pid);
                 case self::TASK:
                     Fn\expects($m)->toHave(['task', 'data']);
 
-                    return new TaskMessage($m->task, $m->data);
+                    return new TaskMessage($m->task, (array) $m->data);
                 case self::STATS:
                     Fn\expects($m)->toHave([
                         'active', 'asleep', 'account', 'running',
@@ -151,12 +152,13 @@ class Message
                     ]);
 
                     return new StatsMessage(
-                        $m->active,
-                        $m->asleep,
-                        $m->account,
-                        $m->running,
-                        $m->uptime,
-                        $m->accounts);
+                        (string) $m->active,
+                        (bool) $m->asleep,
+                        (string) $m->account,
+                        (bool) $m->running,
+                        (int) $m->uptime,
+                        (array) $m->accounts
+                    );
                 case self::ERROR:
                     Fn\expects($m)->toHave([
                         'error_type', 'message', 'suggestion'
@@ -165,16 +167,18 @@ class Message
                     return new ErrorMessage(
                         $m->error_type,
                         $m->message,
-                        $m->suggestion);
+                        $m->suggestion
+                    );
                 case self::HEALTH:
                     Fn\expects($m)->toHave([
                         'tests', 'procs', 'no_accounts'
                     ]);
 
                     return new HealthMessage(
-                        $m->tests,
-                        $m->procs,
-                        $m->no_accounts);
+                        (array) $m->tests,
+                        (array) $m->procs,
+                        (bool) $m->no_accounts
+                    );
                 case self::ACCOUNT:
                     Fn\expects($m)->toHave(['updated', 'email']);
 
@@ -192,16 +196,16 @@ class Message
                 case self::DIAGNOSTICS:
                     Fn\expects($m)->toHave(['tests']);
 
-                    return new DiagnosticsMessage($m->tests);
+                    return new DiagnosticsMessage((array) $m->tests);
             }
-        }
-        catch (ValidationException $e) {
+        } catch (ValidationException $e) {
             self::$log->error($e->getMessage());
 
             throw new Exception($e->getMessage());
         }
 
         $error = 'Invalid message type passed to Message::make';
+
         self::$log->error($error);
 
         throw new Exception($error);
@@ -212,7 +216,7 @@ class Message
      *
      * @param string $message
      */
-    public static function debug($message)
+    public static function debug(string $message)
     {
         self::$log->debug($message);
     }

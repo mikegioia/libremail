@@ -159,8 +159,8 @@ class Router
         foreach ($_SERVER as $name => $value) {
             if (('HTTP_' == substr($name, 0, 5))
                 || ('CONTENT_TYPE' == $name)
-                || ('CONTENT_LENGTH' == $name))
-            {
+                || ('CONTENT_LENGTH' == $name)
+            ) {
                 $key = str_replace(
                     [' ', 'Http'],
                     ['-', 'HTTP'],
@@ -191,9 +191,8 @@ class Router
         if ('HEAD' === $method) {
             ob_start();
             $method = 'GET';
-        }
-        // If it's a POST request, check for a method override header
-        elseif ('POST' === $method) {
+        } elseif ('POST' === $method) {
+            // If it's a POST request, check for a method override header
             $headers = $this->getRequestHeaders();
             $headerSet = isset($headers['X-HTTP-Method-Override']);
             $methodExists = $headerSet
@@ -242,9 +241,8 @@ class Router
             } else {
                 header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
             }
-        }
-        // If a route was handled, perform the finish callback (if any)
-        else {
+        } else {
+            // If a route was handled, perform the finish callback (if any)
             if ($callback) {
                 $callback();
             }
@@ -305,7 +303,8 @@ class Router
                 '#^'.$route['pattern'].'$#',
                 $uri,
                 $matches,
-                PREG_OFFSET_CAPTURE);
+                PREG_OFFSET_CAPTURE
+            );
 
             // We have a match!
             if ($matched) {
@@ -319,17 +318,16 @@ class Router
                         // you PREG_OFFSET_CAPTURE)
                         if (isset($matches[$index + 1])
                             && isset($matches[$index + 1][0])
-                            && is_array($matches[$index + 1][0]))
-                        {
+                            && is_array($matches[$index + 1][0])
+                        ) {
                             return trim(
                                 substr(
                                     $match[0][0],
                                     0,
                                     $matches[$index + 1][0][1] - $match[0][1]),
                                 '/');
-                        }
-                        // We have no following parameters: return the whole lot
-                        else {
+                        } else {
+                            // We have no following parameters: return the whole lot
                             return (isset($match[0][0]))
                                 ? trim($match[0][0], '/')
                                 : null;

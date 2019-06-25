@@ -44,7 +44,8 @@ class Names
         return $this->getMultipleNames($list);
     }
 
-    private function getRow(string $name = null, int $seen = null, int $index = 1) {
+    private function getRow(string $name = null, int $seen = null, int $index = 1)
+    {
         $short = trim(current(explode(' ', $name ?: '')), ' "');
 
         return (object) [
@@ -86,8 +87,8 @@ class Names
             // only if the message is seen already or the current message
             // is unread.
             if ($list[3]->name == $list[1]->name
-                && (1 == $list[3]->seen || 1 != $lastSeen))
-            {
+                && (1 == $list[3]->seen || 1 != $lastSeen)
+            ) {
                 $list[3] = $this->getRow($lastName, $lastSeen, $i);
                 continue;
             }
@@ -123,8 +124,7 @@ class Names
         if ($list[2] && $list[1]->name == $list[2]->name) {
             if ($list[1]->seen && $list[2]->seen) {
                 $list[2] = $this->getEmptyRow();
-            }
-            elseif (! $list[1]->seen && $list[2]->seen) {
+            } elseif (! $list[1]->seen && $list[2]->seen) {
                 $list[1] = $list[2];
                 $list[2] = $this->getEmptyRow();
             }
@@ -136,10 +136,9 @@ class Names
             // and if all messages are seen then kill the final one;
             if ($list[1]->seen && $list[3]->seen) {
                 $list[3] = $this->getEmptyRow();
-            }
-            // or if the last one is seen but the first is not, preserve
-            // the unseen nature of the thread, but collapse the two
-            elseif (! $list[1]->seen && $list[3]->seen) {
+            } elseif (! $list[1]->seen && $list[3]->seen) {
+                // or if the last one is seen but the first is not, preserve
+                // the unseen nature of the thread, but collapse the two
                 $list[1] = $list[3];
                 $list[1]->seen = false;
                 $list[3] = $this->getEmptyRow();

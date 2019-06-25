@@ -42,8 +42,7 @@ class RemoveAccountTask extends AbstractTask
             $account->save([
                 'is_active' => 0
             ], true);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             Message::send(
                 new NotificationMessage(STATUS_ERROR, $e->getMessage()),
                 $server);

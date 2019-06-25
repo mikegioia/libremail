@@ -102,7 +102,7 @@ abstract class Console
         $this->cli->br();
     }
 
-    private function bannerLine($line)
+    private function bannerLine(string $line)
     {
         $this->cli->inline('  ')->backgroundBlack()->out($line);
     }

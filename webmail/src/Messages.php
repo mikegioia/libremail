@@ -32,8 +32,8 @@ class Messages
         int $folderId,
         int $page = 1,
         int $limit = 25,
-        array $options = [])
-    {
+        array $options = []
+    ) {
         $flagged = [];
         $unflagged = [];
         $messageNames = new Names;

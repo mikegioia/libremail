@@ -13,8 +13,7 @@ class DatabaseInsert extends \Exception
 
         if (is_string($errors)) {
             $this->message .= " $errors";
-        }
-        elseif (count($errors)) {
+        } elseif (count($errors)) {
             $this->message .= ' '.implode(PHP_EOL, $errors);
         }
     }

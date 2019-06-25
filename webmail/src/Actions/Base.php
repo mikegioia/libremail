@@ -15,8 +15,8 @@ abstract class Base
     public function run(array $messageIds, Folders $folders, array $options = [])
     {
         if (! $messageIds
-            || ! ($messages = (new MessageModel)->getByIds($messageIds)))
-        {
+            || ! ($messages = (new MessageModel)->getByIds($messageIds))
+        ) {
             return;
         }
 
@@ -33,7 +33,8 @@ abstract class Base
     abstract public function update(
         MessageModel $message,
         Folders $folders,
-        array $options = []);
+        array $options = []
+    );
 
     /**
      * Updates the flag for a message. Stores a row in the
@@ -49,8 +50,8 @@ abstract class Base
         array $filters = [],
         array $options = [],
         bool $ignoreSiblings = false,
-        string $type = null)
-    {
+        string $type = null
+    ) {
         $newValue = $state ? 1 : 0;
         $oldValue = $state ? 0 : 1;
         // We need to update this flag for all messsages with
@@ -61,17 +62,19 @@ abstract class Base
 
         foreach ($messages as $sibling) {
             // Skip the message if it's the same
-            if ($sibling->{$flag} == $newValue) {
+            if (intval($sibling->{$flag}) === $newValue) {
                 continue;
             }
 
             $sibling->setFlag($flag, $state);
+
             TaskModel::create(
                 $sibling->id,
                 $sibling->account_id,
                 $type ?: $this->getType(),
                 $oldValue,
-                null);
+                null
+            );
         }
     }
 
@@ -97,7 +100,8 @@ abstract class Base
             $messagesToRestore = $this->getUniqueDeletedSiblings(
                 $trashed,
                 $folders,
-                $options);
+                $options
+            );
 
             foreach ($messagesToRestore as $folderId => $restore) {
                 // Restore the sibling message
@@ -116,15 +120,16 @@ abstract class Base
             // Delete this message from the trash
             $this->setFlag(
                 $trashed, MessageModel::FLAG_DELETED, true,
-                [], [], true, TaskModel::TYPE_DELETE);
+                [], [], true, TaskModel::TYPE_DELETE
+            );
         }
     }
 
     private function getUniqueDeletedSiblings(
         MessageModel $message,
         Folders $folders,
-        array $options)
-    {
+        array $options
+    ) {
         $unique = [];
         $siblings = $message->getSiblings([], [
             MessageModel::ONLY_DELETED => true,
@@ -139,8 +144,8 @@ abstract class Base
             }
 
             if (! isset($unique[$sibling->folder_id])
-                || strtotime($unique[$sibling->folder_id]->date) > $time)
-            {
+                || strtotime($unique[$sibling->folder_id]->date) > $time
+            ) {
                 $unique[$sibling->folder_id] = $sibling;
             }
         }

@@ -99,7 +99,8 @@ class Controller
                 Url::postParam('id', 0)
             ], [
                 Message::ALL_SIBLINGS => MAILBOX === $type
-            ]);
+            ]
+        );
 
         (new View)->render('/star', [
             'id' => Url::postParam('id', 0),
@@ -169,13 +170,14 @@ class Controller
             Session::notify(
                 'Your account configuration has been updated! You will'.
                 'most likely need to restart the sync process.',
-                Session::SUCCESS);
-        }
-        catch (ServerException $e) {
+                Session::SUCCESS
+            );
+        } catch (ServerException $e) {
             Session::notify(
                 'There was a problem with your account configuration. '.
                 $e->getMessage(),
-                Session::ERROR);
+                Session::ERROR
+            );
         }
 
         Url::redirectBack('/account');
@@ -224,7 +226,7 @@ class Controller
         if (! $message->exists() || $message->sent) {
             throw new NotFoundException;
         }
-exit('preview');
+        exit('preview');
     }
 
     public function outbox()
@@ -260,10 +262,9 @@ exit('preview');
             } else {
                 Url::redirectRaw(Url::make('/preview/%s', $outbox->id));
             }
-        }
-        // Store the POST data back in the session and set the
-        // errors in the session for the page to display
-        catch (ValidationException $e) {
+        } catch (ValidationException $e) {
+            // Store the POST data back in the session and set the
+            // errors in the session for the page to display
             Session::formErrors($e->getErrors());
             Session::formData($_POST);
 
@@ -353,6 +354,7 @@ exit('preview');
                 'formData' => Session::get(Session::FORM_DATA, []),
                 'formErrors' => Session::get(Session::FORM_ERRORS, []),
                 'notifications' => Session::get(Session::NOTIFICATIONS, [])
-            ], $data));
+            ], $data)
+        );
     }
 }

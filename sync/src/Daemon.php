@@ -107,8 +107,7 @@ class Daemon
         // Only do this if the webserver is running.
         $this->loop->addPeriodicTimer(10, function ($timer) use ($syncProcess) {
             if (isset($this->processPids[PROC_SYNC])
-                && $this->webServerProcess)
-            {
+                && $this->webServerProcess) {
                 posix_kill($this->processPids[PROC_SYNC], SIGUSR2);
             }
         });
@@ -159,8 +158,9 @@ class Daemon
      * problems.
      *
      * @param string $process
+     * @param string $event
      */
-    public function restartWithDecay($process, $event)
+    public function restartWithDecay(string $process, string $event)
     {
         $now = time();
         $decay = $this->config['decay'][$process];
@@ -170,8 +170,7 @@ class Daemon
         // point if the process has been running for over an hour.
         if ($now - $this->processLastRestartTime[$process] >= 3600) {
             $currentInterval = $this->config['restart_interval'][$process];
-        }
-        else {
+        } else {
             $currentInterval = $this->processRestartInterval[$process];
         }
 
@@ -270,7 +269,7 @@ class Daemon
         $this->processPids = [];
     }
 
-    private function processMessage($message, $process)
+    private function processMessage(string $message, string $process)
     {
         if (! ($parsed = $this->parseMessage($message, $process))) {
             return;
@@ -293,7 +292,7 @@ class Daemon
      * @param string $json
      * @param string $process
      */
-    private function handleMessage($json, $process)
+    private function handleMessage(string $json, string $process)
     {
         if (! Message::isValid($json)) {
             $this->log->addNotice("Invalid message sent to Daemon: $json");
@@ -303,8 +302,7 @@ class Daemon
 
         try {
             $message = Message::make($json);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
 
@@ -342,14 +340,13 @@ class Daemon
      *
      * @return bool
      */
-    private function handleCommand($message)
+    private function handleCommand(string $message)
     {
         if ($this->command->isValid($message)) {
             // Ignore these but log them
             try {
                 $this->command->run($message);
-            }
-            catch (BadCommandException $e) {
+            } catch (BadCommandException $e) {
                 $this->log->addNotice($e->getMessage());
 
                 return false;

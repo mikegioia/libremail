@@ -61,7 +61,9 @@ class WebServer implements HttpServerInterface
         $conn->close();
     }
 
-    public function onMessage(ConnectionInterface $conn, $msg) {}
+    public function onMessage(ConnectionInterface $conn, $msg)
+    {
+    }
 
     /**
      * Serves a static file to the client.

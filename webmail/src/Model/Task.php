@@ -13,6 +13,7 @@ class Task extends Model
     public $id;
     public $type;
     public $status;
+    public $reason;
     public $folder_id;
     public $old_value;
     public $account_id;
@@ -28,6 +29,7 @@ class Task extends Model
     const STATUS_DONE = 1;
     const STATUS_ERROR = 2;
     const STATUS_REVERTED = 3;
+    const STATUS_IGNORED = 4;
 
     const TYPE_COPY = 'copy';
     const TYPE_READ = 'read';
@@ -47,8 +49,8 @@ class Task extends Model
         int $accountId,
         string $type,
         string $oldValue = null,
-        int $folderId = null)
-    {
+        int $folderId = null
+    ) {
         $data = [
             'type' => $type,
             'old_value' => $oldValue,

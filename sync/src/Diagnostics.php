@@ -119,7 +119,9 @@ class Diagnostics
      * No-op used to instantiate class if we're not running this
      * on startup.
      */
-    public function init() {}
+    public function init()
+    {
+    }
 
     /**
      * Check if the log path is writable.
@@ -132,8 +134,7 @@ class Diagnostics
             $path = Log::preparePath(self::$config['log']['path']);
             Log::checkLogPath(false, $path);
             $this->endTest(STATUS_SUCCESS, self::TEST_LOG_PATH);
-        }
-        catch (LogPathNotWriteableException $e) {
+        } catch (LogPathNotWriteableException $e) {
             $this->endTest(STATUS_ERROR, self::TEST_LOG_PATH, $e);
         }
     }
@@ -151,8 +152,7 @@ class Diagnostics
             $dbFactory = $this->di->raw('db_factory');
             $db = $dbFactory($this->di, $dbConfig);
             $this->endTest(STATUS_SUCCESS, self::TEST_DB_CONN);
-        }
-        catch (TerminateException $e) {
+        } catch (TerminateException $e) {
             $this->endTest(STATUS_ERROR, self::TEST_DB_CONN, $e);
         }
 
@@ -170,8 +170,7 @@ class Diagnostics
         try {
             $db = $this->di['db_factory'];
             $this->endTest(STATUS_SUCCESS, self::TEST_DB_EXISTS);
-        }
-        catch (TerminateException $e) {
+        } catch (TerminateException $e) {
             $this->endTest(STATUS_ERROR, self::TEST_DB_EXISTS, $e);
         }
 
@@ -201,11 +200,9 @@ class Diagnostics
             } else {
                 $this->endTest(STATUS_SUCCESS, self::TEST_MAX_PACKET);
             }
-        }
-        catch (TerminateException $e) {
+        } catch (TerminateException $e) {
             $this->endTest(STATUS_SKIP, self::TEST_MAX_PACKET);
-        }
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             $this->endTest(STATUS_ERROR, self::TEST_MAX_PACKET, $e);
         }
 
@@ -225,8 +222,7 @@ class Diagnostics
                 'test@example.org',
                 false); // don't create the directory
             $this->endTest(STATUS_SUCCESS, self::TEST_ATTACH_PATH);
-        }
-        catch (AttachmentsPathNotWriteableException $e) {
+        } catch (AttachmentsPathNotWriteableException $e) {
             $this->endTest(STATUS_ERROR, self::TEST_ATTACH_PATH, $e);
         }
     }
@@ -280,14 +276,13 @@ class Diagnostics
      *
      * @param const $test
      */
-    private function startTest($test)
+    private function startTest(string $test)
     {
         $message = $this->tests[$test]['name'];
 
         if ($this->console->diagnostics) {
             $this->cli->inline("[....] Testing $message");
-        }
-        elseif (! $this->console->interactive) {
+        } elseif (! $this->console->interactive) {
             $this->log->addDebug("[Diagnostics] Testing $message");
         }
     }
@@ -301,7 +296,7 @@ class Diagnostics
      *
      * @throws FatalException
      */
-    private function endTest($status, $test, Exception $e = null)
+    private function endTest(string $status, string $test, Exception $e = null)
     {
         $code = $this->tests[$test]['code'];
         $message = ($e)
@@ -397,12 +392,13 @@ class Diagnostics
      * Checks if the attachments path is writeable by the user.
      *
      * @param string $email
+     * @param bool $createEmailDir
      *
      * @throws AttachmentsPathNotWriteableException
      *
      * @return bool
      */
-    public static function checkAttachmentsPath($email, $createEmailDir = true)
+    public static function checkAttachmentsPath(string $email, bool $createEmailDir = true)
     {
         $slash = DIRECTORY_SEPARATOR;
         $configPath = self::$config['email']['attachments']['path'];
@@ -446,8 +442,8 @@ class Diagnostics
     public static function checkDatabaseException(
         Container &$di,
         PDOException $e,
-        $forwardException = false,
-        $sleepSeconds = null
+        bool $forwardException = false,
+        bool $sleepSeconds = null
     ) {
         $messages = [
             'Lost connection',
@@ -494,8 +490,7 @@ class Diagnostics
             // TerminateException on failure to connect.
             $di['db'] = $di['db_factory'];
             Model::setDb($di['db']);
-        }
-        catch (TerminateException $err) {
+        } catch (TerminateException $err) {
             if ($forwardException) {
                 throw $err;
             }

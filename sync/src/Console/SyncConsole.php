@@ -159,8 +159,8 @@ class SyncConsole extends Console
             || true === $this->updatedb
             || true === $this->rollback
             || true === $this->threading
-            || true === $this->diagnostics)
-        {
+            || true === $this->diagnostics
+        ) {
             $this->interactive = true;
         }
     }
@@ -207,10 +207,10 @@ class SyncConsole extends Console
         // Send other info messages
         if (true === $this->threading) {
             $this->cli->info('Message sync skipped, only threading activated');
-        }
-        elseif (true === $this->quick) {
+        } elseif (true === $this->quick) {
             $this->cli->info(
-                'Attachments and message contents will not be downloaded');
+                'Attachments and message contents will not be downloaded'
+            );
         }
     }
 
@@ -244,7 +244,8 @@ class SyncConsole extends Console
         list(
             $newAccount['service'],
             $newAccount['imap_host'],
-            $newAccount['imap_port']) = $this->promptAccountType();
+            $newAccount['imap_port']
+        ) = $this->promptAccountType();
         $newAccount['email'] = $this->promptEmail();
         $newAccount['password'] = $this->promptPassword();
 
@@ -254,8 +255,7 @@ class SyncConsole extends Console
             $this->testConnection($newAccount);
             $accountModel = new AccountModel($newAccount);
             $accountModel->save([], true);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->cli->boldRedBackgroundBlack($e->getMessage());
             $input = $this->cli->confirm('Do you want to try again?');
 
@@ -331,12 +331,11 @@ class SyncConsole extends Console
      *
      * @param array $account Account credentials
      */
-    private function testConnection($account)
+    private function testConnection(array $account)
     {
         try {
             Diagnostics::testImapConnection($account);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->cli->error(
                 sprintf(
                     "Unable to connect as '%s' to %s:%s IMAP server: %s.",

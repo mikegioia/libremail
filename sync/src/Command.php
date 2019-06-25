@@ -66,7 +66,8 @@ class Command
         if (! $this->emitter) {
             throw new ErrorException(
                 'A command was attempted to be run in a context '.
-                'without an Event Emitter.');
+                'without an Event Emitter.'
+            );
         }
 
         $matched = preg_match_all($this->regexExtract, $message, $results);
@@ -74,8 +75,8 @@ class Command
         if (! $matched
             || 2 !== count($results)
             || 1 !== count($results[1])
-            || ! strlen($results[1][0]))
-        {
+            || ! strlen($results[1][0])
+        ) {
             throw new BadCommandException($message);
         }
 

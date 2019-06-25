@@ -133,8 +133,7 @@ class Actions
             // Copy and/or move any messages that were sent in
             $this->copyMessages($messageIds, $copyTo, $action);
             $this->moveMessages($messageIds, $moveTo, $folderId);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             Model::getDb()->rollBack();
 
             throw $e;
@@ -161,21 +160,18 @@ class Actions
         string $action,
         array $messageIds,
         array $allMessageIds,
-        array $options = [])
-    {
+        array $options = []
+    ) {
         if (self::MARK_ALL_READ === $action) {
             return (new MarkReadAction)->run($allMessageIds, $this->folders);
-        }
-        elseif (self::MARK_ALL_UNREAD === $action) {
+        } elseif (self::MARK_ALL_UNREAD === $action) {
             return (new MarkUnreadAction)->run($allMessageIds, $this->folders);
-        }
-        elseif (self::FLAG === $action) {
+        } elseif (self::FLAG === $action) {
             return (new FlagAction)->run(
                 [end($allMessageIds)],
                 $this->folders,
                 $options);
-        }
-        elseif (array_key_exists($action, self::ACTION_CLASSES)) {
+        } elseif (array_key_exists($action, self::ACTION_CLASSES)) {
             $class = self::ACTION_CLASSES[$action];
             $actionHandler = new $class;
             $ids = true === ($options[self::ALL_MESSAGES] ?? false)
@@ -257,58 +253,45 @@ class Actions
     private function setResponseMessage(
         string $action,
         int $count,
-        array $folders)
-    {
+        array $folders
+    ) {
         $message = null;
         $folderName = count($folders) > 1
             ? count($folders) + ' folders'
             : implode(', ', $folders);
 
         if (self::MARK_ALL_READ === $action
-            || self::MARK_READ === $action)
-        {
+            || self::MARK_READ === $action
+        ) {
             $message = 'marked as read';
-        }
-        elseif (self::MARK_ALL_UNREAD === $action
+        } elseif (self::MARK_ALL_UNREAD === $action
             || self::MARK_UNREAD === $action
-            || self::MARK_UNREAD_FROM_HERE === $action)
-        {
+            || self::MARK_UNREAD_FROM_HERE === $action
+        ) {
             $message = 'marked as unread';
-        }
-        elseif (self::COPY === $action && $folderName) {
+        } elseif (self::COPY === $action && $folderName) {
             $message = "copied to {$folderName}";
-        }
-        elseif (self::UNCOPY === $action && $folderName) {
+        } elseif (self::UNCOPY === $action && $folderName) {
             $message = "removed from {$folderName}";
-        }
-        elseif (self::MOVE === $action && $folderName) {
+        } elseif (self::MOVE === $action && $folderName) {
             $message = "moved to {$folderName}";
-        }
-        elseif (self::FLAG === $action) {
+        } elseif (self::FLAG === $action) {
             $message = 'starred';
-        }
-        elseif (self::UNFLAG === $action) {
+        } elseif (self::UNFLAG === $action) {
             $message = 'unstarred';
-        }
-        elseif (self::SPAM === $action) {
+        } elseif (self::SPAM === $action) {
             $message = 'flagged as spam';
-        }
-        elseif (self::UNSPAM === $action) {
+        } elseif (self::UNSPAM === $action) {
             $message = 'un-flagged as spam';
-        }
-        elseif (self::DELETE === $action) {
+        } elseif (self::DELETE === $action) {
             $message = 'deleted';
-        }
-        elseif (self::RESTORE === $action) {
+        } elseif (self::RESTORE === $action) {
             $message = 'removed from trash';
-        }
-        elseif (self::ARCHIVE === $action) {
+        } elseif (self::ARCHIVE === $action) {
             $message = 'archived';
-        }
-        elseif (self::TRASH === $action) {
+        } elseif (self::TRASH === $action) {
             $message = 'moved to trash';
-        }
-        elseif (self::UNTRASH === $action) {
+        } elseif (self::UNTRASH === $action) {
             $message = 'removed from trash';
         }
 
@@ -316,10 +299,12 @@ class Actions
             return;
         }
 
-        $message = sprintf("%s $message.",
+        $message = sprintf(
+            "%s $message.",
             1 === $count
                 ? 'Conversation'
-                : $count.' conversations');
+                : $count.' conversations'
+        );
 
         Session::alert($message, TaskModel::getBatchId());
     }

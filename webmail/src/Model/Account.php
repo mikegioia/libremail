@@ -54,7 +54,7 @@ class Account extends Model
     public function fromAddress()
     {
         return $this->name
-            ? sprintf("%s <%s>", $this->name, $this->email)
+            ? sprintf('%s <%s>', $this->name, $this->email)
             : $this->email;
     }
 
@@ -66,8 +66,8 @@ class Account extends Model
         string $password,
         string $name,
         string $imapHost,
-        int $imapPort)
-    {
+        int $imapPort
+    ) {
         $updated = $this->db()
             ->update([
                 'name' => trim($name),

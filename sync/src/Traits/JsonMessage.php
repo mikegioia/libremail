@@ -16,7 +16,7 @@ trait JsonMessage
      * @param string $message
      * @param string $key
      */
-    abstract protected function processMessage($message, $key = null);
+    abstract protected function processMessage(string $message, string $key = null);
 
     /**
      * Reads in a JSON message for handling.
@@ -24,7 +24,7 @@ trait JsonMessage
      * @param string $json
      * @param string $key
      */
-    abstract protected function handleMessage($json, $key = null);
+    abstract protected function handleMessage(string $json, string $key = null);
 
     /**
      * Parses a message chunk to be combined into a JSON array.
@@ -34,7 +34,7 @@ trait JsonMessage
      * @param string $message
      * @param string $key
      */
-    private function parseMessage($message, $key = null)
+    private function parseMessage(string $message, string $key = null)
     {
         // Default index, otherwise a unique key can be specified
         // for handling multiple different streams of messages.
@@ -49,9 +49,7 @@ trait JsonMessage
             $this->messageSize[$key] = intval($unpacked['size']);
         }
 
-        if (isset($this->isReading[$key])
-            && $this->isReading[$key])
-        {
+        if (isset($this->isReading[$key]) && $this->isReading[$key]) {
             $this->message[$key] .= $message;
             $msg = $this->message[$key];
             $msgSize = $this->messageSize[$key];

@@ -37,7 +37,8 @@ class Copy extends Base
                 $message->account_id,
                 $this->getType(),
                 null,
-                $options[Actions::TO_FOLDER_ID]);
+                $options[Actions::TO_FOLDER_ID]
+            );
         }
     }
 
