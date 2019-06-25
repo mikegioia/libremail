@@ -14,6 +14,8 @@ class Session
     const FORM_ERRORS = 'form_errors';
     const NOTIFICATIONS = 'notifications';
 
+    const FLAG_HIDE_JS_ALERT = 'hide_js_alert';
+
     /**
      * Retrieve and optionally remove a session value.
      */
@@ -60,6 +62,34 @@ class Session
         $notifications[] = $newNotification;
 
         $_SESSION[self::NOTIFICATIONS] = $notifications;
+    }
+
+    /**
+     * Stores a flag in the session.
+     *
+     * @throws ClientException
+     */
+    public static function flag(string $flag, $value)
+    {
+        $allowed = [
+            self::FLAG_HIDE_JS_ALERT
+        ];
+
+        if (! in_array($flag, $allowed)) {
+            throw new ClientException('Invalid flag specified');
+        }
+
+        $_SESSION[$flag] = $value;
+    }
+
+    /**
+     * Returns the value for a flag, if set.
+     *
+     * @return mixed
+     */
+    public static function getFlag(string $flag, $default = null)
+    {
+        return $_SESSION[$flag] ?? $default;
     }
 
     /**

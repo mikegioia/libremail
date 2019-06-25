@@ -24,6 +24,17 @@
     </noscript>
 </head>
 <body class="theme-<?php echo $view->meta(PREF_THEME, 'default'); ?> page-<?php echo $pageClass ?? 'main'; ?>">
+    <?php
+    if (is_bool($hideJsAlert ?? null) && true !== $hideJsAlert): ?>
+    <aside class="js-display">
+        <h6>You have JavaScript enabled!</h6>
+        <div>You can and should disable it for this domain.</div>
+        <div class="align-right">
+            <a href="/closejsalert">Close this notification</a>
+        </div>
+    </aside>
+    <?php
+    endif; ?>
     <header class="u-cf">
         <h4 id="logo">
             <a class="icon button" href="#" tabindex="3">
@@ -39,10 +50,4 @@
             <!-- This is a top-layer action. A separate container will be
                 fixed and positioned up here -->
         </div>
-        <!--
-        <aside class="js-display">
-            <h6>You have JavaScript enabled!</h6>
-            <div>You can and should disable it for this domain.</div>
-        </aside>
-        -->
     </header>

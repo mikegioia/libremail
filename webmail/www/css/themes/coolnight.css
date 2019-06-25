@@ -33,6 +33,14 @@ body.theme-coolnight a:focus {
   color: #36cfff;
 }
 
+body.theme-coolnight aside {
+  background-color: #a70834;
+  box-shadow: 0 0.25rem 0.5rem #222;
+}
+body.theme-coolnight aside a {
+  color: #fff;
+}
+
 /* Default background */
 body.theme-coolnight,
 body.theme-coolnight .menu.actions,

@@ -131,6 +131,8 @@ $router->get('/outbox', [$controller, 'outbox']);
 $router->post('/outbox/delete', [$controller, 'deleteDraft']);
 // Preview a message
 $router->get('/preview/(\d+)', [$controller, 'preview']);
+// Close the JavaScript notification
+$router->get('/closejsalert', [$controller, 'closeJsAlert']);
 // Handle 404s
 $router->set404([$controller, 'error404']);
 

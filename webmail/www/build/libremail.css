@@ -4551,8 +4551,30 @@ section#main {
   z-index: 1;
 }
 
-section#main.settings {
-  padding-top: 1.5rem;
+/* Page Headers */
+section#main > h5 {
+  border-bottom: 1px solid #ddd;
+  font-weight: 400;
+  margin: 1.5rem 2rem 2rem 0;
+  padding-bottom: 0.3rem;
+}
+
+section#main > h5 a {
+  float: right;
+  font-size: 1.5rem;
+  transform: translateY(0.75rem);
+}
+
+section#main > h5 + .help-text {
+  color: #555;
+  font-size: 1.125rem;
+  margin: -1rem 2rem 2.5rem 0;
+  max-width: calc(22% + 50rem);
+}
+
+/* Margin with notifications */
+section#main > #notifications {
+  margin-top: 1.5rem;
 }
 
 a:hover,
@@ -4562,8 +4584,11 @@ a:focus {
 
 /* Alerts */
 aside {
-  right: 1rem;
+  background-color: #a70834;
   position: fixed;
+  right: 1rem;
+  top: 0.75rem;
+  z-index: 40;
 }
 
 /* Helpers */
@@ -4608,6 +4633,7 @@ aside {
   position: relative;
   z-index: 30;
 }
+
 /**
 * Navigation and Header
 *
@@ -4647,7 +4673,7 @@ body > header a.icon.button {
 }
 
 #logo a.icon.button:not(:hover):not(:focus) {
-  color: #999;
+  color: #bbb;
 }
 
 #search {
@@ -4911,7 +4937,7 @@ nav li.w-unread {
  * with the messages when they're selected.
  *
  * z-index range: 26-30
-*/
+ */
 
 section #msg-actions {
   border-bottom: 1px solid #ddd;
@@ -5106,6 +5132,16 @@ input[type="button"] {
   text-transform: none;
 }
 
+.button[disabled],
+button[disabled],
+input[type="submit"][disabled],
+input[type="reset"][disabled],
+input[type="button"][disabled] {
+  background-color: #eee !important;
+  border-color: #eee !important;
+  color: #bbb !important;
+}
+
 .icon.button {
   height: 3.5rem;
   line-height: 3.4rem;
@@ -5153,6 +5189,11 @@ input[type="button"].button-primary:focus {
   border-color: #9238ab;
 }
 
+.button.button-primary:not(#compose) {
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
 .button.button-secondary {
   background-color: #1eaedb;
   border-color: #1eaedb;
@@ -5170,6 +5211,7 @@ input[type="button"].button-primary:focus {
   background: #ff524e;
   border-color: #ff524e;
   color: #fff;
+  font-weight: 400;
 }
 
 .button.button-danger:hover,
@@ -5209,6 +5251,7 @@ input[type="button"].button-primary:focus {
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
 }
+
 /**
  * Tooltips
  * Renders tooltips on an element with data-tooltip
@@ -5263,7 +5306,7 @@ input[type="button"].button-primary:focus {
  * an action is performed in the app
  *
  * z-index range: 31-35
-*/
+ */
 
 .alerts input[type="checkbox"] {
   display: none;
@@ -5338,6 +5381,65 @@ input[type="button"].button-primary:focus {
   }
 }
 
+/**
+ * Dialogs
+ * These small overlays display to alert or confirm an action.
+ *
+ * z-index range: 36-40
+*/
+
+
+/* Confirm dialogs */
+.dialog {
+  background: #ddd;
+  border-radius: 0.375rem;
+  border: 1px solid #ccc;
+  display: none;
+  left: calc(50% - 20rem);
+  padding: 1.5rem;
+  position: fixed;
+  top: 10%;
+  width: 40rem;
+  z-index: 40;
+}
+
+.dialog-overlay {
+  display: none;
+}
+
+.dialog:target {
+  display: block;
+}
+
+.dialog:target + .dialog-overlay {
+  background: rgba(0, 0, 0, 0.75);
+  bottom: 0;
+  content: ' ';
+  display: block;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 36;
+}
+
+.dialog form {
+  margin: 0;
+}
+
+.dialog .dialog-controls {
+  text-align: right;
+}
+
+.dialog .dialog-controls .button {
+  margin-bottom: 0;
+}
+
+/* Confirm dialogs */
+.dialog .confirm-message {
+  margin-bottom: 2.5rem;
+  padding: 0.5rem;
+}
 /**
  * Notifications
  * These messages appear at the top of the page.
@@ -6090,7 +6192,15 @@ input[type="checkbox"].thread-msg-more-checkbox {
  * New message and reply to message
  */
 
-form.compose {
+body.page-compose header {
+  z-index: 2;
+}
+
+section.compose {
+  overflow-y: auto;
+}
+
+.compose form {
   margin: 0 2rem 2.5rem 0;
 }
 
@@ -6099,18 +6209,30 @@ form.compose {
   margin-bottom: 1rem;
 }
 
+.compose input[type="radio"] {
+  display: none;
+}
+
+.compose input[type="radio"]:checked + .hidden {
+  display: block !important;
+}
+
+.compose .two.columns label {
+  margin: 0.25rem 0 0
+}
+
 .compose .ten.columns {
   margin-left: 2rem;
   padding-bottom: 1rem;
 }
 
-.compose .ten.columns input[type="text"] {
-  margin-bottom: 0;
-}
-
 .compose .ten.columns textarea,
 .compose .ten.columns input[type="text"] {
+  font-size: 1.5rem;
+  margin-bottom: 0;
   max-width: 50rem;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
 }
 
 .compose .row.hidden {
@@ -6122,14 +6244,9 @@ form.compose {
   overflow: hidden;
 }
 
-.compose .addresses input[type="text"] {
-  font-size: 1.5rem;
-  padding: 0.5rem;
-  width: 100%;
-}
-
 .compose .addresses .ten.columns input[type="text"] {
   margin-bottom: 0.5rem;
+  transition: margin-bottom 200ms ease-in-out;
 }
 
 .compose .addresses input[type="text"]:nth-child(n+2) {
@@ -6137,25 +6254,71 @@ form.compose {
 }
 
 .compose .addresses input[type="text"]:valid,
-.compose .addresses input[type="text"]:valid + input {
+.compose .addresses input[type="text"]:valid + input,
+.compose .addresses input[type="text"]:valid + div + input {
   display: block;
 }
 
-.compose .addresses input[type="text"]:valid:not(:focus) + input:not(:valid):not(:focus) {
+/*
+This is a nice effect but it causes problems if there is a
+blank address input between two valid inputs.
+
+.compose .addresses input[type="text"]:valid:not(:focus) + input:not(:valid):not(:focus),
+.compose .addresses input[type="text"]:valid:not(:focus) + div + input:not(:valid):not(:focus) {
   opacity: 0.5;
   margin-bottom: -2.25rem;
 }
+*/
 
 .compose .addresses input[type="text"]:focus {
   opacity: 1;
   margin-bottom: 0.5rem;
 }
 
+.compose .addresses.from {
+  padding-bottom: 0.5rem;
+}
+
+.compose .addresses.from label {
+  margin: 0;
+}
+
+.compose .addresses.from .show-hidden-addresses {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.compose .addresses.from .show-hidden-addresses label + label {
+  margin-left: 0.5rem;
+}
+
+.compose #toggle-cc:checked ~ .from label[for="toggle-cc"] {
+  display: none;
+}
+
+.compose #toggle-bcc:checked ~ .from label[for="toggle-bcc"] {
+  display: none;
+}
+
+.compose .addresses.from .ten.columns {
+  max-width: 50rem;
+  padding-right: 6rem;
+  position: relative;
+}
+
+.compose .addresses.from .ten.columns label {
+  cursor: pointer;
+  display: inline-block;
+  font-weight: 400;
+  text-decoration: underline;
+}
+
 .compose .message textarea {
   height: 30vh;
+  line-height: 2.125rem;
   min-height: 15rem;
   resize: vertical;
-  width: 100%;
 }
 
 .compose .offset-by-two.ten.columns {
@@ -6168,27 +6331,32 @@ form.compose {
   transform: translateY(-0.125rem);
 }
 
+.compose .buttons button {
+  margin-right: 0.25rem;
+}
+
 .compose .buttons span {
   color: #aaa;
-  margin: 0 0.25rem 0 0.5rem;
+  margin: 0 0.25rem;
+}
+
+.compose .has-error label {
+  color: #d43633;
+}
+
+.compose .has-error .error-message {
+  color: #d43633;
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+  transform: translateY(-0.125rem);
+}
+
+.compose .has-error input[type="text"].with-error {
+  border-color: #d43633;
 }
 /**
  * Settings and Accounts
  */
-
-.settings h5 {
-  border-bottom: 1px solid #ddd;
-  font-weight: 400;
-  margin: 0 2rem 2rem 0;
-  padding-bottom: 0.3rem;
-}
-
-.settings h5 + .help-text {
-  color: #555;
-  font-size: 1.125rem;
-  margin: -1rem 2rem 2.5rem 0;
-  max-width: calc(22% + 50rem);
-}
 
 .settings .row .three.columns label {
   transform: translateY(0.3125rem);
@@ -6286,6 +6454,7 @@ form.compose {
 
 .settings .theme .theme-body .theme-links {
   color: #1eaedb;
+  text-decoration: underline;
 }
 
 .settings .theme + label {
@@ -6520,7 +6689,7 @@ body.theme-warmlight select {
 
 /* Light borders */
 body.theme-warmlight .msg-label,
-body.theme-warmlight .settings h5,
+body.theme-warmlight #main > h5,
 body.theme-warmlight section #msg-actions,
 body.theme-warmlight .dropdown li.notice,
 body.theme-warmlight article.thread-msg {
@@ -6590,6 +6759,25 @@ body.theme-warmlight .button.button-secondary:hover {
   border-color: #005c86;
 }
 
+body.theme-warmlight .button[disabled],
+body.theme-warmlight button[disabled],
+body.theme-warmlight input[type="submit"][disabled],
+body.theme-warmlight input[type="reset"][disabled],
+body.theme-warmlight input[type="button"][disabled] {
+  background-color: #efd8c6 !important;
+  border-color: #efd8c6 !important;
+  color: #caad97 !important;
+}
+
+body.theme-warmlight #logo a.icon.button:not(:hover):not(:focus) {
+  border-color: #caad97;
+  color: #dcc5b3;
+}
+
+body.theme-warmlight #logo a.icon.button:hover {
+  color: #94877d;
+}
+
 /* Shadows */
 body.theme-warmlight .settings .theme {
   box-shadow: 0 2px 2px #e8d3c2;
@@ -6626,13 +6814,10 @@ body.theme-warmlight #topnav-actions .status > div > span {
 }
 
 /* Overwrite #555 */
-body.theme-warmlight .settings h5 + .help-text,
+body.theme-warmlight #main > h5 + .help-text,
 body.theme-warmlight .msg-checkbox:checked + .msg-label + .msg-contents .subject {
   color: #614937;
 }
-
-
-
 
 /**
  * Cool Night
@@ -6661,6 +6846,12 @@ body.theme-warmlight .msg-checkbox:checked + .msg-label + .msg-contents .subject
 
 .settings .theme-coolnight > .theme {
   border-color: #222 !important;
+}
+
+/* Base elements */
+body.theme-coolnight a:hover,
+body.theme-coolnight a:focus {
+  color: #36cfff;
 }
 
 /* Default background */
@@ -6712,6 +6903,10 @@ body.theme-coolnight .msg-label {
   border-color: #2b2b2b;
 }
 
+body.theme-coolnight .msg-label.unseen {
+  background-color: #5b5b5b;
+}
+
 body.theme-coolnight .msg-label:after {
   background-color: #9b9b9b;
   border-color: #2b2b2b;
@@ -6724,7 +6919,7 @@ body.theme-coolnight .msg-checkbox:checked + .msg-label:after {
 body.theme-coolnight .msg-contents.unseen .subject span,
 body.theme-coolnight .msg-contents.unseen .date,
 body.theme-coolnight .msg-contents.unseen strong {
-  font-weight: 600;
+  /*font-weight: 400;*/
 }
 
 body.theme-coolnight .msg-label.unseen,
@@ -6732,8 +6927,8 @@ body.theme-coolnight .msg-contents.unseen,
 body.theme-coolnight .msg-contents.unseen .names,
 body.theme-coolnight .msg-contents.unseen .subject span,
 body.theme-coolnight .msg-contents.unseen .date {
-  background-color: #6b6b6b;
-  color: #ddd;
+  background-color: #5b5b5b;
+  color: #ebebeb;
 }
 
 body.theme-coolnight .msg-checkbox:checked + .msg-label,
@@ -6742,15 +6937,16 @@ body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents {
 }
 
 body.theme-coolnight .msg-checkbox:checked + .msg-label,
+body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents,
 body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents .names,
 body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents .date,
 body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents .subject span {
-  background-color: #ffda6d; /* original yellow */
+  background-color: #f1c953; /* original yellow */
   color: #4b4b4b;
 }
 
 body.theme-coolnight .msg-contents .subject {
-  color: #6b6b6b;
+  color: #8b8b8b8;
 }
 
 /* Threads */
@@ -6810,7 +7006,7 @@ body.theme-coolnight .settings .row input[readonly] {
 }
 
 /* Light borders */
-body.theme-coolnight .settings h5,
+body.theme-coolnight #main > h5,
 body.theme-coolnight section #msg-actions,
 body.theme-coolnight .dropdown li.notice,
 body.theme-coolnight .folder-selector h4,
@@ -6838,57 +7034,68 @@ body.theme-coolnight .compose .row:not(.message) {
   border-color: #323232;
 }
 
-body.theme-coolnight .msg-label.unseen {
-  background-color: #6b6b6b;
-}
-
 /* Dropdown item hover */
 body.theme-coolnight nav a.mailbox:hover,
 body.theme-coolnight nav a.mailbox:hover + .folder-label,
 body.theme-coolnight .dropdown li a:hover,
 body.theme-coolnight .dropdown li [type="submit"]:hover {
-  background-color: #2b2b2b;
+  background-color: #2b2b2b !important;
 }
 
 /* Buttons */
 body.theme-coolnight .button.button-primary {
   background-color: #7952b3;
-  border-color: #321a54;
+  border-color: #1c0c31;
   box-shadow: 0 2px 2px #383838;
 }
 
 body.theme-coolnight .button.button-primary:focus,
 body.theme-coolnight .button.button-primary:hover {
-  background-color: #8e63ce;
-  border-color: #321a54;
-}
-
-body.theme-coolnight .button.button-primary:not(#compose) {
-  font-weight: 400;
-  letter-spacing: 0;
+  background-color: #8859ce;
+  border-color: #1c0c31;
 }
 
 body.theme-coolnight .button.button-secondary {
-  background-color: #178eb3;
-  border-color: #053544;
+  background-color: #1280a2;
+  border-color: #052d3a;
   box-shadow: 0 2px 2px #383838;
 }
 
 body.theme-coolnight .button.button-secondary:focus,
 body.theme-coolnight .button.button-secondary:hover {
-  background-color: #1280a2;
-  border-color: #053544;
+  background-color: #178eb3;
+  border-color: #052d3a;
 }
 
 body.theme-coolnight .button.button-danger {
-  background-color: #d05b5b;
-  border-color: #5a0d0d;
+  background-color: #b74b4b;
+  border-color: #480707;
   box-shadow: 0 2px 2px #383838;
 }
 
 body.theme-coolnight .button.button-danger:hover,
 body.theme-coolnight .button.button-danger:focus {
-  background-color: #b74b4b;  
+  background-color: #d05b5b;
+}
+
+body.theme-coolnight .button[disabled],
+body.theme-coolnight button[disabled],
+body.theme-coolnight input[type="submit"][disabled],
+body.theme-coolnight input[type="reset"][disabled],
+body.theme-coolnight input[type="button"][disabled] {
+  background-color: #444 !important;
+  border-color: #333 !important;
+  color: #777 !important;
+}
+
+body.theme-coolnight #logo a.icon.button:not(:hover):not(:focus) {
+  border-color: #1b1b1b;
+  color: #666;
+}
+
+body.theme-coolnight #logo a.icon.button:hover {
+  border-color: #0b0b0b;
+  color: #aaa;
 }
 
 /* Alerts */
@@ -6904,6 +7111,21 @@ body.theme-coolnight .alerts .alert label {
   color: #aaa !important;
 }
 
+/* Dialogs */
+body.theme-coolnight .dialog {
+  background: #4b4b4b;
+  border: 1px solid #0b0b0b;
+}
+
+/* Form errors */
+body.theme-coolnight .compose .has-error label,
+body.theme-coolnight .compose .has-error .error-message {
+  color: #d05b5b;
+}
+body.theme-coolnight .compose .has-error input[type="text"] {
+  border-color: #d05b5b;
+}
+
 /* Misc elements */
 body.theme-coolnight code {
   background-color: #2b2b2b;
@@ -6916,6 +7138,16 @@ body.theme-coolnight ::placeholder {
 
 body.theme-coolnight #notifications .notification {
   color: #333;
+}
+
+body.theme-coolnight #notifications .notification.success {
+  border: 1px solid #193114;
+  box-shadow: 0 1px 2px #2b2b2b;
+}
+
+body.theme-coolnight #notifications .notification.error {
+  border: 1px solid #2d1414;
+  box-shadow: 0 1px 2px #2b2b2b;
 }
 
 /* Shadows */
@@ -6965,7 +7197,7 @@ body.theme-coolnight #topnav-actions .status > div > span {
 }
 
 /* Overwrite #555 */
-body.theme-coolnight .settings h5 + .help-text {
+body.theme-coolnight #main > h5 + .help-text {
   color: #9b9b9b;
 }
 

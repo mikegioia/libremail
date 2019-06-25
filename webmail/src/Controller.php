@@ -70,6 +70,13 @@ class Controller
         (new Rollback)->run($batchId);
     }
 
+    public function closeJsAlert()
+    {
+        session_start();
+        Session::flag(Session::FLAG_HIDE_JS_ALERT, true);
+        Url::redirectBack();
+    }
+
     public function getStar(string $type, string $theme, int $id, string $state)
     {
         header('Content-Type: text/html');
@@ -331,7 +338,8 @@ class Controller
             'mainHeading' => INBOX === $id
                 ? 'Everything else'
                 : $folder->name,
-            'alert' => Session::get(Session::ALERT)
+            'alert' => Session::get(Session::ALERT),
+            'hideJsAlert' => Session::getFlag(Session::FLAG_HIDE_JS_ALERT, false)
         ]);
     }
 

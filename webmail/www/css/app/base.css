@@ -53,8 +53,27 @@ a:focus {
 
 /* Alerts */
 aside {
-  right: 1rem;
+  background-color: #e46ee6;
+  border-radius: 0.25rem;
+  padding: 1rem;
   position: fixed;
+  right: 1rem;
+  top: 0.75rem;
+  z-index: 40;
+}
+
+aside h6 {
+  font-size: 2.25rem;
+  margin-bottom: 1.5rem;
+}
+
+aside div:first-of-type {
+  margin-bottom: 1rem;
+}
+
+aside a {
+  color: #000;
+  font-size: 1.25rem;
 }
 
 /* Helpers */
