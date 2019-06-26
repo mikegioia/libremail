@@ -206,6 +206,75 @@ class Message extends Model
     }
 
     /**
+     * Returns a list of messages by folder and account.
+     *
+     * @return array Message objects
+     */
+    public function getThreadsByFolder(
+        int $accountId,
+        int $folderId,
+        int $limit = 50,
+        int $offset = 0,
+        array $skipFolderIds = [],
+        array $onlyFolderIds = [],
+        array $options = []
+    ) {
+        $meta = $this->getThreadCountsByFolder(
+            $accountId,
+            $folderId,
+            $skipFolderIds,
+            $onlyFolderIds
+        );
+
+        return $this->loadThreadsByThreadIds(
+            $meta,
+            $accountId,
+            $limit,
+            $offset,
+            $skipFolderIds,
+            $onlyFolderIds,
+            $options
+        );
+    }
+
+    /**
+     * Returns a list of messages by account and search query,
+     * and optionally also by folder.
+     *
+     * @return array Message objects
+     */
+    public function getThreadsBySearch(
+        int $accountId,
+        string $query,
+        int $folderId = null,
+        int $limit = 50,
+        int $offset = 0,
+        string $sortBy = 'date',
+        array $skipFolderIds = [],
+        array $onlyFolderIds = [],
+        array $options = []
+    ) {
+        $meta = $this->getThreadCountsBySearch(
+            $accountId,
+            $query,
+            $folderId,
+            $sortBy,
+            $skipFolderIds,
+            $onlyFolderIds
+        );
+
+        return $this->loadThreadsByThreadIds(
+            $meta,
+            $accountId,
+            $limit,
+            $offset,
+            $skipFolderIds,
+            $onlyFolderIds,
+            $options
+        );
+    }
+
+    /**
      * Returns two counts of messages, by flagged and un-flagged.
      * Also returns the thread IDs that belong to both groups.
      *
@@ -224,9 +293,62 @@ class Message extends Model
             'unflaggedIds' => []
         ];
 
-        // First get all of the thread IDs for this folder
         $threadIds = $this->getThreadIdsByFolder($accountId, $folderId);
 
+        return $this->loadThreadCountsByThreadIds(
+            $threadIds,
+            $counts,
+            $accountId,
+            $skipFolderIds,
+            $onlyFolderIds
+        );
+    }
+
+    /**
+     * Similar method, but pulls thread counts by a search query.
+     *
+     * @return object
+     */
+    public function getThreadCountsBySearch(
+        int $accountId,
+        string $query,
+        int $folderId = null,
+        string $sortBy = 'date',
+        array $skipFolderIds = [],
+        array $onlyFolderIds = []
+    ) {
+        $counts = (object) [
+            'flagged' => 0,
+            'unflagged' => 0,
+            'flaggedIds' => [],
+            'unflaggedIds' => []
+        ];
+
+        $threadIds = $this->getThreadIdsBySearch(
+            $accountId, $query, $folderId, $sortBy
+        );
+
+        return $this->loadThreadCountsByThreadIds(
+            $threadIds,
+            $counts,
+            $accountId,
+            $skipFolderIds,
+            $onlyFolderIds
+        );
+    }
+
+    /**
+     * Internal method for compiling counts by thread IDs.
+     *
+     * @return stdClass $counts Modified counts object
+     */
+    private function loadThreadCountsByThreadIds(
+        array $threadIds,
+        stdClass $counts,
+        int $accountId,
+        array $skipFolderIds = [],
+        array $onlyFolderIds = []
+    ) {
         if (! $threadIds) {
             return $counts;
         }
@@ -268,9 +390,6 @@ class Message extends Model
     /**
      * Load the thread IDs for a given folder.
      *
-     * @param int $accountId
-     * @param int $folderId
-     *
      * @return array
      */
     private function getThreadIdsByFolder(int $accountId, int $folderId)
@@ -294,24 +413,69 @@ class Message extends Model
     }
 
     /**
-     * Returns a list of messages by folder and account.
+     * Returns a list of thread IDs by search query and account.
      *
-     * @return Message array
+     * @todo This should use a different more custom query builder.
+     *       Queries could look like "from:name@email.com" and will
+     *       need to be fully parsed properly.
+     *
+     * @return array
      */
-    public function getThreadsByFolder(
+    private function getThreadIdsBySearch(
         int $accountId,
-        int $folderId,
-        int $limit = 50,
-        int $offset = 0,
-        array $skipFolderIds = [],
-        array $onlyFolderIds = [],
-        array $options = []
+        string $query,
+        int $folderId = null,
+        string $sortBy = 'date',
+        string $sortDir = Model::DESC
     ) {
-        $meta = $this->getThreadCountsByFolder(
-            $accountId,
-            $folderId,
-            $skipFolderIds,
-            $onlyFolderIds);
+        // Work with the raw PDO object for this query
+        // This will prepare the user query string
+        $sql = 'SELECT thread_id, MATCH (subject, text_plain) '.
+            'AGAINST (:queryA IN NATURAL LANGUAGE MODE) AS score '.
+            'FROM messages '.
+            'WHERE deleted = 0 AND account_id = :accountId '.
+            ($folderId ? 'AND folder_id = :folderId ' : '').
+            'AND MATCH (subject, text_plain) AGAINST (:queryB IN NATURAL LANGUAGE MODE) '.
+            'GROUP BY thread_id '.
+            'HAVING score > 5 '.
+            'ORDER BY :sortBy '.$sortDir;
+
+        $sth = $this->db()->prepare($sql);
+
+        $sth->bindValue(':queryA', $query, PDO::PARAM_STR);
+        $sth->bindValue(':queryB', $query, PDO::PARAM_STR);
+        $sth->bindValue(':accountId', $accountId, PDO::PARAM_INT);
+        $sth->bindValue(':sortBy', $sortBy, PDO::PARAM_STR);
+
+        if ($folderId) {
+            $sth->bindValue(':folderId', $folderId, PDO::PARAM_INT);
+        }
+
+        $threadIds = [];
+        $sth->execute();
+        $results = $sth->fetchAll(PDO::FETCH_CLASS);
+
+        foreach ($results as $result) {
+            $threadIds[] = $result->thread_id;
+        }
+
+        return array_values(array_unique($threadIds));
+    }
+
+    /**
+     * Internal method for loading threads by a collection of IDs.
+     *
+     * @return array Message objects
+     */
+    private function loadThreadsByThreadIds(
+        stdClass $meta,
+        int $accountId,
+        int $limit,
+        int $offset,
+        array $skipFolderIds,
+        array $onlyFolderIds,
+        array $options
+    ) {
         $threadIds = array_merge($meta->flaggedIds, $meta->unflaggedIds);
         $options = array_merge(self::DEFAULTS, $options);
 

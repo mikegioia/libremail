@@ -22,6 +22,11 @@ class Url
         return self::$base.vsprintf($path, $parts);
     }
 
+    public static function makeGet(string $path, array $params = [])
+    {
+        return self::get($path, array_merge($_GET, $params));
+    }
+
     public static function makeToken(string $path, array $params = [])
     {
         $params['token'] = Session::getToken();
@@ -85,6 +90,10 @@ class Url
 
         if (STARRED === $urlId) {
             self::redirectRaw(self::starred($page ?: 1));
+        }
+
+        if (SEARCH === $urlId) {
+            self::redirectRaw(self::getBackUrl('/search'));
         }
 
         if (THREAD === $urlId) {

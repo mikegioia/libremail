@@ -28,18 +28,13 @@ class Messages
      *
      * @return [Message array, Message array, object, object]
      */
-    public function getThreads(
+    public function getThreadsByFolder(
         int $folderId,
         int $page = 1,
         int $limit = 25,
         array $options = []
     ) {
-        $flagged = [];
-        $unflagged = [];
-        $messageNames = new Names;
         $messageModel = new Message;
-        $escaper = new Escaper(self::UTF8);
-        $folders = $this->getIndexedFolders($folderId);
         $messages = $messageModel->getThreadsByFolder(
             $this->accountId,
             $folderId,
@@ -53,8 +48,76 @@ class Messages
             $folderId,
             $this->folders->getSkipIds($folderId),
             $this->folders->getRestrictIds($folderId));
+
+        return $this->loadThreads(
+            $messages,
+            $messageCounts,
+            $folderId,
+            $page,
+            $limit,
+            $options
+        );
+    }
+
+    /**
+     * Load the threads for a folder. Returns two arrays, a starred
+     * (or flagged) collection, and non-starred.
+     *
+     * @return [Message array, Message array, object, object]
+     */
+    public function getThreadsBySearch(
+        string $query,
+        int $folderId = null,
+        int $page = 1,
+        int $limit = 25,
+        string $sortBy = 'date',
+        array $options = []
+    ) {
+        $messageModel = new Message;
+        $messages = $messageModel->getThreadsBySearch(
+            $this->accountId,
+            $query,
+            $folderId,
+            $limit,
+            ($page - 1) * $limit,
+            $sortBy,
+            $this->folders->getSkipIds($folderId),
+            $this->folders->getRestrictIds($folderId),
+            $options);
+        $messageCounts = $messageModel->getThreadCountsBySearch(
+            $this->accountId,
+            $query,
+            $folderId,
+            $sortBy,
+            $this->folders->getSkipIds($folderId),
+            $this->folders->getRestrictIds($folderId));
+
+        return $this->loadThreads(
+            $messages,
+            $messageCounts,
+            $folderId,
+            $page,
+            $limit,
+            $options
+        );
+    }
+
+    private function loadThreads(
+        array $messages,
+        stdClass $messageCounts,
+        int $folderId = null,
+        int $page = 1,
+        int $limit = 25,
+        array $options = []
+    ) {
+        $flagged = [];
+        $unflagged = [];
+        $messageNames = new Names;
+        $escaper = new Escaper(self::UTF8);
+        $folders = $this->getIndexedFolders($folderId);
         $splitFlagged = isset($options[Message::SPLIT_FLAGGED])
             && true === $options[Message::SPLIT_FLAGGED];
+
         usort($messages, function ($a, $b) {
             return strcmp($b->date, $a->date);
         });
@@ -65,7 +128,7 @@ class Messages
             $this->setFolders($message, $folders);
             $this->setNameList($message, $messageNames);
 
-            if (1 == $message->flagged && $splitFlagged) {
+            if (1 === (int) $message->flagged && $splitFlagged) {
                 $flagged[] = $message;
             } else {
                 $unflagged[] = $message;
@@ -77,7 +140,7 @@ class Messages
             $page,
             $limit,
             $splitFlagged);
-        $totals = $messageModel->getSizeCounts($this->accountId);
+        $totals = (new Message)->getSizeCounts($this->accountId);
 
         return [$flagged, $unflagged, $paging, $totals];
     }

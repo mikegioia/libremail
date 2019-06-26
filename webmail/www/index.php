@@ -27,6 +27,7 @@ mb_internal_encoding('UTF-8');
 define('GET', 'GET');
 define('POST', 'POST');
 define('INBOX', 'inbox');
+define('SEARCH', 'search');
 define('OUTBOX', 'outbox');
 define('THREAD', 'thread');
 define('VIEWEXT', '.phtml');
@@ -133,6 +134,8 @@ $router->post('/outbox/delete', [$controller, 'deleteDraft']);
 $router->get('/preview/(\d+)', [$controller, 'preview']);
 // Close the JavaScript notification
 $router->get('/closejsalert', [$controller, 'closeJsAlert']);
+// Search messages
+$router->get('/search', [$controller, 'search']);
 // Handle 404s
 $router->set404([$controller, 'error404']);
 

@@ -124,9 +124,7 @@ class Task extends Model
     private function updateStatus(string $status)
     {
         $updated = $this->db()
-            ->update([
-                'status' => $status
-            ])
+            ->update(['status' => $status])
             ->table('tasks')
             ->where('id', '=', $this->id)
             ->execute();

@@ -93,6 +93,10 @@ aside a {
   display: inline;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .no-select {
   -moz-user-select: none;
   -webkit-user-select: none;

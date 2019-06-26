@@ -16,9 +16,13 @@ if ($showPaging): ?>
     <span class="paging-counts">
     <?php
     if ($counts->prevPage):
-        $url = $urlId === STARRED
-            ? App\Url::make('/starred/%s', $counts->prevPage)
-            : App\Url::make('/folder/%s/%s', $folderId, $counts->prevPage); ?>
+        if ($urlId === SEARCH):
+            $url = App\Url::makeGet('/search', ['p' => $counts->prevPage]);
+        else:
+            $url = $urlId === STARRED
+                ? App\Url::make('/starred/%s', $counts->prevPage)
+                : App\Url::make('/folder/%s/%s', $folderId, $counts->prevPage);
+        endif; ?>
         <a class="page prev" href="<?php echo $url; ?>"><i class="fa fa-chevron-left"></i>&nbsp;Prev</a>
     <?php
     endif;
@@ -31,9 +35,13 @@ if ($showPaging): ?>
     <?php
     endif;
     if ($counts->nextPage):
-        $url = $urlId === STARRED
-            ? App\Url::make('/starred/%s', $counts->nextPage)
-            : App\Url::make('/folder/%s/%s', $folderId, $counts->nextPage); ?>
+        if ($urlId === SEARCH):
+            $url = App\Url::makeGet('/search', ['p' => $counts->nextPage]);
+        else:
+            $url = $urlId === STARRED
+                ? App\Url::make('/starred/%s', $counts->nextPage)
+                : App\Url::make('/folder/%s/%s', $folderId, $counts->nextPage);
+        endif; ?>
         <a class="page next" href="<?php echo $url; ?>">Next&nbsp;<i class="fa fa-chevron-right"></i></a>
     <?php
     endif; ?>
@@ -51,7 +59,23 @@ elseif ($counts->total):
         <strong><?php echo $counts->total; ?></strong>
     </a>
 <?php
-endif; ?>
+endif;
+/* Unused right now
+   Currently the search method returns IDs only, and we don't have
+   the score information attached to the thread. It's simple but
+   time-consuming to refactor.
+   Uncommenting this will enable the sorting.
+if ($urlId === SEARCH): ?>
+    <span class="sort-controls">
+        Sort:&nbsp;
+        <a class="control<?php echo (App\Url::getParam('s') ?: 'date') === 'date' ? ' active' : ''; ?>"
+            href="<?php echo App\Url::makeGet('/search', ['s' => 'date']); ?>">Date</a>,<!--
+        --><a class="control<?php echo App\Url::getParam('s') === 'score' ? ' active' : ''; ?>"
+            href="<?php echo App\Url::makeGet('/search', ['s' => 'score']); ?>">Relevancy</a>
+    </span>
+<?php
+endif;
+*/ ?>
 </h5>
 <div id="<?php echo $id; ?>" class="mailbox">
 <?php

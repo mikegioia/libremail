@@ -46,5 +46,5 @@ CREATE TABLE IF NOT EXISTS `messages` (
   INDEX (`account_id`),
   INDEX (`message_id`(16)),
   INDEX (`in_reply_to`(16)),
-  FULLTEXT KEY text_plain (text_plain)
+  FULLTEXT KEY subject_text_plain (subject,text_plain)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

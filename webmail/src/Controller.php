@@ -233,6 +233,7 @@ class Controller
         if (! $message->exists() || $message->sent) {
             throw new NotFoundException;
         }
+
         exit('preview');
     }
 
@@ -289,9 +290,63 @@ class Controller
     }
 
     /**
+     * Search all messages for a collection of thread IDs, and then
+     * render those threads in a mailbox view (with paging, etc).
+     */
+    public function search()
+    {
+        // Load params
+        $page = Url::getParam('p', 1);
+        $query = Url::getParam('q', '');
+        $sortBy = Url::getParam('s', '');
+        $folderId = Url::getParam('f', 0);
+        // Set up libraries
+        $view = new View;
+        $meta = Meta::getAll();
+        $colors = getConfig('colors');
+        $select = Url::getParam('select');
+        $folders = new Folders($this->account, $colors);
+        $messages = new Messages($this->account, $folders);
+
+        // Get the message data
+        list($flagged, $unflagged, $paging, $totals) = $messages->getThreadsBySearch(
+            $query,
+            $folderId,
+            max($page, 1), // disallow negatives
+            25, // page limit
+            $sortBy, [
+                Message::ONLY_FLAGGED => false,
+                Message::SPLIT_FLAGGED => false,
+                Message::INCLUDE_DELETED => false
+            ]);
+
+        $view->htmlHeaders();
+
+        // Render the inbox
+        $view->render('mailbox', [
+            'view' => $view,
+            'page' => $page,
+            'meta' => $meta,
+            'query' => $query,
+            'urlId' => SEARCH,
+            'paging' => $paging,
+            'select' => $select,
+            'totals' => $totals,
+            'showPaging' => true,
+            'flagged' => $flagged,
+            'folders' => $folders,
+            'folderId' => $folderId,
+            'unflagged' => $unflagged,
+            'mainHeading' => 'Search Results',
+            'alert' => Session::get(Session::ALERT),
+            'hideJsAlert' => Session::getFlag(Session::FLAG_HIDE_JS_ALERT, false)
+        ]);
+    }
+
+    /**
      * Helper function to render a mailbox page.
      */
-    private function mailbox($id, $page = 1, $limit = 25)
+    private function mailbox(string $id, int $page = 1, int $limit = 25)
     {
         // Set up libraries
         $view = new View;
@@ -310,9 +365,9 @@ class Controller
         }
 
         // Get the message data
-        list($flagged, $unflagged, $paging, $totals) = $messages->getThreads(
+        list($flagged, $unflagged, $paging, $totals) = $messages->getThreadsByFolder(
             $folderId,
-            $page,
+            max($page, 1), // disallow negatives
             $limit, [
                 Message::SPLIT_FLAGGED => INBOX === $id,
                 Message::ONLY_FLAGGED => STARRED === $id,

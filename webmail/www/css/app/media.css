@@ -8,7 +8,7 @@
     font-size: 95%;
   }
   #search .icon.button {
-    top: 0.05rem;
+    top: 0.1875rem;
   }
   .thread-msg .message {
     font-size: 1.25rem;
@@ -40,7 +40,7 @@
     font-size: 80%;
   }
   #search .icon.button {
-    top: 0;
+    top: 0.125rem;
   }
 }
 
@@ -85,7 +85,7 @@
     font-size: 75%;
   }
   #search .icon.button {
-    top: 0.1rem;
+    top: 0.125rem;
   }
   .dropdown ul.more-actions {
     right: 0;

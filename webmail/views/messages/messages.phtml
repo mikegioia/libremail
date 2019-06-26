@@ -5,10 +5,10 @@ foreach ($messages as $message):
     $url = App\Url::make('/thread/%s/%s', $folderId, $message->thread_id);
     // Figure out if the message should be selected
     $selected = $select === App\Actions::SELECT_ALL
-        || ($select === App\Actions::SELECT_READ && $message->seen == 1)
-        || ($select === App\Actions::SELECT_UNREAD && $message->seen != 1)
-        || ($select === App\Actions::SELECT_FLAGGED && $message->flagged == 1)
-        || ($select === App\Actions::SELECT_UNFLAGGED && $message->flagged != 1); ?>
+        || ($select === App\Actions::SELECT_READ && (int) $message->seen === 1)
+        || ($select === App\Actions::SELECT_UNREAD && (int) $message->seen !== 1)
+        || ($select === App\Actions::SELECT_FLAGGED && (int) $message->flagged === 1)
+        || ($select === App\Actions::SELECT_UNFLAGGED && (int) $message->flagged !== 1); ?>
     <input type="checkbox" name="message[]" value="<?php echo $message->id; ?>"
         id="msg-checkbox-<?php echo $message->id; ?>" class="msg-checkbox"
         <?php echo $selected ? ' checked="checked"' : ''; ?>/>

@@ -192,9 +192,7 @@ class Outbox extends Model
         }
 
         $deleted = $this->db()
-            ->update([
-                'deleted' => 1
-            ])
+            ->update(['deleted' => 1])
             ->table('outbox')
             ->where('id', '=', $this->id)
             ->execute();

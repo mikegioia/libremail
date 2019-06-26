@@ -43,8 +43,10 @@
             <a href="/" class="link">LibreMail</a>
         </h4>
         <div id="search">
-            <input type="search" value="" placeholder="Search..." tabindex="1" /><!--
-            --><a class="icon button" href="#"><i class="fa fa-search"></i></a>
+            <form method="get" action="/search" name="search">
+                <input type="search" value="<?php echo $query ?? '' ?>" name="q" placeholder="Search..." tabindex="1" /><!--
+                --><button class="icon button" type="submit"><i class="fa fa-search"></i></button>
+            </form>
         </div>
         <div id="topnav">
             <!-- This is a top-layer action. A separate container will be
