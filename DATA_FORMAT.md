@@ -113,6 +113,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `deleted` tinyint(1) unsigned DEFAULT NULL,
   `answered` tinyint(1) unsigned DEFAULT NULL,
   `synced` tinyint(1) unsigned DEFAULT NULL,
+  `purge` tinyint(1) unsigned DEFAULT NULL,
   `date` datetime DEFAULT NULL,
   `date_recv` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -127,7 +128,8 @@ CREATE TABLE IF NOT EXISTS `messages` (
   INDEX (`thread_id`),
   INDEX (`account_id`),
   INDEX (`message_id`(16)),
-  INDEX (`in_reply_to`(16))
+  INDEX (`in_reply_to`(16)),
+  FULLTEXT KEY text_plain (text_plain)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
@@ -189,6 +191,8 @@ CREATE TABLE IF NOT EXISTS `messages` (
    server. This is a placeholder for now but if the syncing process was multi-
    stage and only the headers were saved in this table, then this value would
    remain 0 until the text, html, attachments, and other mail parts were synced.
+- `purge` Boolean value for internal use, 1 if the message should be deleted from
+   the database on the next sync cleanup operation.
 - `date` Date-time field representing the processed `date_str` from the message.
    This field is in the format `YYYY-MM-DD HH-MM-SS`.
 - `date_rcv` Date-time fields represending the processed `recv_str` from the
@@ -207,7 +211,9 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `status` tinyint(1) unsigned NOT NULL,
   `old_value` tinyint(1) unsigned DEFAULT NULL,
   `folder_id` int(10) unsigned DEFAULT NULL,
+  `retries` tinyint(1) unsigned DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `reason` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX (`status`),
   INDEX (`batch_id`),
@@ -225,7 +231,9 @@ CREATE TABLE IF NOT EXISTS `tasks` (
 - `old_value` The previous value before the task is performed. Used for rolling
    back any changes.
 - `folder_id` Optional reference to a folder if the task applies to one.
+- `retries` Optional number of retry attempts made.
 - `created_at` Timestamp denoting when the task was added to the database.
+- `reason` Optional description explaining the status.
 
 ## Batches
 
