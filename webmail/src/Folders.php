@@ -322,7 +322,8 @@ class Folders
         $this->loadFolders();
         $this->folderCounts = (new Message)->getUnreadCounts(
             $this->accountId,
-            $this->getSkipIds()
+            $this->getSkipIds(),
+            $this->getDraftsId()
         );
 
         // Add meta info to the folders

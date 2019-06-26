@@ -640,8 +640,11 @@ class Message extends Model
         return $messages;
     }
 
-    public function getUnreadCounts(int $accountId, array $skipFolderIds)
-    {
+    public function getUnreadCounts(
+        int $accountId,
+        array $skipFolderIds,
+        int $draftMailboxId
+    ) {
         $indexed = [];
         $unseenThreadIds = $this->getUnseenThreads($accountId, $skipFolderIds);
 
@@ -664,6 +667,17 @@ class Message extends Model
                 ++$indexed[$thread->folder_id];
             }
         }
+
+        // Set all messages as unread for the drafts mailbox
+        $draftThreads = $this->db()
+            ->select(['count(distinct(thread_id)) as count'])
+            ->count('thread_id', 'count', true)
+            ->from('messages')
+            ->where('deleted', '=', 0)
+            ->where('folder_id', '=', $draftMailboxId)
+            ->execute()
+            ->fetch();
+        $indexed[$draftMailboxId] = $draftThreads['count'] ?? 0;
 
         return $indexed;
     }
