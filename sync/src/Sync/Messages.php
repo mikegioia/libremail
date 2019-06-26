@@ -212,7 +212,7 @@ class Messages
         // Save the meta info that comes back from the server
         // regardless if the record exists.
         try {
-            $message->save();
+            $message->save([], ['thread_id']);
         } catch (ValidationException $e) {
             $this->log->notice(
                 "Failed validation for message $messageId: ".

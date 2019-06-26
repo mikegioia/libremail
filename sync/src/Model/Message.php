@@ -382,12 +382,13 @@ class Message extends Model
      * Create or updates a message record.
      *
      * @param array $data
+     * @param array $skipFields Set of fields to not update
      *
      * @throws ValidationException
      * @throws DatabaseUpdateException
      * @throws DatabaseInsertException
      */
-    public function save(array $data = [])
+    public function save(array $data = [], array $skipFields = [])
     {
         $val = new Validator;
 
@@ -415,6 +416,10 @@ class Message extends Model
         $this->setData($data);
 
         $data = $this->getData();
+
+        if ($skipFields) {
+            $data = array_diff_key($data, array_flip($skipFields));
+        }
 
         if (! $val->validate($data)) {
             throw new ValidationException(

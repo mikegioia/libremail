@@ -284,7 +284,7 @@ class Threads
     ) {
         if (! $threadId
             || ($message->getThreadId()
-                && $message->getThreadId() <= $threadId)
+                && $message->getThreadId() < $threadId)
         ) {
             $threadId = $message->getThreadId();
         }
