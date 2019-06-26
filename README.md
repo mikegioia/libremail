@@ -23,17 +23,15 @@ application.
 
 ![Ready](https://img.shields.io/badge/status-ready-brightgreen.svg?style=flat-square)
 
-Both email clients in this project utilise the syncing engine provided in the
-[`sync`](sync) app. This application is designed to continually archive emails
-from any number of IMAP servers and accounts. The data is saved in a format
-outlined in the [`DATA_FORMAT.md`](DATA_FORMAT.md) file. Any application that
-saves data in the format outlined in that document can be used, but the
-[`sync`](sync) app here is a PHP version that you can use.
+Both email clients in this project utilize the syncing engine provided in the
+[`sync`](sync) app. This application is designed to continually download emails
+from any number of IMAP servers and accounts. The data is saved in the format
+outlined in [`DATA_FORMAT.md`](DATA_FORMAT.md).
 
 Please see the `sync` directory for full documentation on setting up the sync
-engine as a stand-alone, i.e. connecting accounts, populating test data, and
-the different ways with which you can run the application continuously
-(supervisor, cron, etc).
+engine; i.e. connecting accounts, populating test data, and the different ways
+with which you can run the application in the background (supervisor, cron,
+etc).
 
 ### 2. JavaScript-free HTML Email Client
 
@@ -52,13 +50,12 @@ are encountered upon clicking external links or downloading and opening files,
 disabling JavaScript for LibreMail can prevent malicious activity from other
 websites you have open, browser extensions, and more.
 
-
-Web applications and pages can not only function, but thrive in a JavaScript-
-free environment. The [`webmail`](webmail) application in this project provides
-a rich GMail-style interface for interacting with the local email saved in a SQL
-database from the [`sync`](sync) app (this is a pre-requisite). It's
-mobile-friendly, extremely light-weight, and provides almost full parity to
-GMail's email client.
+Web applications and pages can not only function, but _thrive_ in a
+JavaScript-free environment. The [`webmail`](webmail) application in this
+project provides a rich GMail-style interface for interacting with the local
+email saved in a SQL database from the [`sync`](sync) app (this is a
+pre-requisite). It's mobile-friendly, extremely light-weight, and provides
+almost full parity to GMail's email client.
 
 ### 3. Kanban-style Email Client
 

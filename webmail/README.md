@@ -17,7 +17,7 @@ I'll soon be using this as my daily driver, which should shore up a lot of bugs.
        star/unstar actions for messages and threads.~
  - [x] ~Edit account credentials and settings~
  - [x] ~Sync all actions with IMAP/SMTP server~
- - [ ] Search and display search results
+ - [x] Search and display search results
  - [ ] Compose new message
  - [ ] Reply to and forward messages
 
