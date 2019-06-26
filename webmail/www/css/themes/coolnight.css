@@ -132,6 +132,10 @@ body.theme-coolnight .msg-checkbox:checked + .msg-label + .msg-contents .subject
   color: #4b4b4b;
 }
 
+body.theme-coolnight .msg-contents .names span.red {
+  color: #ea5d84;
+}
+
 body.theme-coolnight .msg-contents .subject {
   color: #8b8b8b8;
 }

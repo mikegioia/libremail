@@ -84,7 +84,8 @@ if ($messages):
         'view' => $view,
         'select' => $select,
         'folderId' => $folderId,
-        'messages' => $messages
+        'messages' => $messages,
+        'isDrafts' => (int) $folderId === $folders->getDraftsId()
     ]);
     $view->render('nav/actions-menu', [
         'folders' => $folders,

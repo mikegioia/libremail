@@ -17,7 +17,13 @@ foreach ($messages as $message):
     <div class="msg-contents <?php echo $message->seen == 1 ? 'seen' : 'unseen'; ?>" id="msg-contents-<?php echo $message->id; ?>">
         <iframe src="<?php echo App\Url::make('/star/mailbox/%s/%s/%s.html', $view->meta(PREF_THEME, 'default'), $message->id, $message->flagged == 1 ? 'on' : 'off'); ?>" class="star"></iframe>
         <a href="<?php echo $url; ?>" class="names">
-            <?php echo $message->names; // cleaned already ?>
+        <?php
+        if ($isDrafts): ?>
+            <span class="red">Draft</span>
+        <?php
+        else:
+            echo $message->names; // cleaned already
+        endif; ?>
         </a>
         <a href="<?php echo $url; ?>" class="subject">
         <?php
