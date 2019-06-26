@@ -25,6 +25,11 @@ class Folder extends Model
 
     use ModelTrait;
 
+    const DRAFTS = [
+        '[Gmail]/Drafts',
+        '[Gmail]/Bozze'
+    ];
+
     public function getData()
     {
         return [
@@ -64,6 +69,11 @@ class Folder extends Model
     public function isIgnored()
     {
         return Fn\intEq($this->ignored, 1);
+    }
+
+    public function isDrafts()
+    {
+        return in_array($this->getName(), self::DRAFTS);
     }
 
     public function getById(int $id)

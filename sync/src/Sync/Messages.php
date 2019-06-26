@@ -107,7 +107,14 @@ class Messages
         $i = 1;
         $progress = null;
         $total = count($newIds);
-        $toDownload = array_diff($newIds, $savedIds);
+
+        // Ignore the draft folder, so that we re-download draft content
+        if ($folder->isDrafts()) {
+            $toDownload = $newIds;
+        } else {
+            $toDownload = array_diff($newIds, $savedIds);
+        }
+
         $count = count($toDownload);
         $syncedCount = $total - $count;
         $noun = Fn\plural('message', $total);
