@@ -2,6 +2,8 @@
 
 namespace App;
 
+use DateTime;
+use DateTimeZone;
 use Pb\PDO\Database;
 
 class Model
@@ -10,6 +12,7 @@ class Model
     private static $dsn;
     private static $username;
     private static $password;
+    private static $timezone;
 
     const ASC = 'asc';
     const DESC = 'desc';
@@ -40,11 +43,16 @@ class Model
     /**
      * Store the connection info statically.
      */
-    public static function initDb(string $dsn, string $username, string $password)
-    {
+    public static function initDb(
+        string $dsn,
+        string $username,
+        string $password,
+        string $timezone
+    ) {
         self::$dsn = $dsn;
         self::$username = $username;
         self::$password = $password;
+        self::$timezone = $timezone;
     }
 
     /**
@@ -72,5 +80,31 @@ class Model
         );
 
         return self::$db;
+    }
+
+    /**
+     * Returns a new local DateTime object.
+     *
+     * @return DateTime
+     */
+    public function localDate()
+    {
+        return new DateTime(
+            date(DATE_DATABASE),
+            new DateTimeZone(self::$timezone)
+        );
+    }
+
+    /**
+     * Returns a new UTC-adjusted DateTime object.
+     *
+     * @return DateTime
+     */
+    public function utcDate()
+    {
+        return new DateTime(
+            gmdate(DATE_DATABASE),
+            new DateTimeZone('UTC')
+        );
     }
 }

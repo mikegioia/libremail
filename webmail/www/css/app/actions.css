@@ -41,6 +41,7 @@ section #msg-actions a.button {
   display: none;
   position: fixed;
   top: calc(6.75rem);
+  min-width: 20rem;
 }
 
 .menu.actions.sticky {

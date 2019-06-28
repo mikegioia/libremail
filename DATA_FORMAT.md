@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `folder_id` int(10) unsigned NOT NULL,
   `unique_id` int(10) unsigned DEFAULT NULL,
   `thread_id` int(10) unsigned DEFAULT NULL,
+  `outbox_id` int(10) unsigned DEFAULT NULL,
   `date_str` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `charset` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `subject` varchar(270) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -126,6 +127,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   INDEX (`folder_id`),
   INDEX (`unique_id`),
   INDEX (`thread_id`),
+  INDEX (`outbox_id`),
   INDEX (`account_id`),
   INDEX (`message_id`(16)),
   INDEX (`in_reply_to`(16)),
@@ -143,6 +145,9 @@ CREATE TABLE IF NOT EXISTS `messages` (
 - `thread_id` An identifier common to all messages within a thread. A thread is
    computed using the `message_id`, `references`, and any addresses in the `to`,
    `cc`, `from`, `bcc`, and `reply_to` fields.
+- `outbox_id` Foreign key referencing the message in the `outbox` table.
+   This is usually a draft message in the drafts mailbox and `outbox_id` is the
+   link between the two.
 - `date_str` The date string as stored in the mail header. This can take
    many different formats and sometimes not even be a valid date string. It
    should be stored here regardless. The `date` field is a cleansed version of
@@ -305,7 +310,7 @@ CREATE TABLE IF NOT EXISTS `outbox` (
 
 - `id` Unique integer identifying the outbox message.
 - `account_id` Foreign key referencing the account from the `accounts` table.
-- `account_id` Foreign key referencing the message that this message is replying
+- `parent_id` Foreign key referencing the message that this message is replying
   to. Not used if the message is starting a new thread.
 - `to` Comma separated list of addresses to send the message to.
 - `from` Address used in the from header.

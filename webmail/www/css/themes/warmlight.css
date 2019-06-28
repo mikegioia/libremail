@@ -236,6 +236,7 @@ body.theme-warmlight #topnav-actions .status > div > span {
 }
 
 /* Overwrite #555 */
+body.theme-warmlight .compose .help-text,
 body.theme-warmlight #main > h5 + .help-text,
 body.theme-warmlight .msg-checkbox:checked + .msg-label + .msg-contents .subject {
   color: #614937;

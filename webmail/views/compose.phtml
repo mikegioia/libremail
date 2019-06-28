@@ -36,7 +36,7 @@ $view->render('nav', [
     <?php
     endif; ?>
     <form action="/compose" method="post">
-        <div class="row addresses<?php echo isset($formErrors['to']) ? ' has-error' : ''; ?>">
+        <div class="row input-row addresses<?php echo isset($formErrors['to']) ? ' has-error' : ''; ?>">
             <div class="two columns label">
                 <label class="align-right">To</label>
             </div>
@@ -55,7 +55,7 @@ $view->render('nav', [
             </div>
         </div>
         <input type="radio" id="toggle-cc" />
-        <div class="row addresses <?php echo isset($formErrors['cc']) ? 'has-error' : 'hidden'; ?>">
+        <div class="row input-row addresses <?php echo isset($formErrors['cc']) ? 'has-error' : 'hidden'; ?>">
             <div class="two columns label">
                 <label class="align-right">Cc</label>
             </div>
@@ -70,7 +70,7 @@ $view->render('nav', [
             </div>
         </div>
         <input type="radio" id="toggle-bcc" />
-        <div class="row addresses <?php echo isset($formErrors['bcc']) ? 'has-error' : 'hidden'; ?>">
+        <div class="row input-row addresses <?php echo isset($formErrors['bcc']) ? 'has-error' : 'hidden'; ?>">
             <div class="two columns label">
                 <label class="align-right" for="settings-email">Bcc</label>
             </div>
@@ -103,7 +103,7 @@ $view->render('nav', [
                 </span>
             </div>
         </div>
-        <div class="row subject">
+        <div class="row input-row subject">
             <div class="two columns label">
                 <label class="align-right" for="settings-email">Subject</label>
             </div>
@@ -111,12 +111,14 @@ $view->render('nav', [
                 <input type="text" name="subject" value="<?php echo $formData['subject'] ?? $message->subject; ?>" />
             </div>
         </div>
-        <div class="row message">
+        <div class="row input-row message">
             <div class="two columns label">
                 <label class="align-right" for="settings-email">Message</label>
             </div>
             <div class="ten columns">
                 <textarea name="text_plain"><?php echo $formData['text_plain'] ?? $message->text_plain; ?></textarea>
+                <div class="help-text align-right">
+                    Markdown enabled
             </div>
         </div>
         <div class="buttons">

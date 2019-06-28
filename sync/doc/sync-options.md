@@ -4,12 +4,11 @@ Before you begin, you can run `./sync --help` to see a list of what options you
 have. Below is an explanation of the options you can specify when running this
 script:
 
-* `--interactive | -i`
+* `--actions | -a`
 
-  **Defaults to enabled**. This runs the application interactively, or in a mode
-  designed for the CLI (command line interface). Messages are printed to the
-  screen and you could be prompted to enter data for certain actions (like
-  creating a new account).
+  Run the sync script in actions-only mode. This disables downloading the
+  messages and attachments and instead only syncs the pending actions to the
+  IMAP server.
 
 * `--background | -b`
 
@@ -18,10 +17,19 @@ script:
   a systemd service, managed via a hypervisor, or any other method of
   watchdogging or monitoring a PHP script.
 
+* `--create | -c`
+
+  Run the sync script but only prompt for adding a new IMAP account.
+
 * `--diagnostics | -d`
 
   Runs through the diagnostic tests and reports any errors. Use this to start
   debugging any failures.
+
+* `--daemon | -e`
+
+  Run the sync script in daemon mode. This supresses output to the console
+  and instead writes everything to the log files.
 
 * `--folder <folder> | -f <folder>`
 
@@ -32,19 +40,21 @@ script:
   argument is the full name of the IMAP folder: 'INBOX', or 'Accounts/Support'
   are examples.
 
-* `--create | -c`
+* `--help | -h`
 
-  Run the sync script but only prompt for adding a new IMAP account.
+  Print the help message.
 
-* `--daemon | -e`
+* `--interactive | -i`
 
-  Run the sync script in daemon mode. This supresses output to the console
-  and instead writes everything to the log files.
+  **Defaults to enabled**. This runs the application interactively, or in a mode
+  designed for the CLI (command line interface). Messages are printed to the
+  screen and you could be prompted to enter data for certain actions (like
+  creating a new account).
 
-* `--updatedb | -u`
+* `--quick | -q`
 
-  Updates the database by running the migration scripts in `db/`. These scripts
-  will only run once so you can run this as many times as you'd like.
+  Runs the sync in quick mode. This skips downloading attachments and message
+  conten. It can be useful for testing and debugging large mailboxes.
 
 * `--rollback | -r`
 
@@ -54,20 +64,16 @@ script:
 
 * `--sleep | -s`
 
-  Run the sync script in sleep mode. This keeps the entire sync disabled and will
-  not make any IMAP connections or do anything but respond to signals. It can be
-  helpful for signal testing.
+  Run the sync script in sleep mode. This keeps the entire sync disabled and
+  will not make any IMAP connections or do anything but respond to signals. It
+  can be helpful for signal testing.
 
 * `--threading | -t`
 
   Run the sync script in threading mode. This skips download messages and goes
   straight to performing a threading operation. It can be useful for debugging.
 
-* `--quick | -q`
+* `--updatedb | -u`
 
-  Runs the sync in quick mode. This skips downloading attachments and message
-  conten. It can be useful for testing and debugging large mailboxes.
-
-* `--help | -h`
-
-  Print the help message.
+  Updates the database by running the migration scripts in `db/`. These scripts
+  will only run once so you can run this as many times as you'd like.

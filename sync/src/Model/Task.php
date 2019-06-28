@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use PDO;
+use Exception;
 use App\Model;
 use Belt\Belt;
 use App\Traits\Model as ModelTrait;
@@ -82,9 +83,14 @@ class Task extends Model
      */
     public function fail(
         string $message,
+        Exception $e = null,
         int $status = self::STATUS_ERROR,
         $returnValue = false
     ) {
+        if ($e) {
+            $message .= ' '.$e->getMessage();
+        }
+
         $this->updateStatus($status, $message);
 
         return $returnValue;

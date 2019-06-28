@@ -45,6 +45,7 @@ class Sync
     private $folder;
     private $daemon;
     private $asleep;
+    private $actions;
     private $running;
     private $mailbox;
     private $retries;
@@ -96,6 +97,7 @@ class Sync
             $this->sleep = $di['console']->sleep;
             $this->folder = $di['console']->folder;
             $this->daemon = $di['console']->daemon;
+            $this->actions = $di['console']->actions;
             $this->threading = $di['console']->threading;
             $this->interactive = $di['console']->interactive;
         }
@@ -297,7 +299,9 @@ class Sync
             // Commit any pending actions to the mail server
             $this->syncActions($account);
 
-            if (true === Fn\get($options, self::OPT_ONLY_SYNC_ACTIONS)) {
+            if (true === Fn\get($options, self::OPT_ONLY_SYNC_ACTIONS)
+                || true === $this->actions
+            ) {
                 $this->disconnect();
 
                 return true;

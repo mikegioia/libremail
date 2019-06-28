@@ -247,22 +247,43 @@ class Controller
 
     public function deleteDraft()
     {
-        (new Outbox($this->account))
-            ->getById(intval($_POST['id'] ?? 0))
-            ->delete();
+        $id = intval(Url::postParam('id'));
+        $outboxMessage = (new Outbox($this->account))->getById($id);
 
-        Session::notify('Draft message deleted.', Session::SUCCESS);
+        // First try to delete the draft, then delete the outbox message
+        if ($outboxMessage->exists()) {
+            $draftMessage = (new Message)->getByOutboxId($id);
+
+            if ($draftMessage->exists()) {
+                $draftMessage->delete();
+            }
+        }
+
+        // Throws not found if it doesn't exist
+        try {
+            $outboxMessage->delete();
+            Session::notify('Draft message deleted!', Session::SUCCESS);
+        } catch (NotFoundException $e) {
+            Session::notify('Draft message not found!', Session::ERROR);
+        }
+
         Url::redirect('/outbox');
     }
 
     public function send()
     {
         session_start();
+        $folders = new Folders($this->account, []);
+        $draftId = $folders->getDraftsId();
 
         try {
             $outbox = new Outbox($this->account);
             $outbox->setPostData($_POST);
             $outbox->save();
+
+            // Update the draft if it exists, and optionally create
+            // a new one if this message is a draft
+            (new Message)->createOrUpdateDraft($outbox, $draftId);
 
             if ($outbox->draft) {
                 Session::notify('Draft message saved.', Session::SUCCESS);
@@ -296,10 +317,10 @@ class Controller
     public function search()
     {
         // Load params
-        $page = Url::getParam('p', 1);
         $query = Url::getParam('q', '');
         $sortBy = Url::getParam('s', '');
-        $folderId = Url::getParam('f', 0);
+        $page = (int) Url::getParam('p', 1);
+        $folderId = (int) Url::getParam('f', 0);
         // Set up libraries
         $view = new View;
         $meta = Meta::getAll();
@@ -357,7 +378,7 @@ class Controller
         $messages = new Messages($this->account, $folders);
         $folderId = INBOX === $id || STARRED === $id
             ? $folders->getInboxId()
-            : $id;
+            : intval($id);
         $folder = $folders->getById($folderId);
 
         if (! $folder) {

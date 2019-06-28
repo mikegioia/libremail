@@ -36,7 +36,7 @@ define('MAILBOX', 'mailbox');
 define('BASEDIR', __DIR__.'/..');
 define('DIR', DIRECTORY_SEPARATOR);
 define('VIEWDIR', BASEDIR.'/views');
-define('DATE_DATABASE', 'Y-m-d h:i:s');
+define('DATE_DATABASE', 'Y-m-d H:i:s');
 // Error constants
 define('ERR_NO_TRASH_FOLDER', 1010);
 define('ERR_NO_STARRED_FOLDER', 1011);
@@ -66,7 +66,8 @@ Model::initDb(
         $config['DB_DATABASE'],
         $config['DB_CHARSET']),
     $config['DB_USERNAME'],
-    $config['DB_PASSWORD']
+    $config['DB_PASSWORD'],
+    $config['TIMEZONE']
 );
 
 // Pass the routes into the URL service

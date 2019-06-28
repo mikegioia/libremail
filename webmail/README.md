@@ -14,7 +14,7 @@ I'll soon be using this as my daily driver, which should shore up a lot of bugs.
  - [x] ~Inbox and folder message display~
  - [x] ~Message thread view~
  - [x] ~Archive, mark read/unread, delete, move (label), copy,
-       star/unstar actions for messages and threads.~
+       star/unstar actions for messages and threads~
  - [x] ~Edit account credentials and settings~
  - [x] ~Sync all actions with IMAP/SMTP server~
  - [x] Search and display search results

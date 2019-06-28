@@ -55,6 +55,14 @@
             <span class="normal">Not trash</span>
         </button>
     <?php
+    elseif ($folders->getDraftsId() === $folderId): ?>
+        <button name="action" value="edit" class="icon button control">
+            <span class="normal">Edit draft</span>
+        </button><!--
+        --><button name="action" value="delete" class="icon button control">
+            <span class="normal">Delete draft</span>
+        </button>
+    <?php
     else: ?>
         <button name="action" value="archive" class="icon button control pill pill-left" data-tooltip="Archive">
             <i class="fa fa-archive"></i>
@@ -69,17 +77,29 @@
     endif; ?>
     </div><!--
 <?php
-if (isset($threadView)): ?>
+if (isset($threadView)):
+    if ($folders->getSpamId() === $folderId
+        || $folders->getTrashId() === $folderId
+        || $folders->getDraftsId() === $folderId): ?>
+    --><button name="action" value="mark_unread" class="icon button control pill" data-tooltip="Mark unread" data-wide>
+        <i class="far fa-envelope"></i>
+    </button><!--
+    <?php
+    else: ?>
     --><button name="action" value="mark_unread" class="icon button control pill pill-right" data-tooltip="Mark unread" data-wide>
         <i class="far fa-envelope"></i>
     </button><!--
-<?php
-elseif ($folders->getSpamId() !== $folderId && $folders->getTrashId() !== $folderId): ?>
+    <?php
+    endif;
+elseif ($folders->getSpamId() !== $folderId
+    && $folders->getTrashId() !== $folderId
+    && $folders->getDraftsId() !== $folderId): ?>
     --><button name="action" value="mark_read" class="icon button control">
         <span class="normal">Mark as read</span>
     </button><!--
 <?php
-endif; ?>
+endif;
+if ($folders->getDraftsId() !== $folderId): ?>
     --><a href="#move-messages" class="icon button control pill pill-left" data-tooltip="Move to">
         <i class="far fa-folder"></i>
         <i class="fa fa-plus"></i>
@@ -88,6 +108,8 @@ endif; ?>
         <i class="fa fa-tag"></i>
         <i class="fa fa-plus"></i>
     </a><!--
+<?php
+endif; ?>
     --><div class="dropdown inline-blocked control">
         <a href="#" class="icon button">
             <span class="normal">More</span>

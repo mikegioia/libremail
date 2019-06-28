@@ -1,13 +1,13 @@
 <?php
-if ( $folder->ignored != 1 && ! $folder->is_mailbox ): ?>
-    <li class="<?php echo $folders->getNavClassString( $folder->id, $activeId, $children ); ?>">
+if ((int) $folder->ignored !== 1 && ! $folder->is_mailbox): ?>
+    <li class="<?php echo $folders->getNavClassString($folder->id, $activeId, $children); ?>">
         <input type="checkbox" id="folder-<?php echo $folder->id; ?>-checkbox" class="folder-checkbox" />
-        <a href="<?php echo App\Url::folder( $folder->id ); ?>" class="mailbox">
-            <?php $view->clean( $folder->name ); ?><?php echo $folder->unread_count ? ' ('. $folder->unread_count .')' : ''; ?>
+        <a href="<?php echo App\Url::folder($folder->id); ?>" class="mailbox">
+            <?php $view->clean($folder->name); ?><?php echo $folder->unread_count ? ' ('. $folder->unread_count .')' : ''; ?>
         </a>
         <label for="folder-<?php echo $folder->id; ?>-checkbox" class="folder-label">
         <?php
-        if ( $children ): ?>
+        if ($children): ?>
             <i class="fa fa-caret-right"></i>
             <i class="fa fa-caret-down"></i>
         <?php
@@ -15,16 +15,16 @@ if ( $folder->ignored != 1 && ! $folder->is_mailbox ): ?>
         </label>
         <a class="color" style="background-color: <?php echo $folder->color->bg; ?>"></a>
     <?php
-    if ( $children ): ?>
+    if ($children): ?>
         <ul class="sub">
         <?php
-        foreach ( $children as $child ):
-            $view->render( 'nav/folder', [
+        foreach ($children as $child):
+            $view->render('nav/folder', [
                 'view' => $view,
                 'folders' => $folders,
                 'activeId' => $activeId,
-                'folder' => $child[ 'folder' ],
-                'children' => $child[ 'children' ]
+                'folder' => $child['folder'],
+                'children' => $child['children']
             ]);
         endforeach; ?>
         </ul>

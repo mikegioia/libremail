@@ -22,6 +22,7 @@ class SyncConsole extends Console
     public $create;
     public $folder;
     public $daemon;
+    public $actions;
     public $verbose;
     public $updatedb;
     public $rollback;
@@ -44,6 +45,12 @@ class SyncConsole extends Console
     protected function setupArgs()
     {
         $this->addArguments([
+            'actions' => [
+                'prefix' => 'a',
+                'longPrefix' => 'actions',
+                'description' => 'Runs on the action sync operation, mail sync is disabled',
+                'noValue' => true,
+            ],
             'background' => [
                 'prefix' => 'b',
                 'longPrefix' => 'background',
@@ -139,6 +146,7 @@ class SyncConsole extends Console
         $this->create = $this->cli->arguments->get('create');
         $this->folder = $this->cli->arguments->get('folder');
         $this->daemon = $this->cli->arguments->get('daemon');
+        $this->actions = $this->cli->arguments->get('actions');
         $this->verbose = $this->cli->arguments->get('verbose');
         $this->updatedb = $this->cli->arguments->get('updatedb');
         $this->rollback = $this->cli->arguments->get('rollback');
@@ -147,21 +155,21 @@ class SyncConsole extends Console
         $this->diagnostics = $this->cli->arguments->get('diagnostics');
         $this->interactive = $this->cli->arguments->get('interactive');
 
-        // If background is set, turn off interactive
-        if (true === $this->background) {
-            $this->once = false;
-            $this->interactive = false;
-        }
-
-        // If create or update DB is set turn interactive on
+        // Some flags also enable interactive mode
         if (true === $this->sleep
             || true === $this->create
+            || true === $this->actions
             || true === $this->updatedb
             || true === $this->rollback
             || true === $this->threading
             || true === $this->diagnostics
         ) {
             $this->interactive = true;
+        }
+
+        // If background is set, turn off interactive
+        if (true === $this->background) {
+            $this->interactive = false;
         }
     }
 
@@ -204,13 +212,15 @@ class SyncConsole extends Console
             $this->cli->info('Starting IMAP sync in interactive mode');
         }
 
-        // Send other info messages
+        // Other message notifications
         if (true === $this->threading) {
             $this->cli->info('Message sync skipped, only threading activated');
         } elseif (true === $this->quick) {
             $this->cli->info(
                 'Attachments and message contents will not be downloaded'
             );
+        } elseif (true === $this->actions) {
+            $this->cli->info('Message sync skipped, only syncing actions');
         }
     }
 

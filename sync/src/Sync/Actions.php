@@ -49,6 +49,7 @@ class Actions
         TaskModel::TYPE_UNREAD => 'App\Sync\Actions\Unread'
     ];
 
+    const ERR_UID_MISMATCH = 'Unique IDs are no longer the same';
     const ERR_FAIL_IMAP_SYNC = 'Failed IMAP sync';
     const ERR_NO_IMAP_MESSAGE = 'No message found in IMAP mailbox';
     const ERR_NO_SQL_FOLDER = 'No folder found in SQL';
@@ -90,6 +91,7 @@ class Actions
             $this->processTask($task);
             $this->updateProgress($i + 1);
         }
+        exit;
     }
 
     /**
@@ -180,18 +182,23 @@ class Actions
 
         try {
             $this->mailbox->select($sqlFolder->name);
-            $imapMessage = $this->mailbox->getMessage($sqlMessage->message_no);
+            $msgNo = $this->mailbox->getNumberByUniqueId($sqlMessage->unique_id);
+            $imapMessage = $this->mailbox->getMessage($msgNo);
         } catch (Exception $e) {
             $this->log->warning(
                 "Failed downloading message for task {$task->id}: ".
                 $e->getMessage());
             $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
 
-            return $task->fail(self::ERR_NO_IMAP_MESSAGE);
+            return $task->fail(self::ERR_NO_IMAP_MESSAGE, $e);
         }
 
         // Check if the unique ID is the same; halt if not
         if (! Fn\intEq($imapMessage->uid, $sqlMessage->unique_id)) {
+            print_r($sqlMessage);
+            print_r($imapMessage);
+            exit('uid mismatch!');
+
             return $task->fail(self::ERR_UID_MISMATCH);
         }
 

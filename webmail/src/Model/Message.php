@@ -3,10 +3,16 @@
 namespace App\Model;
 
 use PDO;
+use DateTime;
 use stdClass;
 use Exception;
+use DateTimeZone;
+use App\View;
 use App\Model;
+use App\Model\Outbox;
 use App\Exceptions\NotFoundException;
+use App\Exceptions\DatabaseInsertException;
+use App\Exceptions\DatabaseUpdateException;
 
 class Message extends Model
 {
@@ -34,6 +40,7 @@ class Message extends Model
     public $unique_id;
     public $folder_id;
     public $thread_id;
+    public $outbox_id;
     public $text_html;
     public $account_id;
     public $message_id;
@@ -101,6 +108,7 @@ class Message extends Model
             'unique_id' => $this->unique_id,
             'folder_id' => $this->folder_id,
             'thread_id' => $this->thread_id,
+            'outbox_id' => $this->outbox_id,
             'text_html' => $this->text_html,
             'account_id' => $this->account_id,
             'message_id' => $this->message_id,
@@ -160,7 +168,7 @@ class Message extends Model
         }
 
         return $message
-            ? new static($message)
+            ? new self($message)
             : false;
     }
 
@@ -172,6 +180,18 @@ class Message extends Model
             ->whereIn('id', $ids)
             ->execute()
             ->fetchAll(PDO::FETCH_CLASS, get_class());
+    }
+
+    public function getByOutboxId(int $outboxId)
+    {
+        $message = $this->db()
+            ->select()
+            ->from('messages')
+            ->where('outbox_id', '=', $outboxId)
+            ->execute()
+            ->fetchObject();
+
+        return new self($message ?: null);
     }
 
     /**
@@ -540,7 +560,8 @@ class Message extends Model
             ->select([
                 'id', '`to`', 'cc', '`from`', '`date`',
                 'seen', 'subject', 'flagged', 'thread_id',
-                'text_plain', 'charset', 'message_id'
+                'text_plain', 'charset', 'message_id',
+                'outbox_id'
             ])
             ->from('messages')
             ->where('deleted', '=', 0)
@@ -578,7 +599,8 @@ class Message extends Model
                     'folders' => [],
                     'id' => $row->id,
                     'unseen' => false,
-                    'subject' => $row->subject
+                    'subject' => $row->subject,
+                    'date' => $row->date_recv ?: $row->date
                 ];
             }
 
@@ -655,6 +677,7 @@ class Message extends Model
                 ->where('deleted', '=', 0)
                 ->where('seen', '=', 0)
                 ->whereIn('thread_id', $unseenThreadIds)
+                ->whereNotIn('folder_id', $skipFolderIds)
                 ->groupBy(['folder_id', 'thread_id'])
                 ->execute()
                 ->fetchAll(PDO::FETCH_CLASS);
@@ -818,6 +841,121 @@ class Message extends Model
     }
 
     /**
+     * Creates or modifies a draft message based on an outbox message.
+     * Only creates a new message if the outbox is a draft.
+     *
+     * @param Outbox $outbox
+     * @param int $draftsId Drafts mailbox (folder) ID
+     */
+    public function createOrUpdateDraft(Outbox $outbox, int $draftsId)
+    {
+        // Only create the draft if the outbox message is a draft
+        if (1 !== (int) $outbox->draft) {
+            return;
+        }
+
+        // New message will be returned if not found
+        $message = $this->getByOutboxId($outbox->id);
+        // Set the date to now and stored in UTC
+        $utcDate = $this->utcDate();
+        $localDate = $this->localDate();
+        // Flags
+        $message->seen = 1;
+        $message->deleted = 0;
+        // ID fields
+        $message->unique_id = null;
+        $message->message_no = null;
+        $message->folder_id = $draftsId;
+        $message->outbox_id = $outbox->id;
+        $message->account_id = $outbox->account_id;
+        // String fields
+        $message->from = $outbox->from;
+        $message->subject = $outbox->subject;
+        $message->text_html = $outbox->text_html;
+        $message->text_plain = $outbox->text_plain;
+        $message->to = implode(', ', $outbox->to);
+        $message->cc = implode(', ', $outbox->cc);
+        $message->bcc = implode(', ', $outbox->bcc);
+        // Date fields
+        $message->date = $utcDate->format(DATE_DATABASE);
+        $message->date_str = $localDate->format(DATE_RFC822);
+        $message->date_recv = $utcDate->format(DATE_DATABASE);
+
+        return $this->createOrUpdate($message);
+    }
+
+    public function createOrUpdate(
+        Message $message,
+        bool $removeNulls = true,
+        bool $setThreadId = true
+    ) {
+        $data = $message->getData();
+
+        if (true === $removeNulls) {
+            $data = array_filter($data, function ($var) {
+                return $var !== null;
+            });
+        }
+
+        if ($message->exists()) {
+            $updated = $this->db()
+                ->update($data)
+                ->table('messages')
+                ->where('id', '=', $message->id)
+                ->execute();
+
+            if (! is_numeric($updated)) {
+                throw new DatabaseUpdateException(
+                    "Failed updating draft message {$message->id}"
+                );
+            }
+        } else {
+            $newMessageId = $this->db()
+                ->insert(array_keys($data))
+                ->into('messages')
+                ->values(array_values($data))
+                ->execute();
+
+            if (! $newMessageId) {
+                throw new DatabaseInsertException(
+                    "Failed creating draft message from outbox {$outbox->id}"
+                );
+            }
+
+            $message->id = $newMessageId;
+
+            // Update the thread ID
+            if (true === $setThreadId) {
+                $message->setThreadId($newMessageId);
+            }
+        }
+
+        return $message;
+    }
+
+    /**
+     * Stores the thread ID on a message.
+     *
+     * @param int $threadId
+     *
+     * @return bool
+     */
+    public function setThreadId(int $threadId)
+    {
+        if (! $this->exists()) {
+            return false;
+        }
+
+        $updated = $this->db()
+            ->update(['thread_id' => $threadId])
+            ->table('messages')
+            ->where('id', '=', $this->id)
+            ->execute();
+
+        return is_numeric($updated) ? $updated : false;
+    }
+
+    /**
      * Updates a flag on the message.
      */
     public function setFlag(string $flag, bool $state, int $id = null)
@@ -878,14 +1016,37 @@ class Message extends Model
             ->execute();
 
         if (! $newMessageId) {
-            throw new Exception(
+            throw new DatabaseInsertException(
                 "Failed copying message {$this->id} to Folder #{$folderId}"
             );
         }
 
         $data['id'] = $newMessageId;
 
-        return new static($data);
+        return new self($data);
+    }
+
+    public function exists()
+    {
+        return is_numeric($this->id) && $this->id;
+    }
+
+    /**
+     * @throws NotFoundException
+     */
+    public function delete()
+    {
+        if (! $this->exists()) {
+            throw new NotFoundException;
+        }
+
+        $deleted = $this->db()
+            ->delete()
+            ->table('outbox')
+            ->where('id', '=', $this->id)
+            ->execute();
+
+        return is_numeric($deleted) ? $deleted : false;
     }
 
     /**

@@ -62,7 +62,7 @@ class Folders
     // Color constants
     const COLOR_GREY = [
         'name' => 'light-grey',
-        'bg' => '#bcbdc1',
+        'bg' => '#cdcfd4',
         'fg' => '#303138'
     ];
 

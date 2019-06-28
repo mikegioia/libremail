@@ -16,7 +16,7 @@ section.compose {
 
 .compose .row:not(.message) {
   border-bottom: 1px solid #eee;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .compose input[type="radio"] {
@@ -27,13 +27,9 @@ section.compose {
   display: block !important;
 }
 
-.compose .two.columns label {
-  margin: 0.25rem 0 0
-}
-
 .compose .ten.columns {
   margin-left: 2rem;
-  padding-bottom: 1rem;
+  padding-bottom: 0.75rem;
 }
 
 .compose .ten.columns textarea,
@@ -41,12 +37,20 @@ section.compose {
   font-size: 1.5rem;
   margin-bottom: 0;
   max-width: 50rem;
-  padding: 0.5rem 0.75rem;
+  padding: 1rem 0.75rem;
   width: 100%;
+}
+
+.compose .ten.columns input[type="text"] {
+  height: 3.25rem;
 }
 
 .compose .row.hidden {
   display: none;
+}
+
+.compose .row.input-row .label {
+  padding-top: 0.25rem;
 }
 
 .compose .addresses .ten.columns {
@@ -129,6 +133,13 @@ blank address input between two valid inputs.
   line-height: 2.125rem;
   min-height: 15rem;
   resize: vertical;
+}
+
+.compose .help-text {
+  color: #555;
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+  max-width: 50rem;
 }
 
 .compose .offset-by-two.ten.columns {

@@ -179,7 +179,7 @@ class Outbox extends Model
     {
         return is_numeric($this->id)
             && $this->id
-            && 1 != $this->deleted;
+            && 1 !== (int) $this->deleted;
     }
 
     /**

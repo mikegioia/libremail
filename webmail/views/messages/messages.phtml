@@ -1,8 +1,11 @@
 <?php
 
 foreach ($messages as $message):
-    // URL goes to the first un-read message in the thread
-    $url = App\Url::make('/thread/%s/%s', $folderId, $message->thread_id);
+    if ($isDrafts && $message->outbox_id): // For drafts the URL goes to the edit page
+        $url = App\Url::make('/compose/%s', $message->outbox_id);
+    else: // URL goes to the first un-read message in the thread
+        $url = App\Url::make('/thread/%s/%s', $folderId, $message->thread_id);
+    endif;
     // Figure out if the message should be selected
     $selected = $select === App\Actions::SELECT_ALL
         || ($select === App\Actions::SELECT_READ && (int) $message->seen === 1)

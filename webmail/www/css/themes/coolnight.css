@@ -78,6 +78,11 @@ body.theme-coolnight .msg-contents .date {
   color: #ccc;
 }
 
+/* Navigation */
+body.theme-coolnight nav li.active a {
+  color: #36cfff;
+}
+
 /* Message lists */
 body.theme-coolnight .msg-contents {
   background-color: #3b3b3b;
@@ -137,7 +142,7 @@ body.theme-coolnight .msg-contents .names span.red {
 }
 
 body.theme-coolnight .msg-contents .subject {
-  color: #8b8b8b8;
+  color: #8b8b8b;
 }
 
 /* Threads */
@@ -388,6 +393,7 @@ body.theme-coolnight #topnav-actions .status > div > span {
 }
 
 /* Overwrite #555 */
+body.theme-coolnight .compose .help-text,
 body.theme-coolnight #main > h5 + .help-text {
   color: #9b9b9b;
 }
