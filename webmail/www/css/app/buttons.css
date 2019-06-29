@@ -70,16 +70,16 @@ input[type="button"].button-primary:focus {
 }
 
 .button.button-secondary {
-  background-color: #1eaedb;
-  border-color: #1eaedb;
+  background-color: #0378eb; /* #1eaedb; */
+  border-color: #0378eb; /* #1eaedb; */
   font-weight: 400;
   letter-spacing: 0;
 }
 
 .button.button-secondary:hover,
 .button.button-secondary:focus {
-  background-color: #0fa0ce;
-  border-color: #0fa0ce;
+  background-color: #0365c5; /* #0fa0ce; */
+  border-color: #0365c5; /* #0fa0ce; */
 }
 
 .button.button-danger {

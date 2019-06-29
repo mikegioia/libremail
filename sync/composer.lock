@@ -535,16 +535,16 @@
         },
         {
             "name": "particlebits/imap",
-            "version": "2.0.6",
+            "version": "2.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "8304892b73708a44ed629b3c9667890b1fe861c9"
+                "reference": "f104fbf54dd0466348daff61e706add1cc3c89f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/8304892b73708a44ed629b3c9667890b1fe861c9",
-                "reference": "8304892b73708a44ed629b3c9667890b1fe861c9",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/f104fbf54dd0466348daff61e706add1cc3c89f4",
+                "reference": "f104fbf54dd0466348daff61e706add1cc3c89f4",
                 "shasum": ""
             },
             "require": {
@@ -578,7 +578,7 @@
                 "mail",
                 "php"
             ],
-            "time": "2019-06-26T20:46:36+00:00"
+            "time": "2019-06-28T23:36:38+00:00"
         },
         {
             "name": "particlebits/pdo",

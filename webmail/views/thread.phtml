@@ -16,6 +16,7 @@ $view->render('nav', [
             <?php
             $view->render('nav/actions-menu', [
                 'sticky' => true,
+                'thread' => $thread,
                 'threadView' => true,
                 'folders' => $folders,
                 'folderId' => $folderId
@@ -24,6 +25,12 @@ $view->render('nav', [
 
         <section id="msg-list">
             <?php
+            if ($folders->getDraftsId() === $folderId && ! $thread->isOutboxMessage()):
+                $view->render('threads/draft-alert', [
+                    'thread' => $thread
+                ]);
+            endif;
+
             $view->render('threads/message-list', [
                 'i' => 0,
                 'view' => $view,

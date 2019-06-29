@@ -55,14 +55,21 @@
             <span class="normal">Not trash</span>
         </button>
     <?php
-    elseif ($folders->getDraftsId() === $folderId): ?>
+    elseif ($folders->getDraftsId() === $folderId):
+        if (isset($thread) && $thread->isOutboxMessage()): ?>
         <button name="action" value="edit" class="icon button control">
             <span class="normal">Edit draft</span>
         </button><!--
         --><button name="action" value="delete" class="icon button control">
             <span class="normal">Delete draft</span>
         </button>
-    <?php
+        <?php
+        else: ?>
+        <button name="action" value="delete" class="icon button control">
+            <span class="normal">Delete draft</span>
+        </button>
+        <?php
+        endif;
     else: ?>
         <button name="action" value="archive" class="icon button control pill pill-left" data-tooltip="Archive">
             <i class="fa fa-archive"></i>
@@ -78,15 +85,10 @@
     </div><!--
 <?php
 if (isset($threadView)):
-    if ($folders->getSpamId() === $folderId
-        || $folders->getTrashId() === $folderId
-        || $folders->getDraftsId() === $folderId): ?>
+    if ($folders->getSpamId() !== $folderId
+        && $folders->getTrashId() !== $folderId
+        && $folders->getDraftsId() !== $folderId): ?>
     --><button name="action" value="mark_unread" class="icon button control pill" data-tooltip="Mark unread" data-wide>
-        <i class="far fa-envelope"></i>
-    </button><!--
-    <?php
-    else: ?>
-    --><button name="action" value="mark_unread" class="icon button control pill pill-right" data-tooltip="Mark unread" data-wide>
         <i class="far fa-envelope"></i>
     </button><!--
     <?php
@@ -117,7 +119,9 @@ endif; ?>
         </a>
         <ul class="more-actions">
         <?php
-        if ($folders->getSpamId() === $folderId || $folders->getTrashId() === $folderId): ?>
+        if ($folders->getSpamId() === $folderId
+            || $folders->getTrashId() === $folderId
+            || $folders->getDraftsId() === $folderId): ?>
             <li>
                 <input type="submit" name="action" value="Mark as read" />
             </li>

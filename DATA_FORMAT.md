@@ -139,53 +139,53 @@ CREATE TABLE IF NOT EXISTS `messages` (
 - `account_id` Foreign key referencing the account from the `accounts` table.
 - `folder_id` Foreign key referencing the folder from the `folders` table.
 - `unique_id` Unique IMAP mail ID as given from the mail server. The unique ID
-   differs from the `message_no` in that it is an unchanging ID issued from the
-   mail server. This unique ID (or uid) is used in determining which messages
-   are new or marked for deletion in the syncing process.
+  differs from the `message_no` in that it is an unchanging ID issued from the
+  mail server. This unique ID (or uid) is used in determining which messages
+  are new or marked for deletion in the syncing process.
 - `thread_id` An identifier common to all messages within a thread. A thread is
-   computed using the `message_id`, `references`, and any addresses in the `to`,
-   `cc`, `from`, `bcc`, and `reply_to` fields.
+  computed using the `message_id`, `references`, and any addresses in the `to`,
+  `cc`, `from`, `bcc`, and `reply_to` fields.
 - `outbox_id` Foreign key referencing the message in the `outbox` table.
-   This is usually a draft message in the drafts mailbox and `outbox_id` is the
-   link between the two.
+  This is usually a draft message in the drafts mailbox and `outbox_id` is the
+  link between the two.
 - `date_str` The date string as stored in the mail header. This can take
-   many different formats and sometimes not even be a valid date string. It
-   should be stored here regardless. The `date` field is a cleansed version of
-   this (see below).
+  many different formats and sometimes not even be a valid date string. It
+  should be stored here regardless. The `date` field is a cleansed version of
+  this (see below).
 - `charset` The character set as stored in the mail header. This is to be
-   used when decoding the plain text if the plain text part is encoded in a
-   non UTF-8 format.
+  used when decoding the plain text if the plain text part is encoded in a
+  non UTF-8 format.
 - `subject` The subject of the message.
 - `message_id` The message ID as stored in the mail header. This usually
-   takes a form of `<591d...4140a@example.org>` and is returned from the
-   mail server.
+  takes a form of `<591d...4140a@example.org>` and is returned from the
+  mail server.
 - `in_reply_to` Optional string containing the `message_id` of the message that
-   this email is replying to. This value comes from the mail header.
+  this email is replying to. This value comes from the mail header.
 - `recv_str` Date the message was received by the account's mail server.
 - `size` Integer denoting the size in bytes of the message.
 - `message_no` The positional message number returned from the mail server.
-   **This value can change** if messages are moved within a folder and is only
-   used when fetching a message or other information from the IMAP server.
+  **This value can change** if messages are moved within a folder and is only
+  used when fetching a message or other information from the IMAP server.
 - `to` String containing the entire `To` mail header value. This is usually of
-   the form "Full name <fullname@example.org>".
+  the form "Full name <fullname@example.org>".
 - `from` String containing the entire `From` mail header value.
 - `cc` String containing the entire `Cc` mail header value.
 - `bcc` String containing the entire `Bcc` mail header value.
 - `reply_to` String containing the entire `Reply-To` or `Return-Path` mail
-   header value.
+  header value.
 - `text_plain` The full string text of the `text/plain` part of the message.
-   This can sometimes contain concatenated plain text mail parts.
+  This can sometimes contain concatenated plain text mail parts.
 - `text_html` The full string text of the `text/html` part of the message.
 - `references` Optional string containing the entire `References` mail header.
-   References are any other `message_id`s that may be included in any way
-   within the message.
+  References are any other `message_id`s that may be included in any way
+  within the message.
 - `attachments` **@TODO JSON encode this field or move to another table**
-   Serialized array of the attachment information. This is an array of objects
-   containing the name, filename, path on disk, mime-type, and the original
-   file name and name fields (which may be empty).
+  Serialized array of the attachment information. This is an array of objects
+  containing the name, filename, path on disk, mime-type, and the original
+  file name and name fields (which may be empty).
 - `raw_headers` Raw message headers as stored on the mail server.
 - `raw_content` Raw message content as stored on the mail server. This includes
-   all mail parts as one contiguous string.
+  all mail parts as one contiguous string.
 - `seen` Boolean value, 1 if the `\Seen` flag exists on the message.
 - `draft` Boolean value, 1 if the `\Draft` flag exists on the message.
 - `recent` Boolean value, 1 if the `\Recent` flag exists on the message.
@@ -193,15 +193,15 @@ CREATE TABLE IF NOT EXISTS `messages` (
 - `deleted` Boolean value denoting if the message was deleted on the server.
 - `answered` Boolean value, 1 if the `\Answered` flag exists on the message.
 - `synced` Boolean value denoting if the message has been synced with the IMAP
-   server. This is a placeholder for now but if the syncing process was multi-
-   stage and only the headers were saved in this table, then this value would
-   remain 0 until the text, html, attachments, and other mail parts were synced.
+  server. This is a placeholder for now but if the syncing process was multi-
+  stage and only the headers were saved in this table, then this value would
+  remain 0 until the text, html, attachments, and other mail parts were synced.
 - `purge` Boolean value for internal use, 1 if the message should be deleted from
-   the database on the next sync cleanup operation.
+  the database on the next sync cleanup operation.
 - `date` Date-time field representing the processed `date_str` from the message.
-   This field is in the format `YYYY-MM-DD HH-MM-SS`.
+  This field is in the format `YYYY-MM-DD HH-MM-SS`.
 - `date_rcv` Date-time fields represending the processed `recv_str` from the
-   message.
+  message.
 - `created_at` Timestamp denoting when the message was added to the database.
 
 ## Tasks
@@ -216,6 +216,7 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `status` tinyint(1) unsigned NOT NULL,
   `old_value` tinyint(1) unsigned DEFAULT NULL,
   `folder_id` int(10) unsigned DEFAULT NULL,
+  `outbox_id` int(10) unsigned DEFAULT NULL,
   `retries` tinyint(1) unsigned DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `reason` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -234,8 +235,9 @@ CREATE TABLE IF NOT EXISTS `tasks` (
 - `type` String denoting the type of task it is.
 - `status` The current state of the task. 0 new, 1 done, 2 error, 3 reverted.
 - `old_value` The previous value before the task is performed. Used for rolling
-   back any changes.
+  back any changes.
 - `folder_id` Optional reference to a folder if the task applies to one.
+- `outbox_id` Optional reference to an outbox message if the task applies to one.
 - `retries` Optional number of retry attempts made.
 - `created_at` Timestamp denoting when the task was added to the database.
 - `reason` Optional description explaining the status.
@@ -323,11 +325,11 @@ CREATE TABLE IF NOT EXISTS `outbox` (
 - `draft` Flag denoting if the message is a draft.
 - `sent` Flag denoting if this message has been sent. No further action neeeded
   if it has been.
-- `locked` Flag denoting if the message is locked. This is used so that two actions
-  aren't performed on the same outbox message at once.
+- `locked` Flag denoting if the message is locked. This is used so that two
+  actions aren't performed on the same outbox message at once.
 - `attempts` Integer counting the number of send attempts for this message.
 - `send_after` Optional timestamp to delay the sending of a message.
 - `created_at` Timestamp denoting when the message was added to the database.
 - `updated_at` Timestamp denoting when the message was last updated.
-- `update_history` String log of all actions performed on this message. Each action
-  is separated by a new line.
+- `update_history` String log of all actions performed on this message. Each
+  action is separated by a new line.

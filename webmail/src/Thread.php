@@ -145,6 +145,17 @@ class Thread
         return in_array($id, $this->unreadIds);
     }
 
+    public function isOutboxMessage()
+    {
+        foreach ($this->messages as $message) {
+            if ($message->outbox_id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Adds additional fields to each message.
      */

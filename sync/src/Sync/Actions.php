@@ -173,10 +173,10 @@ class Actions
             return $task->fail(self::ERR_NO_SQL_FOLDER);
         }
 
-        // Skip messages without a message number. These were added during
-        // a copy command and do not have a corresponding server message.
+        // Skip messages without a unique ID. These were added during a
+        // copy command (etc) and do not have a corresponding server message.
         // They'll be purged after the message is copied to the mailbox.
-        if (! $sqlMessage->message_no) {
+        if (! $sqlMessage->unique_id) {
             return $task->ignore();
         }
 

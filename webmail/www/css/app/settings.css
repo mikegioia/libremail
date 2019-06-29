@@ -89,15 +89,15 @@
 }
 
 .settings .theme .theme-body .theme-button {
-  background-color: #1eaedb;
-  background-image: linear-gradient(90deg, #ab51c4 50%, #1eaedb 50%);
+  background-color: #0378eb;
+  background-image: linear-gradient(90deg, #ab51c4 50%, #0378eb 50%);
   border-radius: 0.125rem;
   height: 1.75rem;
   width: 2rem;
 }
 
 .settings .theme .theme-body .theme-links {
-  color: #1eaedb;
+  color: #0378eb;
   text-decoration: underline;
 }
 

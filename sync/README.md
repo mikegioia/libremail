@@ -47,7 +47,7 @@ in version 7.2. See below for info about PHP 5.6.
 Version 1.0.0 of this application supports PHP 5.6, with compatibility for all
 of the composer dependencies at that snapshot.
 
-If you like to use that, run the following command:
+If you'd like to use that, run the following command:
 
 ```
 $> git checkout 1.0.0
