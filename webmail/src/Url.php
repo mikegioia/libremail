@@ -4,7 +4,15 @@ namespace App;
 
 class Url
 {
+    /**
+     * @var string Base url stem
+     */
     private static $base;
+
+    /**
+     * @var string URL to redirect to
+     */
+    private static $redirectUrl;
 
     public static function setBase(string $base)
     {
@@ -46,6 +54,16 @@ class Url
             : self::make('/folder/%s', $folderId);
     }
 
+    public static function compose()
+    {
+        return self::make('/compose');
+    }
+
+    public static function edit(int $outboxId)
+    {
+        return self::make('/compose/%s', $outboxId);
+    }
+
     public static function thread(int $folderId, int $threadId)
     {
         return self::make('/thread/%s/%s', $folderId, $threadId);
@@ -78,25 +96,33 @@ class Url
         return $_GET[$key] ?? $default;
     }
 
-    /**
-     * @param string|null $urlId If set, needs to be a constant
-     * @param int|string $page Additional URL argument
-     */
-    public static function actionRedirect($urlId, int $folderId, $page, string $action)
+    public static function getRedirectUrl()
     {
-        if (INBOX === $urlId) {
+        return self::$redirectUrl;
+    }
+
+    public static function setRedirectUrl(string $url)
+    {
+        self::$redirectUrl = $url;
+    }
+
+    /**
+     * @param string $urlId If set, needs to be a constant
+     * @param int $folderId Container folder of the message
+     * @param int $page Additional URL argument
+     * @param string $action Action (constant) performed on the message
+     */
+    public static function actionRedirect(string $urlId, int $folderId, int $page, string $action)
+    {
+        if (self::getRedirectUrl()) {
+            self::redirectRaw(self::getRedirectUrl());
+        } elseif (INBOX === $urlId) {
             self::redirect('/');
-        }
-
-        if (STARRED === $urlId) {
+        } elseif (STARRED === $urlId) {
             self::redirectRaw(self::starred($page ?: 1));
-        }
-
-        if (SEARCH === $urlId) {
+        } elseif (SEARCH === $urlId) {
             self::redirectRaw(self::getBackUrl('/search'));
-        }
-
-        if (THREAD === $urlId) {
+        } elseif (THREAD === $urlId) {
             if (Actions::MARK_UNREAD_FROM_HERE !== $action
                 && Actions::MARK_UNREAD !== $action
                 && Actions::DELETE !== $action
@@ -107,9 +133,9 @@ class Url
             } else {
                 self::redirectRaw(self::folder($folderId));
             }
+        } else {
+            self::redirectRaw(self::folder($folderId, $page));
         }
-
-        self::redirectRaw(self::folder($folderId, $page));
     }
 
     public static function getCurrentUrl()

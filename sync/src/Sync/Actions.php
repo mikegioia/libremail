@@ -91,7 +91,6 @@ class Actions
             $this->processTask($task);
             $this->updateProgress($i + 1);
         }
-        exit;
     }
 
     /**

@@ -216,10 +216,18 @@ input[type="checkbox"].thread-msg-more-checkbox {
 }
 
 .thread-msg .message {
-  line-height: 1.4;
+  font-family: 'Nanum Gothic Coding', monospace;
+  line-height: 0.75;
   max-width: 60rem;
   padding: 0 1rem 0 4rem;
+  white-space: pre;
   word-wrap: break-word;
+}
+
+.thread-msg.text-html .message {
+  font-family: inherit;
+  line-height: 1.4;
+  white-space: normal;
 }
 
 .thread-msg .actions {

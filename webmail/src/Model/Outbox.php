@@ -2,10 +2,13 @@
 
 namespace App\Model;
 
+use Parsedown;
 use App\Model;
 use Zend\Mail\Address;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ValidationException;
+use App\Exceptions\DatabaseInsertException;
+use App\Exceptions\DatabaseUpdateException;
 use Zend\Mail\Exception\InvalidArgumentException;
 
 class Outbox extends Model
@@ -40,17 +43,19 @@ class Outbox extends Model
      * Designed to take in POST data and save defaults.
      */
     public function __construct(
-        Account $account,
+        Account $account = null,
         Message $message = null,
         array $data = null
     ) {
         $this->parent = $message;
-        $this->account = $account;
 
-        $this->account_id = $this->account->id;
-        $this->from = $account->name
-            ? sprintf('%s <%s>', $account->name, $account->email)
-            : $account->email;
+        if ($account) {
+            $this->account = $account;
+            $this->account_id = $this->account->id;
+            $this->from = $account->name
+                ? sprintf('%s <%s>', $account->name, $account->email)
+                : $account->email;
+        }
 
         // If a message came in, set the message as the parent
         if ($this->parent) {
@@ -71,6 +76,7 @@ class Outbox extends Model
         $this->id = $data['id'] ?? 0;
         $this->subject = $data['subject'] ?? '';
         $this->text_plain = $data['text_plain'] ?? '';
+        $this->text_html = $this->getHtml();
         $this->to = $this->parseAddresses($data['to'] ?? []);
         $this->cc = $this->parseAddresses($data['cc'] ?? []);
         $this->bcc = $this->parseAddresses($data['bcc'] ?? []);
@@ -82,6 +88,25 @@ class Outbox extends Model
         if (isset($data['send_outbox'])) {
             $this->draft = 0;
         }
+
+        return $this;
+    }
+
+    /**
+     * Copies data from a message into this outbox message.
+     */
+    public function copyMessageData(Message $message, bool $isDraft = true)
+    {
+        $this->from = $message->from;
+        $this->draft = $isDraft ? 1 : 0;
+        $this->subject = $message->subject;
+        $this->text_plain = $message->text_plain;
+        $this->text_html = $this->getHtml();
+        $this->to = $this->parseAddresses($message->to);
+        $this->cc = $this->parseAddresses($message->cc);
+        $this->bcc = $this->parseAddresses($message->bcc);
+
+        return $this;
     }
 
     public function getById(int $id)
@@ -99,6 +124,9 @@ class Outbox extends Model
 
     /**
      * Store a new mesage in the outbox.
+     *
+     * @throws DatabaseInsertException
+     * @throws DatabaseUpdateException
      */
     public function save()
     {
@@ -111,6 +139,7 @@ class Outbox extends Model
             'draft' => $this->draft ? 1 : 0,
             'parent_id' => $this->parent_id,
             'account_id' => $this->account_id,
+            'text_html' => $this->text_html,
             'text_plain' => $this->text_plain,
             'to' => $this->addressString($this->to),
             'cc' => $this->addressString($this->cc),
@@ -119,11 +148,17 @@ class Outbox extends Model
         ];
 
         if ($this->id) {
-            $this->db()
+            $updated = $this->db()
                 ->update($data)
                 ->table('outbox')
                 ->where('id', '=', $this->id)
                 ->execute();
+
+            if (! is_numeric($updated)) {
+                throw new DatabaseUpdateException(
+                    "Failed updating outbox message {$this->id}"
+                );
+            }
         } elseif (! $this->isEmpty()) {
             $newOutboxId = $this->db()
                 ->insert(array_keys($data))
@@ -132,7 +167,9 @@ class Outbox extends Model
                 ->execute();
 
             if (! $newOutboxId) {
-                throw new Exception('Failed adding message to Outbox');
+                throw new DatabaseInsertException(
+                    'Failed adding message to outbox'
+                );
             }
 
             $this->id = $newOutboxId;
@@ -178,14 +215,24 @@ class Outbox extends Model
     public function exists()
     {
         return is_numeric($this->id)
-            && $this->id
+            && (int) $this->id !== 0
             && 1 !== (int) $this->deleted;
+    }
+
+    /**
+     * Returns text_plain markdown converted to HTML.
+     *
+     * @return string
+     */
+    public function getHtml()
+    {
+        return (new Parsedown())->text($this->text_plain);
     }
 
     /**
      * @throws NotFoundException
      */
-    public function delete()
+    public function softDelete()
     {
         if (! $this->exists()) {
             throw new NotFoundException;

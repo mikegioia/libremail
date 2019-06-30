@@ -83,6 +83,13 @@ body.theme-warmlight .thread-msg label.thread-msg-header .from span {
   color: #846b58;
 }
 
+/* Preview */
+body.theme-warmlight .compose .outbox-preview {
+  background: #fffdfb;
+  box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.1);
+  padding-top: 1rem;
+}
+
 /* Buttons and dropdowns */
 body.theme-warmlight .dropdown ul,
 body.theme-warmlight .button:not(.button-primary):not(.button-secondary):not(.button-danger),
@@ -130,6 +137,11 @@ body.theme-warmlight .dropdown li input[type="submit"] {
 body.theme-warmlight nav #mailboxes-divider,
 body.theme-warmlight .compose .row:not(.message) {
   border-color: #e8d3c2;
+}
+
+/* Lightest border */
+body.theme-warmlight .outbox-preview blockquote {
+  border-color: #f9e8db;
 }
 
 /* Dropdown item hover */
@@ -225,7 +237,8 @@ body.theme-warmlight .settings .row .note {
 
 /* Overwrite #777 */
 body.theme-warmlight section #msg-list footer,
-body.theme-warmlight .settings .row input[readonly] {
+body.theme-warmlight .settings .row input[readonly],
+body.theme-warmlight .outbox-preview blockquote {
   color: #a08672;
 }
 

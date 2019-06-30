@@ -16,6 +16,7 @@ class Folders
     private $folders;
     private $inboxId;
     private $trashId;
+    private $account;
     private $draftsId;
     private $starredId;
     private $accountId;
@@ -69,6 +70,7 @@ class Folders
     public function __construct(Account $account, array $colors)
     {
         $this->colors = $colors;
+        $this->account = $account;
         $this->accountId = $account->id;
         $this->colorCount = count($colors);
     }
@@ -117,6 +119,11 @@ class Folders
         $this->loadFolders();
 
         return (int) $this->{$mailbox};
+    }
+
+    public function getAccount()
+    {
+        return $this->account;
     }
 
     /**

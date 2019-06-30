@@ -16,6 +16,7 @@ class Task extends Model
     public $reason;
     public $retries;
     public $folder_id;
+    public $outbox_id;
     public $old_value;
     public $account_id;
     public $message_id;
@@ -35,6 +36,7 @@ class Task extends Model
     const TYPE_COPY = 'copy';
     const TYPE_READ = 'read';
     const TYPE_FLAG = 'flag';
+    const TYPE_CREATE = 'create';
     const TYPE_DELETE = 'delete';
     const TYPE_UNFLAG = 'unflag';
     const TYPE_UNREAD = 'unread';
@@ -50,12 +52,14 @@ class Task extends Model
         int $accountId,
         string $type,
         string $oldValue = null,
-        int $folderId = null
+        int $folderId = null,
+        int $outboxId = null
     ) {
         $data = [
             'type' => $type,
             'old_value' => $oldValue,
             'folder_id' => $folderId,
+            'outbox_id' => $outboxId,
             'message_id' => $messageId,
             'account_id' => $accountId,
             'status' => self::STATUS_NEW,

@@ -5,7 +5,7 @@ you want to check it out :D
 
 I'll soon be using this as my daily driver, which should shore up a lot of bugs.
 
-#### Web Client Admin Interface
+#### Web Client Interface
 
 ![Webmail Client Screenshot](http://mikegioia.github.io/libremail/images/webmail_screenshot.png)
 
@@ -30,3 +30,38 @@ I'll soon be using this as my daily driver, which should shore up a lot of bugs.
    free to change any other settings, like the app's URL, too.
 
 This application is set to run over localhost on port 9899 by default.
+
+#### Software Licenses
+
+The Web Client includes the following 3rd party packages:
+
+1. Fonts
+    1. [Open Sans Web Font](https://en.wikipedia.org/wiki/Open_Sans),
+       _Steve Matteson_
+        * [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+    2. [Font Awesome 5 Free Web Font](https://fontawesome.com), _Fort Awesome_
+        * SVG Icons — [CC BY 4.0 License](https://creativecommons.org/licenses/by/4.0/)
+        * Web and Desktop Fonts — [SIL OFL 1.1 License](https://scripts.sil.org/OFL)
+    3. [Nanum Gothic Coding Font](https://en.wikipedia.org/wiki/Nanum_font),
+       _Sandoll Communication_
+        * [SIL OFL 1.1 License](https://scripts.sil.org/OFL)
+2. CSS
+    1. [Skeleton CSS Boilerplate](https://github.com/dhg/Skeleton),
+       _Dave Gamache_
+        * [MIT License](https://opensource.org/licenses/MIT)
+3. PHP
+    1. [Linkify](https://github.com/misd-service-development/php-linkify),
+       _MISD Service Development, University of Cambridge_
+        * [MIT License](https://opensource.org/licenses/MIT)
+    2. [HTML Purifier](http://htmlpurifier.org), _Edward Z. Yang_
+        * [MIT License](https://opensource.org/licenses/MIT)
+    3. [PDO](https://github.com/ParticleBits/pdo), _Mike Gioia, ParticleBits_
+        * [MIT License](https://opensource.org/licenses/MIT)
+    4. [Zend Mail](https://github.com/zendframework/zend-mail),
+       _Zend Technologies USA, Inc._
+        * [BSD 3-Clause](https://opensource.org/licenses/BSD-3-Clause)
+    5. [Zend Escaper](https://github.com/zendframework/zend-escaper),
+       _Zend Technologies USA, Inc._
+        * [BSD 3-Clause](https://opensource.org/licenses/BSD-3-Clause)
+    6. [Parsedown](https://parsedown.org), _Emanuil Rusev_
+        * [MIT License](https://opensource.org/licenses/MIT)

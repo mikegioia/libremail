@@ -704,6 +704,28 @@ class Message extends Model
     }
 
     /**
+     * @throws DatabaseUpdateException
+     */
+    public function softDelete(bool $purge = false)
+    {
+        $this->requireInt($this->id, 'Message ID');
+
+        $updates = ['deleted' => 1];
+
+        if (true === $purge) {
+            $updates['purge'] = 1;
+        }
+
+        $updated = $this->db()
+            ->update($updates)
+            ->table('messages')
+            ->where('id', '=', $this->id)
+            ->execute();
+
+        $this->errorHandle($updated);
+    }
+
+    /**
      * Removes messages from a folder/account that are marked
      * for purge (removal).
      *
@@ -753,6 +775,27 @@ class Message extends Model
             ->execute();
 
         return is_numeric($deleted); // To catch 0s
+    }
+
+    /**
+     * Soft removes a message created by this application (usually
+     * a draft) and any outbox message if there is one attached.
+     *
+     * @throws ValidationException
+     * @throws DatabaseUpdateException
+     *
+     * @return bool
+     */
+    public function deleteCreatedMessage()
+    {
+        $this->requireInt($this->id, 'Message ID');
+
+        if ($this->outbox_id) {
+            return (new Outbox($this->outbox_id))->softDelete()
+                && $this->softDelete(true);
+        }
+
+        return $this->softDelete(true);
     }
 
     /**

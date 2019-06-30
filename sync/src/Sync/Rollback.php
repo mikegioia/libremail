@@ -89,6 +89,13 @@ class Rollback
                 return (new MessageModel($task->message_id))
                     ->loadById()
                     ->deleteCopiesFrom($task->folder_id);
+
+            case TaskModel::TYPE_CREATE:
+                // Mark the message and any corresponding outbox
+                // message as deleted
+                return (new MessageModel($task->message_id))
+                    ->loadById()
+                    ->deleteCreatedMessage();
         }
     }
 }

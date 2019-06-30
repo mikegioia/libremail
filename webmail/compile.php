@@ -8,6 +8,7 @@ $css = [
     // Vendor files
     'font-awesome.css',
     'open-sans.css',
+    'nanum-gothic.css',
     'normalize.css',
     'skeleton.css',
     // App files

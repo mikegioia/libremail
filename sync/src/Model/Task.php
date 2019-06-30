@@ -18,6 +18,7 @@ class Task extends Model
     public $retries;
     public $old_value;
     public $folder_id;
+    public $outbox_id;
     public $account_id;
     public $message_id;
     public $created_at;
@@ -31,6 +32,7 @@ class Task extends Model
     const TYPE_COPY = 'copy';
     const TYPE_READ = 'read';
     const TYPE_FLAG = 'flag';
+    const TYPE_CREATE = 'create';
     const TYPE_DELETE = 'delete';
     const TYPE_UNFLAG = 'unflag';
     const TYPE_UNREAD = 'unread';
@@ -50,6 +52,7 @@ class Task extends Model
             'retries' => $this->retries,
             'old_value' => $this->old_value,
             'folder_id' => $this->folder_id,
+            'outbox_id' => $this->outbox_id,
             'account_id' => $this->account_id,
             'message_id' => $this->message_id,
             'created_at' => $this->created_at

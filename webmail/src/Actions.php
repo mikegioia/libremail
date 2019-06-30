@@ -37,6 +37,7 @@ class Actions
     const MARK_ALL_READ = 'mark_all_read';
     const MARK_ALL_UNREAD = 'mark_all_unread';
     const MARK_UNREAD_FROM_HERE = 'mark_unread_from_here';
+    const CONVERT_DRAFT = 'convert_draft';
     // Selections
     const SELECT_ALL = 'all';
     const SELECT_NONE = 'none';
@@ -45,6 +46,7 @@ class Actions
     const SELECT_FLAGGED = 'starred';
     const SELECT_UNFLAGGED = 'unstarred';
     // Options
+    const OUTBOX_ID = 'outbox_id';
     const ALL_MESSAGES = 'all_messages';
     const TO_FOLDER_ID = 'to_folder_id';
     const FROM_FOLDER_ID = 'from_folder_id';
@@ -73,6 +75,7 @@ class Actions
         'untrash' => 'App\Actions\Untrash',
         'mark_read' => 'App\Actions\MarkRead',
         'mark_unread' => 'App\Actions\MarkUnread',
+        'convert_draft' => 'App\Actions\ConvertDraft',
         'mark_unread_from_here' => 'App\Actions\MarkUnreadFromHere'
     ];
 
@@ -100,11 +103,14 @@ class Actions
      */
     public function run()
     {
-        $urlId = $this->param('url_id');
-        $page = $this->param('page', '');
+        // Strings
         $action = $this->param('action');
         $select = $this->param('select');
-        $folderId = $this->param('folder_id', 0);
+        $urlId = $this->param('url_id', '');
+        // Integers
+        $page = (int) $this->param('page', 0);
+        $folderId = (int) $this->param('folder_id', 0);
+        // Arrays
         $messageIds = $this->param('message', []);
         $allMessageIds = $this->param('message_all', []);
         $moveTo = array_filter($this->param('move_to', []));
@@ -256,6 +262,8 @@ class Actions
         array $folders
     ) {
         $message = null;
+        $nounUpper = 'Conversation';
+        $nounPlural = 'conversations';
         $folderName = count($folders) > 1
             ? count($folders) + ' folders'
             : implode(', ', $folders);
@@ -293,6 +301,10 @@ class Actions
             $message = 'moved to trash';
         } elseif (self::UNTRASH === $action) {
             $message = 'removed from trash';
+        } elseif (self::CONVERT_DRAFT === $action) {
+            $nounUpper = 'Draft';
+            $nounPlural = 'drafts';
+            $message = 'imported to outbox';
         }
 
         if (! $message) {
@@ -302,8 +314,8 @@ class Actions
         $message = sprintf(
             "%s $message.",
             1 === $count
-                ? 'Conversation'
-                : $count.' conversations'
+                ? $nounUpper
+                : $count.' '.$nounPlural
         );
 
         Session::alert($message, TaskModel::getBatchId());

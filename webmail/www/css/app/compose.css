@@ -41,6 +41,10 @@ section.compose {
   width: 100%;
 }
 
+.compose .ten.columns textarea {
+  padding: 0.5rem 0.75rem;
+}
+
 .compose .ten.columns input[type="text"] {
   height: 3.25rem;
 }
@@ -93,7 +97,12 @@ blank address input between two valid inputs.
   padding-bottom: 0.5rem;
 }
 
-.compose .addresses.from label {
+.compose .row.padded {
+  padding-bottom: 0.25rem;
+}
+
+.compose .addresses.from label,
+.compose .row.padded label {
   margin: 0;
 }
 
@@ -174,4 +183,50 @@ blank address input between two valid inputs.
 
 .compose .has-error input[type="text"].with-error {
   border-color: #d43633;
+}
+
+/* Message preview */
+
+.compose.preview form {
+  margin-bottom: 4rem;
+}
+
+.compose.preview .help-text {
+  margin-top: 1rem;
+}
+
+.outbox-preview {
+  margin-bottom: 1.5rem;
+}
+
+.outbox-preview p {
+  margin-bottom: 1rem;
+}
+
+.outbox-preview p:last-child {
+  margin-bottom: 0;
+}
+
+.outbox-preview ol,
+.outbox-preview ul {
+  margin: 0 0 1rem 1rem;
+}
+
+.outbox-preview li {
+  margin: 0 0 0 0.5rem;
+}
+
+.outbox-preview blockquote {
+  border-left: 0.5rem solid rgba(0, 0, 0, 0.05);
+  color: #777;
+  margin: 0 0 1rem;
+  padding: 1rem 1rem 1rem 2rem;
+}
+
+.outbox-preview pre {
+  margin: 0 0 1rem 0;
+}
+
+.outbox-preview .text-html {
+  padding-right: 0.75rem;
 }

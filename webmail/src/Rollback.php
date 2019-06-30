@@ -46,7 +46,12 @@ class Rollback
 
         Model::getDb()->commit();
         Session::alert('Action'.(1 === $count ? '' : 's').' undone.');
-        Url::redirectBack();
+
+        if (TYPE_CREATE === $task->type) {
+            Url::redirect('/');
+        } else {
+            Url::redirectBack();
+        }
     }
 
     /**
@@ -76,10 +81,17 @@ class Rollback
             case TaskModel::TYPE_COPY:
                 // Mark as deleted any messages with this message-id
                 // that are in the specified folder and that do not
-                // have a unique ID field.
+                // have a unique ID field
                 return (new MessageModel($task->message_id))
                     ->loadById()
                     ->deleteCopiesFrom($task->folder_id);
+
+            case TaskModel::TYPE_CREATE:
+                // Mark the message and any corresponding outbox
+                // message as deleted
+                return (new MessageModel($task->message_id))
+                    ->loadById()
+                    ->deleteCreatedMessage();
         }
     }
 }

@@ -107,4 +107,15 @@ class Model
             new DateTimeZone('UTC')
         );
     }
+
+    /**
+     * Determines if the model object has a valid ID.
+     *
+     * @return bool
+     */
+    public function exists()
+    {
+        return is_numeric($this->id)
+            && (int) $this->id !== 0;
+    }
 }

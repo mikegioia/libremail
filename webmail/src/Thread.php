@@ -287,14 +287,9 @@ class Thread
 
     /**
      * Parses the text/plain content into escaped HTML.
-     *
-     * @todo
      */
     private function setContent(Message &$message)
     {
-        // @TODO
-        //$message->text_markdown = $message->text_plain;
-
         // Cleanse it
         $body = htmlspecialchars($message->text_plain, ENT_QUOTES, 'UTF-8');
 

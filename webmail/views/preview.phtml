@@ -1,0 +1,108 @@
+<?php
+
+$view->render('header', [
+    'view' => $view,
+    'pageClass' => 'compose',
+    'pageTitle' => 'Preview and Send Message',
+]);
+
+$view->render('nav', [
+    'view' => $view,
+    'activeId' => 0,
+    'folders' => $folders
+]); ?>
+
+<section id="main" class="compose preview">
+    <?php
+    $view->render('notifications', [
+        'messages' => $notifications
+    ]); ?>
+
+    <h5>
+        <span>Preview and Send Message</span>
+        <a href="#confirm-delete">Delete this message</a>
+    </h5>
+    <form action="<?php echo App\Url::compose(); ?>" method="post">
+        <article class="outbox-preview">
+            <!-- To -->
+            <div class="row padded">
+                <div class="two columns label">
+                    <label class="align-right">To</label>
+                </div>
+                <div class="ten columns">
+                    <span><?php $view->clean(implode(',', $message->to)); ?></span>
+                </div>
+            </div>
+            <!-- From -->
+            <div class="row padded">
+                <div class="two columns label">
+                    <label class="align-right">From</label>
+                </div>
+                <div class="ten columns">
+                    <span><?php $view->clean($account->fromAddress()); ?></span>
+                </div>
+            </div>
+            <!-- Subject -->
+            <div class="row padded">
+                <div class="two columns label">
+                    <label class="align-right" for="settings-email">Subject</label>
+                </div>
+                <div class="ten columns">
+                    <span><?php $view->clean($message->subject); ?></span>
+                </div>
+            </div>
+            <div class="row padded message markdown">
+                <div class="two columns label">
+                    <label class="align-right" for="settings-email">Message</label>
+                </div>
+                <div class="ten columns text-html">
+                    <?php echo $message->text_html; ?>
+                </div>
+            </div>
+        </article>
+        <div class="buttons">
+            <button type="submit" name="edit" class="button button-secondary">
+                Back to edit
+            </button>
+            <button type="submit" name="send_outbox" class="button button-primary">
+                Send
+            </button>
+            <button type="submit" name="send_schedule" class="button button-primary">
+                Scheduled send
+            </button>
+            <button type="submit" name="send_outbox" class="button button-danger u-pull-right">
+                Send now!
+            </button>
+            <!--
+            <button type="submit" name="send_now" class="button button-secondary" formnovalidate
+                <?php echo $view->env('COMPOSE_SEND_NOW') ? '' : 'disabled title="Not available"'; ?>>
+                Blind Send
+            </button>
+            -->
+            <input type="hidden" name="id" value="<?php echo $message->id; ?>" />
+        </div>
+        <div class="help-text">
+            When you click <code>Send</code>, your message will be moved to the Outbox.
+            Messages stay in the Outbox for at least 1 minute before being sent.
+            You can still edit the message, schedule a specific time, or trash it before
+            it gets sent.
+        </div>
+    </form>
+</section>
+
+<?php
+$view->render('confirm', [
+    'id' => 'confirm-delete',
+    'confirmLabel' => 'Yes, delete it',
+    'cancelLabel' => 'No!',
+    'action' => App\Url::make('/outbox/delete'),
+    'message' => 'Are you sure you want to delete this message?',
+    'data' => [
+        'id' => $message->id
+    ]
+]);
+
+$view->render('footer', [
+    'meta' => $meta,
+    'alert' => $alert
+]); ?>

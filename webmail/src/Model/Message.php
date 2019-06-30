@@ -11,6 +11,8 @@ use App\View;
 use App\Model;
 use App\Model\Outbox;
 use App\Exceptions\NotFoundException;
+use App\Exceptions\ValidationException;
+use App\Exceptions\DatabaseDeleteException;
 use App\Exceptions\DatabaseInsertException;
 use App\Exceptions\DatabaseUpdateException;
 
@@ -1026,11 +1028,6 @@ class Message extends Model
         return new self($data);
     }
 
-    public function exists()
-    {
-        return is_numeric($this->id) && $this->id;
-    }
-
     /**
      * @throws NotFoundException
      */
@@ -1042,7 +1039,7 @@ class Message extends Model
 
         $deleted = $this->db()
             ->delete()
-            ->table('outbox')
+            ->table('messages')
             ->where('id', '=', $this->id)
             ->execute();
 
@@ -1050,14 +1047,48 @@ class Message extends Model
     }
 
     /**
-     * Removes any message from the specified folder that is missing
-     * a message_no and unique_id. These messages were copied by the
-     * client and not synced yet.
+     * @throws NotFoundException
+     *
+     * @return bool
+     */
+    public function softDelete(bool $purge = false)
+    {
+        if (! $this->exists()) {
+            throw new NotFoundException;
+        }
+
+        $updates = ['deleted' => 1];
+
+        if (true === $purge) {
+            $updates['purge'] = 1;
+        }
+
+        $updated = $this->db()
+            ->update($updates)
+            ->table('messages')
+            ->where('id', '=', $this->id)
+            ->execute();
+
+        return is_numeric($updated) ? $updated : false;
+    }
+
+    /**
+     * Hard removes any message from the specified folder that is
+     * missing a unique_id. These messages were copied by the client
+     * and not synced yet.
      *
      * @throws ValidationException
+     *
+     * @return bool
      */
     public function deleteCopiesFrom(int $folderId)
     {
+        if (! $this->exists() || ! $this->message_id) {
+            throw new ValidationException(
+                'Message needs to be loaded before copies are deleted'
+            );
+        }
+
         $deleted = $this->db()
             ->delete()
             ->from('messages')
@@ -1069,5 +1100,32 @@ class Message extends Model
             ->execute();
 
         return is_numeric($deleted); // To catch 0s
+    }
+
+    /**
+     * Soft removes a message created by this application (usually
+     * a draft) and any outbox message if there is one attached.
+     *
+     * @throws ValidationException
+     * @throws NotFoundException
+     *
+     * @return bool
+     */
+    public function deleteCreatedMessage()
+    {
+        if (! $this->exists()) {
+            throw new ValidationException(
+                'Message needs to be loaded before it can be deleted'
+            );
+        }
+
+        if ($this->outbox_id) {
+            // Throws NotFoundException
+            return (new Outbox)->getById($this->outbox_id)->softDelete()
+                && $this->softDelete(true);
+        }
+
+        // Throws NotFoundException
+        return $this->softDelete(true);
     }
 }

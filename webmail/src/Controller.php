@@ -173,7 +173,6 @@ class Controller
             // Save the new account info
             $this->account->update($email, $password, $name, $host, $port);
 
-            // @TODO Restart the sync process via pkill
             Session::notify(
                 'Your account configuration has been updated! You will'.
                 'most likely need to restart the sync process.',
@@ -228,13 +227,15 @@ class Controller
 
     public function preview(int $outboxId)
     {
-        $message = (new Outbox($this->account))->getById($outboxId);
+        $outboxMessage = (new Outbox($this->account))->getById($outboxId);
 
-        if (! $message->exists() || $message->sent) {
+        if (! $outboxMessage->exists() || $outboxMessage->sent) {
             throw new NotFoundException;
         }
 
-        exit('preview');
+        $this->page('preview', [
+            'message' => $outboxMessage
+        ]);
     }
 
     public function outbox()
@@ -247,6 +248,8 @@ class Controller
 
     public function deleteDraft()
     {
+        session_start();
+
         $id = intval(Url::postParam('id'));
         $outboxMessage = (new Outbox($this->account))->getById($id);
 
@@ -255,13 +258,13 @@ class Controller
             $draftMessage = (new Message)->getByOutboxId($id);
 
             if ($draftMessage->exists()) {
-                $draftMessage->delete();
+                $draftMessage->softDelete(true);
             }
         }
 
         // Throws not found if it doesn't exist
         try {
-            $outboxMessage->delete();
+            $outboxMessage->softDelete();
             Session::notify('Draft message deleted!', Session::SUCCESS);
         } catch (NotFoundException $e) {
             Session::notify('Draft message not found!', Session::ERROR);
@@ -273,23 +276,23 @@ class Controller
     public function send()
     {
         session_start();
+
         $folders = new Folders($this->account, []);
         $draftId = $folders->getDraftsId();
 
         try {
             $outbox = new Outbox($this->account);
-            $outbox->setPostData($_POST);
-            $outbox->save();
+            $outbox->setPostData($_POST)->save();
 
             // Update the draft if it exists, and optionally create
             // a new one if this message is a draft
             (new Message)->createOrUpdateDraft($outbox, $draftId);
+            Session::notify('Draft message saved.', Session::SUCCESS);
 
-            if ($outbox->draft) {
-                Session::notify('Draft message saved.', Session::SUCCESS);
-                Url::redirectRaw(Url::make('/compose/%s', $outbox->id));
-            } else {
+            if (! is_null(Url::postParam('send_preview'))) {
                 Url::redirectRaw(Url::make('/preview/%s', $outbox->id));
+            } else {
+                Url::redirectRaw(Url::make('/compose/%s', $outbox->id));
             }
         } catch (ValidationException $e) {
             // Store the POST data back in the session and set the
@@ -322,8 +325,6 @@ class Controller
         $page = (int) Url::getParam('p', 1);
         $folderId = (int) Url::getParam('f', 0);
         // Set up libraries
-        $view = new View;
-        $meta = Meta::getAll();
         $colors = getConfig('colors');
         $select = Url::getParam('select');
         $folders = new Folders($this->account, $colors);
@@ -341,13 +342,9 @@ class Controller
                 Message::INCLUDE_DELETED => false
             ]);
 
-        $view->htmlHeaders();
-
-        // Render the inbox
-        $view->render('mailbox', [
-            'view' => $view,
+        // Render the search page
+        $this->page('mailbox', [
             'page' => $page,
-            'meta' => $meta,
             'query' => $query,
             'urlId' => SEARCH,
             'paging' => $paging,
@@ -359,8 +356,6 @@ class Controller
             'folderId' => $folderId,
             'unflagged' => $unflagged,
             'mainHeading' => 'Search Results',
-            'alert' => Session::get(Session::ALERT),
-            'hideJsAlert' => Session::getFlag(Session::FLAG_HIDE_JS_ALERT, false)
         ]);
     }
 
@@ -370,8 +365,6 @@ class Controller
     private function mailbox(string $id, int $page = 1, int $limit = 25)
     {
         // Set up libraries
-        $view = new View;
-        $meta = Meta::getAll();
         $colors = getConfig('colors');
         $select = Url::getParam('select');
         $folders = new Folders($this->account, $colors);
@@ -395,14 +388,10 @@ class Controller
                 Message::INCLUDE_DELETED => $folderId === $folders->getTrashId()
             ]);
 
-        $view->htmlHeaders();
-
         // Render the inbox
-        $view->render('mailbox', [
+        $this->page('mailbox', [
             'urlId' => $id,
-            'view' => $view,
             'page' => $page,
-            'meta' => $meta,
             'paging' => $paging,
             'select' => $select,
             'totals' => $totals,
@@ -413,9 +402,7 @@ class Controller
             'showPaging' => INBOX !== $id,
             'mainHeading' => INBOX === $id
                 ? 'Everything else'
-                : $folder->name,
-            'alert' => Session::get(Session::ALERT),
-            'hideJsAlert' => Session::getFlag(Session::FLAG_HIDE_JS_ALERT, false)
+                : $folder->name
         ]);
     }
 
@@ -437,7 +424,8 @@ class Controller
                 'alert' => Session::get(Session::ALERT),
                 'formData' => Session::get(Session::FORM_DATA, []),
                 'formErrors' => Session::get(Session::FORM_ERRORS, []),
-                'notifications' => Session::get(Session::NOTIFICATIONS, [])
+                'notifications' => Session::get(Session::NOTIFICATIONS, []),
+                'hideJsAlert' => Session::getFlag(Session::FLAG_HIDE_JS_ALERT, false)
             ], $data)
         );
     }

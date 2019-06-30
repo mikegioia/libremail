@@ -186,6 +186,11 @@ class Messages
                 'folder_id' => $folder->getId(),
                 'account_id' => $folder->getAccountId(),
             ]);
+            // We interpret any message received as valid, regardless
+            // of the \Deleted flag. If the message's UID no longer
+            // comes back, then we mark it as deleted. This is most
+            // likely only relevant for drafts.
+            $imapMessage->flags->deleted = 0;
             $message->setMessageData($imapMessage, [
                 // This will trim subjects to the max size
                 MessageModel::OPT_TRUNCATE_FIELDS => true,
