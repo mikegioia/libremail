@@ -302,7 +302,7 @@ class Thread
             ]
         ]);
 
-        $message->body = nl2br(trim($body));
+        $message->body = rtrim($body);
     }
 
     /**
