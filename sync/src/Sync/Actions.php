@@ -28,6 +28,7 @@ class Actions
     private $mailbox;
     private $progress;
     private $interactive;
+    private $foldersToExpunge = [];
 
     private static $dupeLookup = [
         TaskModel::TYPE_DELETE => TaskModel::TYPE_UNDELETE,
@@ -91,6 +92,8 @@ class Actions
             $this->processTask($task);
             $this->updateProgress($i + 1);
         }
+
+        $this->expungeFolders();
     }
 
     /**
@@ -194,6 +197,9 @@ class Actions
 
         // Check if the unique ID is the same; halt if not
         if (! Fn\intEq($imapMessage->uid, $sqlMessage->unique_id)) {
+            // @TODO remove this debugging info
+            // this case can no longer be re-created now that we're pulling
+            // the updated message ID each time
             print_r($sqlMessage);
             print_r($imapMessage);
             exit('uid mismatch!');
@@ -213,6 +219,10 @@ class Actions
             (new $actionClass(
                 $task, $sqlFolder, $sqlMessage, $imapMessage
             ))->run($this->mailbox);
+
+            if (TaskModel::TYPE_DELETE === $task->type) {
+                $this->foldersToExpunge[] = $sqlFolder->name;
+            }
         } catch (Exception $e) {
             $this->log->warning(
                 "Failed syncing IMAP action for task {$task->id}: ".
@@ -223,6 +233,30 @@ class Actions
         }
 
         $task->done();
+    }
+
+    /**
+     * If any messages were deleted, we need to issue an EXPUNGE
+     * command to the folders containing those messages. That way,
+     * we won't pull them down again on sync.
+     */
+    private function expungeFolders()
+    {
+        if (! $this->foldersToExpunge) {
+            return;
+        }
+
+        $folders = array_unique($this->foldersToExpunge);
+
+        try {
+            foreach ($folders as $folder) {
+                $this->mailbox->expunge($folder);
+            }
+        } catch (Exception $e) {
+            $this->log->warning(
+                "Failed expunging folder {folder}: ".$e->getMessage());
+            $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
+        }
     }
 
     private function startProgress(int $total)

@@ -192,7 +192,8 @@ class Actions
         return str_replace(
             array_keys(self::ACTION_CONVERSIONS),
             array_values(self::ACTION_CONVERSIONS),
-            $action);
+            $action
+        );
     }
 
     /**

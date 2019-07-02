@@ -130,8 +130,6 @@ $view->render('nav', [
                 <button type="submit" name="send_preview" class="button button-primary" formnovalidate>
                     Preview + Send
                 </button>
-            <?php
-            endif; ?>
                 <span>or</span>
                 <a href="/">Go back</a>
                 <input type="hidden" name="id" value="<?php echo $message->id ?? ''; ?>" />

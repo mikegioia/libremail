@@ -125,6 +125,7 @@ class Url
         } elseif (THREAD === $urlId) {
             if (Actions::MARK_UNREAD_FROM_HERE !== $action
                 && Actions::MARK_UNREAD !== $action
+                && Actions::ARCHIVE !== $action
                 && Actions::DELETE !== $action
                 && Actions::TRASH !== $action
                 && Actions::SPAM !== $action
