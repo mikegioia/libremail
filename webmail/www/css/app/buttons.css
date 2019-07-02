@@ -37,7 +37,8 @@ input[type="button"][disabled] {
 
 .button.button-primary,
 .button.button-secondary,
-.button.button-danger {
+.button.button-danger,
+.button.button-success {
   color: #fff;
   font-size: 1.75rem;
   height: 3.5rem;
@@ -85,7 +86,6 @@ input[type="button"].button-primary:focus {
 .button.button-danger {
   background: #ff524e;
   border-color: #ff524e;
-  color: #fff;
   font-weight: 400;
 }
 
@@ -93,6 +93,19 @@ input[type="button"].button-primary:focus {
 .button.button-danger:focus {
   background-color: #d43633;
   border-color: #d43633;
+  color: #fff;
+}
+
+.button.button-success {
+  background: #32a757;
+  border-color: #32a757;
+  font-weight: 400;
+}
+
+.button.button-success:hover,
+.button.button-success:focus {
+  background-color: #29924a;
+  border-color: #29924a;
   color: #fff;
 }
 

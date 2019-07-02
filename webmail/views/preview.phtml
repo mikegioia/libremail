@@ -30,7 +30,14 @@ $view->render('nav', [
                     <label class="align-right">To</label>
                 </div>
                 <div class="ten columns">
+                <?php
+                if ($message->to): ?>
                     <span><?php $view->clean(implode(',', $message->to)); ?></span>
+                <?php
+                else: ?>
+                    <em class="error"><?php $view->clean($message->to ? implode(',', $message->to) : 'Missing'); ?></em>
+                <?php
+                endif; ?>
                 </div>
             </div>
             <!-- From -->
@@ -48,7 +55,14 @@ $view->render('nav', [
                     <label class="align-right" for="settings-email">Subject</label>
                 </div>
                 <div class="ten columns">
+                <?php
+                if ($message->subject): ?>
                     <span><?php $view->clean($message->subject); ?></span>
+                <?php
+                else: ?>
+                    <em class="error">No subject</em>
+                <?php
+                endif; ?>
                 </div>
             </div>
             <div class="row padded message markdown">
@@ -56,7 +70,13 @@ $view->render('nav', [
                     <label class="align-right" for="settings-email">Message</label>
                 </div>
                 <div class="ten columns text-html">
-                    <?php echo $message->text_html; ?>
+                <?php
+                if ($message->text_html):
+                    echo $message->text_html;
+                else: ?>
+                    <em class="error">No message body</em>
+                <?php
+                endif; ?>
                 </div>
             </div>
         </article>
@@ -64,16 +84,16 @@ $view->render('nav', [
             <button type="submit" name="edit" class="button button-secondary">
                 Back to edit
             </button>
-            <button type="submit" name="send_outbox" class="button button-primary">
+            <button type="submit" name="send_outbox" class="button button-success"<?php echo $message->to ? '' : ' disabled'; ?>>
                 Send
             </button>
-            <button type="submit" name="send_schedule" class="button button-primary">
+            <button type="submit" name="send_schedule" class="button button-primary"<?php echo $message->to ? '' : ' disabled'; ?>>
                 Scheduled send
             </button>
+            <!--
             <button type="submit" name="send_outbox" class="button button-danger u-pull-right">
                 Send now!
             </button>
-            <!--
             <button type="submit" name="send_now" class="button button-secondary" formnovalidate
                 <?php echo $view->env('COMPOSE_SEND_NOW') ? '' : 'disabled title="Not available"'; ?>>
                 Blind Send

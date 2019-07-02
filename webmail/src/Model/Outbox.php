@@ -4,6 +4,7 @@ namespace App\Model;
 
 use Parsedown;
 use App\Model;
+use App\Session;
 use Zend\Mail\Address;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ValidationException;
@@ -128,9 +129,9 @@ class Outbox extends Model
      * @throws DatabaseInsertException
      * @throws DatabaseUpdateException
      */
-    public function save()
+    public function save(bool $notifyOnError = false)
     {
-        $this->validate();
+        $this->validate($notifyOnError);
         $this->updateHistory($this->id ? self::UPDATED : self::CREATED);
 
         $data = [
@@ -183,20 +184,24 @@ class Outbox extends Model
      *
      * @throws ValidationException
      */
-    public function validate()
+    public function validate(bool $notifyOnError = false)
     {
         $e = new ValidationException;
-
-        if (! array_filter($this->to)) {
-            $e->addError('to', null, 'Specify at least one recipient', 0);
-        }
 
         foreach (['to', 'cc', 'bcc'] as $field) {
             $this->validateAddresses($field, $e);
         }
 
-        if ($e->hasError() && ! $this->draft) {
-            throw $e;
+        if (! array_filter($this->to)) {
+            $e->addError('to', null, 'Specify at least one recipient.', 0);
+        }
+
+        if ($e->hasError()) {
+            if ($this->draft && true === $notifyOnError) {
+                Session::notify($e->getMessage(), Session::ERROR);
+            } elseif (! $this->draft) {
+                throw $e;
+            }
         }
     }
 

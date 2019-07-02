@@ -178,11 +178,11 @@ body.theme-coolnight .thread-msg-row label .date {
 
 /* Default buttons and dropdowns */
 body.theme-coolnight .dropdown ul,
-body.theme-coolnight .button:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-coolnight button:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-coolnight input[type="submit"]:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-coolnight input[type="reset"]:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-coolnight input[type="button"]:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-coolnight .button:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-coolnight button:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-coolnight input[type="submit"]:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-coolnight input[type="reset"]:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-coolnight input[type="button"]:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
 body.theme-coolnight .settings .theme,
 body.theme-coolnight .folder-selector {
   background-color: #3b3b3b;

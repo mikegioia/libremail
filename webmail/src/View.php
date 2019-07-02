@@ -95,13 +95,13 @@ class View
     /**
      * Sanitizes and prints a value for a view.
      */
-    public function clean(string $value, bool $return = false)
+    public function clean(string $value = null, bool $return = false)
     {
         if ($return) {
-            return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+            return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
         }
 
-        echo htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+        echo htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
     }
 
     public function raw(string $value)

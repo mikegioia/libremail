@@ -148,6 +148,9 @@ blank address input between two valid inputs.
   color: #555;
   font-size: 1.125rem;
   margin-bottom: 0.25rem;
+}
+
+.compose textarea + .help-text {
   max-width: 50rem;
 }
 
@@ -191,16 +194,21 @@ blank address input between two valid inputs.
   margin-bottom: 4rem;
 }
 
+.compose.preview form .error {
+  color: #ff524e;
+}
+
 .compose.preview .help-text {
   margin-top: 1rem;
+  max-width: calc(22% + 50rem);
 }
 
 .outbox-preview {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .outbox-preview p {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .outbox-preview p:last-child {
@@ -209,7 +217,7 @@ blank address input between two valid inputs.
 
 .outbox-preview ol,
 .outbox-preview ul {
-  margin: 0 0 1rem 1rem;
+  margin: 0 0 1.25rem 1.25rem;
 }
 
 .outbox-preview li {
@@ -219,12 +227,12 @@ blank address input between two valid inputs.
 .outbox-preview blockquote {
   border-left: 0.5rem solid rgba(0, 0, 0, 0.05);
   color: #777;
-  margin: 0 0 1rem;
-  padding: 1rem 1rem 1rem 2rem;
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 1rem 0.75rem 1.25rem;
 }
 
 .outbox-preview pre {
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.25rem 0;
 }
 
 .outbox-preview .text-html {

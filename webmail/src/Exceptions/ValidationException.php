@@ -25,6 +25,29 @@ class ValidationException extends Exception
         } else {
             $this->errors[$key] = $message;
         }
+
+        $this->setMessage($this->getMessageString());
+    }
+
+    public function setMessage(string $message)
+    {
+        $this->message = $message;
+    }
+
+    public function getMessageString()
+    {
+        $messages = [];
+        $errors = $this->getErrors();
+
+        foreach ($this->getErrors() as $key => $errors) {
+            if (is_array($errors)) {
+                $messages = array_merge($messages, $errors);
+            } else {
+                $messages[] = $errors;
+            }
+        }
+
+        return implode('<br>', $messages);
     }
 
     public function getErrors()

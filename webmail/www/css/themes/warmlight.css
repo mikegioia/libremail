@@ -85,18 +85,18 @@ body.theme-warmlight .thread-msg label.thread-msg-header .from span {
 
 /* Preview */
 body.theme-warmlight .compose .outbox-preview {
-  background: #fffdfb;
+  background: #fdf5ef;
   box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.1);
   padding-top: 1rem;
 }
 
 /* Buttons and dropdowns */
 body.theme-warmlight .dropdown ul,
-body.theme-warmlight .button:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-warmlight button:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-warmlight input[type="submit"]:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-warmlight input[type="reset"]:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-warmlight input[type="button"]:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-warmlight .button:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-warmlight button:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-warmlight input[type="submit"]:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-warmlight input[type="reset"]:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-warmlight input[type="button"]:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
 body.theme-warmlight .settings .theme,
 body.theme-warmlight .folder-selector {
   border-color: #b19c8c;

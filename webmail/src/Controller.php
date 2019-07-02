@@ -277,19 +277,29 @@ class Controller
     {
         session_start();
 
+        $isPreview = ! is_null(Url::postParam('send_preview'));
         $folders = new Folders($this->account, []);
         $draftId = $folders->getDraftsId();
 
+        if (! is_null(Url::postParam('edit'))) {
+            if (Url::postParam('id')) {
+                Url::redirectRaw(Url::make('/compose/%s', Url::postParam('id')));
+            } else {
+                Session::notify('No message specified!', Session::ERROR);
+                Url::redirectRaw(Url::make('/compose'));
+            }
+        }
+
         try {
             $outbox = new Outbox($this->account);
-            $outbox->setPostData($_POST)->save();
+            $outbox->setPostData($_POST)->save($isPreview);
 
             // Update the draft if it exists, and optionally create
             // a new one if this message is a draft
             (new Message)->createOrUpdateDraft($outbox, $draftId);
             Session::notify('Draft message saved.', Session::SUCCESS);
 
-            if (! is_null(Url::postParam('send_preview'))) {
+            if ($isPreview) {
                 Url::redirectRaw(Url::make('/preview/%s', $outbox->id));
             } else {
                 Url::redirectRaw(Url::make('/compose/%s', $outbox->id));
