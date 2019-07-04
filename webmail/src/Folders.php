@@ -126,6 +126,11 @@ class Folders
         return $this->account;
     }
 
+    public function getColors()
+    {
+        return $this->colors;
+    }
+
     /**
      * Most queries for messages want to ignore certain folders.
      * For example, if a single message in a thread was trashed

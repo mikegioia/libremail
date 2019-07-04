@@ -13,7 +13,7 @@ if ((int) $folder->ignored !== 1 && ! $folder->is_mailbox): ?>
         <?php
         endif; ?>
         </label>
-        <a class="color" style="background-color: <?php echo $folder->color->bg; ?>"></a>
+        <a class="color color-<?php echo $folder->color->name; ?>"></a>
     <?php
     if ($children): ?>
         <ul class="sub">

@@ -1,0 +1,8 @@
+<style type="text/css" nonce="<?php echo App\View::getNonce(); ?>">
+<?php
+foreach ($colors as $i => $color):
+    echo str_repeat(' ', 6),
+        ".color-{$color['name']} { color: {$color['fg']}; background-color: {$color['bg']}; }\n";
+endforeach;
+// Leave indent here for HTML output formatting ?>
+    </style>

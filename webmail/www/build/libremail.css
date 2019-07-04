@@ -5220,7 +5220,8 @@ input[type="button"][disabled] {
 
 .button.button-primary,
 .button.button-secondary,
-.button.button-danger {
+.button.button-danger,
+.button.button-success {
   color: #fff;
   font-size: 1.75rem;
   height: 3.5rem;
@@ -5268,7 +5269,6 @@ input[type="button"].button-primary:focus {
 .button.button-danger {
   background: #ff524e;
   border-color: #ff524e;
-  color: #fff;
   font-weight: 400;
 }
 
@@ -5276,6 +5276,19 @@ input[type="button"].button-primary:focus {
 .button.button-danger:focus {
   background-color: #d43633;
   border-color: #d43633;
+  color: #fff;
+}
+
+.button.button-success {
+  background: #32a757;
+  border-color: #32a757;
+  font-weight: 400;
+}
+
+.button.button-success:hover,
+.button.button-success:focus {
+  background-color: #29924a;
+  border-color: #29924a;
   color: #fff;
 }
 
@@ -6213,10 +6226,9 @@ input[type="checkbox"].thread-msg-more-checkbox {
 
 .thread-msg .message {
   font-family: 'Nanum Gothic Coding', monospace;
-  line-height: 0.75;
-  max-width: 60rem;
-  padding: 0 1rem 0 4rem;
-  white-space: pre;
+  max-width: 52rem;
+  padding: 0 0 0 4rem;
+  white-space: pre-wrap;
   word-wrap: break-word;
 }
 
@@ -6378,7 +6390,12 @@ blank address input between two valid inputs.
   padding-bottom: 0.5rem;
 }
 
-.compose .addresses.from label {
+.compose .row.padded {
+  padding-bottom: 0.25rem;
+}
+
+.compose .addresses.from label,
+.compose .row.padded label {
   margin: 0;
 }
 
@@ -6424,6 +6441,9 @@ blank address input between two valid inputs.
   color: #555;
   font-size: 1.125rem;
   margin-bottom: 0.25rem;
+}
+
+.compose textarea + .help-text {
   max-width: 50rem;
 }
 
@@ -6459,6 +6479,57 @@ blank address input between two valid inputs.
 
 .compose .has-error input[type="text"].with-error {
   border-color: #d43633;
+}
+
+/* Message preview */
+
+.compose.preview form {
+  margin-bottom: 4rem;
+}
+
+.compose.preview form .error {
+  color: #ff524e;
+}
+
+.compose.preview .help-text {
+  margin-top: 1rem;
+  max-width: calc(22% + 50rem);
+}
+
+.outbox-preview {
+  margin-bottom: 2rem;
+}
+
+.outbox-preview p {
+  margin-bottom: 1.25rem;
+}
+
+.outbox-preview p:last-child {
+  margin-bottom: 0;
+}
+
+.outbox-preview ol,
+.outbox-preview ul {
+  margin: 0 0 1.25rem 1.25rem;
+}
+
+.outbox-preview li {
+  margin: 0 0 0 0.5rem;
+}
+
+.outbox-preview blockquote {
+  border-left: 0.5rem solid rgba(0, 0, 0, 0.05);
+  color: #777;
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 1rem 0.75rem 1.25rem;
+}
+
+.outbox-preview pre {
+  margin: 0 0 1.25rem 0;
+}
+
+.outbox-preview .text-html {
+  padding-right: 0.75rem;
 }
 /**
  * Settings and Accounts
@@ -6768,13 +6839,20 @@ body.theme-warmlight .thread-msg label.thread-msg-header .from span {
   color: #846b58;
 }
 
+/* Preview */
+body.theme-warmlight .compose .outbox-preview {
+  background: #fdf5ef;
+  box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.1);
+  padding-top: 1rem;
+}
+
 /* Buttons and dropdowns */
 body.theme-warmlight .dropdown ul,
-body.theme-warmlight .button:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-warmlight button:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-warmlight input[type="submit"]:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-warmlight input[type="reset"]:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-warmlight input[type="button"]:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-warmlight .button:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-warmlight button:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-warmlight input[type="submit"]:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-warmlight input[type="reset"]:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-warmlight input[type="button"]:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
 body.theme-warmlight .settings .theme,
 body.theme-warmlight .folder-selector {
   border-color: #b19c8c;
@@ -6815,6 +6893,11 @@ body.theme-warmlight .dropdown li input[type="submit"] {
 body.theme-warmlight nav #mailboxes-divider,
 body.theme-warmlight .compose .row:not(.message) {
   border-color: #e8d3c2;
+}
+
+/* Lightest border */
+body.theme-warmlight .outbox-preview blockquote {
+  border-color: #f9e8db;
 }
 
 /* Dropdown item hover */
@@ -6910,7 +6993,8 @@ body.theme-warmlight .settings .row .note {
 
 /* Overwrite #777 */
 body.theme-warmlight section #msg-list footer,
-body.theme-warmlight .settings .row input[readonly] {
+body.theme-warmlight .settings .row input[readonly],
+body.theme-warmlight .outbox-preview blockquote {
   color: #a08672;
 }
 
@@ -7107,11 +7191,11 @@ body.theme-coolnight .thread-msg-row label .date {
 
 /* Default buttons and dropdowns */
 body.theme-coolnight .dropdown ul,
-body.theme-coolnight .button:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-coolnight button:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-coolnight input[type="submit"]:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-coolnight input[type="reset"]:not(.button-primary):not(.button-secondary):not(.button-danger),
-body.theme-coolnight input[type="button"]:not(.button-primary):not(.button-secondary):not(.button-danger),
+body.theme-coolnight .button:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-coolnight button:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-coolnight input[type="submit"]:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-coolnight input[type="reset"]:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
+body.theme-coolnight input[type="button"]:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
 body.theme-coolnight .settings .theme,
 body.theme-coolnight .folder-selector {
   background-color: #3b3b3b;

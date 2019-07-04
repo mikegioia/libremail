@@ -2,7 +2,7 @@
 $yellow = $theme === 'coolnight'
      ? '#a98304'
      : '#d6a70e'; ?>
-<style type="text/css">
+<style type="text/css" nonce="<?php echo App\View::getNonce(); ?>">
     html {
         overflow: hidden;
     }
@@ -44,9 +44,11 @@ $yellow = $theme === 'coolnight'
 <div class="star-form">
     <form action="/star" method="post">
         <button type="submit">
-            <svg version="1.1" xmlns="http://www.w3.org/2000/svg"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
-                x="0" y="0" viewBox="0, 0, 64, 64">
+            <!--
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            -->
+            <svg version="1.1" x="0" y="0" viewBox="0, 0, 64, 64">
                 <g>
                 <?php
                 if ( $flagged ): ?>

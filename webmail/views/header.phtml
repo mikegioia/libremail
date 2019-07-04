@@ -7,16 +7,24 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php
-    if (false == $view->env('WEB_BUILD', true)): ?>
+    if (true === (bool) $view->env('WEB_BUILD', true)): ?>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'nonce-<?php echo $view::getNonce(); ?>'; img-src 'self' https://*.gravatar.com">
+    <?php
+    endif;
+    if (false === (bool) $view->env('WEB_BUILD', true)): ?>
     <link href="/css/site.css" rel="stylesheet" type="text/css">
     <?php
     else: ?>
-    <link href="/build/libremail.css" rel="stylesheet" type="text/css">
+    <link href="/build/libremail.css" rel="stylesheet" type="text/css" nonce="<?php echo $view::getNonce(); ?>">
     <?php
-    endif; ?>
+    endif;
+    $view->render('colors-css', [
+        'colors' => $folders->getColors(),
+        'count' => count($folders->getColors())
+    ]); ?>
     <link href="/favicon.ico" rel="icon" type="image/png">
     <noscript>
-        <style type="text/css">
+        <style type="text/css" nonce="<?php echo $view::getNonce(); ?>">
             .js-display {
                 display: none;
             }

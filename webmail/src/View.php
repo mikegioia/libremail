@@ -16,6 +16,7 @@ class View
 {
     private $data = [];
 
+    private static $nonce;
     private static $config;
     private static $timezone;
 
@@ -34,6 +35,19 @@ class View
     public static function setTimezone(string $timezone)
     {
         self::$timezone = $timezone;
+    }
+
+    /**
+     * Returns the system-wide nonce for the current request.
+     * Only generated on the first call/
+     */
+    public static function getNonce()
+    {
+        if (! isset(self::$nonce)) {
+            self::$nonce = base64_encode(bin2hex(random_bytes(12)));
+        };
+
+        return self::$nonce;
     }
 
     /**
