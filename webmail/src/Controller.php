@@ -270,7 +270,7 @@ class Controller
             Session::notify('Draft message not found!', Session::ERROR);
         }
 
-        Url::redirect('/outbox');
+        Url::redirect('/');
     }
 
     public function send()

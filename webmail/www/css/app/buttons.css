@@ -84,15 +84,15 @@ input[type="button"].button-primary:focus {
 }
 
 .button.button-danger {
-  background: #ff524e;
-  border-color: #ff524e;
+  background: #e03d39;
+  border-color: #e03d39;
   font-weight: 400;
 }
 
 .button.button-danger:hover,
 .button.button-danger:focus {
-  background-color: #d43633;
-  border-color: #d43633;
+  background-color: #b92c28; /* #d43633; */
+  border-color: #b92c28;
   color: #fff;
 }
 

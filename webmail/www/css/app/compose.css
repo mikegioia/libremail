@@ -238,3 +238,7 @@ blank address input between two valid inputs.
 .outbox-preview .text-html {
   padding-right: 0.75rem;
 }
+
+.outbox-preview .text-html > :last-child {
+  margin-bottom: 0.5rem;
+}
