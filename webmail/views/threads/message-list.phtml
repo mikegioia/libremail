@@ -18,8 +18,8 @@ foreach ($thread->getThreadIndex() as $i => $item):
             'view' => $view,
             'open' => $item->open,
             'folders' => $folders,
-            'locked' => $item->current,
-            'message' => $item->message
+            'message' => $item->message,
+            'locked' => $item->current || $threadCount === 1
         ]);
     elseif ($item->type === $thread::INDEX_GROUP):
         if ($item->count > 1): ?>

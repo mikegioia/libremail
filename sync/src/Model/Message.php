@@ -281,7 +281,7 @@ class Message extends Model
             );
         }
 
-        return $ids;
+        return array_filter($ids);
     }
 
     /**

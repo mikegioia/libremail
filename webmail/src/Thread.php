@@ -342,8 +342,8 @@ class Thread
             // but open it only if they're unread
             if (0 === $i || $i === $count - 2) {
                 $closeGroup($group);
-                $addItem($message, 1 != $message->seen || 1 === $count);
-            } elseif (1 != $message->seen || $i >= $count - 1) {
+                $addItem($message, 1 !== (int) $message->seen || 1 === $count);
+            } elseif (1 !== (int) $message->seen || $i >= $count - 1) {
                 // If it's unread or the last message in the thread,
                 // then display it opened
                 $closeGroup($group);
