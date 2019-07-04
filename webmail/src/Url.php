@@ -64,6 +64,11 @@ class Url
         return self::make('/compose/%s', $outboxId);
     }
 
+    public static function preview(int $outboxId)
+    {
+        return self::make('/preview/%s', $outboxId);
+    }
+
     public static function thread(int $folderId, int $threadId)
     {
         return self::make('/thread/%s/%s', $folderId, $threadId);
@@ -72,18 +77,22 @@ class Url
     public static function redirect(string $path, array $params = [], int $code = 303)
     {
         header('Location: '.self::get($path, $params), $code);
+
         die();
     }
 
-    public static function redirectRaw(string $url, int $code = 303)
+    public static function redirectRaw(string $url, array $params = [], int $code = 303)
     {
+        $url .= $params ? '?'.http_build_query($params) : '';
+
         header('Location: '.$url, $code);
+
         die();
     }
 
     public static function redirectBack($default = '/', int $code = 303)
     {
-        return self::redirectRaw(self::getBackUrl($default), $code);
+        return self::redirectRaw(self::getBackUrl($default), [], $code);
     }
 
     public static function postParam(string $key, $default = null)

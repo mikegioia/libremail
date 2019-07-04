@@ -126,7 +126,7 @@ class Actions
         // If a selection was made, return to the previous page
         // with the key in the query params.
         if ($select) {
-            Url::redirect('/', [
+            Url::redirectRaw(Url::folder($folderId), [
                 'select' => strtolower($select)
             ]);
         }

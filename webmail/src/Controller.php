@@ -283,10 +283,10 @@ class Controller
 
         if (! is_null(Url::postParam('edit'))) {
             if (Url::postParam('id')) {
-                Url::redirectRaw(Url::make('/compose/%s', Url::postParam('id')));
+                Url::redirectRaw(Url::edit(Url::postParam('id')));
             } else {
                 Session::notify('No message specified!', Session::ERROR);
-                Url::redirectRaw(Url::make('/compose'));
+                Url::redirectRaw(Url::compose());
             }
         }
 
@@ -300,9 +300,9 @@ class Controller
             Session::notify('Draft message saved.', Session::SUCCESS);
 
             if ($isPreview) {
-                Url::redirectRaw(Url::make('/preview/%s', $outbox->id));
+                Url::redirectRaw(Url::preview($outbox->id));
             } else {
-                Url::redirectRaw(Url::make('/compose/%s', $outbox->id));
+                Url::redirectRaw(Url::edit($outbox->id));
             }
         } catch (ValidationException $e) {
             // Store the POST data back in the session and set the
@@ -311,9 +311,9 @@ class Controller
             Session::formData($_POST);
 
             if (isset($outbox->id) && $outbox->exists()) {
-                Url::redirectRaw(Url::make('/compose/%s', $outbox->id));
+                Url::redirectRaw(Url::edit($outbox->id));
             } else {
-                Url::redirectRaw('/compose');
+                Url::redirectRaw(Url::compose());
             }
         }
     }
