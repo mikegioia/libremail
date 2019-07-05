@@ -20,11 +20,11 @@ Always write a clear log message for your commits. One-line messages are fine fo
 
 Start reading the LibreMail code and you'll get the hang of it. We optimize for readability:
 
-  * Indent using four spaces (soft tabs)
-  * Avoid logic in views
+  * Indent using four spaces (soft tabs) for PHP, and 2 spaces for CSS.
+  * Avoid logic in views.
   * Keep all lines <= 80 characters. This isn't strongly enforced but it should be adhered to as much as possible.
   * ALWAYS put spaces after list items and method parameters (`[1, 2, 3]`, not `[1,2,3]`), around operators (`x += 1`, not `x+=1`), and around hash arrows.
-  * This is open source, free as speech, GPL-only software. Consider the people who will read your code, and make it look nice for them.
+  * This is open source, free as in speech, GPL-only software. Consider the people who will read your code, and make it look nice for them!
 
 Please see the following documents for more information:
 
@@ -33,4 +33,5 @@ Please see the following documents for more information:
   * [DATA_FORMAT.md](DATA_FORMAT.md)
 
 Thanks,
+
 Mike Gioia
