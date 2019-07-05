@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   **This value can change** if messages are moved within a folder and is only
   used when fetching a message or other information from the IMAP server.
 - `to` String containing the entire `To` mail header value. This is usually of
-  the form "Full name <fullname@example.org>".
+  the form `Full name <fullname@example.org>`.
 - `from` String containing the entire `From` mail header value.
 - `cc` String containing the entire `Cc` mail header value.
 - `bcc` String containing the entire `Bcc` mail header value.
