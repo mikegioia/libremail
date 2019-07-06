@@ -136,13 +136,15 @@ class Url
         if (self::getRedirectUrl()) {
             self::redirectRaw(self::getRedirectUrl());
         } elseif (INBOX === $urlId) {
-            self::redirect('/');
+            self::redirect();
         } elseif (STARRED === $urlId) {
             self::redirectRaw(self::starred($page ?: 1));
         } elseif (SEARCH === $urlId) {
             self::redirectRaw(self::getBackUrl('/search'));
         } elseif (THREAD === $urlId) {
-            if (Actions::MARK_UNREAD_FROM_HERE !== $action
+            if (Actions::ARCHIVE === $action) {
+                self::redirect();
+            } elseif (Actions::MARK_UNREAD_FROM_HERE !== $action
                 && Actions::MARK_UNREAD !== $action
                 && Actions::ARCHIVE !== $action
                 && Actions::DELETE !== $action
