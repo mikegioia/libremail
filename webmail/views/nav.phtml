@@ -14,14 +14,16 @@
                 <label class="folder-label"></label>
             </li>
         <?php
-        endif; ?>
-            <li class="">
+        endif;
+        if ($folders->getOutbox()->getUnreadCount()): ?>
+            <li class="w-unread<?php echo isset($activeLabel) && OUTBOX === $activeLabel ? ' active' : ''; ?>">
                 <a href="/outbox" class="mailbox">
-                    Outbox
+                    Outbox (<?php echo $folders->getOutbox()->getUnreadCount(); ?>)
                 </a>
                 <label class="folder-label"></label>
             </li>
         <?php
+        endif;
         if ($folders->getStarredId()): ?>
             <li class="<?php echo $folders->getNavClassString($folders->getStarredId(), $activeId); ?>">
                 <a href="<?php echo App\Url::folder($folders->getStarredId()); ?>" class="mailbox">

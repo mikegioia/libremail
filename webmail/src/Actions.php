@@ -34,10 +34,10 @@ class Actions
     const UNTRASH = 'untrash';
     const MARK_READ = 'mark_read';
     const MARK_UNREAD = 'mark_unread';
+    const CONVERT_DRAFT = 'convert_draft';
     const MARK_ALL_READ = 'mark_all_read';
     const MARK_ALL_UNREAD = 'mark_all_unread';
     const MARK_UNREAD_FROM_HERE = 'mark_unread_from_here';
-    const CONVERT_DRAFT = 'convert_draft';
     // Selections
     const SELECT_ALL = 'all';
     const SELECT_NONE = 'none';
@@ -47,10 +47,12 @@ class Actions
     const SELECT_UNFLAGGED = 'unstarred';
     // Options
     const OUTBOX_ID = 'outbox_id';
+    const SEND_AFTER = 'send_after';
     const ALL_MESSAGES = 'all_messages';
     const TO_FOLDER_ID = 'to_folder_id';
     const FROM_FOLDER_ID = 'from_folder_id';
     const SINGLE_MESSAGE = 'single_message';
+    const OUTBOX_MESSAGE = 'outbox_message';
     // Convert these action names
     const ACTION_CONVERSIONS = [
         'Add star' => 'flag',
@@ -119,8 +121,8 @@ class Actions
         $action = $this->convertAction($action);
         // Prepare the options
         $options = [
-            self::ALL_MESSAGES => 1 == $this->param('apply_to_all'),
-            self::SINGLE_MESSAGE => 1 == $this->param('single_message')
+            self::ALL_MESSAGES => 1 === (int) $this->param('apply_to_all'),
+            self::SINGLE_MESSAGE => 1 === (int) $this->param('single_message')
         ];
 
         // If a selection was made, return to the previous page

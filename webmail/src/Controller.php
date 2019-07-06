@@ -12,6 +12,7 @@ use App\Exceptions\ClientException;
 use App\Exceptions\ServerException;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ValidationException;
+use App\Actions\Queue as QueueAction;
 use App\Actions\MarkRead as MarkReadAction;
 
 class Controller
@@ -241,8 +242,7 @@ class Controller
     public function outbox()
     {
         $this->page('outbox', [
-            'folderId' => OUTBOX,
-            'messages' => []
+            'messages' => (new Outbox($this->account))->getActive()
         ]);
     }
 
@@ -273,22 +273,13 @@ class Controller
         Url::redirect('/');
     }
 
-    public function send()
+    public function draft()
     {
         session_start();
 
         $isPreview = ! is_null(Url::postParam('send_preview'));
         $folders = new Folders($this->account, []);
         $draftId = $folders->getDraftsId();
-
-        if (! is_null(Url::postParam('edit'))) {
-            if (Url::postParam('id')) {
-                Url::redirectRaw(Url::edit(Url::postParam('id')));
-            } else {
-                Session::notify('No message specified!', Session::ERROR);
-                Url::redirectRaw(Url::compose());
-            }
-        }
 
         try {
             $outbox = new Outbox($this->account);
@@ -316,6 +307,55 @@ class Controller
                 Url::redirectRaw(Url::compose());
             }
         }
+    }
+
+    public function send()
+    {
+        session_start();
+
+        $id = intval(Url::postParam('id'));
+        $outboxMessage = (new Outbox($this->account))->getById($id);
+
+        if (! $outboxMessage->exists()) {
+            Session::notify('Message not found!', Session::ERROR);
+            Url::redirectRaw(Url::compose());
+        }
+
+        if (! is_null(Url::postParam('edit'))) {
+            Url::redirectRaw(Url::edit(Url::postParam('id')));
+        }
+
+        if (! $outboxMessage->isDraft()) {
+            Session::notify('Message not available to send!', Session::ERROR);
+            Url::redirectBack('/compose');
+        }
+
+        $draftMessage = (new Message)->getByOutboxId($outboxMessage->id);
+
+        if (! $draftMessage->exists()) {
+            Session::notify(
+                'Draft message not found! This is a grave error and '.
+                'means you will need to delete this message and create '.
+                'a new one!',
+                Session::ERROR);
+            Url::redirectRaw(Url::compose());
+        }
+
+        if (! is_null(Url::postParam('send_outbox'))) {
+            (new QueueAction)->run(
+                [$draftMessage->id],
+                new Folders($this->account, getConfig('colors')),
+                [Actions::OUTBOX_MESSAGE => $outboxMessage]
+            );
+
+            Session::notify(
+                'Your message was queued for delivery! You still have '.
+                'time to review it and make any changes.');
+            Url::redirectRaw(Url::outbox());
+        }
+
+        Session::notify('No message delivery type specified!', Session::ERROR);
+        Url::redirectRaw(Url::preview(Url::postParam('id')));
     }
 
     public function error404()

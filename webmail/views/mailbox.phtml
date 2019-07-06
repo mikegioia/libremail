@@ -14,6 +14,10 @@ $view->render('nav', [
 ]); ?>
 
 <section id="main">
+    <?php
+    $view->render('notifications', [
+        'messages' => $notifications
+    ]); ?>
     <form action="/update" method="post">
         <?php
         $view->render('nav/actions'); ?>

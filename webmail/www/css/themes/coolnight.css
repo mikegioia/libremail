@@ -176,6 +176,16 @@ body.theme-coolnight .thread-msg-row label .date {
   color: #aaa;
 }
 
+/* Preview */
+body.theme-coolnight .compose .outbox-preview {
+  background: #323232;
+  box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.25);
+}
+
+body.theme-coolnight .compose .outbox-preview .row:not(.message) {
+  border-color: #222;
+}
+
 /* Default buttons and dropdowns */
 body.theme-coolnight .dropdown ul,
 body.theme-coolnight .button:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
@@ -196,6 +206,7 @@ body.theme-coolnight input[type="search"],
 body.theme-coolnight input[type="text"],
 body.theme-coolnight input[type="email"],
 body.theme-coolnight input[type="password"],
+body.theme-coolnight input[type="datetime-local"],
 body.theme-coolnight .settings .row input[readonly],
 body.theme-coolnight textarea,
 body.theme-coolnight select {
@@ -339,16 +350,16 @@ body.theme-coolnight ::placeholder {
   color: #aaa;
 }
 
-body.theme-coolnight #notifications .notification {
+body.theme-coolnight .notifications .notification {
   color: #333;
 }
 
-body.theme-coolnight #notifications .notification.success {
+body.theme-coolnight .notifications .notification.success {
   border: 1px solid #193114;
   box-shadow: 0 1px 2px #2b2b2b;
 }
 
-body.theme-coolnight #notifications .notification.error {
+body.theme-coolnight .notifications .notification.error {
   border: 1px solid #2d1414;
   box-shadow: 0 1px 2px #2b2b2b;
 }

@@ -87,10 +87,12 @@ class Model
      *
      * @return DateTime
      */
-    public function localDate()
+    public function localDate(string $localDate = null)
     {
         return new DateTime(
-            date(DATE_DATABASE),
+            is_null($localDate)
+                ? date(DATE_DATABASE)
+                : $localDate,
             new DateTimeZone(self::$timezone)
         );
     }
@@ -100,10 +102,12 @@ class Model
      *
      * @return DateTime
      */
-    public function utcDate()
+    public function utcDate(string $utcDate = null)
     {
         return new DateTime(
-            gmdate(DATE_DATABASE),
+            is_null($utcDate)
+                ? gmdate(DATE_DATABASE)
+                : $utcDate,
             new DateTimeZone('UTC')
         );
     }
@@ -116,6 +120,6 @@ class Model
     public function exists()
     {
         return is_numeric($this->id)
-            && (int) $this->id !== 0;
+            && 0 !== (int) $this->id;
     }
 }

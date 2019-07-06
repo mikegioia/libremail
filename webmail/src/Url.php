@@ -69,12 +69,22 @@ class Url
         return self::make('/preview/%s', $outboxId);
     }
 
+    public static function send()
+    {
+        return self::make('/send');
+    }
+
+    public static function outbox()
+    {
+        return self::make('/outbox');
+    }
+
     public static function thread(int $folderId, int $threadId)
     {
         return self::make('/thread/%s/%s', $folderId, $threadId);
     }
 
-    public static function redirect(string $path, array $params = [], int $code = 303)
+    public static function redirect(string $path = '/', array $params = [], int $code = 303)
     {
         header('Location: '.self::get($path, $params), $code);
 

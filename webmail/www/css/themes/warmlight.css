@@ -108,6 +108,7 @@ body.theme-warmlight input[type="search"],
 body.theme-warmlight input[type="text"],
 body.theme-warmlight input[type="email"],
 body.theme-warmlight input[type="password"],
+body.theme-warmlight input[type="datetime-local"],
 body.theme-warmlight .settings .row input[readonly],
 body.theme-warmlight textarea,
 body.theme-warmlight select {
@@ -158,13 +159,18 @@ body.theme-warmlight code {
   border-color: #dcc9bd;
 }
 
-body.theme-warmlight #notifications .notification.success {
+body.theme-warmlight .notifications .notification.success {
   background-color: #4da74d;
   color: #fff;
 }
 
-body.theme-warmlight #notifications .notification.error {
+body.theme-warmlight .notifications .notification.error {
   background-color: #d05b5b;
+  color: #fff;
+}
+
+body.theme-warmlight .notifications .notification.info {
+  background-color: #2385f8;
   color: #fff;
 }
 
@@ -224,7 +230,8 @@ body.theme-warmlight .folder-selector {
 /* Overwrite #aaa */
 body.theme-warmlight .folder-selector h4 .close,
 body.theme-warmlight .settings .buttons.row span,
-body.theme-warmlight section #msg-list footer span.bg {
+body.theme-warmlight section #msg-list footer span.bg,
+body.theme-warmlight .compose.preview #schedule label {
   color: #b19c8c;
 }
 

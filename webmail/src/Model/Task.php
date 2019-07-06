@@ -34,8 +34,9 @@ class Task extends Model
     const STATUS_IGNORED = 4;
 
     const TYPE_COPY = 'copy';
-    const TYPE_READ = 'read';
     const TYPE_FLAG = 'flag';
+    const TYPE_READ = 'read';
+    const TYPE_SEND = 'send';
     const TYPE_CREATE = 'create';
     const TYPE_DELETE = 'delete';
     const TYPE_UNFLAG = 'unflag';

@@ -2,6 +2,7 @@
 
 namespace App\Model;
 
+use PDO;
 use Parsedown;
 use App\Model;
 use App\Session;
@@ -28,14 +29,18 @@ class Outbox extends Model
     public $attempts;
     public $parent_id;
     public $text_html;
-    public $account_id;
     public $text_plain;
+    public $account_id;
+    public $send_after;
     public $created_at;
     public $updated_at;
     public $update_history;
 
     private $parent;
     private $account;
+
+    // Lazy-loaded and cached
+    private $unreadCount;
 
     const CREATED = 'created';
     const UPDATED = 'updated';
@@ -145,7 +150,8 @@ class Outbox extends Model
             'to' => $this->addressString($this->to),
             'cc' => $this->addressString($this->cc),
             'bcc' => $this->addressString($this->bcc),
-            'update_history' => $this->update_history
+            'update_history' => $this->update_history,
+            'send_after' => $this->send_after ?? null
         ];
 
         if ($this->id) {
@@ -217,10 +223,15 @@ class Outbox extends Model
             && ! $this->text_plain;
     }
 
+    public function isDraft()
+    {
+        return 1 === (int) $this->draft;
+    }
+
     public function exists()
     {
         return is_numeric($this->id)
-            && (int) $this->id !== 0
+            && 0 !== (int) $this->id
             && 1 !== (int) $this->deleted;
     }
 
@@ -232,6 +243,60 @@ class Outbox extends Model
     public function getHtml()
     {
         return (new Parsedown())->text($this->text_plain);
+    }
+
+    /**
+     * Returns the count of unread/active outbox messages.
+     * Caches this locally.
+     *
+     * @throws ValidationException
+     *
+     * @return int
+     */
+    public function getUnreadCount()
+    {
+        if (! is_null($this->unreadCount)) {
+            return $this->unreadCount;
+        }
+
+        if (! $this->account_id) {
+            throw new ValidationException(
+                'Account ID required when querying outbox unread'
+            );
+        }
+
+        $result = $this->db()
+            ->select(['count(id) as count'])
+            ->from('outbox')
+            ->where('sent', '=', 0)
+            ->where('draft', '=', 0)
+            ->where('deleted', '=', 0)
+            ->where('account_id', '=', $this->account->id)
+            ->execute()
+            ->fetch();
+
+        $this->unreadCount = $result['count'] ?? 0;
+
+        return $this->unreadCount;
+    }
+
+    public function getActive()
+    {
+        if (! $this->account_id) {
+            throw new ValidationException(
+                'Account ID required when querying outbox unread'
+            );
+        }
+
+        return $this->db()
+            ->select()
+            ->from('outbox')
+            ->where('sent', '=', 0)
+            ->where('draft', '=', 0)
+            ->where('deleted', '=', 0)
+            ->where('account_id', '=', $this->account->id)
+            ->execute()
+            ->fetchAll(PDO::FETCH_CLASS, get_class());
     }
 
     /**

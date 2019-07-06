@@ -3,15 +3,15 @@
  * These messages appear at the top of the page.
 */
 
-#notifications {
+.notifications {
   padding-right: 2rem;
 }
 
-#notifications input[type="checkbox"] {
+.notifications input[type="checkbox"] {
   display: none;
 }
 
-#notifications .notification {
+.notifications .notification {
   border-radius: 0.375rem;
   font-weight: 400;
   margin: 0.25rem 0 1rem;
@@ -19,15 +19,19 @@
   position: relative;
 }
 
-#notifications .notification.success {
+.notifications .notification.success {
   background-color: #b7e1ae;
 }
 
-#notifications .notification.error {
+.notifications .notification.error {
   background-color: #fcc;
 }
 
-#notifications .notification label {
+.notifications .notification.info {
+  background-color: #b1d8ff;
+}
+
+.notifications .notification label {
   color: rgba(0, 0, 0, 0.33);
   cursor: pointer;
   font-size: 2rem;
@@ -36,10 +40,10 @@
   top: 0.5625rem;
 }
 
-#notifications .notification label:hover {
+.notifications .notification label:hover {
   color: rgba(0, 0, 0, 0.66);
 }
 
-#notifications input[type="checkbox"]:checked+.notification {
+.notifications input[type="checkbox"]:checked + .notification {
   display: none;
 }

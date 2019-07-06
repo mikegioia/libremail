@@ -39,13 +39,13 @@ class View
 
     /**
      * Returns the system-wide nonce for the current request.
-     * Only generated on the first call/
+     * Only generated on the first call.
      */
     public static function getNonce()
     {
         if (! isset(self::$nonce)) {
             self::$nonce = base64_encode(bin2hex(random_bytes(12)));
-        };
+        }
 
         return self::$nonce;
     }

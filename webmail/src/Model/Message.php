@@ -3,16 +3,11 @@
 namespace App\Model;
 
 use PDO;
-use DateTime;
 use stdClass;
 use Exception;
-use DateTimeZone;
-use App\View;
 use App\Model;
-use App\Model\Outbox;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ValidationException;
-use App\Exceptions\DatabaseDeleteException;
 use App\Exceptions\DatabaseInsertException;
 use App\Exceptions\DatabaseUpdateException;
 
@@ -696,7 +691,6 @@ class Message extends Model
         // Set all messages as unread for the drafts mailbox
         $draftThreads = $this->db()
             ->select(['count(distinct(thread_id)) as count'])
-            ->count('thread_id', 'count', true)
             ->from('messages')
             ->where('deleted', '=', 0)
             ->where('folder_id', '=', $draftMailboxId)
@@ -895,7 +889,7 @@ class Message extends Model
 
         if (true === $removeNulls) {
             $data = array_filter($data, function ($var) {
-                return $var !== null;
+                return null !== $var;
             });
         }
 

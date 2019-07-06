@@ -14,6 +14,10 @@ section.compose {
   margin: 0 2rem 2.5rem 0;
 }
 
+.compose .notifications {
+  margin-bottom: 2rem;
+}
+
 .compose .row:not(.message) {
   border-bottom: 1px solid #eee;
   margin-bottom: 0.75rem;
@@ -158,19 +162,35 @@ blank address input between two valid inputs.
   margin-left: calc(13.333% + 2rem);
 }
 
-.compose .buttons a,
+.compose .buttons a:not(.button),
 .compose .buttons span {
   display: inline-block;
   transform: translateY(-0.125rem);
 }
 
-.compose .buttons button {
+.compose .buttons button,
+.compose .buttons a.button {
+  letter-spacing: 0;
   margin-right: 0.25rem;
+}
+
+.compose .buttons a.button {
+  border: none;
+  position: relative;
+  top: -0.125rem;
 }
 
 .compose .buttons span {
   color: #aaa;
   margin: 0 0.25rem;
+}
+
+.compose input[type="datetime-local"] {
+  border: 1px solid #d1d1d1;
+  border-radius: 0.25rem;
+  box-sizing: border-box;
+  font-size: 1.5rem;
+  padding: 0.5rem 0.75rem;
 }
 
 .compose .has-error label {
@@ -201,6 +221,28 @@ blank address input between two valid inputs.
 .compose.preview .help-text {
   margin-top: 1rem;
   max-width: calc(22% + 50rem);
+}
+
+.compose.preview #schedule {
+  display: none;
+}
+
+.compose.preview #schedule label {
+  margin: 0 0.25rem 0 0.5rem;
+}
+
+.compose.preview #schedule:target {
+  display: inline;
+}
+
+.compose.preview #schedule:target + a {
+  display: none;
+}
+
+.outbox-preview {
+  background: #fbfbfb;
+  box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.1);
+  padding-top: 1rem;
 }
 
 .outbox-preview {

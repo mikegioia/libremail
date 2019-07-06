@@ -101,6 +101,10 @@
   text-decoration: underline;
 }
 
+.settings .theme .theme-body .theme-links a {
+  text-decoration: underline;
+}
+
 .settings .theme + label {
   font-size: 1.25rem;
   margin: 0.5rem 0;

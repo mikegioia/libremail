@@ -17,13 +17,23 @@ $view->render('nav', [
     <?php
     $view->render('notifications', [
         'messages' => $notifications
-    ]); ?>
+    ]);
 
+    if ($message->isDraft()): ?>
     <h5>
         <span>Preview and Send Message</span>
         <a href="#confirm-delete">Delete this message</a>
     </h5>
-    <form action="<?php echo App\Url::compose(); ?>" method="post">
+    <?php
+    else: ?>
+    <div class="notifications">
+        <div class="notification info">
+            <span>This message is scheduled for delivery!</span>
+        </div>
+    </div>
+    <?php
+    endif; ?>
+    <form action="<?php echo App\Url::send(); ?>" method="post">
         <article class="outbox-preview">
             <!-- To -->
             <div class="row padded">
@@ -81,17 +91,23 @@ $view->render('nav', [
                 </div>
             </div>
         </article>
+        <?php
+        if ($message->isDraft()): ?>
         <div class="buttons">
             <button type="submit" name="edit" class="button button-secondary">
                 Back to edit
             </button>
             <button type="submit" name="send_outbox" class="button button-success"<?php echo $message->to ? '' : ' disabled'; ?>>
-                Send
-            </button>
-            <button type="submit" name="send_schedule" class="button button-primary"<?php echo $message->to ? '' : ' disabled'; ?>>
-                Scheduled send
+                Send Message!
             </button>
             <!--
+            <span id="schedule">
+                <label class="inline-blocked">Send on:</label>
+                <input type="datetime-local" name="send_after" value="" placeholder="">
+            </span>
+            <a href="#schedule" class="button button-primary"<?php echo $message->to ? '' : ' disabled'; ?>>
+                Scheduled send
+            </a>
             <button type="submit" name="send_outbox" class="button button-danger u-pull-right">
                 Send now!
             </button>
@@ -108,6 +124,8 @@ $view->render('nav', [
             You can still edit the message, schedule a specific time, or trash it before
             it gets sent.
         </div>
+        <?php
+        endif; ?>
     </form>
 </section>
 

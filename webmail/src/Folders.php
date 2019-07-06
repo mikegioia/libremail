@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Model\Folder;
+use App\Model\Outbox;
 use App\Model\Account;
 use App\Model\Message;
 
@@ -13,6 +14,7 @@ class Folders
     private $colors;
     private $sentId;
     private $spamId;
+    private $outbox;
     private $folders;
     private $inboxId;
     private $trashId;
@@ -129,6 +131,17 @@ class Folders
     public function getColors()
     {
         return $this->colors;
+    }
+
+    public function getOutbox()
+    {
+        if ($this->outbox) {
+            return $this->outbox;
+        }
+
+        $this->outbox = new Outbox($this->account);
+
+        return $this->outbox;
     }
 
     /**

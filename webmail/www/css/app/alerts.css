@@ -11,7 +11,7 @@
 }
 
 .alerts .alert {
-  animation: slideUpDown 8s 0s ease forwards;
+  animation: slideUpDown 15s 0s ease forwards;
   background-color: #333;
   border-radius: 0.375rem;
   bottom: 2rem;
@@ -73,8 +73,8 @@
   100% {
     transform: translateY(7rem);
   }
-  5%,
-  95% {
+  3%,
+  97% {
     transform: translateY(0);
   }
 }

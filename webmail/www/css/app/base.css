@@ -42,7 +42,7 @@ section#main > h5 + .help-text {
 }
 
 /* Margin with notifications */
-section#main > #notifications {
+section#main > .notifications {
   margin-top: 1.5rem;
 }
 
@@ -135,7 +135,7 @@ aside a {
   font-weight: 600;
 }
 
-/* Z-Index layers */
+/* Z-index layers */
 .top-layer {
   height: 5rem;
   padding-top: 0.75rem;

@@ -6,7 +6,6 @@ use App\Url;
 use App\Folders;
 use App\Model\Task as TaskModel;
 use App\Model\Outbox as OutboxModel;
-use App\Model\Account as AccountModel;
 use App\Model\Message as MessageModel;
 
 class ConvertDraft extends Delete

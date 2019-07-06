@@ -30,6 +30,18 @@ abstract class Base
      */
     abstract public function getType();
 
+    /**
+     * @param MessageModel $message SQL message to update
+     * @param Folders $folders Meta info about mailboxes
+     * @param array $options Any of the following:
+     *     int `outbox_id`
+     *  string `send_after`
+     *   array `all_messages`
+     *     int `to_folder_id`
+     *     int `from_folder_id`
+     *    bool `single_message`
+     *  Outbox `outbox_message`
+     */
     abstract public function update(
         MessageModel $message,
         Folders $folders,

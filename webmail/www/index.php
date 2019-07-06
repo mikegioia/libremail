@@ -126,13 +126,15 @@ $router->get('/compose', [$controller, 'compose']);
 // Edit an existing message
 $router->get('/compose/(\d+)', [$controller, 'compose']);
 // Send a new message
-$router->post('/compose', [$controller, 'send']);
+$router->post('/compose', [$controller, 'draft']);
 // View the outbox messages
 $router->get('/outbox', [$controller, 'outbox']);
 // Delete draft
 $router->post('/outbox/delete', [$controller, 'deleteDraft']);
 // Preview a message
 $router->get('/preview/(\d+)', [$controller, 'preview']);
+// Send or queue an email
+$router->post('/send', [$controller, 'send']);
 // Close the JavaScript notification
 $router->get('/closejsalert', [$controller, 'closeJsAlert']);
 // Search messages
