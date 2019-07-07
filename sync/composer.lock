@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
     "content-hash": "1d2743f61ec1d409ed6d90615b03d07d",
@@ -535,16 +535,16 @@
         },
         {
             "name": "particlebits/imap",
-            "version": "2.0.8",
+            "version": "2.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "d593841bf8308fe27a2d34d792f50cef45fcaa9c"
+                "reference": "a3d2a089d7f39364ca21045b4e8141d97cded772"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/d593841bf8308fe27a2d34d792f50cef45fcaa9c",
-                "reference": "d593841bf8308fe27a2d34d792f50cef45fcaa9c",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/a3d2a089d7f39364ca21045b4e8141d97cded772",
+                "reference": "a3d2a089d7f39364ca21045b4e8141d97cded772",
                 "shasum": ""
             },
             "require": {
@@ -578,7 +578,7 @@
                 "mail",
                 "php"
             ],
-            "time": "2019-07-01T19:09:30+00:00"
+            "time": "2019-07-07T18:23:38+00:00"
         },
         {
             "name": "particlebits/pdo",
