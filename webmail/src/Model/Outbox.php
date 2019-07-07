@@ -246,6 +246,36 @@ class Outbox extends Model
     }
 
     /**
+     * Returns a human-readable string of names to display
+     * in a short list.
+     *
+     * @return string
+     */
+    public function getNames()
+    {
+        $names = [];
+        $to = $this->parseAddresses($this->to);
+        $cc = $this->parseAddresses($this->cc);
+        $bcc = $this->parseAddresses($this->bcc);
+
+        if ($to) {
+            $names[] = 'To: '.implode(', ', $this->getNamesFromAddresses($to));
+        }
+
+        if ($cc) {
+            $names[] = 'CC: '.implode(', ', $this->getNamesFromAddresses($cc));
+        }
+
+        if ($bcc) {
+            $names[] = 'BCC: '.implode(', ', $this->getNamesFromAddresses($bcc));
+        }
+
+        return $names
+            ? implode(', ', $names)
+            : '';
+    }
+
+    /**
      * Returns the count of unread/active outbox messages.
      * Caches this locally.
      *
@@ -342,6 +372,20 @@ class Outbox extends Model
         $addresses = array_map('trim', $addresses);
 
         return array_values(array_filter($addresses));
+    }
+
+    private function getNamesFromAddresses(array $addresses)
+    {
+        return array_map(function ($address) {
+            $address = trim($address);
+            $pos = strpos($address, '<');
+
+            if (false !== $pos && $pos > 0) {
+                return trim(substr($address, 0, $pos));
+            }
+
+            return trim($address, '<> ');
+        }, $addresses);
     }
 
     private function addressString(array $addresses)

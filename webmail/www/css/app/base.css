@@ -28,6 +28,10 @@ section#main > h5 {
   padding-bottom: 0.3rem;
 }
 
+section#main > h5.w-notification {
+  margin-bottom: 1.25rem;
+}
+
 section#main > h5 a {
   float: right;
   font-size: 1.5rem;

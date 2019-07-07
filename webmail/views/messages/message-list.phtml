@@ -47,7 +47,7 @@ if ($showPaging): ?>
     endif; ?>
     </span>
 <?php
-elseif ($counts->total):
+elseif ($counts->total ?? 0):
     $url = $urlId === STARRED
         ? App\Url::make('/starred/%s', $counts->page)
         : App\Url::make('/folder/%s/%s', $folderId, $counts->page); ?>
@@ -83,6 +83,7 @@ if ($messages):
     $view->render('messages/messages', [
         'view' => $view,
         'select' => $select,
+        'isOutbox' => false,
         'folderId' => $folderId,
         'messages' => $messages,
         'isDrafts' => $folderId === $folders->getDraftsId()

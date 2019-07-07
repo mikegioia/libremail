@@ -106,6 +106,10 @@
   font-size: 1.2rem;
 }
 
+.dropdown li.notice:first-child {
+  border-top: none !important;
+}
+
 .dropdown li .left-icon {
   color: #444;
   display: inline-block;

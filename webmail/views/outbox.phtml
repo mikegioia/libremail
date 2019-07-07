@@ -13,7 +13,48 @@ $view->render('nav', [
 ]); ?>
 
 <section id="main">
+    <?php
+    $view->render('notifications', [
+        'messages' => $notifications
+    ]); ?>
+    <form action="/outbox/update" method="post">
+        <?php
+        $view->render('nav/actions', [
+            'folderLabel' => OUTBOX
+        ]); ?>
 
+        <section id="msg-list" class="no-select">
+            <input type="checkbox" id="mailbox-outbox-checkbox" class="mailbox-checkbox" />
+            <h5>
+                <span>Outbox</span>
+            </h5>
+            <div id="outbox" class="mailbox">
+            <?php
+            if ($messages):
+                $view->render('messages/outbox-messages', [
+                    'view' => $view,
+                    'select' => $select,
+                    'messages' => $messages,
+                    'today' => $view::getDate(null, $view::DATE_FULL)
+                ]);
+                $view->render('nav/outbox-actions-menu', [
+                    'folderId' => 0,
+                    'folders' => $folders,
+                    'folderLabel' => OUTBOX
+                ]);
+            else:
+                $view->render('messages/no-messages');
+            endif; ?>
+            </div>
+
+            <?php
+            $view->render('messages/footer', [
+                'view' => $view,
+                'meta' => $meta,
+                'totals' => $totals
+            ]); ?>
+        </section>
+    </form>
 </section>
 
 <?php

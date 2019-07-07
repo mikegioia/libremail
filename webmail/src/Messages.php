@@ -198,13 +198,11 @@ class Messages
     private function setDisplayDate(Message &$message)
     {
         $today = View::getDate(null, View::DATE_FULL);
-        $messageTime = $message->date_recv
-            ? strtotime($message->date_recv)
-            : strtotime($message->date);
-        $messageDate = View::getDate($message->date, View::DATE_FULL);
+        $dateString = $message->date_recv ?: $message->date;
+        $messageDate = View::getDate($dateString, View::DATE_FULL);
         $message->display_date = $today === $messageDate
-            ? View::getDate($message->date, View::TIME)
-            : View::getDate($message->date, View::DATE_SHORT);
+            ? View::getDate($dateString, View::TIME)
+            : View::getDate($dateString, View::DATE_SHORT);
     }
 
     /**

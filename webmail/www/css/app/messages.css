@@ -256,6 +256,16 @@ input[type="checkbox"].msg-checkbox {
   width: 3rem;
 }
 
+.msg-contents .queued-for-delivery {
+  color: #ab51c4;
+  float: left;
+  height: 3rem;
+  line-height: 3rem;
+  padding-right: 0.2rem;
+  text-align: center;
+  width: 2.5rem;
+}
+
 .msg-contents .names {
   color: #333;
   display: block;

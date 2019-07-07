@@ -239,13 +239,6 @@ class Controller
         ]);
     }
 
-    public function outbox()
-    {
-        $this->page('outbox', [
-            'messages' => (new Outbox($this->account))->getActive()
-        ]);
-    }
-
     public function deleteDraft()
     {
         session_start();
@@ -361,6 +354,17 @@ class Controller
     public function error404()
     {
         throw new NotFoundException;
+    }
+
+    public function outbox()
+    {
+        $select = Url::getParam('select');
+
+        $this->page('outbox', [
+            'select' => $select,
+            'messages' => (new Outbox($this->account))->getActive(),
+            'totals' => (new Message)->getSizeCounts($this->account->id)
+        ]);
     }
 
     /**

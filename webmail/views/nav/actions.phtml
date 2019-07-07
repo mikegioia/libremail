@@ -36,12 +36,16 @@
                 <i class="fa fa-caret-down"></i>
             </a>
             <ul>
+                <?php
+                if (! isset($folderLabel) || OUTBOX !== $folderLabel): ?>
                 <li>
                     <input type="submit" name="action" value="Mark all as read" />
                 </li>
                 <li>
                     <input type="submit" name="action" value="Mark all as unread" />
                 </li>
+                <?php
+                endif; ?>
                 <li class="notice">
                     <em>
                         Select messages to see more actions

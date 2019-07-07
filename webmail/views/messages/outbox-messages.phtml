@@ -1,0 +1,30 @@
+<?php
+
+foreach ($messages as $message):
+    $url = App\Url::make('/preview/%s', $message->id);
+    $date = $view::getDate($message->send_after, $view::DATE_FULL); ?>
+    <input type="checkbox" name="message[]" value="<?php echo $message->id; ?>"
+        id="msg-checkbox-<?php echo $message->id; ?>" class="msg-checkbox"
+        <?php echo $select === App\Actions::SELECT_ALL ? ' checked="checked"' : ''; ?>/>
+    <label for="msg-checkbox-<?php echo $message->id; ?>"
+        class="msg-label seen"></label>
+    <div class="msg-contents seen" id="msg-contents-<?php echo $message->id; ?>">
+        <span class="queued-for-delivery" title="Queued for delivery">
+            <i class="fas fa-angle-double-right"></i>
+        </span>
+        <a href="<?php echo $url; ?>" class="names">
+            <?php $view->clean($message->getNames()); ?>
+        </a>
+        <a href="<?php echo $url; ?>" class="subject">
+            <span><?php $view->clean($message->subject); ?></span>&nbsp;<?php $view->clean($message->text_plain); ?>
+        </a>
+        <a href="<?php echo $url; ?>" class="date">
+            <?php echo $today === $date
+                ? $view::getDate($message->send_after, $view::TIME)
+                : $view::getDate($message->send_after, $view::DATE_SHORT); ?>
+        </a>
+    </div>
+    <input type="hidden" name="message_all[]" value="<?php echo $message->id; ?>" />
+    <div class="u-cf"></div>
+<?php
+endforeach; ?>
