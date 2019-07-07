@@ -156,6 +156,10 @@ class Threads
         $total = $this->maxId - $minId;
         $messageModel = new MessageModel;
 
+        if (! $total) {
+            return;
+        }
+
         $this->log->debug(
             "Threading: storing {$total} messages for threading for ".
             "{$this->account->email}");
