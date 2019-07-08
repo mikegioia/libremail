@@ -297,10 +297,12 @@ class Sync
             );
 
             // Commit any pending actions to the mail server
-            $this->syncActions($account);
+            // If any actions are made, force a message refresh
+            $actionCount = $this->syncActions($account);
 
-            if (true === Fn\get($options, self::OPT_ONLY_SYNC_ACTIONS)
-                || true === $this->actions
+            if ((true === Fn\get($options, self::OPT_ONLY_SYNC_ACTIONS)
+                    || true === $this->actions)
+                && $actionCount === 0
             ) {
                 $this->disconnect();
 
@@ -698,7 +700,7 @@ class Sync
      */
     private function syncActions(AccountModel $account)
     {
-        (new ActionSync(
+        $count = (new ActionSync(
             $this->log,
             $this->cli,
             $this->emitter,
@@ -707,6 +709,8 @@ class Sync
         ))->run($account);
 
         $this->checkForHalt();
+
+        return $count;
     }
 
     private function sendMessage(string $message, string $status = STATUS_ERROR)

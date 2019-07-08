@@ -79,7 +79,7 @@ class Task extends Model
      * @param string $message
      * @param int $status
      * @param mixed $returnValue Value returned from this function;
-     *   Useful for the caller to respond with this function
+     *   Useful for the caller to respond with this function.
      *
      * @throws DatabaseUpdateException
      *
@@ -104,10 +104,14 @@ class Task extends Model
      * Marks a message as done.
      *
      * @throws DatabaseUpdateException
+     *
+     * @return bool
      */
     public function done()
     {
         $this->updateStatus(self::STATUS_DONE, null, true);
+
+        return true;
     }
 
     /**

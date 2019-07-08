@@ -24,6 +24,7 @@ class View
     const TIME = 'g:i a';
     const DATE_SHORT = 'M j';
     const DATE_FULL = 'Y-m-d';
+    const DATE_DISPLAY_TIME = 'F jS \a\t g:i a';
     const DEFAULT_TZ = 'America/New_York';
 
     public static function setConfig(array $config)

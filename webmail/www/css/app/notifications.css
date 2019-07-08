@@ -47,3 +47,17 @@
 .notifications input[type="checkbox"]:checked + .notification {
   display: none;
 }
+
+.notifications .notification-actions {
+  margin-top: 1rem;
+}
+
+.notifications .notification-actions .button {
+  margin-bottom: 0.25rem;
+}
+
+.notifications .notification-actions span {
+  color: rgba(0, 0, 0, 0.66);
+  font-size: 90%;
+  margin-left: 1rem;
+}

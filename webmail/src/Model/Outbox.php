@@ -4,6 +4,7 @@ namespace App\Model;
 
 use PDO;
 use Parsedown;
+use App\View;
 use App\Model;
 use App\Session;
 use Zend\Mail\Address;
@@ -228,6 +229,15 @@ class Outbox extends Model
         return 1 === (int) $this->draft;
     }
 
+    public function isPastDue()
+    {
+        $now = time();
+        $sendTime = strtotime($this->send_after);
+
+        return ! $this->isDraft()
+            && (! $sendTime || $now >= $sendTime);
+    }
+
     public function exists()
     {
         return is_numeric($this->id)
@@ -273,6 +283,30 @@ class Outbox extends Model
         return $names
             ? implode(', ', $names)
             : '';
+    }
+
+    public function getDeliveryDate()
+    {
+        if (! $this->send_after) {
+            return '(no date saved)';
+        }
+
+        $now = $this->localDate();
+        $localDate = $this->localDate($this->send_after);
+
+        // If it's past, use the full time
+        if ($localDate < $now) {
+            return $localDate->format(View::DATE_DISPLAY_TIME);
+        }
+
+        // If it's < 12 hours from now use the time
+        $hours = $localDate->diff($now, true)->hours;
+
+        if ($hours <= 12) {
+            return $localDate->format(View::TIME);
+        }
+
+        return $localDate->format(View::DATE_SHORT);
     }
 
     /**

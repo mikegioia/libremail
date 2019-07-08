@@ -4,7 +4,9 @@ $view->render('header', [
     'view' => $view,
     'folders' => $folders,
     'pageClass' => 'compose',
-    'pageTitle' => 'Preview and Send Message',
+    'pageTitle' => $message->isDraft()
+        ? 'Preview and Send Message'
+        : 'Outgoing Message'
 ]);
 
 $view->render('nav', [
@@ -29,14 +31,37 @@ $view->render('nav', [
     <h5 class="w-notification">
         <span>Outgoing Message</span>
     </h5>
-    <div class="notifications">
-        <div class="notification info">
-            <span>This message is scheduled for delivery!</span>
-        </div>
-    </div>
     <?php
     endif; ?>
     <form action="<?php echo App\Url::send(); ?>" method="post">
+        <?php
+        if (! $message->isDraft()): ?>
+        <div class="notifications">
+            <div class="notification info">
+                <div>This message is scheduled for delivery!</div>
+                <div class="notification-actions">
+                    <button name="restore_draft" class="button button-secondary">Cancel delivery</button>
+                <?php
+                if ($message->isPastDue()):
+                    if ((int) $meta->running === 1): ?>
+                    <span>Sending shortly&hellip;</span>
+                    <?php
+                    else: ?>
+                    <span>Will be sent when sync starts (currently offline!)</span>
+                    <?php
+                    endif;
+                else: ?>
+                    <span>
+                        This message will be delivered
+                        <strong><?php echo $message->getDeliveryDate(); ?></strong>
+                    </span>
+                <?php
+                endif; ?>
+                </div>
+            </div>
+        </div>
+        <?php
+        endif; ?>
         <article class="outbox-preview">
             <!-- To -->
             <div class="row padded">

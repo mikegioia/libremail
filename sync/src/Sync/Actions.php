@@ -70,13 +70,18 @@ class Actions
         $this->interactive = $interactive;
     }
 
+    /**
+     * Runs any available actions.
+     *
+     * @return int Count of actions processed
+     */
     public function run(AccountModel $account)
     {
         $tasks = (new TaskModel)->getTasksForSync($account->id);
         $count = count($tasks);
 
         if (! $count) {
-            return;
+            return 0;
         }
 
         $noun = Fn\plural('task', $count);
@@ -85,15 +90,21 @@ class Actions
         // Compress them by removing any redundant tasks
         // Redundant tasks are marked as `ignored`
         $tasks = $this->processDuplicates($tasks);
+        $count = 0;
 
         $this->startProgress(count($tasks));
 
         foreach ($tasks as $i => $task) {
-            $this->processTask($task);
+            if ($this->processTask($task)) {
+                ++$count;
+            }
+
             $this->updateProgress($i + 1);
         }
 
         $this->expungeFolders();
+
+        return $count;
     }
 
     /**
@@ -232,7 +243,7 @@ class Actions
             return $task->fail(self::ERR_FAIL_IMAP_SYNC);
         }
 
-        $task->done();
+        return $task->done();
     }
 
     /**

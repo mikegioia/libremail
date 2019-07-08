@@ -3,7 +3,7 @@
             <div class="status u-pull-left">
                 <div class="running">
                 <?php
-                if ($meta->running == 1): ?>
+                if ((int) $meta->running === 1): ?>
                     <i class="fa fa-wifi"></i>
                     <span>Online</span>
                 <?php
@@ -15,7 +15,7 @@
                 </div>
                 <div class="asleep">
                 <?php
-                if ($meta->asleep == 1 || $meta->running != 1): ?>
+                if ((int) $meta->asleep === 1 || (int) $meta->running !== 1): ?>
                     <i class="fa fa-moon"></i>
                     <span>Asleep</span>
                 <?php
