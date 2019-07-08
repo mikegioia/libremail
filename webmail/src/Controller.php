@@ -58,8 +58,9 @@ class Controller
     {
         session_start();
 
-        if (! is_null(Url::postParam('send_outbox'))) {
-            exit('do it');
+        if (! is_null(Url::postParam('restore_draft'))) {
+            var_dump($_POST);
+            exit;
         }
 
         // Process any other actions

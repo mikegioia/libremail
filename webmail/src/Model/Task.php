@@ -42,6 +42,7 @@ class Task extends Model
     const TYPE_UNFLAG = 'unflag';
     const TYPE_UNREAD = 'unread';
     const TYPE_UNDELETE = 'undelete';
+    const TYPE_RESTORE_DRAFT = 'restore_draft';
 
     /**
      * Create a new task.

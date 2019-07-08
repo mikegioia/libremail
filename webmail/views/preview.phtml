@@ -31,37 +31,33 @@ $view->render('nav', [
     <h5 class="w-notification">
         <span>Outgoing Message</span>
     </h5>
+    <div class="notifications">
+        <div class="notification info">
+            <div>This message is scheduled for delivery!</div>
+            <div class="notification-actions">
+                <a class="button button-secondary" href="#confirm-restore-draft">Cancel delivery</a>
+            <?php
+            if ($message->isPastDue()):
+                if ((int) $meta->running === 1 || (int) $meta->asleep === 1): ?>
+                <span>Sending shortly&hellip;</span>
+                <?php
+                else: ?>
+                <span>Will be sent when sync starts (currently offline!)</span>
+                <?php
+                endif;
+            else: ?>
+                <span>
+                    This message will be delivered
+                    <strong><?php echo $message->getDeliveryDate(); ?></strong>
+                </span>
+            <?php
+            endif; ?>
+            </div>
+        </div>
+    </div>
     <?php
     endif; ?>
     <form action="<?php echo App\Url::send(); ?>" method="post">
-        <?php
-        if (! $message->isDraft()): ?>
-        <div class="notifications">
-            <div class="notification info">
-                <div>This message is scheduled for delivery!</div>
-                <div class="notification-actions">
-                    <button name="restore_draft" class="button button-secondary">Cancel delivery</button>
-                <?php
-                if ($message->isPastDue()):
-                    if ((int) $meta->running === 1 || (int) $meta->asleep === 1): ?>
-                    <span>Sending shortly&hellip;</span>
-                    <?php
-                    else: ?>
-                    <span>Will be sent when sync starts (currently offline!)</span>
-                    <?php
-                    endif;
-                else: ?>
-                    <span>
-                        This message will be delivered
-                        <strong><?php echo $message->getDeliveryDate(); ?></strong>
-                    </span>
-                <?php
-                endif; ?>
-                </div>
-            </div>
-        </div>
-        <?php
-        endif; ?>
         <article class="outbox-preview">
             <!-- To -->
             <div class="row padded">
@@ -162,10 +158,23 @@ $view->render('confirm', [
     'id' => 'confirm-delete',
     'confirmLabel' => 'Yes, delete it',
     'cancelLabel' => 'No!',
-    'action' => App\Url::make('/outbox/delete'),
+    'action' => App\Url::deleteOutbox(),
     'message' => 'Are you sure you want to delete this message?',
     'data' => [
         'id' => $message->id
+    ]
+]);
+
+$view->render('confirm', [
+    'id' => 'confirm-restore-draft',
+    'confirmName' => 'restore_draft',
+    'confirmLabel' => 'Yes, cancel delivery',
+    'cancelLabel' => 'No!',
+    'action' => App\Url::updateOutbox(),
+    'message' => 'Are you sure you want to cancel the delivery of this message?'
+        .'<br><br>This will restore the message back to a draft, where you can edit it again.',
+    'data' => [
+        'message[]' => $message->id
     ]
 ]);
 

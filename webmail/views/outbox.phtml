@@ -17,7 +17,7 @@ $view->render('nav', [
     $view->render('notifications', [
         'messages' => $notifications
     ]); ?>
-    <form action="/outbox/update" method="post">
+    <form action="<?php echo App\Url::updateOutbox(); ?>" method="post">
         <?php
         $view->render('nav/actions', [
             'folderLabel' => OUTBOX
