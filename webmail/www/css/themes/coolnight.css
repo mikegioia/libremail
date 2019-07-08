@@ -44,8 +44,9 @@ body.theme-coolnight .alert {
 body.theme-coolnight aside a {
   color: #fff;
 }
-body.theme-coolnight .alert .icon.button {
-  box-shadow: none;
+body.theme-coolnight .alert .icon.button,
+body.theme-coolnight .notification .button {
+  box-shadow: none !important;
 }
 
 /* Default background */

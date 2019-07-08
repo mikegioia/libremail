@@ -37,11 +37,8 @@ $view->render('nav', [
                     'messages' => $messages,
                     'today' => $view::getDate(null, $view::DATE_FULL)
                 ]);
-                $view->render('nav/outbox-actions-menu', [
-                    'folderId' => 0,
-                    'folders' => $folders,
-                    'folderLabel' => OUTBOX
-                ]);
+
+                $view->render('nav/outbox-actions-menu');
             else:
                 $view->render('messages/no-messages');
             endif; ?>

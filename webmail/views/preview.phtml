@@ -43,7 +43,7 @@ $view->render('nav', [
                     <button name="restore_draft" class="button button-secondary">Cancel delivery</button>
                 <?php
                 if ($message->isPastDue()):
-                    if ((int) $meta->running === 1): ?>
+                    if ((int) $meta->running === 1 || (int) $meta->asleep === 1): ?>
                     <span>Sending shortly&hellip;</span>
                     <?php
                     else: ?>
