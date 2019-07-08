@@ -128,9 +128,12 @@ class Actions
         // If a selection was made, return to the previous page
         // with the key in the query params.
         if ($select) {
-            Url::redirectRaw(Url::folder($folderId), [
-                'select' => strtolower($select)
-            ]);
+            Url::redirectRaw(
+                OUTBOX === $urlId
+                    ? Url::outbox()
+                    : Url::folder($folderId),
+                ['select' => strtolower($select)]
+            );
         }
 
         Model::getDb()->beginTransaction();

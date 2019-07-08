@@ -53,6 +53,8 @@ $view->render('nav', [
                 'meta' => $meta,
                 'totals' => $totals
             ]); ?>
+
+            <input type="hidden" name="url_id" value="<?php echo OUTBOX; ?>" />
         </section>
     </form>
 </section>

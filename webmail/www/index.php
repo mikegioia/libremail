@@ -129,6 +129,8 @@ $router->get('/compose/(\d+)', [$controller, 'compose']);
 $router->post('/compose', [$controller, 'draft']);
 // View the outbox messages
 $router->get('/outbox', [$controller, 'outbox']);
+// Update outbox messages
+$router->post('/outbox/update', [$controller, 'updateOutbox']);
 // Delete draft
 $router->post('/outbox/delete', [$controller, 'deleteDraft']);
 // Preview a message
