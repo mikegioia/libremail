@@ -104,7 +104,7 @@ $router->post('/update', [$controller, 'update']);
 // Update messages via GET but require a CSRF token
 $router->get('/action', [$controller, 'action']);
 // Undo an action or collection of actions
-$router->get('/undo/(\d+)', [$controller, 'undo']);
+$router->post('/undo/(\d+)', [$controller, 'undo']);
 // Get the star HTML for a message
 $router->get('/star/(\w+)/(\w+)/(\d+)/(\w+).html', [$controller, 'getStar']);
 // Set star flag on a message
