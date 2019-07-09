@@ -35,6 +35,7 @@ class Actions
     const MARK_READ = 'mark_read';
     const MARK_UNREAD = 'mark_unread';
     const CONVERT_DRAFT = 'convert_draft';
+    const RESTORE_DRAFT = 'restore_draft';
     const MARK_ALL_READ = 'mark_all_read';
     const MARK_ALL_UNREAD = 'mark_all_unread';
     const MARK_UNREAD_FROM_HERE = 'mark_unread_from_here';
@@ -78,6 +79,7 @@ class Actions
         'mark_read' => 'App\Actions\MarkRead',
         'mark_unread' => 'App\Actions\MarkUnread',
         'convert_draft' => 'App\Actions\ConvertDraft',
+        'restore_draft' => 'App\Actions\RestoreDraft',
         'mark_unread_from_here' => 'App\Actions\MarkUnreadFromHere'
     ];
 
@@ -311,6 +313,10 @@ class Actions
             $nounUpper = 'Draft';
             $nounPlural = 'drafts';
             $message = 'imported to outbox';
+        } elseif (self::RESTORE_DRAFT === $action) {
+            $nounUpper = 'Message';
+            $nounPlural = 'messages';
+            $message = 'converted back to draft';
         }
 
         if (! $message) {

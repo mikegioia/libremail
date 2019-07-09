@@ -9,6 +9,8 @@ use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 
 class Meta extends Model
 {
+    use ModelTrait;
+
     public $key;
     public $value;
     public $updated_at;
@@ -22,8 +24,6 @@ class Meta extends Model
     const ACTIVE_FOLDER = 'active_folder';
     const ACTIVE_ACCOUNT = 'active_account';
     const LAST_SYNC_TIME = 'last_sync_time';
-
-    use ModelTrait;
 
     public function getData()
     {

@@ -4,8 +4,8 @@ namespace App\Actions;
 
 use App\Actions;
 use App\Folders;
+use App\MessageInterface;
 use App\Exceptions\ServerException;
-use App\Model\Message as MessageModel;
 
 class Unspam extends Delete
 {
@@ -15,7 +15,7 @@ class Unspam extends Delete
      *
      * @see Base for params
      */
-    public function update(MessageModel $message, Folders $folders, array $options = [])
+    public function update(MessageInterface $message, Folders $folders, array $options = [])
     {
         if (! $folders->getSpamId()) {
             throw new ServerException('No Spam folder found', ERR_NO_SPAM_FOLDER);

@@ -5,8 +5,8 @@ namespace App\Actions;
 use Exception;
 use App\Actions;
 use App\Folders;
+use App\MessageInterface;
 use App\Model\Task as TaskModel;
-use App\Model\Message as MessageModel;
 
 class Copy extends Base
 {
@@ -19,7 +19,7 @@ class Copy extends Base
      *
      * @throws Exception
      */
-    public function update(MessageModel $message, Folders $folders, array $options = [])
+    public function update(MessageInterface $message, Folders $folders, array $options = [])
     {
         if (! isset($options[Actions::TO_FOLDER_ID])) {
             throw new Exception('Missing folder ID in copy action');

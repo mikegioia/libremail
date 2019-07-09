@@ -14,6 +14,8 @@ use App\Exceptions\DatabaseInsert as DatabaseInsertException;
 
 class Folder extends Model
 {
+    use ModelTrait;
+
     public $id;
     public $name;
     public $count;
@@ -22,8 +24,6 @@ class Folder extends Model
     public $ignored;
     public $account_id;
     public $created_at;
-
-    use ModelTrait;
 
     const DRAFTS = [
         '[Gmail]/Drafts',

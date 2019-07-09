@@ -4,6 +4,7 @@ namespace App;
 
 use App\Model\Task as TaskModel;
 use App\Exceptions\ServerException;
+use App\Model\Outbox as OutboxModel;
 use App\Model\Message as MessageModel;
 
 class Rollback
@@ -46,12 +47,7 @@ class Rollback
 
         Model::getDb()->commit();
         Session::alert('Action'.(1 === $count ? '' : 's').' undone.');
-
-        if (TYPE_CREATE === $task->type) {
-            Url::redirect('/');
-        } else {
-            Url::redirectBack();
-        }
+        Url::redirectBack();
     }
 
     /**
@@ -92,6 +88,18 @@ class Rollback
                 return (new MessageModel($task->message_id))
                     ->loadById()
                     ->deleteCreatedMessage();
+
+            case TaskModel::TYPE_DELETE_OUTBOX:
+                // Remove the deleted flag on the outbox message
+                return (new OutboxModel)
+                    ->loadById($task->outbox_id, true)
+                    ->restore();
+
+            case TaskModel::TYPE_SEND:
+                // Restore the outbox message
+                return (new OutboxModel)
+                    ->loadById($task->outbox_id)
+                    ->restore(true);
         }
     }
 }

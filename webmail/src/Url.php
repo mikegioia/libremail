@@ -74,14 +74,14 @@ class Url
         return self::make('/send');
     }
 
+    public static function update()
+    {
+        return self::make('/update');
+    }
+
     public static function outbox()
     {
         return self::make('/outbox');
-    }
-
-    public static function updateOutbox()
-    {
-        return self::make('/outbox/update');
     }
 
     public static function deleteOutbox()

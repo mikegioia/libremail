@@ -13,17 +13,17 @@ $view->render('nav', [
 ]); ?>
 
 <section id="main">
-    <?php
-    $view->render('notifications', [
-        'messages' => $notifications
-    ]); ?>
-    <form action="<?php echo App\Url::updateOutbox(); ?>" method="post">
+    <form action="<?php echo App\Url::update(); ?>" method="post">
         <?php
         $view->render('nav/actions', [
             'folderLabel' => OUTBOX
         ]); ?>
 
         <section id="msg-list" class="no-select">
+            <?php
+            $view->render('notifications', [
+                'messages' => $notifications
+            ]); ?>
             <input type="checkbox" id="mailbox-outbox-checkbox" class="mailbox-checkbox" />
             <h5>
                 <span>Outbox</span>

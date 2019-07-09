@@ -113,6 +113,19 @@ class Model
     }
 
     /**
+     * Takes in a UTC date string and converts it to the local time.
+     *
+     * @return DateTime
+     */
+    public function utcToLocal(string $utcDate = null)
+    {
+        $datetime = $this->utcDate($utcDate);
+        $datetime->setTimezone(new DateTimeZone(self::$timezone));
+
+        return $datetime;
+    }
+
+    /**
      * Determines if the model object has a valid ID.
      *
      * @return bool

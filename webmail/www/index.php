@@ -104,7 +104,7 @@ $router->post('/update', [$controller, 'update']);
 // Update messages via GET but require a CSRF token
 $router->get('/action', [$controller, 'action']);
 // Undo an action or collection of actions
-$router->post('/undo/(\d+)', [$controller, 'undo']);
+$router->get('/undo/(\d+)', [$controller, 'undo']);
 // Get the star HTML for a message
 $router->get('/star/(\w+)/(\w+)/(\d+)/(\w+).html', [$controller, 'getStar']);
 // Set star flag on a message
@@ -129,8 +129,6 @@ $router->get('/compose/(\d+)', [$controller, 'compose']);
 $router->post('/compose', [$controller, 'draft']);
 // View the outbox messages
 $router->get('/outbox', [$controller, 'outbox']);
-// Update outbox messages
-$router->post('/outbox/update', [$controller, 'updateOutbox']);
 // Delete draft
 $router->post('/outbox/delete', [$controller, 'deleteDraft']);
 // Preview a message

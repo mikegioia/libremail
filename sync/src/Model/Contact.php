@@ -9,13 +9,13 @@ use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 
 class Contact extends Model
 {
+    use ModelTrait;
+
     public $id;
     public $name;
     public $tally;
     public $account_id;
     public $created_at;
-
-    use ModelTrait;
 
     public function getData()
     {

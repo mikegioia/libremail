@@ -47,7 +47,7 @@ $view->render('nav', [
                 endif;
             else: ?>
                 <span>
-                    This message will be delivered
+                    This message will be delivered:
                     <strong><?php echo $message->getDeliveryDate(); ?></strong>
                 </span>
             <?php
@@ -167,10 +167,11 @@ $view->render('confirm', [
 
 $view->render('confirm', [
     'id' => 'confirm-restore-draft',
-    'confirmName' => 'restore_draft',
+    'confirmName' => 'action',
+    'confirmValue' => 'restore_draft',
     'confirmLabel' => 'Yes, cancel delivery',
     'cancelLabel' => 'No!',
-    'action' => App\Url::updateOutbox(),
+    'action' => App\Url::update(),
     'message' => 'Are you sure you want to cancel the delivery of this message?'
         .'<br><br>This will restore the message back to a draft, where you can edit it again.',
     'data' => [

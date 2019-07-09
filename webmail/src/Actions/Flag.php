@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Actions;
 use App\Folders;
+use App\MessageInterface;
 use App\Model\Task as TaskModel;
 use App\Actions\Copy as CopyAction;
 use App\Model\Message as MessageModel;
@@ -16,7 +17,7 @@ class Flag extends Base
      *
      * @see Base for params
      */
-    public function update(MessageModel $message, Folders $folders, array $options = [])
+    public function update(MessageInterface $message, Folders $folders, array $options = [])
     {
         $this->setFlag($message, MessageModel::FLAG_FLAGGED, true, [], $options);
 

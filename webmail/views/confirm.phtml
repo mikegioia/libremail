@@ -3,7 +3,7 @@
         <div class="confirm-message"><?php echo $message; ?></div>
         <div class="dialog-controls">
             <a href="#" class="button button-danger"><?php echo $cancelLabel ?? 'Cancel'; ?></a>
-            <button type="submit" class="button button-secondary" name="<?php echo $confirmName ?? 'submit'; ?>"><?php echo $confirmLabel ?? 'Okay'; ?></button>
+            <button type="submit" class="button button-secondary" name="<?php echo $confirmName ?? 'submit'; ?>"<?php echo isset($confirmValue) ? ' value="'.$confirmValue.'"' : ''; ?>><?php echo $confirmLabel ?? 'Okay'; ?></button>
         </div>
         <?php
     if (isset($data)):

@@ -2,11 +2,15 @@
 
 namespace App\Model;
 
+use PDO;
 use App\Model;
 use App\Traits\Model as ModelTrait;
+use App\Exceptions\NotFound as NotFoundException;
 
 class Outbox extends Model
 {
+    use ModelTrait;
+
     public $id;
     public $to;
     public $cc;
@@ -27,7 +31,8 @@ class Outbox extends Model
     public $updated_at;
     public $update_history;
 
-    use ModelTrait;
+    const DELETED = 'deleted';
+    const RESTORED = 'restored';
 
     public function getData()
     {
@@ -55,6 +60,65 @@ class Outbox extends Model
     }
 
     /**
+     * @throws NotFoundException
+     */
+    public function loadById()
+    {
+        if (! $this->id) {
+            throw new NotFoundException(MESSAGE);
+        }
+
+        $outbox = $this->getById($this->id);
+
+        if ($outbox) {
+            $this->setData($outbox);
+        }
+
+        return $this;
+    }
+
+    public function getById(int $id)
+    {
+        return $this->db()
+            ->select()
+            ->from('outbox')
+            ->where('id', '=', $id)
+            ->execute()
+            ->fetch(PDO::FETCH_OBJ);
+    }
+
+    /**
+     * Removes the delete flag.
+     *
+     * @throws ValidationException
+     */
+    public function restore(bool $draft = false)
+    {
+        $this->requireInt($this->id, 'Outbox ID');
+        $this->updateHistory(self::RESTORED);
+
+        $this->deleted = 0;
+
+        $data = [
+            'deleted' => 0,
+            'update_history' => $this->update_history
+        ];
+
+        if (true === $draft) {
+            $this->draft = 1;
+            $data['draft'] = 1;
+        }
+
+        $restored = $this->db()
+            ->update($data)
+            ->table('outbox')
+            ->where('id', '=', $this->id)
+            ->execute();
+
+        return is_numeric($restored) ? $restored : false;
+    }
+
+    /**
      * @throws ValidationException
      *
      * @return bool
@@ -62,13 +126,31 @@ class Outbox extends Model
     public function softDelete()
     {
         $this->requireInt($this->id, 'Outbox ID');
+        $this->updateHistory(self::DELETED);
+
+        $this->deleted = 1;
 
         $deleted = $this->db()
-            ->update(['deleted' => 1])
+            ->update([
+                'deleted' => 1,
+                'update_history' => $this->update_history
+            ])
             ->table('outbox')
             ->where('id', '=', $this->id)
             ->execute();
 
         return is_numeric($deleted) ? $deleted : false;
+    }
+
+    /**
+     * Logs a new item to the history text.
+     */
+    private function updateHistory(string $type)
+    {
+        $update = date('ymdhis').' '.$type;
+
+        $this->update_history = $this->update_history
+            ? sprintf("%s\n%s", $update, $this->update_history)
+            : $update;
     }
 }

@@ -5,6 +5,7 @@ namespace App\Sync;
 use App\Model;
 use League\CLImate\CLImate;
 use App\Model\Task as TaskModel;
+use App\Model\Outbox as OutboxModel;
 use App\Model\Message as MessageModel;
 
 class Rollback
@@ -96,6 +97,18 @@ class Rollback
                 return (new MessageModel($task->message_id))
                     ->loadById()
                     ->deleteCreatedMessage();
+
+            case TaskModel::TYPE_DELETE_OUTBOX:
+                // Remove the deleted flag on the outbox message
+                return (new OutboxModel($task->outbox_id))
+                    ->loadById()
+                    ->restore();
+
+            case TaskModel::TYPE_SEND:
+                // Restore the outbox message to a draft
+                return (new OutboxModel($task->outbox_id))
+                    ->loadById()
+                    ->restore(true);
         }
     }
 }

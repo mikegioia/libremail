@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Url;
 use App\Folders;
+use App\MessageInterface;
 use App\Model\Task as TaskModel;
 use App\Model\Outbox as OutboxModel;
 use App\Model\Message as MessageModel;
@@ -19,7 +20,7 @@ class ConvertDraft extends Delete
      *
      * @throws Exception
      */
-    public function update(MessageModel $message, Folders $folders, array $options = [])
+    public function update(MessageInterface $message, Folders $folders, array $options = [])
     {
         // Create both the outbox message the draft message
         $outbox = new OutboxModel($folders->getAccount());

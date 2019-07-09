@@ -54,22 +54,6 @@ class Controller
         ))->run();
     }
 
-    public function updateOutbox()
-    {
-        session_start();
-
-        if (! is_null(Url::postParam('restore_draft'))) {
-            var_dump($_POST);
-            exit;
-        }
-
-        // Process any other actions
-        (new Actions(
-            new Folders($this->account, getConfig('colors')),
-            $_POST + $_GET
-        ))->run();
-    }
-
     public function action()
     {
         session_start();
