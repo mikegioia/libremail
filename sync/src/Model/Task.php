@@ -79,8 +79,8 @@ class Task extends Model
      *
      * @param string $message
      * @param int $status
-     * @param mixed $returnValue Value returned from this function;
-     *   Useful for the caller to respond with this function.
+     * @param mixed $returnValue value returned from this function;
+     *   Useful for the caller to respond with this function
      *
      * @throws DatabaseUpdateException
      *
