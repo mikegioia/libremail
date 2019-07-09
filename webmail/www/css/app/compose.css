@@ -116,6 +116,10 @@ blank address input between two valid inputs.
   top: 0;
 }
 
+.compose .addresses.from .show-hidden-addresses label a {
+  text-decoration: underline;
+}
+
 .compose .addresses.from .show-hidden-addresses label + label {
   margin-left: 0.5rem;
 }
