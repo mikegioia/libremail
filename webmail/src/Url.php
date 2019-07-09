@@ -74,9 +74,19 @@ class Url
         return self::make('/send');
     }
 
+    public static function update()
+    {
+        return self::make('/update');
+    }
+
     public static function outbox()
     {
         return self::make('/outbox');
+    }
+
+    public static function deleteOutbox()
+    {
+        return self::make('/outbox/delete');
     }
 
     public static function thread(int $folderId, int $threadId)

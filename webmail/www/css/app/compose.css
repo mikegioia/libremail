@@ -16,7 +16,6 @@ section.compose {
 
 .compose .notifications {
   margin-bottom: 1.5rem;
-  padding-right: 0;
 }
 
 .compose .row:not(.message) {

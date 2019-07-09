@@ -212,17 +212,18 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `batch_id` int(10) unsigned NOT NULL,
   `account_id` int(10) unsigned NOT NULL,
   `message_id` int(10) unsigned NOT NULL,
-  `type` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `outbox_id` int(10) unsigned DEFAULT NULL,
+  `type` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` tinyint(1) unsigned NOT NULL,
   `old_value` tinyint(1) unsigned DEFAULT NULL,
   `folder_id` int(10) unsigned DEFAULT NULL,
-  `outbox_id` int(10) unsigned DEFAULT NULL,
   `retries` tinyint(1) unsigned DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `reason` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX (`status`),
   INDEX (`batch_id`),
+  INDEX (`outbox_id`),
   INDEX (`account_id`),
   INDEX (`message_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -232,12 +233,12 @@ CREATE TABLE IF NOT EXISTS `tasks` (
 - `batch_id` Foreign key referencing the batch of tasks it's a part of.
 - `account_id` Foreign key referencing the account from the `accounts` table.
 - `message_id` Foreign key referencing the message this task affects.
+- `outbox_id` Optional reference to an outbox message if the task applies to one.
 - `type` String denoting the type of task it is.
 - `status` The current state of the task. 0 new, 1 done, 2 error, 3 reverted.
 - `old_value` The previous value before the task is performed. Used for rolling
   back any changes.
 - `folder_id` Optional reference to a folder if the task applies to one.
-- `outbox_id` Optional reference to an outbox message if the task applies to one.
 - `retries` Optional number of retry attempts made.
 - `created_at` Timestamp denoting when the task was added to the database.
 - `reason` Optional description explaining the status.

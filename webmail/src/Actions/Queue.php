@@ -6,9 +6,9 @@ use DateTime;
 use DateTimeZone;
 use DateInterval;
 use App\Folders;
+use App\MessageInterface;
 use App\Model\Task as TaskModel;
 use App\Model\Outbox as OutboxModel;
-use App\Model\Message as MessageModel;
 use App\Exceptions\ServerException;
 
 class Queue extends Delete
@@ -27,7 +27,7 @@ class Queue extends Delete
      *
      * @throws ServerException
      */
-    public function update(MessageModel $message, Folders $folders, array $options = [])
+    public function update(MessageInterface $message, Folders $folders, array $options = [])
     {
         $outboxMessage = $options['outbox_message'] ?? null;
 

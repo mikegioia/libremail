@@ -14,6 +14,8 @@ use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 
 class Account extends Model
 {
+    use ModelTrait;
+
     public $id;
     public $email;
     public $service;
@@ -23,8 +25,6 @@ class Account extends Model
     public $imap_port;
     public $imap_flags;
     public $created_at;
-
-    use ModelTrait;
 
     public function getData()
     {

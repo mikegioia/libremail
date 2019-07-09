@@ -12,7 +12,7 @@ $view->render('nav', [
 ]); ?>
 
 <section id="main">
-    <form action="/update" method="post">
+    <form action="<?php echo App\Url::update(); ?>" method="post">
         <div id="msg-actions">
             <?php
             $view->render('nav/actions-menu', [

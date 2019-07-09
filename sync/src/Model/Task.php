@@ -11,6 +11,8 @@ use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 
 class Task extends Model
 {
+    use ModelTrait;
+
     public $id;
     public $type;
     public $status;
@@ -38,10 +40,9 @@ class Task extends Model
     const TYPE_UNFLAG = 'unflag';
     const TYPE_UNREAD = 'unread';
     const TYPE_UNDELETE = 'undelete';
+    const TYPE_DELETE_OUTBOX = 'delete_outbox';
 
     const MAX_ATTEMPTS = 3;
-
-    use ModelTrait;
 
     public function getData()
     {
@@ -78,8 +79,8 @@ class Task extends Model
      *
      * @param string $message
      * @param int $status
-     * @param mixed $returnValue Value returned from this function;
-     *   Useful for the caller to respond with this function.
+     * @param mixed $returnValue value returned from this function;
+     *   Useful for the caller to respond with this function
      *
      * @throws DatabaseUpdateException
      *

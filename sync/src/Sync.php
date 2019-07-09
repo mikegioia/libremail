@@ -302,7 +302,7 @@ class Sync
 
             if ((true === Fn\get($options, self::OPT_ONLY_SYNC_ACTIONS)
                     || true === $this->actions)
-                && $actionCount === 0
+                && 0 === $actionCount
             ) {
                 $this->disconnect();
 

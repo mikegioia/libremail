@@ -14,30 +14,30 @@ $view->render('nav', [
 ]); ?>
 
 <section id="main">
-    <?php
-    $view->render('notifications', [
-        'messages' => $notifications
-    ]); ?>
-    <form action="/update" method="post">
+    <form action="<?php echo App\Url::update(); ?>" method="post">
         <?php
         $view->render('nav/actions'); ?>
 
         <section id="msg-list" class="no-select">
-        <?php
-        if ($flagged):
-            $view->render('messages/message-list', [
-                'view' => $view,
-                'urlId' => STARRED,
-                'select' => $select,
-                'folders' => $folders,
-                'heading' => 'Starred',
-                'messages' => $flagged,
-                'folderId' => $folderId,
-                'id' => 'mailbox-starred',
-                'showPaging' => $showPaging,
-                'counts' => $paging->flagged
+            <?php
+            $view->render('notifications', [
+                'messages' => $notifications
             ]);
-        endif;
+
+            if ($flagged):
+                $view->render('messages/message-list', [
+                    'view' => $view,
+                    'urlId' => STARRED,
+                    'select' => $select,
+                    'folders' => $folders,
+                    'heading' => 'Starred',
+                    'messages' => $flagged,
+                    'folderId' => $folderId,
+                    'id' => 'mailbox-starred',
+                    'showPaging' => $showPaging,
+                    'counts' => $paging->flagged
+                ]);
+            endif;
 
             $view->render('messages/message-list', [
                 'view' => $view,

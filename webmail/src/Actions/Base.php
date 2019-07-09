@@ -4,18 +4,25 @@ namespace App\Actions;
 
 use App\Actions;
 use App\Folders;
+use App\MessageInterface;
 use App\Model\Task as TaskModel;
 use App\Model\Message as MessageModel;
 
 abstract class Base
 {
+    public $messageClass = 'App\Model\Message';
+
     /**
      * Iterates over the messages and calls subclass method.
+     * By default this returns MessageModel objects. However,
+     * if the model class is defined, then that will be used.
      */
     public function run(array $messageIds, Folders $folders, array $options = [])
     {
+        $model = new $this->messageClass;
+
         if (! $messageIds
-            || ! ($messages = (new MessageModel)->getByIds($messageIds))
+            || ! ($messages = $model->getByIds($messageIds))
         ) {
             return;
         }
@@ -31,7 +38,7 @@ abstract class Base
     abstract public function getType();
 
     /**
-     * @param MessageModel $message SQL message to update
+     * @param MessageModel | OutboxModel $message SQL object to update
      * @param Folders $folders Meta info about mailboxes
      * @param array $options Any of the following:
      *     int `outbox_id`
@@ -43,7 +50,7 @@ abstract class Base
      *  Outbox `outbox_message`
      */
     abstract public function update(
-        MessageModel $message,
+        MessageInterface $message,
         Folders $folders,
         array $options = []
     );
@@ -56,7 +63,7 @@ abstract class Base
      * @param array $filters Optional query filters to limit siblings
      */
     protected function setFlag(
-        MessageModel $message,
+        MessageInterface $message,
         string $flag,
         bool $state,
         array $filters = [],

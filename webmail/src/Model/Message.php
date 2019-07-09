@@ -6,12 +6,13 @@ use PDO;
 use stdClass;
 use Exception;
 use App\Model;
+use App\MessageInterface;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ValidationException;
 use App\Exceptions\DatabaseInsertException;
 use App\Exceptions\DatabaseUpdateException;
 
-class Message extends Model
+class Message extends Model implements MessageInterface
 {
     public $id;
     public $to;
@@ -1115,7 +1116,7 @@ class Message extends Model
 
         if ($this->outbox_id) {
             // Throws NotFoundException
-            return (new Outbox)->getById($this->outbox_id)->softDelete()
+            return (new Outbox)->getById($this->outbox_id, true)->softDelete()
                 && $this->softDelete(true);
         }
 

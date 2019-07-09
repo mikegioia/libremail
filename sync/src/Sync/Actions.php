@@ -265,7 +265,7 @@ class Actions
             }
         } catch (Exception $e) {
             $this->log->warning(
-                "Failed expunging folder {folder}: ".$e->getMessage());
+                'Failed expunging folder {folder}: '.$e->getMessage());
             $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
         }
     }

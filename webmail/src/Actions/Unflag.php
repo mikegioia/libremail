@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Actions;
 use App\Folders;
+use App\MessageInterface;
 use App\Model\Task as TaskModel;
 use App\Model\Message as MessageModel;
 use App\Actions\Delete as DeleteAction;
@@ -16,7 +17,7 @@ class Unflag extends DeleteAction
      *
      * @see Base for params
      */
-    public function update(MessageModel $message, Folders $folders, array $options = [])
+    public function update(MessageInterface $message, Folders $folders, array $options = [])
     {
         $this->setFlag($message, MessageModel::FLAG_FLAGGED, false, [], $options);
 

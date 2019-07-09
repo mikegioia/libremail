@@ -18,10 +18,10 @@ use App\Traits\Model as ModelTrait;
 
 class Migration extends Model
 {
+    use ModelTrait;
+
     public $name;
     public $created_at;
-
-    use ModelTrait;
 
     /**
      * Read each file in the script folder and check to see

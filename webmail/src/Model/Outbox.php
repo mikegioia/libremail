@@ -7,14 +7,15 @@ use Parsedown;
 use App\View;
 use App\Model;
 use App\Session;
-use Zend\Mail\Address;
+use App\MessageInterface;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ValidationException;
 use App\Exceptions\DatabaseInsertException;
 use App\Exceptions\DatabaseUpdateException;
 use Zend\Mail\Exception\InvalidArgumentException;
+use Zend\Mail\Address;
 
-class Outbox extends Model
+class Outbox extends Model implements MessageInterface
 {
     public $id;
     public $to;
@@ -45,6 +46,8 @@ class Outbox extends Model
 
     const CREATED = 'created';
     const UPDATED = 'updated';
+    const DELETED = 'deleted';
+    const RESTORED = 'restored';
 
     /**
      * Designed to take in POST data and save defaults.
@@ -71,10 +74,7 @@ class Outbox extends Model
 
         if ($data) {
             $this->setData($data);
-            // Converts strings to arrays
-            $this->to = $this->parseAddresses($this->to);
-            $this->cc = $this->parseAddresses($this->cc);
-            $this->bcc = $this->parseAddresses($this->bcc);
+            $this->convertAddresses();
         }
     }
 
@@ -116,17 +116,35 @@ class Outbox extends Model
         return $this;
     }
 
-    public function getById(int $id)
+    public function loadById(int $id, bool $includeDeleted = false)
     {
-        $data = $this->db()
+        return $this->getById($id, $includeDeleted);
+    }
+
+    public function getById(int $id, bool $includeDeleted = false)
+    {
+        $qry = $this->db()
             ->select()
             ->from('outbox')
-            ->where('id', '=', $id)
-            ->where('deleted', '=', 0)
-            ->execute()
-            ->fetch();
+            ->where('id', '=', $id);
+
+        if (! $includeDeleted) {
+            $qry->where('deleted', '=', 0);
+        }
+
+        $data = $qry->execute()->fetch();
 
         return new self($this->account, null, $data ?: null);
+    }
+
+    public function getByIds(array $ids)
+    {
+        return $this->db()
+            ->select()
+            ->from('outbox')
+            ->whereIn('id', $ids)
+            ->execute()
+            ->fetchAll(PDO::FETCH_CLASS, get_class());
     }
 
     /**
@@ -137,6 +155,7 @@ class Outbox extends Model
      */
     public function save(bool $notifyOnError = false)
     {
+        $this->convertAddresses();
         $this->validate($notifyOnError);
         $this->updateHistory($this->id ? self::UPDATED : self::CREATED);
 
@@ -212,6 +231,22 @@ class Outbox extends Model
         }
     }
 
+    public function reset()
+    {
+        $this->id = 0;
+        $this->sent = 1;
+        $this->draft = 1;
+        $this->locked = 0;
+        $this->deleted = 0;
+        $this->attempts = 0;
+        $this->send_after = null;
+        $this->created_at = null;
+        $this->updated_at = null;
+        $this->update_history = '';
+
+        return $this;
+    }
+
     /**
      * Determines if this message is completely empty.
      */
@@ -231,11 +266,11 @@ class Outbox extends Model
 
     public function isPastDue()
     {
-        $now = time();
-        $sendTime = strtotime($this->send_after);
+        $now = $this->utcDate();
+        $sendAfter = $this->utcDate($this->send_after);
 
         return ! $this->isDraft()
-            && (! $sendTime || $now >= $sendTime);
+            && (! $this->send_after || $now >= $sendAfter);
     }
 
     public function exists()
@@ -292,21 +327,21 @@ class Outbox extends Model
         }
 
         $now = $this->localDate();
-        $localDate = $this->localDate($this->send_after);
+        $sendAfter = $this->utcToLocal($this->send_after);
 
         // If it's past, use the full time
-        if ($localDate < $now) {
-            return $localDate->format(View::DATE_DISPLAY_TIME);
+        if ($sendAfter < $now) {
+            return $sendAfter->format(View::DATE_DISPLAY_TIME);
         }
 
         // If it's < 12 hours from now use the time
-        $hours = $localDate->diff($now, true)->hours;
+        $hours = $sendAfter->diff($now, true)->h;
 
         if ($hours <= 12) {
-            return $localDate->format(View::TIME);
+            return $sendAfter->format(View::TIME);
         }
 
-        return $localDate->format(View::DATE_SHORT);
+        return $sendAfter->format(View::DATE_SHORT);
     }
 
     /**
@@ -364,6 +399,39 @@ class Outbox extends Model
     }
 
     /**
+     * Removes the delete flag.
+     *
+     * @throws NotFoundException
+     */
+    public function restore(bool $draft = false)
+    {
+        if (! is_numeric($this->id) || 0 === (int) $this->id) {
+            throw new NotFoundException;
+        }
+
+        $this->updateHistory(self::RESTORED);
+        $this->deleted = 0;
+
+        $data = [
+            'deleted' => 0,
+            'update_history' => $this->update_history
+        ];
+
+        if (true === $draft) {
+            $this->draft = 1;
+            $data['draft'] = 1;
+        }
+
+        $restored = $this->db()
+            ->update($data)
+            ->table('outbox')
+            ->where('id', '=', $this->id)
+            ->execute();
+
+        return is_numeric($restored) ? $restored : false;
+    }
+
+    /**
      * @throws NotFoundException
      */
     public function softDelete()
@@ -372,13 +440,35 @@ class Outbox extends Model
             throw new NotFoundException;
         }
 
+        $this->updateHistory(self::DELETED);
+        $this->deleted = 1;
+
         $deleted = $this->db()
-            ->update(['deleted' => 1])
+            ->update([
+                'deleted' => 1,
+                'update_history' => $this->update_history
+            ])
             ->table('outbox')
             ->where('id', '=', $this->id)
             ->execute();
 
         return is_numeric($deleted) ? $deleted : false;
+    }
+
+    /**
+     * Not used, implemented from MessageInterface.
+     */
+    public function getSiblings(array $filters = [], array $options = [])
+    {
+        return [];
+    }
+
+    /**
+     * Not used, implemented from MessageInterface.
+     */
+    public function copyTo(int $folderId)
+    {
+        return;
     }
 
     /**
@@ -391,6 +481,24 @@ class Outbox extends Model
         $this->update_history = $this->update_history
             ? sprintf("%s\n%s", $update, $this->update_history)
             : $update;
+    }
+
+    /**
+     * Converts addresses to arrays.
+     */
+    private function convertAddresses()
+    {
+        if (is_string($this->to)) {
+            $this->to = $this->parseAddresses($this->to);
+        }
+
+        if (is_string($this->cc)) {
+            $this->cc = $this->parseAddresses($this->cc);
+        }
+
+        if (is_string($this->bcc)) {
+            $this->bcc = $this->parseAddresses($this->bcc);
+        }
     }
 
     /**

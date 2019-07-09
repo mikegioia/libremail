@@ -145,6 +145,9 @@ class Message extends Model
         return $this->unserializedAttachments;
     }
 
+    /**
+     * @throws NotFoundException
+     */
     public function loadById()
     {
         if (! $this->id) {
