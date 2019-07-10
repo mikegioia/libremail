@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `imap_host` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `imap_port` mediumint(5) DEFAULT NULL,
   `imap_flags` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `smtp_host` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `smtp_port` mediumint(5) DEFAULT NULL,
   `is_active` tinyint(1) unsigned DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -39,11 +41,15 @@ CREATE TABLE IF NOT EXISTS `accounts` (
    advised that the user stores an access key or application password.
 - `imap_host` String containing the hostname for connecting to the IMAP server.
    This is usually of the form `imap.mail-server.com`.
-- `imap_port` Optional integer specifying what port to use. The applications
+- `imap_port` Optional integer specifying what port to use. The application
    should default to using 993 for SSL connections.
 - `imap_flags` Optional string containing additional flags for connecting to
    the IMAP server. This could be `/imap/ssl` which would be appended to the
    connection string. As of now the sync engine does not use this at all.
+- `smtp_host` String containing the hostname for connecting to the SMTP server.
+   This is usually of the form `smtp.mail-server.com`.
+- `smtp_port` Optional integer specifying what port to use for sending messages.
+   The application should default to using 587 for SSL connections.
 - `is_active` Boolean flag denoting if the account is active. The sync engine
    should skip accounts with a value of 1.
 - `created_at` Timestamp denoting when the account was added to the database.

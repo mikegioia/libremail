@@ -23,6 +23,8 @@ class Account extends Model
     public $is_active;
     public $imap_host;
     public $imap_port;
+    public $smtp_host;
+    public $smtp_port;
     public $imap_flags;
     public $created_at;
 
@@ -36,6 +38,8 @@ class Account extends Model
             'is_active' => $this->is_active,
             'imap_host' => $this->imap_host,
             'imap_port' => $this->imap_port,
+            'smtp_host' => $this->smtp_host,
+            'smtp_port' => $this->smtp_port,
             'imap_flags' => $this->imap_flags,
             'created_at' => $this->created_at
         ];
@@ -77,8 +81,10 @@ class Account extends Model
             }
 
             $this->id = $exists->id;
+
             unset($data['id']);
             unset($data['created_at']);
+
             $updated = $this->db()
                 ->update($data)
                 ->table('accounts')
@@ -93,7 +99,9 @@ class Account extends Model
         }
 
         $createdAt = new DateTime;
+
         unset($data['id']);
+
         $data['is_active'] = 1;
         $data['service'] = strtolower($data['service']);
         $data['created_at'] = $createdAt->format(DATE_DATABASE);
@@ -121,15 +129,16 @@ class Account extends Model
         $val = new Validator;
 
         $val->required('email', 'Email')->lengthBetween(0, 100);
-        $val->required('service', 'Service type')
-            ->inArray(
-                array_map(
-                    'strtolower',
-                    $this->config('email.services')
-                ));
+        $val->required('service', 'Service type')->inArray(
+            array_map(
+                'strtolower',
+                $this->config('email.services')
+            ));
         $val->required('password', 'Password')->lengthBetween(0, 100);
         $val->optional('imap_host', 'IMAP host')->lengthBetween(0, 50);
         $val->optional('imap_port', 'IMAP port')->lengthBetween(0, 5);
+        $val->optional('smtp_host', 'SMTP host')->lengthBetween(0, 50);
+        $val->optional('smtp_port', 'SMTP port')->lengthBetween(0, 5);
         $val->optional('imap_flags', 'IMAP flags')->lengthBetween(0, 50);
 
         if (! $val->validate($this->getData())) {
@@ -160,7 +169,7 @@ class Account extends Model
             ->execute()
             ->fetchObject();
 
-        return ($account)
+        return $account
             ? new self($account)
             : $account;
     }
@@ -197,6 +206,7 @@ class Account extends Model
 
             if (! $this->imap_port) {
                 $this->imap_port = $other['port'];
+                $this->smtp_port = $other['smtp_port'];
             }
 
             return;
@@ -205,5 +215,7 @@ class Account extends Model
         $this->service = $config[$emailParts[1]]['key'];
         $this->imap_host = $config[$emailParts[1]]['host'];
         $this->imap_port = $config[$emailParts[1]]['port'];
+        $this->smtp_host = $config[$emailParts[1]]['smtp_host'];
+        $this->smtp_port = $config[$emailParts[1]]['smtp_port'];
     }
 }

@@ -106,7 +106,7 @@ class Actions
         $this->startProgress(count($tasks));
 
         foreach ($tasks as $i => $task) {
-            if ($this->processTask($task)) {
+            if ($this->processTask($task, $account)) {
                 ++$count;
             }
 
@@ -182,8 +182,9 @@ class Actions
      * If not an error is logged and the task is skipped.
      *
      * @param TaskModel $task
+     * @param AccountModel $account
      */
-    private function processTask(TaskModel $task)
+    private function processTask(TaskModel $task, AccountModel $account)
     {
         $imapMessage = new Message;
         $sqlFolder = new FolderModel;
@@ -221,7 +222,9 @@ class Actions
         }
 
         $action = new $actionClass(
-            $task, $sqlFolder, $sqlMessage, $sqlOutbox, $imapMessage
+            $task, $account,
+            $sqlFolder, $sqlMessage, $sqlOutbox,
+            $imapMessage
         );
 
         if (! $action->isReady()) {

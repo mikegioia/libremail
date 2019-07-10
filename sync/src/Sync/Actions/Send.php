@@ -6,6 +6,8 @@ use DateTime;
 use Pb\Imap\Mailbox;
 use App\Sync\Actions;
 use App\Model\Task as TaskModel;
+use Zend\Mail\Transport\SmtpOptions;
+use Zend\Mail\Transport\Smtp as SmtpTransport;
 
 class Send extends Base
 {
@@ -49,12 +51,29 @@ class Send extends Base
         // Create the IMAP message and perform the SMTP send
         // If it fails, delete the sent message and update the outbox
         // message to be marked as failed
-
+        try {
+            $this->sendSmtp();
+        } catch (Exception $e) {}
 
         // Update the status of the outbox message to sent
 
 
         exit('ready to send a message');
+    }
+
+    public function sendSmtp()
+    {
+        // Setup SMTP transport using PLAIN authentication
+        $transport = (new SmtpTransport)->setOptions(
+            new SmtpOptions([
+                'name' => 'localhost.localdomain',
+                'host' => '127.0.0.1',
+                'connection_class' => 'plain',
+                'connection_config' => [
+                    'username' => 'user',
+                    'password' => 'pass'
+                ]
+            ]);
     }
 
     public function getType()

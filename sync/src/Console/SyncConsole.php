@@ -251,11 +251,15 @@ class SyncConsole extends Console
     private function promptAccountInfo()
     {
         $newAccount = [];
+
         list(
             $newAccount['service'],
             $newAccount['imap_host'],
-            $newAccount['imap_port']
+            $newAccount['imap_port'],
+            $newAccount['smtp_host'],
+            $newAccount['smtp_port']
         ) = $this->promptAccountType();
+
         $newAccount['email'] = $this->promptEmail();
         $newAccount['password'] = $this->promptPassword();
 
@@ -304,21 +308,25 @@ class SyncConsole extends Console
             }
 
             $this->cli->comment('Account setup canceled.');
-            exit(0);
+            $this->close();
         }
 
         $service = strtolower($service);
         $port = $this->config['email'][$service]['port'];
+        $smtpPort = $this->config['email'][$service]['smtp_port'];
 
         // If the service was 'other' we need to ask them for the host.
         if ('other' === $service) {
             $host = $this->cli->input(
                 'Host address (like imap.host.com):')->prompt();
+            $smtpHost = $this->cli->input(
+                'SMTP host address (like smtp.host.com):')->prompt();
         } else {
             $host = $this->config['email'][$service]['host'];
+            $smtpHost = $this->config['email'][$service]['smtp_host'];
         }
 
-        return [$service, $host, $port];
+        return [$service, $host, $port, $smtpHost, $smtpPort];
     }
 
     private function promptEmail()
@@ -363,8 +371,13 @@ class SyncConsole extends Console
                 $this->promptAccountInfo();
             } else {
                 $this->cli->comment('Account setup canceled.');
-                exit(0);
+                $this->close();
             }
         }
+    }
+
+    private function close()
+    {
+        exit(0);
     }
 }

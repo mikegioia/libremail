@@ -7,6 +7,7 @@ use Pb\Imap\Message;
 use App\Model\Task as TaskModel;
 use App\Model\Folder as FolderModel;
 use App\Model\Outbox as OutboxModel;
+use App\Model\Account as AccountModel;
 use App\Model\Message as MessageModel;
 
 abstract class Base
@@ -14,11 +15,13 @@ abstract class Base
     protected $task;
     protected $folder;
     protected $outbox;
+    protected $account;
     protected $message;
     protected $imapMessage;
 
     public function __construct(
         TaskModel $task,
+        AccountModel $account,
         FolderModel $folder,
         MessageModel $message,
         OutboxModel $outbox,
@@ -27,6 +30,7 @@ abstract class Base
         $this->task = $task;
         $this->folder = $folder;
         $this->outbox = $outbox;
+        $this->account = $account;
         $this->message = $message;
         $this->imapMessage = $imapMessage;
     }

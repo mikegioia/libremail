@@ -167,12 +167,16 @@ class Controller
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
         $host = $_POST['host'] ?? 'imap.gmail.com';
+        list($smtpHost, $smtpPort) = Config::getSmtpSettings($host);
 
         try {
             (new Imap)->connect($email, $password, $host, $port);
 
             // Save the new account info
-            $this->account->update($email, $password, $name, $host, $port);
+            $this->account->update(
+                $email, $password, $name,
+                $host, $port, $smtpHost, $smtpPort
+            );
 
             Session::notify(
                 'Your account configuration has been updated! You will'.

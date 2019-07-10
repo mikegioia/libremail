@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `imap_host` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `imap_port` mediumint(5) DEFAULT NULL,
   `imap_flags` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `smtp_host` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `smtp_port` mediumint(5) DEFAULT NULL,
   `is_active` tinyint(1) unsigned DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
