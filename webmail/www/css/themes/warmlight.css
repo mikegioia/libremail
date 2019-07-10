@@ -136,7 +136,7 @@ body.theme-warmlight .dropdown li input[type="submit"] {
 
 /* Very light border */
 body.theme-warmlight nav #mailboxes-divider,
-body.theme-warmlight .compose .row:not(.message) {
+body.theme-warmlight .compose .row:not(.message):not(.buttons) {
   border-color: #e8d3c2;
 }
 

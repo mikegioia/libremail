@@ -189,6 +189,19 @@ class Message extends Model
             ->fetchAll(PDO::FETCH_CLASS, $this->getClass());
     }
 
+    public function getByOutboxId(int $outboxId, int $folderId)
+    {
+        $message = $this->db()
+            ->select()
+            ->from('messages')
+            ->where('outbox_id', '=', $outboxId)
+            ->where('folder_id', '=', $folderId)
+            ->execute()
+            ->fetchObject();
+
+        return new self($message ?: null);
+    }
+
     public function getSubjectHash()
     {
         return self::makeSubjectHash($this->subject ?: '');
@@ -578,6 +591,97 @@ class Message extends Model
             'attachments' => $this->formatAttachments($message->getAttachments())
         ]);
     }
+
+    /**
+     * Creates or modifies a draft message based on an outbox message.
+     * Only creates a new message if the outbox is a draft.
+     *
+     * @param Outbox $outbox
+     * @param int $draftsId Drafts mailbox (folder) ID
+     */
+    public function createOrUpdateSent(Outbox $outbox, int $sentId)
+    {
+        // New message will be returned if not found
+        $message = $this->getByOutboxId($outbox->id, $sendId);
+        // Set the date to now and stored in UTC
+        $utcDate = $this->utcDate();
+        $localDate = $this->localDate();
+        // Flags
+        $message->seen = 1;
+        $message->deleted = 0;
+        // ID fields
+        $message->unique_id = null;
+        $message->message_no = null;
+        $message->folder_id = $sentId;
+        $message->outbox_id = $outbox->id;
+        $message->account_id = $outbox->account_id;
+        // String fields
+        $message->from = $outbox->from;
+        $message->subject = $outbox->subject;
+        $message->text_html = $outbox->text_html;
+        $message->text_plain = $outbox->text_plain;
+        $message->to = implode(', ', $outbox->to);
+        $message->cc = implode(', ', $outbox->cc);
+        $message->bcc = implode(', ', $outbox->bcc);
+        // Date fields
+        $message->date = $utcDate->format(DATE_DATABASE);
+        $message->date_str = $localDate->format(DATE_RFC822);
+        $message->date_recv = $utcDate->format(DATE_DATABASE);
+
+        return $this->createOrUpdate($message);
+    }
+
+    /**
+     * @throws DatabaseInsertException
+     * @throws DatabaseUpdateException
+     *
+     * @return Message
+     */
+    public function createOrUpdate(
+        Message $message,
+        bool $removeNulls = true,
+        bool $setThreadId = true
+    ) {
+        $data = $message->getData();
+
+        if (true === $removeNulls) {
+            $data = array_filter($data, function ($var) {
+                return null !== $var;
+            });
+        }
+
+        if ($message->exists()) {
+            $updated = $this->db()
+                ->update($data)
+                ->table('messages')
+                ->where('id', '=', $message->id)
+                ->execute();
+
+            $this->errorHandle($updated);
+        } else {
+            $newMessageId = $this->db()
+                ->insert(array_keys($data))
+                ->into('messages')
+                ->values(array_values($data))
+                ->execute();
+
+            if (! $newMessageId) {
+                throw new DatabaseInsertException('Failed creating new message');
+            }
+
+            $message->id = $newMessageId;
+
+            // Update the thread ID
+            if (true === $setThreadId) {
+                $message->saveThreadId([$message->id], $message->id);
+            }
+        }
+
+        return $message;
+    }
+
+    /**
+     * Creates a new message in the sent mail folder
 
     /**
      * Takes in an array of message unique IDs and marks them all as

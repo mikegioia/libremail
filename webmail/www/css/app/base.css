@@ -146,3 +146,8 @@ aside a {
   position: relative;
   z-index: 30;
 }
+
+/* Padding helpers */
+.pb-0 {
+  padding-bottom: 0 !important;
+}

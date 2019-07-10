@@ -11,32 +11,22 @@ use DateTime;
 use Exception;
 use DateTimeZone;
 use App\Model\Meta;
+use App\Traits\ConfigTrait;
 
 class View
 {
+    use ConfigTrait;
+
     private $data = [];
 
     private static $nonce;
-    private static $config;
-    private static $timezone;
 
     const UTC = 'UTC';
     const TIME = 'g:i a';
     const DATE_SHORT = 'M j';
     const DATE_FULL = 'Y-m-d';
-    const DATE_DISPLAY_TIME = 'F jS \a\t g:i a';
     const DEFAULT_TZ = 'America/New_York';
-
-    public static function setConfig(array $config)
-    {
-        self::$config = $config;
-        self::setTimezone($config['TIMEZONE'] ?? self::DEFAULT_TZ);
-    }
-
-    public static function setTimezone(string $timezone)
-    {
-        self::$timezone = $timezone;
-    }
+    const DATE_DISPLAY_TIME = 'F jS \a\t g:i a';
 
     /**
      * Returns the system-wide nonce for the current request.
@@ -122,13 +112,6 @@ class View
     public function raw(string $value)
     {
         echo $value;
-    }
-
-    public function env(string $key, $default = null)
-    {
-        return isset(self::$config[$key])
-            ? self::$config[$key]
-            : $default;
     }
 
     /**

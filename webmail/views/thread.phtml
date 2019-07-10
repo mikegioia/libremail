@@ -28,6 +28,7 @@ $view->render('nav', [
             <?php
             if ($folders->getDraftsId() === $folderId && ! $thread->isOutboxMessage()):
                 $view->render('threads/draft-alert', [
+                    'view' => $view,
                     'thread' => $thread
                 ]);
             endif;

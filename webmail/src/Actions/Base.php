@@ -5,11 +5,14 @@ namespace App\Actions;
 use App\Actions;
 use App\Folders;
 use App\MessageInterface;
+use App\Traits\ConfigTrait;
 use App\Model\Task as TaskModel;
 use App\Model\Message as MessageModel;
 
 abstract class Base
 {
+    use ConfigTrait;
+
     public $messageClass = 'App\Model\Message';
 
     /**

@@ -42,16 +42,16 @@ class Send extends Base
      */
     public function run(Mailbox $mailbox)
     {
+        // Create a new temporary message in the sent mail mailbox
+        // with purge=1 to ensure it's removed upon re-sync
+
+
         // Create the IMAP message and perform the SMTP send
+        // If it fails, delete the sent message and update the outbox
+        // message to be marked as failed
 
 
-        // If successful, create a new temporary message in the
-        // sent mail mailbox with purge=1 to ensure it's removed
-        // upon re-sync
-
-
-        // Update the status of the outbox message to sent if succeeded
-        // or failed if not (log a reason to update_history)
+        // Update the status of the outbox message to sent
 
 
         exit('ready to send a message');

@@ -33,6 +33,7 @@ define('THREAD', 'thread');
 define('VIEWEXT', '.phtml');
 define('STARRED', 'starred');
 define('MAILBOX', 'mailbox');
+define('LIBREMAIL', 'LibreMail');
 define('BASEDIR', __DIR__.'/..');
 define('DIR', DIRECTORY_SEPARATOR);
 define('VIEWDIR', BASEDIR.'/views');
@@ -46,7 +47,7 @@ define('ERR_TASK_ROLLBACK', 1020);
 define('PREF_THEME', 'wm.theme');
 
 // Helper to load external config files
-function getConfig($file)
+function getConfig(string $file)
 {
     return include BASEDIR.'/config/'.$file.'.php';
 }
@@ -55,7 +56,7 @@ function getConfig($file)
 $config = parse_ini_file(BASEDIR.'/.env');
 
 // Set the timezone now
-date_default_timezone_set($config['TIMEZONE']);
+date_default_timezone_set($config['TIMEZONE'] ?? View::DEFAULT_TZ);
 
 // Set up the database connection
 Model::initDb(
@@ -73,8 +74,9 @@ Model::initDb(
 // Pass the routes into the URL service
 Url::setBase($config['WEB_URL']);
 
-// View class utilizes the config
+// Some classes utilize the config
 View::setConfig($config);
+Actions\Base::setConfig($config);
 
 // Get the email address from the cookie (if set) and
 // fetch the account. Otherwise, load the first active

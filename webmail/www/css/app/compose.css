@@ -18,7 +18,7 @@ section.compose {
   margin-bottom: 1.5rem;
 }
 
-.compose .row:not(.message) {
+.compose .row:not(.message):not(.buttons) {
   border-bottom: 1px solid #eee;
   margin-bottom: 0.75rem;
 }

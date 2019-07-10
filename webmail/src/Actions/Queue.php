@@ -3,9 +3,10 @@
 namespace App\Actions;
 
 use DateTime;
+use App\Actions;
+use App\Folders;
 use DateTimeZone;
 use DateInterval;
-use App\Folders;
 use App\MessageInterface;
 use App\Model\Task as TaskModel;
 use App\Model\Outbox as OutboxModel;
@@ -76,9 +77,10 @@ class Queue extends Delete
             $date = $message->localDate($sendAfter);
             $date->setTimezone(new DateTimeZone('UTC'));
         } else {
-            // Default is 60 seconds from now
+            // Get the default delay from the environment settings
+            $delay = $this->env('SEND_DELAY', 60);
             $date = new DateTime(gmdate(DATE_ATOM));
-            $date->add(new DateInterval('PT60S'));
+            $date->add(new DateInterval('PT'.$delay.'S'));
         }
 
         return $date->format(DATE_DATABASE);
