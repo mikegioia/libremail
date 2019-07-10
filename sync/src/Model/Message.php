@@ -158,6 +158,8 @@ class Message extends Model
 
         if ($message) {
             $this->setData($message);
+        } else {
+            throw new NotFoundException(MESSAGE);
         }
 
         return $this;
@@ -165,6 +167,10 @@ class Message extends Model
 
     public function getById(int $id)
     {
+        if ($id <= 0) {
+            return;
+        }
+
         return $this->db()
             ->select()
             ->from('messages')

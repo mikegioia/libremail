@@ -8,6 +8,7 @@ use DateTime;
 use App\Model;
 use Particle\Validator\Validator;
 use App\Traits\Model as ModelTrait;
+use App\Exceptions\NotFound as NotFoundException;
 use App\Exceptions\Validation as ValidationException;
 use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 use App\Exceptions\DatabaseInsert as DatabaseInsertException;
@@ -76,8 +77,32 @@ class Folder extends Model
         return in_array($this->getName(), self::DRAFTS);
     }
 
+    /**
+     * @throws NotFoundException
+     */
+    public function loadById()
+    {
+        if (! $this->id) {
+            throw new NotFoundException(FOLDER);
+        }
+
+        $folder = $this->getById($this->id);
+
+        if ($folder) {
+            $this->setData($folder);
+        } else {
+            throw new NotFoundException(FOLDER);
+        }
+
+        return $this;
+    }
+
     public function getById(int $id)
     {
+        if ($id <= 0) {
+            return;
+        }
+
         return $this->db()
             ->select()
             ->from('folders')

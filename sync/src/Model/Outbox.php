@@ -65,13 +65,15 @@ class Outbox extends Model
     public function loadById()
     {
         if (! $this->id) {
-            throw new NotFoundException(MESSAGE);
+            throw new NotFoundException(OUTBOX);
         }
 
         $outbox = $this->getById($this->id);
 
         if ($outbox) {
             $this->setData($outbox);
+        } else {
+            throw new NotFoundException(OUTBOX);
         }
 
         return $this;
@@ -79,6 +81,10 @@ class Outbox extends Model
 
     public function getById(int $id)
     {
+        if ($id <= 0) {
+            return;
+        }
+
         return $this->db()
             ->select()
             ->from('outbox')
