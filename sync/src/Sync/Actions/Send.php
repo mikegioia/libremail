@@ -20,6 +20,7 @@ class Send extends Base
      */
     public function isReady()
     {
+        return false;
         // If the outbox message is deleted, update task reason and get out
         if (1 === (int) $this->outbox->deleted) {
             $this->task->ignore(Actions::IGNORE_OUTBOX_DELETED);
@@ -53,7 +54,10 @@ class Send extends Base
         // message to be marked as failed
         try {
             $this->sendSmtp();
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+            print_r($e->getMessage());
+            exit('failed!');
+        }
 
         // Update the status of the outbox message to sent
 
@@ -73,7 +77,9 @@ class Send extends Base
                     'username' => 'user',
                     'password' => 'pass'
                 ]
-            ]);
+            ]));
+        print_r($transport);
+        exit;
     }
 
     public function getType()
