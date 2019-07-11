@@ -1,3 +1,5 @@
+<?php
+if (isset($meta) && $meta): ?>
     <div class="top-layer u-cf">
         <div id="topnav-actions" class="dropdown u-pull-right">
             <div class="status u-pull-left">
@@ -42,6 +44,27 @@
         </div>
     </div>
 <?php
+elseif (isset($showSettingsMenu) && true === $showSettingsMenu): ?>
+    <div class="top-layer u-cf">
+        <div id="topnav-actions" class="dropdown u-pull-right">
+            <a class="icon button" href="#" tabindex="3">
+                <i class="fa fa-sliders-h"></i>
+            </a>
+            <ul class="right-menu size-medium">
+                <li>
+                    <i class="fa left-icon fa-wrench"></i>
+                    <a href="/settings">Settings &amp; Preferences</a>
+                </li>
+                <li>
+                    <i class="fa left-icon fa-envelope"></i>
+                    <a href="/account">Configure Email</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+<?php
+endif;
+
 if (isset($alert) && $alert): ?>
     <div class="alerts">
         <input type="checkbox" id="alert-1" />

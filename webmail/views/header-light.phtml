@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title><?php $view->clean($title); ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?php
+    if (true === (bool) $view->env('WEB_BUILD', true)): ?>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'nonce-<?php echo $view::getNonce(); ?>'; img-src 'self' https://*.gravatar.com">
+    <?php
+    endif;
+    if (false === (bool) $view->env('WEB_BUILD', true)): ?>
+    <link href="/css/site.css" rel="stylesheet" type="text/css">
+    <?php
+    else: ?>
+    <link href="/build/libremail.css" rel="stylesheet" type="text/css" nonce="<?php echo $view::getNonce(); ?>">
+    <?php
+    endif; ?>
+    <link href="/favicon.ico" rel="icon" type="image/png">
+</head>
+<body class="theme-<?php echo $view->meta(PREF_THEME, 'default'); ?> page-<?php echo $pageClass ?? 'main'; ?>">
+    <header class="u-cf">
+        <h4 id="logo">
+            <a href="/" class="link"><?php $view->clean($view->env('NAME', LIBREMAIL)); ?></a>
+        </h4>
+        <div id="topnav">
+            <!-- This is a top-layer action. A separate container will be
+                fixed and positioned up here -->
+        </div>
+    </header>

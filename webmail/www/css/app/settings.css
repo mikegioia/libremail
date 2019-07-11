@@ -115,3 +115,11 @@
   margin-left: 0.25rem;
   transform: translateY(0.0625rem);
 }
+
+/* Account setup page */
+
+section.settings.setup {
+  left: 2rem !important;
+  margin: 0 auto;
+  max-width: 64rem;
+}

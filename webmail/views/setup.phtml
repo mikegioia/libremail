@@ -1,20 +1,11 @@
 <?php
 
-$view->render('header', [
+$view->render('header-light', [
     'view' => $view,
-    'folders' => $folders,
-    'pageTitle' => 'Account Configuration',
-    'hideSearch' => $folders->getCount() === 0,
-    'hideCollapse' => $folders->getCount() === 0
-]);
-
-$view->render('nav', [
-    'view' => $view,
-    'activeId' => 0,
-    'folders' => $folders
+    'title' => 'Configure '.$view->env('NAME', LIBREMAIL).' Account'
 ]); ?>
 
-<section id="main" class="settings">
+<section id="main" class="settings setup">
     <?php
     $view->render('notifications', [
         'messages' => $notifications
@@ -26,20 +17,13 @@ $view->render('nav', [
         Once you save your email address you cannot edit it here! Common settings for
         GMail are <code>imap.google.com</code> for the host, and port <code>993</code>.
     </div>
-    <form action="/account" method="post">
+    <form action="/account/create" method="post">
         <div class="row">
             <div class="three columns label">
                 <label class="align-right" for="settings-email">Email</label>
             </div>
             <div class="seven columns input">
-            <?php
-            if ($account->email): ?>
-                <input type="email" id="settings-email" name="email" value="<?php $view->clean($account->email ?: ''); ?>" title="Can't be changed!" required readonly />
-            <?php
-            else: ?>
-                <input type="email" id="settings-email" name="email" value="" placeholder="you@gmail.com" required />
-            <?php
-            endif; ?>
+                <input type="email" id="settings-email" name="email" value="<?php $view->clean($account->email ?: ''); ?>" placeholder="you@mail.com" required />
             </div>
         </div>
         <div class="row">
@@ -68,7 +52,7 @@ $view->render('nav', [
                 <label class="align-right" for="settings-host">IMAP Address</label>
             </div>
             <div class="seven columns input">
-                <input type="text" id="settings-host" name="host" value="<?php $view->clean($account->imap_host ?: ''); ?>" placeholder="imap.gmail.com" required />
+                <input type="text" id="settings-host" name="host" value="<?php $view->clean($account->imap_host ?: ''); ?>" placeholder="imap.gmail.com" />
             </div>
         </div>
         <div class="row">
@@ -76,7 +60,7 @@ $view->render('nav', [
                 <label class="align-right" for="settings-host">IMAP Port</label>
             </div>
             <div class="three columns input">
-                <input type="text" id="settings-port" name="port" value="<?php $view->clean($account->imap_port ?: ''); ?>" placeholder="993" required />
+                <input type="text" id="settings-port" name="port" value="<?php $view->clean($account->imap_port ?: ''); ?>" placeholder="993" />
             </div>
         </div>
         <div class="buttons row">
@@ -84,14 +68,10 @@ $view->render('nav', [
                 <button type="submit" class="button button-secondary">
                     Save Account
                 </button>
-                <span>or</span>
-                <a href="/">Go back</a>
             </div>
         </div>
     </form>
 </section>
 
 <?php
-$view->render('footer', [
-    'meta' => $meta
-]); ?>
+$view->render('footer'); ?>

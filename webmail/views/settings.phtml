@@ -3,7 +3,9 @@
 $view->render('header', [
     'view' => $view,
     'folders' => $folders,
-    'pageTitle' => 'Settings &amp; Preferences',
+    'hideSearch' => $folders->getCount() === 0,
+    'hideCollapse' => $folders->getCount() === 0,
+    'pageTitle' => 'Settings &amp; Preferences'
 ]);
 
 $view->render('nav', [

@@ -98,11 +98,44 @@
   html {
     font-size: 62.5%;
   }
+
+  section#error {
+    margin: 0;
+    max-width: none;
+    min-width: auto;
+    padding: 6rem 0 0;
+  }
+
+  section#error > div {
+    background: none !important;
+    box-shadow: none !important;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
 
 /* Small devices (landscape phones) */
 @media (max-width: 575px) {
   html {
     font-size: 62.5%;
+  }
+
+  section#main > h5 + .help-text {
+    margin-bottom: 1.5rem;
+  }
+
+  .settings .row input[type="text"],
+  .settings .row input[type="email"],
+  .settings .row input[type="password"] {
+    margin-bottom: 1rem;
+  }
+
+  .settings .row .three.columns label {
+    text-align: left;
+    transform: none;
+  }
+
+  .settings form > .row > .columns.input {
+    width: calc(100% - 6rem);
   }
 }

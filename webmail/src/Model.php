@@ -8,11 +8,13 @@ use Pb\PDO\Database;
 
 class Model
 {
-    private static $db;
-    private static $dsn;
-    private static $username;
-    private static $password;
-    private static $timezone;
+    // Underscore these to not conflict with class variables
+    // Especially during setData(), this can cause problems
+    private static $_db;
+    private static $_dsn;
+    private static $_username;
+    private static $_password;
+    private static $_timezone;
 
     const ASC = 'asc';
     const DESC = 'desc';
@@ -33,10 +35,10 @@ class Model
         }
     }
 
-    public function setData($data)
+    public function setData(array $data)
     {
         foreach ($data as $key => $value) {
-            $this->$key = $value;
+            $this->{$key} = $value;
         }
     }
 
@@ -49,10 +51,10 @@ class Model
         string $password,
         string $timezone
     ) {
-        self::$dsn = $dsn;
-        self::$username = $username;
-        self::$password = $password;
-        self::$timezone = $timezone;
+        self::$_dsn = $dsn;
+        self::$_username = $username;
+        self::$_password = $password;
+        self::$_timezone = $timezone;
     }
 
     /**
@@ -69,17 +71,17 @@ class Model
 
     public static function getDb()
     {
-        if (isset(self::$db)) {
-            return self::$db;
+        if (isset(self::$_db)) {
+            return self::$_db;
         }
 
-        self::$db = new Database(
-            self::$dsn,
-            self::$username,
-            self::$password
+        self::$_db = new Database(
+            self::$_dsn,
+            self::$_username,
+            self::$_password
         );
 
-        return self::$db;
+        return self::$_db;
     }
 
     /**
@@ -93,7 +95,7 @@ class Model
             is_null($localDate)
                 ? date(DATE_DATABASE)
                 : $localDate,
-            new DateTimeZone(self::$timezone)
+            new DateTimeZone(self::$_timezone)
         );
     }
 
@@ -120,7 +122,7 @@ class Model
     public function utcToLocal(string $utcDate = null)
     {
         $datetime = $this->utcDate($utcDate);
-        $datetime->setTimezone(new DateTimeZone(self::$timezone));
+        $datetime->setTimezone(new DateTimeZone(self::$_timezone));
 
         return $datetime;
     }

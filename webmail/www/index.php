@@ -89,62 +89,80 @@ $email = $_COOKIE['email'] ?? null;
 $account = $email
     ? (new Account)->getByEmail($email)
     : (new Account)->getFirstActive();
-
-if (! $account) {
-    throw new Exception('No account found!');
-}
+$account = $account ?: new Account;
 
 $router = new Router;
 $controller = new Controller($account);
 
-// Inbox
-$router->get('/', [$controller, 'inbox']);
-// Folder
-$router->get('/folder/(\d+)', [$controller, 'folder']);
-// Folder page
-$router->get('/folder/(\d+)/(\d+)', [$controller, 'folderPage']);
-// Starred messages in the inbox
-$router->get('/starred/(\d+)', [$controller, 'starred']);
-// Update messages
-$router->post('/update', [$controller, 'update']);
-// Update messages via GET but require a CSRF token
-$router->get('/action', [$controller, 'action']);
-// Undo an action or collection of actions
-$router->post('/undo/(\d+)', [$controller, 'undo']);
-// Get the star HTML for a message
-$router->get('/star/(\w+)/(\w+)/(\d+)/(\w+).html', [$controller, 'getStar']);
-// Set star flag on a message
-$router->post('/star', [$controller, 'setStar']);
-// Message thread
-$router->get('/thread/(\d+)/(\d+)', [$controller, 'thread']);
-// Original message
-$router->get('/original/(\d+)', [$controller, 'original']);
-// Account configuration
-$router->get('/account', [$controller, 'account']);
-// Updating account data
-$router->post('/account', [$controller, 'updateAccount']);
-// Settings and preferences
-$router->get('/settings', [$controller, 'settings']);
-// Updating settings
-$router->post('/settings', [$controller, 'updateSettings']);
-// Compose a new message
-$router->get('/compose', [$controller, 'compose']);
-// Edit an existing message
-$router->get('/compose/(\d+)', [$controller, 'compose']);
-// Send a new message
-$router->post('/compose', [$controller, 'draft']);
-// View the outbox messages
-$router->get('/outbox', [$controller, 'outbox']);
-// Delete draft
-$router->post('/outbox/delete', [$controller, 'deleteDraft']);
-// Preview a message
-$router->get('/preview/(\d+)', [$controller, 'preview']);
-// Send or queue an email
-$router->post('/send', [$controller, 'send']);
-// Close the JavaScript notification
-$router->get('/closejsalert', [$controller, 'closeJsAlert']);
-// Search messages
-$router->get('/search', [$controller, 'search']);
+// If there's no account, the only allowed pages are the
+// account creation page, and the account create endpoint.
+if (! $account->exists()) {
+    // Create account
+    $router->get('/', [$controller, 'setup']);
+    // Save account
+    $router->post('/account/create', [$controller, 'createAccount']);
+} elseif (! $account->hasFolders()) {
+    // Error page
+    $router->get('/', [$controller, 'errorNoFolders']);
+    // Account configuration
+    $router->get('/account', [$controller, 'account']);
+    // Updating account data
+    $router->post('/account', [$controller, 'updateAccount']);
+    // Settings and preferences
+    $router->get('/settings', [$controller, 'settings']);
+    // Updating settings
+    $router->post('/settings', [$controller, 'updateSettings']);
+} else {
+    // Inbox
+    $router->get('/', [$controller, 'inbox']);
+    // Folder
+    $router->get('/folder/(\d+)', [$controller, 'folder']);
+    // Folder page
+    $router->get('/folder/(\d+)/(\d+)', [$controller, 'folderPage']);
+    // Starred messages in the inbox
+    $router->get('/starred/(\d+)', [$controller, 'starred']);
+    // Update messages
+    $router->post('/update', [$controller, 'update']);
+    // Update messages via GET but require a CSRF token
+    $router->get('/action', [$controller, 'action']);
+    // Undo an action or collection of actions
+    $router->post('/undo/(\d+)', [$controller, 'undo']);
+    // Get the star HTML for a message
+    $router->get('/star/(\w+)/(\w+)/(\d+)/(\w+).html', [$controller, 'getStar']);
+    // Set star flag on a message
+    $router->post('/star', [$controller, 'setStar']);
+    // Message thread
+    $router->get('/thread/(\d+)/(\d+)', [$controller, 'thread']);
+    // Original message
+    $router->get('/original/(\d+)', [$controller, 'original']);
+    // Account configuration
+    $router->get('/account', [$controller, 'account']);
+    // Updating account data
+    $router->post('/account', [$controller, 'updateAccount']);
+    // Settings and preferences
+    $router->get('/settings', [$controller, 'settings']);
+    // Updating settings
+    $router->post('/settings', [$controller, 'updateSettings']);
+    // Compose a new message
+    $router->get('/compose', [$controller, 'compose']);
+    // Edit an existing message
+    $router->get('/compose/(\d+)', [$controller, 'compose']);
+    // Send a new message
+    $router->post('/compose', [$controller, 'draft']);
+    // View the outbox messages
+    $router->get('/outbox', [$controller, 'outbox']);
+    // Delete draft
+    $router->post('/outbox/delete', [$controller, 'deleteDraft']);
+    // Preview a message
+    $router->get('/preview/(\d+)', [$controller, 'preview']);
+    // Send or queue an email
+    $router->post('/send', [$controller, 'send']);
+    // Close the JavaScript notification
+    $router->get('/closejsalert', [$controller, 'closeJsAlert']);
+    // Search messages
+    $router->get('/search', [$controller, 'search']);
+}
+
 // Handle 404s
 $router->set404([$controller, 'error404']);
 
@@ -152,21 +170,16 @@ $router->set404([$controller, 'error404']);
 try {
     $router->run();
 } catch (NotFoundException $e) {
-    header('HTTP/1.1 404 Not Found');
-    echo '<h1>404 Page Not Found</h1>';
+    View::show404();
 } catch (ClientException $e) {
-    header('HTTP/1.1 400 Bad Request');
-    echo '<h1>400 Bad Request</h1>';
-    echo '<p>'.$e->getMessage().'</p>';
+    View::showError(View::HTTP_400, 'Bad Request', $e->getMessage());
 } catch (ServerException $e) {
-    header('HTTP/1.1 500 Server Error');
-    echo '<h1>500 Server Error</h1>';
-    echo '<p>'.$e->getMessage().' [#'.$e->getCode().']</p>';
+    $message = $e->getMessage().' [#'.$e->getCode().']';
+    View::showError(View::HTTP_500, 'Server Error', $message);
 } catch (Exception $e) {
-    if (true !== $config['DEBUG']) {
-        header('HTTP/1.1 500 Server Error');
-        echo '<h1>500 Server Error</h1>';
-        echo '<p>'.$e->getMessage().' [#'.$e->getCode().']</p>';
+    if (1 !== (int) $config['DEBUG']) {
+        $message = $e->getMessage().' [#'.$e->getCode().']';
+        View::showError(View::HTTP_500, 'Server Error', $message);
     } else {
         throw $e;
     }

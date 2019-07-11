@@ -1,0 +1,22 @@
+<?php
+
+$view->render('header-light', [
+    'view' => $view,
+    'title' => $heading
+]); ?>
+
+<section id="error">
+    <div>
+        <h2><?php $view->clean($heading); ?></h2>
+        <?php
+        if ($message): ?>
+        <p><?php $view->clean($message); ?></p>
+        <?php
+        endif; ?>
+    </div>
+</section>
+
+<?php
+$view->render('footer', [
+    'showSettingsMenu' => $showSettingsMenu ?? false
+]); ?>

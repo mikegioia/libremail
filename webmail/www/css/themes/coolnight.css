@@ -178,7 +178,8 @@ body.theme-coolnight .thread-msg-row label .date {
 }
 
 /* Preview */
-body.theme-coolnight .compose .outbox-preview {
+body.theme-coolnight .compose .outbox-preview,
+body.theme-coolnight section#error > div {
   background: #323232;
   box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.25);
 }
