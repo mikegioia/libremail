@@ -141,6 +141,8 @@ class Send extends Base
                     'password' => $this->account->password
                 ]
             ]));
+        // Set the transport to disconnect on destruct
+        $transport->setAutoDisconnect();
 
         $message = new MailMessage;
 
@@ -162,6 +164,7 @@ class Send extends Base
         // Custom headers
         $message->getHeaders()->addHeaderLine('X-Client', 'LibreMail');
 
+        // Away we go!
         $transport->send($message);
     }
 
