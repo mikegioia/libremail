@@ -682,9 +682,6 @@ class Message extends Model
     }
 
     /**
-     * Creates a new message in the sent mail folder
-
-    /**
      * Takes in an array of message unique IDs and marks them all as
      * deleted in the database.
      *
