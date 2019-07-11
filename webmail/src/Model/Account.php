@@ -6,7 +6,6 @@ use PDO;
 use Exception;
 use App\Model;
 use App\Config;
-use App\Model\Folder;
 use App\Exceptions\ServerException;
 use App\Exceptions\DatabaseInsertException;
 
@@ -154,7 +153,7 @@ class Account extends Model
             'imap_port' => trim($this->imap_port),
             'smtp_host' => trim($this->smtp_host),
             'smtp_port' => trim($this->smtp_port),
-            'created_at' => $this->utcDate()->format(DATE_DATABASE) 
+            'created_at' => $this->utcDate()->format(DATE_DATABASE)
         ];
 
         try {

@@ -31,7 +31,7 @@ class Folder extends Model
             ->select()
             ->from('folders')
             ->where('deleted', '=', 0)
-            ->where( 'ignored', '=', 0 )
+            ->where('ignored', '=', 0)
             ->where('account_id', '=', $accountId)
             ->execute()
             ->fetchAll(PDO::FETCH_CLASS, get_class());
@@ -55,7 +55,7 @@ class Folder extends Model
             ->select(['count(1) as count'])
             ->from('folders')
             ->where('deleted', '=', 0)
-            ->where( 'ignored', '=', 0 )
+            ->where('ignored', '=', 0)
             ->where('account_id', '=', $accountId)
             ->execute()
             ->fetchObject();
