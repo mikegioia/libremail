@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `subject` varchar(270) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `message_id` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `in_reply_to` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `recv_str` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `recv_str` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `size` int(10) unsigned DEFAULT NULL,
   `message_no` int(10) unsigned DEFAULT NULL,
   `to` text COLLATE utf8mb4_unicode_ci,
@@ -304,6 +304,7 @@ CREATE TABLE IF NOT EXISTS `outbox` (
   `text_html` longtext COLLATE utf8mb4_unicode_ci,
   `draft` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `sent` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `failed` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `locked` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `attempts` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `send_after` datetime DEFAULT NULL,
@@ -332,6 +333,8 @@ CREATE TABLE IF NOT EXISTS `outbox` (
 - `draft` Flag denoting if the message is a draft.
 - `sent` Flag denoting if this message has been sent. No further action neeeded
   if it has been.
+- `failed` Flag denoting if the message failed to send. A message should be
+  logged to the `update_history` if so.
 - `locked` Flag denoting if the message is locked. This is used so that two
   actions aren't performed on the same outbox message at once.
 - `attempts` Integer counting the number of send attempts for this message.

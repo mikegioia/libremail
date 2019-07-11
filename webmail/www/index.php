@@ -37,7 +37,11 @@ define('LIBREMAIL', 'LibreMail');
 define('BASEDIR', __DIR__.'/..');
 define('DIR', DIRECTORY_SEPARATOR);
 define('VIEWDIR', BASEDIR.'/views');
+define('DATE_DATETIME', 'j F Y H:i');
 define('DATE_DATABASE', 'Y-m-d H:i:s');
+define('DATE_CALENDAR_SHORT', 'j M');
+define('DATE_CALENDAR', 'j/m/Y');
+define('DATE_TIME_SHORT', 'H:i');
 // Error constants
 define('ERR_NO_TRASH_FOLDER', 1010);
 define('ERR_NO_STARRED_FOLDER', 1011);

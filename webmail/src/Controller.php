@@ -248,11 +248,15 @@ class Controller
         session_start();
 
         $id = intval(Url::postParam('id'));
+        $folders = new Folders($this->account, []);
         $outboxMessage = (new Outbox($this->account))->getById($id);
 
         // First try to delete the draft, then delete the outbox message
         if ($outboxMessage->exists()) {
-            $draftMessage = (new Message)->getByOutboxId($id);
+            $draftMessage = (new Message)->getByOutboxId(
+                $id,
+                $folders->getDraftsId()
+            );
 
             if ($draftMessage->exists()) {
                 $draftMessage->softDelete(true);
@@ -312,6 +316,7 @@ class Controller
 
         $id = intval(Url::postParam('id'));
         $outboxMessage = (new Outbox($this->account))->getById($id);
+        $folders = new Folders($this->account, getConfig('colors'));
 
         if (! $outboxMessage->exists()) {
             Session::notify('Message not found!', Session::ERROR);
@@ -327,7 +332,10 @@ class Controller
             Url::redirectBack('/compose');
         }
 
-        $draftMessage = (new Message)->getByOutboxId($outboxMessage->id);
+        $draftMessage = (new Message)->getByOutboxId(
+            $outboxMessage->id,
+            $folders->getDraftsId()
+        );
 
         if (! $draftMessage->exists()) {
             Session::notify(
@@ -341,7 +349,7 @@ class Controller
         if (! is_null(Url::postParam('send_outbox'))) {
             (new QueueAction)->run(
                 [$draftMessage->id],
-                new Folders($this->account, getConfig('colors')),
+                $folders,
                 [Actions::OUTBOX_MESSAGE => $outboxMessage]
             );
 

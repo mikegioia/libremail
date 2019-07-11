@@ -177,7 +177,8 @@ $di['db_factory'] = $di->factory(function ($c, $config = null) {
         throw new TerminateException(
             'There was a problem connecting to the database. '.
             'Are you sure it exists? Here are the details: '.
-            $e->getMessage());
+            $e->getMessage()
+        );
     }
 });
 

@@ -58,14 +58,17 @@ class Actions
         TaskModel::TYPE_UNREAD => 'App\Sync\Actions\Unread'
     ];
 
-    const ERR_UID_MISMATCH = 'Unique IDs are no longer the same';
     const ERR_FAIL_IMAP_SYNC = 'Failed IMAP sync';
     const ERR_NO_IMAP_MESSAGE = 'No message found in IMAP mailbox';
     const ERR_NO_SQL_FOLDER = 'No folder found in SQL';
     const ERR_NO_SQL_MESSAGE = 'No message found in SQL';
     const ERR_NO_SQL_OUTBOX = 'No outbox message found in SQL';
+    const ERR_NO_SQL_SENT = 'No sent folder found in SQL';
+    const ERR_TRANSPORT_FAIL = 'Message failed before transport';
+    const ERR_TRANSPORT_GENERAL = 'Message failed from an unknown exception';
 
     const IGNORE_OUTBOX_DELETED = 'Outbox message previously deleted';
+    const IGNORE_OUTBOX_SENT = 'Outbox message previously sent';
 
     public function __construct(
         Logger $log,
@@ -244,7 +247,11 @@ class Actions
                 $e->getMessage());
             $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
 
-            return $task->fail(self::ERR_FAIL_IMAP_SYNC);
+            if (! $task->isFailed()) {
+                $task->fail(self::ERR_FAIL_IMAP_SYNC);
+            }
+
+            return false;
         }
 
         Model::getDb()->commit();
@@ -261,9 +268,6 @@ class Actions
      * data into them. Returns false on error and true on success.
      * Data may be modified even on failure, as part of the data could
      * be loaded.
-     *
-     * @todo Finalize the error checking below. I haven't recreated this
-     *  in a long time (weeks since July-9-2019).
      *
      * @return bool
      */
@@ -307,18 +311,6 @@ class Actions
             $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
 
             return $task->fail(self::ERR_NO_IMAP_MESSAGE, $e);
-        }
-
-        // Check if the unique ID is the same; halt if not
-        if (! Fn\intEq($imapMessage->uid, $message->unique_id)) {
-            // @TODO remove this debugging info
-            // this case can no longer be re-created now that we're pulling
-            // the updated message ID each time
-            print_r($message);
-            print_r($imapMessage);
-            exit('uid mismatch!');
-
-            return $task->fail(self::ERR_UID_MISMATCH);
         }
 
         return true;

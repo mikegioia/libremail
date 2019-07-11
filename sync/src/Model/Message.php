@@ -427,7 +427,6 @@ class Message extends Model
         $val->optional('seen', 'Seen')->callback([$this, 'isValidFlag']);
         $val->optional('message_id', 'Message ID')->lengthBetween(0, 250);
         $val->optional('draft', 'Draft')->callback([$this, 'isValidFlag']);
-        $val->optional('recv_str', 'Received Date')->lengthBetween(0, 250);
         $val->optional('in_reply_to', 'In-Reply-To')->lengthBetween(0, 250);
         $val->optional('recent', 'Recent')->callback([$this, 'isValidFlag']);
         $val->optional('date_recv', 'Date Received')->datetime(DATE_DATABASE);
@@ -511,8 +510,9 @@ class Message extends Model
             return;
         }
 
-        $createdAt = new DateTime;
         unset($data['id']);
+
+        $createdAt = new DateTime;
         $data['created_at'] = $createdAt->format(DATE_DATABASE);
 
         try {
@@ -602,12 +602,13 @@ class Message extends Model
     public function createOrUpdateSent(Outbox $outbox, int $sentId)
     {
         // New message will be returned if not found
-        $message = $this->getByOutboxId($outbox->id, $sendId);
+        $message = $this->getByOutboxId($outbox->id, $sentId);
         // Set the date to now and stored in UTC
         $utcDate = $this->utcDate();
         $localDate = $this->localDate();
         // Flags
         $message->seen = 1;
+        $message->purge = 1; // clean up on next sync
         $message->deleted = 0;
         // ID fields
         $message->unique_id = null;
@@ -616,13 +617,13 @@ class Message extends Model
         $message->outbox_id = $outbox->id;
         $message->account_id = $outbox->account_id;
         // String fields
+        $message->to = $outbox->to;
+        $message->cc = $outbox->cc;
+        $message->bcc = $outbox->bcc;
         $message->from = $outbox->from;
         $message->subject = $outbox->subject;
         $message->text_html = $outbox->text_html;
         $message->text_plain = $outbox->text_plain;
-        $message->to = implode(', ', $outbox->to);
-        $message->cc = implode(', ', $outbox->cc);
-        $message->bcc = implode(', ', $outbox->bcc);
         // Date fields
         $message->date = $utcDate->format(DATE_DATABASE);
         $message->date_str = $localDate->format(DATE_RFC822);
@@ -650,7 +651,7 @@ class Message extends Model
             });
         }
 
-        if ($message->exists()) {
+        if ($message->id) {
             $updated = $this->db()
                 ->update($data)
                 ->table('messages')

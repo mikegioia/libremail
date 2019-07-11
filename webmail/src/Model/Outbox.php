@@ -24,6 +24,7 @@ class Outbox extends Model implements MessageInterface
     public $from;
     public $sent;
     public $draft;
+    public $failed;
     public $locked;
     public $deleted;
     public $subject;

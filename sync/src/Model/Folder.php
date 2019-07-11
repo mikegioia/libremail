@@ -31,6 +31,11 @@ class Folder extends Model
         '[Gmail]/Bozze'
     ];
 
+    const SENT = [
+        '[Gmail]/Sent Mail',
+        '[Gmail]/Posta inviata'
+    ];
+
     public function getData()
     {
         return [
@@ -75,6 +80,11 @@ class Folder extends Model
     public function isDrafts()
     {
         return in_array($this->getName(), self::DRAFTS);
+    }
+
+    public function isSent()
+    {
+        return in_array($this->getName(), self::SENT);
     }
 
     /**
@@ -177,7 +187,9 @@ class Folder extends Model
         }
 
         $createdAt = new DateTime;
+
         unset($data['id']);
+
         $data['deleted'] = 0;
         $data['created_at'] = $createdAt->format(DATE_DATABASE);
         $newFolderId = $this->db()
@@ -196,6 +208,7 @@ class Folder extends Model
     public function delete()
     {
         $this->deleted = 1;
+
         $updated = $this->db()
             ->update([
                 'deleted' => 1
@@ -291,5 +304,18 @@ class Folder extends Model
         ksort($indexed);
 
         return $indexed;
+    }
+
+    public function getSentByAccount(int $accountId)
+    {
+        $folders = $this->getByAccount($accountId);
+
+        foreach ($folders as $folder) {
+            if ($folder->isSent()) {
+                return $folder;
+            }
+        }
+
+        throw new NotFoundException('sent mail folder');
     }
 }

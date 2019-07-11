@@ -165,6 +165,11 @@ class Task extends Model
         }
     }
 
+    public function isFailed()
+    {
+        return self::STATUS_ERROR === $this->status;
+    }
+
     /**
      * Updates the status of the message.
      *
