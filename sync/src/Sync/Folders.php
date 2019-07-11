@@ -87,7 +87,8 @@ class Folders
             $progress = $this->cli->progress()->total($count);
         } else {
             $this->log->info(
-                "Adding $count new ".Fn\plural('folder', $count));
+                "Adding $count new ".Fn\plural('folder', $count)
+            );
         }
 
         foreach ($toAdd as $folderName) {
@@ -96,6 +97,7 @@ class Folders
                 'account_id' => $account->getId(),
                 'ignored' => $this->getIgnored($folderName)
             ]);
+
             $folder->save();
             $folders[$folder->getId()] = $folder;
 
