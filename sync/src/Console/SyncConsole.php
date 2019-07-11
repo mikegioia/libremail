@@ -308,7 +308,7 @@ class SyncConsole extends Console
             }
 
             $this->cli->comment('Account setup canceled.');
-            $this->close();
+            $this->exit();
         }
 
         $service = strtolower($service);
@@ -371,12 +371,12 @@ class SyncConsole extends Console
                 $this->promptAccountInfo();
             } else {
                 $this->cli->comment('Account setup canceled.');
-                $this->close();
+                $this->exit();
             }
         }
     }
 
-    private function close()
+    private function exit()
     {
         exit(0);
     }
