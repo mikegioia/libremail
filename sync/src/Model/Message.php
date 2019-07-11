@@ -158,6 +158,8 @@ class Message extends Model
 
         if ($message) {
             $this->setData($message);
+        } else {
+            throw new NotFoundException(MESSAGE);
         }
 
         return $this;
@@ -165,6 +167,10 @@ class Message extends Model
 
     public function getById(int $id)
     {
+        if ($id <= 0) {
+            return;
+        }
+
         return $this->db()
             ->select()
             ->from('messages')
@@ -181,6 +187,19 @@ class Message extends Model
             ->whereIn('id', $ids)
             ->execute()
             ->fetchAll(PDO::FETCH_CLASS, $this->getClass());
+    }
+
+    public function getByOutboxId(int $outboxId, int $folderId)
+    {
+        $message = $this->db()
+            ->select()
+            ->from('messages')
+            ->where('outbox_id', '=', $outboxId)
+            ->where('folder_id', '=', $folderId)
+            ->execute()
+            ->fetchObject();
+
+        return new self($message ?: null);
     }
 
     public function getSubjectHash()
@@ -408,7 +427,6 @@ class Message extends Model
         $val->optional('seen', 'Seen')->callback([$this, 'isValidFlag']);
         $val->optional('message_id', 'Message ID')->lengthBetween(0, 250);
         $val->optional('draft', 'Draft')->callback([$this, 'isValidFlag']);
-        $val->optional('recv_str', 'Received Date')->lengthBetween(0, 250);
         $val->optional('in_reply_to', 'In-Reply-To')->lengthBetween(0, 250);
         $val->optional('recent', 'Recent')->callback([$this, 'isValidFlag']);
         $val->optional('date_recv', 'Date Received')->datetime(DATE_DATABASE);
@@ -492,8 +510,9 @@ class Message extends Model
             return;
         }
 
-        $createdAt = new DateTime;
         unset($data['id']);
+
+        $createdAt = new DateTime;
         $data['created_at'] = $createdAt->format(DATE_DATABASE);
 
         try {
@@ -571,6 +590,95 @@ class Message extends Model
             'reply_to' => $this->formatAddress($message->replyTo),
             'attachments' => $this->formatAttachments($message->getAttachments())
         ]);
+    }
+
+    /**
+     * Creates or modifies a draft message based on an outbox message.
+     * Only creates a new message if the outbox is a draft.
+     *
+     * @param Outbox $outbox
+     * @param int $draftsId Drafts mailbox (folder) ID
+     */
+    public function createOrUpdateSent(Outbox $outbox, int $sentId)
+    {
+        // New message will be returned if not found
+        $message = $this->getByOutboxId($outbox->id, $sentId);
+        // Set the date to now and stored in UTC
+        $utcDate = $this->utcDate();
+        $localDate = $this->localDate();
+        // Flags
+        $message->seen = 1;
+        $message->purge = 1; // clean up on next sync
+        $message->deleted = 0;
+        // ID fields
+        $message->unique_id = null;
+        $message->message_no = null;
+        $message->folder_id = $sentId;
+        $message->outbox_id = $outbox->id;
+        $message->account_id = $outbox->account_id;
+        // String fields
+        $message->to = $outbox->to;
+        $message->cc = $outbox->cc;
+        $message->bcc = $outbox->bcc;
+        $message->from = $outbox->from;
+        $message->subject = $outbox->subject;
+        $message->text_html = $outbox->text_html;
+        $message->text_plain = $outbox->text_plain;
+        // Date fields
+        $message->date = $utcDate->format(DATE_DATABASE);
+        $message->date_str = $localDate->format(DATE_RFC822);
+        $message->date_recv = $utcDate->format(DATE_DATABASE);
+
+        return $this->createOrUpdate($message);
+    }
+
+    /**
+     * @throws DatabaseInsertException
+     * @throws DatabaseUpdateException
+     *
+     * @return Message
+     */
+    public function createOrUpdate(
+        Message $message,
+        bool $removeNulls = true,
+        bool $setThreadId = true
+    ) {
+        $data = $message->getData();
+
+        if (true === $removeNulls) {
+            $data = array_filter($data, function ($var) {
+                return null !== $var;
+            });
+        }
+
+        if ($message->id) {
+            $updated = $this->db()
+                ->update($data)
+                ->table('messages')
+                ->where('id', '=', $message->id)
+                ->execute();
+
+            $this->errorHandle($updated);
+        } else {
+            $newMessageId = $this->db()
+                ->insert(array_keys($data))
+                ->into('messages')
+                ->values(array_values($data))
+                ->execute();
+
+            if (! $newMessageId) {
+                throw new DatabaseInsertException('Failed creating new message');
+            }
+
+            $message->id = $newMessageId;
+
+            // Update the thread ID
+            if (true === $setThreadId) {
+                $message->saveThreadId([$message->id], $message->id);
+            }
+        }
+
+        return $message;
     }
 
     /**

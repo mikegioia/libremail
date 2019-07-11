@@ -20,8 +20,8 @@ $view->render('nav', [
 
     <h5>Settings &amp; Preferences</h5>
     <div class="help-text">
-        Customize your LibreMail experience! Make sure to click <code>Save Preferences</code>
-        when done.
+        Customize your <?php $view->clean($view->env('NAME', LIBREMAIL)); ?> experience!
+        Make sure to click <code>Save Preferences</code> when done.
     </div>
     <form action="/settings" method="post">
         <div class="row">
@@ -43,7 +43,7 @@ $view->render('nav', [
                         </div>
                         <label>
                             <input id="theme-default" type="radio" name="<?php echo PREF_THEME; ?>" value="default" <?php echo $view->meta(PREF_THEME, 'default') === 'default' ? 'checked' : ''; ?>>
-                            <span>LibreMail Classic</span>
+                            <span>Classic</span>
                         </label>
                     </div>
                     <div class="four columns theme-warmlight">

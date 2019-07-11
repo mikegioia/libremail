@@ -180,12 +180,13 @@ class Message extends Model implements MessageInterface
             ->fetchAll(PDO::FETCH_CLASS, get_class());
     }
 
-    public function getByOutboxId(int $outboxId)
+    public function getByOutboxId(int $outboxId, int $folderId)
     {
         $message = $this->db()
             ->select()
             ->from('messages')
             ->where('outbox_id', '=', $outboxId)
+            ->where('folder_id', '=', $folderId)
             ->execute()
             ->fetchObject();
 
@@ -852,7 +853,7 @@ class Message extends Model implements MessageInterface
         }
 
         // New message will be returned if not found
-        $message = $this->getByOutboxId($outbox->id);
+        $message = $this->getByOutboxId($outbox->id, $draftsId);
         // Set the date to now and stored in UTC
         $utcDate = $this->utcDate();
         $localDate = $this->localDate();
@@ -903,7 +904,7 @@ class Message extends Model implements MessageInterface
 
             if (! is_numeric($updated)) {
                 throw new DatabaseUpdateException(
-                    "Failed updating draft message {$message->id}"
+                    "Failed updating message {$message->id}"
                 );
             }
         } else {
@@ -914,9 +915,7 @@ class Message extends Model implements MessageInterface
                 ->execute();
 
             if (! $newMessageId) {
-                throw new DatabaseInsertException(
-                    "Failed creating draft message from outbox {$outbox->id}"
-                );
+                throw new DatabaseInsertException('Failed creating new message');
             }
 
             $message->id = $newMessageId;

@@ -61,17 +61,40 @@ class Task extends Model
         ];
     }
 
-    /**
-     * Updates the status of the task to done.
-     */
+    public function requiresImapMessage()
+    {
+        return in_array($this->type, [
+            self::TYPE_COPY,
+            self::TYPE_FLAG,
+            self::TYPE_READ,
+            self::TYPE_CREATE,
+            self::TYPE_DELETE,
+            self::TYPE_UNFLAG,
+            self::TYPE_UNREAD,
+            self::TYPE_UNDELETE
+        ]);
+    }
+
+    public function requiresOutboxMessage()
+    {
+        return in_array($this->type, [
+            self::TYPE_SEND,
+            self::TYPE_DELETE_OUTBOX
+        ]);
+    }
+
     public function revert()
     {
         $this->updateStatus(self::STATUS_REVERTED);
+
+        return $this;
     }
 
-    public function ignore()
+    public function ignore(string $message = null)
     {
-        $this->updateStatus(self::STATUS_IGNORED);
+        $this->updateStatus(self::STATUS_IGNORED, $message);
+
+        return $this;
     }
 
     /**
@@ -142,6 +165,11 @@ class Task extends Model
         }
     }
 
+    public function isFailed()
+    {
+        return self::STATUS_ERROR === $this->status;
+    }
+
     /**
      * Updates the status of the message.
      *
@@ -156,9 +184,15 @@ class Task extends Model
         string $reason = null,
         bool $force = false
     ) {
+        if (! $this->id) {
+            return;
+        }
+
+        $this->status = $status;
         $updates = ['status' => $status];
 
         if ($reason || $force) {
+            $this->reason = $reason;
             $updates['reason'] = $reason;
         }
 

@@ -465,7 +465,9 @@ class Threads
         }
 
         // Store these in SQL
-        (new ContactModel)->store($keys, $contacts);
+        if ($contacts) {
+            (new ContactModel)->store($keys, $contacts);
+        }
     }
 
     private function startProgress(int $pass, int $total)

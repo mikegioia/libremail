@@ -30,7 +30,7 @@ set_time_limit(0);
 define('BASEPATH', __DIR__);
 // User UTF-8
 mb_internal_encoding('UTF-8');
-//date_default_timezone_set( 'UTC' );
+date_default_timezone_set('UTC');
 define('DBSCRIPTS', BASEPATH.'/db/*.sql');
 
 // Load configuration files and parse the CLI arguments
@@ -177,7 +177,8 @@ $di['db_factory'] = $di->factory(function ($c, $config = null) {
         throw new TerminateException(
             'There was a problem connecting to the database. '.
             'Are you sure it exists? Here are the details: '.
-            $e->getMessage());
+            $e->getMessage()
+        );
     }
 });
 

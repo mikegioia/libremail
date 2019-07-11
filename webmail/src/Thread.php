@@ -227,26 +227,26 @@ class Thread
     private function setDate(Message &$message)
     {
         $now = time();
-        $startOfToday = strtotime('today');
-        $timestamp = strtotime($message->date_recv);
-
-        $message->timestamp = $timestamp;
-        $message->datetime_string = date('j F Y H:i', $timestamp);
+        $dateString = $message->date_recv ?: $message->date;
+        $date = $message->utcToLocal($dateString);
+        $message->timestamp = $date->getTimestamp();
+        $message->datetime_string = $date->format(DATE_DATETIME);
+        $startOfToday = $message->localDate(date(DATE_DATABASE, strtotime('today')));
 
         // Show the time if it's today
-        if ($timestamp >= $startOfToday) {
-            $message->date_string = date('H:i', $timestamp);
+        if ($date >= $startOfToday) {
+            $message->date_string = $date->format(DATE_TIME_SHORT);
         } else {
             // If the year is different and older than 6 months,
             // show the full date
-            if (date('Y', $now) !== date('Y', $timestamp)
-                && $now - $timestamp >= 15552000
+            if (date('Y', $now) !== date('Y', $message->timestamp)
+                && $now - $message->timestamp >= 15552000
             ) {
                 // @TODO MM/DD/YYYY or DD/MM/YYYY user setting
-                $message->date_string = date('j/m/Y', $timestamp);
+                $message->date_string = $date->format(DATE_CALENDAR);
             } else {
                 // Catch-all is like "8 Jul"
-                $message->date_string = date('j M', $timestamp);
+                $message->date_string = $date->format(DATE_CALENDAR_SHORT);
             }
         }
     }

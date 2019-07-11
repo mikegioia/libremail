@@ -2,26 +2,35 @@
 
 namespace App\Sync\Actions;
 
-use stdClass;
 use Pb\Imap\Mailbox;
 use Pb\Imap\Message;
 use App\Model\Task as TaskModel;
+use App\Model\Folder as FolderModel;
+use App\Model\Outbox as OutboxModel;
+use App\Model\Account as AccountModel;
+use App\Model\Message as MessageModel;
 
 abstract class Base
 {
     protected $task;
     protected $folder;
+    protected $outbox;
+    protected $account;
     protected $message;
     protected $imapMessage;
 
     public function __construct(
         TaskModel $task,
-        stdClass $folder,
-        stdClass $message,
+        AccountModel $account,
+        FolderModel $folder,
+        MessageModel $message,
+        OutboxModel $outbox,
         Message $imapMessage
     ) {
         $this->task = $task;
         $this->folder = $folder;
+        $this->outbox = $outbox;
+        $this->account = $account;
         $this->message = $message;
         $this->imapMessage = $imapMessage;
     }
@@ -32,6 +41,14 @@ abstract class Base
     abstract public function getType();
 
     abstract public function run(Mailbox $mailbox);
+
+    /**
+     * Extended in sub-classes, if necessary.
+     */
+    public function isReady()
+    {
+        return true;
+    }
 
     /**
      * Checks if the SQL message is "real", i.e. that it has

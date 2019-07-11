@@ -8,6 +8,7 @@ use DateTime;
 use App\Model;
 use Particle\Validator\Validator;
 use App\Traits\Model as ModelTrait;
+use App\Exceptions\NotFound as NotFoundException;
 use App\Exceptions\Validation as ValidationException;
 use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 use App\Exceptions\DatabaseInsert as DatabaseInsertException;
@@ -28,6 +29,11 @@ class Folder extends Model
     const DRAFTS = [
         '[Gmail]/Drafts',
         '[Gmail]/Bozze'
+    ];
+
+    const SENT = [
+        '[Gmail]/Sent Mail',
+        '[Gmail]/Posta inviata'
     ];
 
     public function getData()
@@ -76,8 +82,37 @@ class Folder extends Model
         return in_array($this->getName(), self::DRAFTS);
     }
 
+    public function isSent()
+    {
+        return in_array($this->getName(), self::SENT);
+    }
+
+    /**
+     * @throws NotFoundException
+     */
+    public function loadById()
+    {
+        if (! $this->id) {
+            throw new NotFoundException(FOLDER);
+        }
+
+        $folder = $this->getById($this->id);
+
+        if ($folder) {
+            $this->setData($folder);
+        } else {
+            throw new NotFoundException(FOLDER);
+        }
+
+        return $this;
+    }
+
     public function getById(int $id)
     {
+        if ($id <= 0) {
+            return;
+        }
+
         return $this->db()
             ->select()
             ->from('folders')
@@ -152,7 +187,9 @@ class Folder extends Model
         }
 
         $createdAt = new DateTime;
+
         unset($data['id']);
+
         $data['deleted'] = 0;
         $data['created_at'] = $createdAt->format(DATE_DATABASE);
         $newFolderId = $this->db()
@@ -171,6 +208,7 @@ class Folder extends Model
     public function delete()
     {
         $this->deleted = 1;
+
         $updated = $this->db()
             ->update([
                 'deleted' => 1
@@ -266,5 +304,18 @@ class Folder extends Model
         ksort($indexed);
 
         return $indexed;
+    }
+
+    public function getSentByAccount(int $accountId)
+    {
+        $folders = $this->getByAccount($accountId);
+
+        foreach ($folders as $folder) {
+            if ($folder->isSent()) {
+                return $folder;
+            }
+        }
+
+        throw new NotFoundException('sent mail folder');
     }
 }

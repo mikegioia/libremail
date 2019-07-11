@@ -36,6 +36,10 @@ class Contact extends Model
      */
     public function store(array $keys, array $data)
     {
+        if (! $data) {
+            return;
+        }
+
         $updated = $this->db()
             ->insertMulti($keys, $data)
             ->into('contacts')

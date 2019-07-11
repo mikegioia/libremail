@@ -2,6 +2,8 @@
 
 namespace App;
 
+use DateTime;
+use DateTimeZone;
 use Monolog\Logger;
 use Pb\PDO\Database;
 use Pimple\Container;
@@ -18,6 +20,8 @@ class Model
 
     const ASC = 'asc';
     const DESC = 'desc';
+
+    const UTC = 'UTC';
 
     /**
      * @var bool Mode for returning new DB instance
@@ -140,7 +144,7 @@ class Model
      *
      * @return mixed | array
      */
-    public function config($key = '')
+    public function config(string $key = '')
     {
         if (! $key) {
             return self::$config;
@@ -177,5 +181,37 @@ class Model
             sprintf("%s\n\n%s", $message, implode("\n", $return)),
             ". \t\n\r\0\x0B"
         ).'.';
+    }
+
+    /**
+     * Returns a new local DateTime object.
+     *
+     * @return DateTime
+     */
+    public function localDate(string $localDate = null)
+    {
+        $timezone = $this->config('app.timezone');
+
+        return new DateTime(
+            is_null($localDate)
+                ? date(DATE_DATABASE)
+                : $localDate,
+            new DateTimeZone($timezone)
+        );
+    }
+
+    /**
+     * Returns a new UTC-adjusted DateTime object.
+     *
+     * @return DateTime
+     */
+    public function utcDate(string $utcDate = null)
+    {
+        return new DateTime(
+            is_null($utcDate)
+                ? gmdate(DATE_DATABASE)
+                : $utcDate,
+            new DateTimeZone(self::UTC)
+        );
     }
 }

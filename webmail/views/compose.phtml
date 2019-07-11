@@ -116,14 +116,14 @@ $view->render('nav', [
             <div class="two columns label">
                 <label class="align-right" for="settings-email">Message</label>
             </div>
-            <div class="ten columns">
+            <div class="ten columns pb-0">
                 <textarea name="text_plain"><?php echo $formData['text_plain'] ?? $message->text_plain; ?></textarea>
                 <div class="help-text align-right">
                     Markdown enabled
                 </div>
             </div>
         </div>
-        <div class="buttons">
+        <div class="row buttons">
             <div class="ten columns offset-by-two">
                 <button type="submit" name="send_draft" class="button button-secondary" formnovalidate>
                     Save Draft

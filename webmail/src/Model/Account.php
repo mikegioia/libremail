@@ -15,6 +15,8 @@ class Account extends Model
     public $is_active;
     public $imap_host;
     public $imap_port;
+    public $smtp_host;
+    public $smtp_port;
     public $imap_flags;
     public $created_at;
 
@@ -66,7 +68,9 @@ class Account extends Model
         string $password,
         string $name,
         string $imapHost,
-        int $imapPort
+        int $imapPort,
+        string $smtpHost,
+        int $smtpPort
     ) {
         $updated = $this->db()
             ->update([
@@ -74,7 +78,9 @@ class Account extends Model
                 'email' => trim($email),
                 'password' => trim($password),
                 'imap_host' => trim($imapHost),
-                'imap_port' => trim($imapPort)
+                'imap_port' => trim($imapPort),
+                'smtp_host' => trim($smtpHost),
+                'smtp_port' => trim($smtpPort)
             ])
             ->table('accounts')
             ->where('id', '=', $this->id)

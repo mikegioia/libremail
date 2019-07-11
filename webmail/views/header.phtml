@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>LibreMail<?php echo isset($pageTitle) ? ' &bull; '.$pageTitle : ''; ?></title>
+    <title><?php $view->clean($view->env('NAME', LIBREMAIL)); ?><?php echo isset($pageTitle) ? ' &bull; '.$pageTitle : ''; ?></title>
     <meta name="author" content="">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -48,7 +48,7 @@
             <a class="icon button" href="#" tabindex="3">
                 <i class="fa fa-bars"></i>
             </a>
-            <a href="/" class="link">LibreMail</a>
+            <a href="/" class="link"><?php $view->clean($view->env('NAME', LIBREMAIL)); ?></a>
         </h4>
         <div id="search">
             <form method="get" action="/search" name="search">

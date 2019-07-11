@@ -6,19 +6,25 @@
 
 namespace App\Sync;
 
+// Core
 use Fn;
-use App\Sync;
 use Exception;
+use RuntimeException;
+// Vendor
 use Monolog\Logger;
 use Pb\Imap\Mailbox;
 use Pb\Imap\Message;
-use RuntimeException;
 use League\CLImate\CLImate;
+use Evenement\EventEmitter as Emitter;
+// Application
+use App\Sync;
+use App\Model;
 use App\Model\Task as TaskModel;
 use App\Model\Folder as FolderModel;
+use App\Model\Outbox as OutboxModel;
 use App\Model\Account as AccountModel;
 use App\Model\Message as MessageModel;
-use Evenement\EventEmitter as Emitter;
+use App\Exceptions\NotFound as NotFoundException;
 
 class Actions
 {
@@ -43,18 +49,26 @@ class Actions
     private static $actionLookup = [
         TaskModel::TYPE_COPY => 'App\Sync\Actions\Copy',
         TaskModel::TYPE_DELETE => 'App\Sync\Actions\Delete',
+        TaskModel::TYPE_DELETE_OUTBOX => 'App\Sync\Actions\DeleteOutbox',
         TaskModel::TYPE_FLAG => 'App\Sync\Actions\Flag',
         TaskModel::TYPE_READ => 'App\Sync\Actions\Read',
+        TaskModel::TYPE_SEND => 'App\Sync\Actions\Send',
         TaskModel::TYPE_UNDELETE => 'App\Sync\Actions\Undelete',
         TaskModel::TYPE_UNFLAG => 'App\Sync\Actions\Unflag',
         TaskModel::TYPE_UNREAD => 'App\Sync\Actions\Unread'
     ];
 
-    const ERR_UID_MISMATCH = 'Unique IDs are no longer the same';
     const ERR_FAIL_IMAP_SYNC = 'Failed IMAP sync';
     const ERR_NO_IMAP_MESSAGE = 'No message found in IMAP mailbox';
     const ERR_NO_SQL_FOLDER = 'No folder found in SQL';
     const ERR_NO_SQL_MESSAGE = 'No message found in SQL';
+    const ERR_NO_SQL_OUTBOX = 'No outbox message found in SQL';
+    const ERR_NO_SQL_SENT = 'No sent folder found in SQL';
+    const ERR_TRANSPORT_FAIL = 'Message failed before transport';
+    const ERR_TRANSPORT_GENERAL = 'Message failed from an unknown exception';
+
+    const IGNORE_OUTBOX_DELETED = 'Outbox message previously deleted';
+    const IGNORE_OUTBOX_SENT = 'Outbox message previously sent';
 
     public function __construct(
         Logger $log,
@@ -95,7 +109,7 @@ class Actions
         $this->startProgress(count($tasks));
 
         foreach ($tasks as $i => $task) {
-            if ($this->processTask($task)) {
+            if ($this->processTask($task, $account)) {
                 ++$count;
             }
 
@@ -171,51 +185,35 @@ class Actions
      * If not an error is logged and the task is skipped.
      *
      * @param TaskModel $task
+     * @param AccountModel $account
      */
-    private function processTask(TaskModel $task)
+    private function processTask(TaskModel $task, AccountModel $account)
     {
-        $sqlMessage = (new MessageModel)->getById($task->message_id);
+        $imapMessage = new Message;
+        $sqlFolder = new FolderModel;
+        $sqlOutbox = new OutboxModel($task->outbox_id);
+        $sqlMessage = new MessageModel($task->message_id);
 
-        if (! $sqlMessage) {
-            return $task->fail(self::ERR_NO_SQL_MESSAGE);
-        }
+        // Some tasks have no message_id and don't need to be
+        // processed the same way. These interact solely with
+        // outbox messages.
+        if ($task->requiresImapMessage()) {
+            // Variables will be updated upon success
+            $loaded = $this->loadMessageData(
+                $task, $sqlMessage, $sqlFolder, $imapMessage
+            );
 
-        $sqlFolder = (new FolderModel)->getById($sqlMessage->folder_id);
-
-        if (! $sqlFolder) {
-            return $task->fail(self::ERR_NO_SQL_FOLDER);
-        }
-
-        // Skip messages without a unique ID. These were added during a
-        // copy command (etc) and do not have a corresponding server message.
-        // They'll be purged after the message is copied to the mailbox.
-        if (! $sqlMessage->unique_id) {
-            return $task->ignore();
+            if (! $loaded) {
+                return false;
+            }
         }
 
         try {
-            $this->mailbox->select($sqlFolder->name);
-            $msgNo = $this->mailbox->getNumberByUniqueId($sqlMessage->unique_id);
-            $imapMessage = $this->mailbox->getMessage($msgNo);
-        } catch (Exception $e) {
-            $this->log->warning(
-                "Failed downloading message for task {$task->id}: ".
-                $e->getMessage());
-            $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
-
-            return $task->fail(self::ERR_NO_IMAP_MESSAGE, $e);
-        }
-
-        // Check if the unique ID is the same; halt if not
-        if (! Fn\intEq($imapMessage->uid, $sqlMessage->unique_id)) {
-            // @TODO remove this debugging info
-            // this case can no longer be re-created now that we're pulling
-            // the updated message ID each time
-            print_r($sqlMessage);
-            print_r($imapMessage);
-            exit('uid mismatch!');
-
-            return $task->fail(self::ERR_UID_MISMATCH);
+            $sqlOutbox->loadById();
+        } catch (NotFoundException $e) {
+            if ($task->requiresOutboxMessage()) {
+                return $task->fail(self::ERR_NO_SQL_OUTBOX);
+            }
         }
 
         $actionClass = self::$actionLookup[$task->type] ?? null;
@@ -226,24 +224,96 @@ class Actions
             );
         }
 
-        try {
-            (new $actionClass(
-                $task, $sqlFolder, $sqlMessage, $imapMessage
-            ))->run($this->mailbox);
+        $action = new $actionClass(
+            $task, $account,
+            $sqlFolder, $sqlMessage, $sqlOutbox,
+            $imapMessage
+        );
 
-            if (TaskModel::TYPE_DELETE === $task->type) {
-                $this->foldersToExpunge[] = $sqlFolder->name;
-            }
+        if (! $action->isReady()) {
+            return false;
+        }
+
+        Model::getDb()->beginTransaction();
+
+        try {
+            $action->run($this->mailbox);
+            $task->done();
         } catch (Exception $e) {
+            Model::getDb()->rollBack();
+
             $this->log->warning(
                 "Failed syncing IMAP action for task {$task->id}: ".
                 $e->getMessage());
             $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
 
-            return $task->fail(self::ERR_FAIL_IMAP_SYNC);
+            if (! $task->isFailed()) {
+                $task->fail(self::ERR_FAIL_IMAP_SYNC);
+            }
+
+            return false;
         }
 
-        return $task->done();
+        Model::getDb()->commit();
+
+        if (TaskModel::TYPE_DELETE === $task->type) {
+            $this->foldersToExpunge[] = $sqlFolder->name;
+        }
+
+        return true;
+    }
+
+    /**
+     * Modifies the final three parameters and loads the respective
+     * data into them. Returns false on error and true on success.
+     * Data may be modified even on failure, as part of the data could
+     * be loaded.
+     *
+     * @return bool
+     */
+    private function loadMessageData(
+        TaskModel $task,
+        MessageModel &$message,
+        FolderModel &$folder,
+        Message &$imapMessage
+    ) {
+        try {
+            $message->loadById();
+        } catch (NotFoundException $e) {
+            return $task->fail(self::ERR_NO_SQL_MESSAGE);
+        }
+
+        try {
+            $folder->id = $message->folder_id;
+            $folder->loadById();
+        } catch (NotFoundException $e) {
+            return $task->fail(self::ERR_NO_SQL_FOLDER);
+        }
+
+        // Skip messages without a unique ID. These were added
+        // during a copy command (etc) and do not have a
+        // corresponding server message. They'll be purged after
+        // the message is copied to the mailbox.
+        if (! $message->unique_id) {
+            $task->ignore();
+
+            return false;
+        }
+
+        try {
+            $this->mailbox->select($folder->name);
+            $msgNo = $this->mailbox->getNumberByUniqueId($message->unique_id);
+            $imapMessage = $this->mailbox->getMessage($msgNo);
+        } catch (Exception $e) {
+            $this->log->warning(
+                "Failed downloading message for task {$task->id}: ".
+                $e->getMessage());
+            $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
+
+            return $task->fail(self::ERR_NO_IMAP_MESSAGE, $e);
+        }
+
+        return true;
     }
 
     /**

@@ -122,7 +122,8 @@ body.theme-warmlight #main > h5,
 body.theme-warmlight section #msg-actions,
 body.theme-warmlight .dropdown li.notice,
 body.theme-warmlight article.thread-msg,
-body.theme-warmlight section #msg-list h5 .sort-controls {
+body.theme-warmlight section #msg-list h5 .sort-controls,
+body.theme-warmlight section #msg-list .mailbox-checkbox:checked + h5 {
   border-color: #dcc5b3;
 }
 
@@ -136,7 +137,7 @@ body.theme-warmlight .dropdown li input[type="submit"] {
 
 /* Very light border */
 body.theme-warmlight nav #mailboxes-divider,
-body.theme-warmlight .compose .row:not(.message) {
+body.theme-warmlight .compose .row:not(.message):not(.buttons) {
   border-color: #e8d3c2;
 }
 

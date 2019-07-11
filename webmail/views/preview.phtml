@@ -33,7 +33,17 @@ $view->render('nav', [
     </h5>
     <div class="notifications">
         <div class="notification info">
+        <?php
+        if (! $message->isPastDue() && ! ((int) $meta->running === 1 || $meta->asleep !== 1)): ?>
+            <div>
+                Scheduled for <strong><?php echo $message->getDeliveryDate(); ?></strong>
+                but won't be sent until sync starts (currently offline!)
+            </div>
+        <?php
+        else: ?>
             <div>This message is scheduled for delivery!</div>
+        <?php
+        endif; ?>
             <div class="notification-actions">
                 <a class="button button-secondary" href="#confirm-restore-draft">Cancel delivery</a>
             <?php
@@ -45,12 +55,14 @@ $view->render('nav', [
                 <span>Will be sent when sync starts (currently offline!)</span>
                 <?php
                 endif;
-            else: ?>
+            else:
+                if ((int) $meta->running === 1 || (int) $meta->asleep === 1): ?>
                 <span>
                     This message will be delivered:
                     <strong><?php echo $message->getDeliveryDate(); ?></strong>
                 </span>
-            <?php
+                <?php
+                endif;
             endif; ?>
             </div>
         </div>

@@ -301,8 +301,8 @@ class Sync
             $actionCount = $this->syncActions($account);
 
             if ((true === Fn\get($options, self::OPT_ONLY_SYNC_ACTIONS)
-                    || true === $this->actions)
-                && 0 === $actionCount
+                    && 0 === $actionCount)
+                || true === $this->actions
             ) {
                 $this->disconnect();
 
