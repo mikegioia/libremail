@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `outbox` (
   `text_html` longtext COLLATE utf8mb4_unicode_ci,
   `draft` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `sent` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `failed` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `locked` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `deleted` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `attempts` tinyint(1) unsigned NOT NULL DEFAULT 0,
