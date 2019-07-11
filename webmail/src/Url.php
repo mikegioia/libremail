@@ -117,12 +117,16 @@ class Url
 
     public static function postParam(string $key, $default = null)
     {
-        return $_POST[$key] ?? $default;
+        return isset($_POST[$key])
+            ? ($_POST[$key] ?: $default)
+            : $default;
     }
 
     public static function getParam(string $key, $default = null)
     {
-        return $_GET[$key] ?? $default;
+        return isset($_GET[$key])
+            ? ($_GET[$key] ?: $default)
+            : $default;
     }
 
     public static function getRedirectUrl()

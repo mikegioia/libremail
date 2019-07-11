@@ -180,7 +180,7 @@ class Folders
         return [];
     }
 
-    public function get($withMeta = false)
+    public function get(bool $withMeta = false)
     {
         if ($this->loaded) {
             return $this->folders;
@@ -225,6 +225,22 @@ class Folders
             });
 
         return $this->applySelected($this->listFolders, $selectedIds);
+    }
+
+    /**
+     * Returns a count of folders.
+     *
+     * @return int
+     */
+    public function getCount()
+    {
+        if ($this->folders) {
+            return count($this->folders);
+        }
+
+        $this->loadFolders();
+
+        return count($this->folders);
     }
 
     /**

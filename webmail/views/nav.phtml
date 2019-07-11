@@ -1,4 +1,6 @@
 <nav class="no-select">
+<?php
+if ($folders->getCount() > 0): ?>
     <a id="compose" href="/compose" class="button button-primary" tabindex="2">Compose</a><!--
     <a id="collapse-mailboxes" href="#collapse">
         <i class="fa fa-sign-out-alt fa-flip-horizontal"></i>
@@ -98,4 +100,11 @@
     <?php
     endif; ?>
     </div>
+<?php
+else: ?>
+    <div class="alert">
+        No folders found for this account.
+    </div>
+<?php
+endif; ?>
 </nav>

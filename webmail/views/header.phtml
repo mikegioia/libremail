@@ -45,17 +45,25 @@
     endif; ?>
     <header class="u-cf">
         <h4 id="logo">
+        <?php
+        if (! isset($hideCollapse) || true !== $hideCollapse): ?>
             <a class="icon button" href="#" tabindex="3">
                 <i class="fa fa-bars"></i>
             </a>
+        <?php
+        endif; ?>
             <a href="/" class="link"><?php $view->clean($view->env('NAME', LIBREMAIL)); ?></a>
         </h4>
+        <?php
+        if (! isset($hideSearch) || true !== $hideSearch): ?>
         <div id="search">
             <form method="get" action="/search" name="search">
                 <input type="search" value="<?php echo $query ?? '' ?>" name="q" placeholder="Search..." tabindex="1" /><!--
                 --><button class="icon button" type="submit"><i class="fa fa-search"></i></button>
             </form>
         </div>
+        <?php
+        endif; ?>
         <div id="topnav">
             <!-- This is a top-layer action. A separate container will be
                 fixed and positioned up here -->

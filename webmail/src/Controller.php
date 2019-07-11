@@ -71,13 +71,6 @@ class Controller
         (new Rollback)->run($batchId);
     }
 
-    public function closeJsAlert()
-    {
-        session_start();
-        Session::flag(Session::FLAG_HIDE_JS_ALERT, true);
-        Url::redirectBack();
-    }
-
     public function getStar(string $type, string $theme, int $id, string $state)
     {
         header('Content-Type: text/html');
@@ -116,6 +109,13 @@ class Controller
             'theme' => Url::postParam('theme'),
             'flagged' => 'on' === Url::postParam('state', 'on')
         ]);
+    }
+
+    public function closeJsAlert()
+    {
+        session_start();
+        Session::flag(Session::FLAG_HIDE_JS_ALERT, true);
+        Url::redirectBack();
     }
 
     public function thread(int $folderId, int $threadId)
@@ -158,15 +158,74 @@ class Controller
         $this->page('account');
     }
 
+    public function setup()
+    {
+        $view = new View;
+
+        $view->htmlHeaders();
+        $view->render('setup', [
+            'view' => $view,
+            'account' => new Account(Session::get(Session::FORM_DATA)),
+            'notifications' => Session::get(Session::NOTIFICATIONS, [])
+        ]);
+    }
+
+    public function createAccount()
+    {
+        session_start();
+
+        $name = Url::postParam('name', '');
+        $port = Url::postParam('port', 993);
+        $email = Url::postParam('email', '');
+        $password = Url::postParam('password', '');
+        $host = Url::postParam('host', 'imap.gmail.com');
+
+        list($smtpHost, $smtpPort) = Config::getSmtpSettings($host);
+
+        $this->account->setData([
+            'name' => $name,
+            'email' => $email,
+            'password' => $password,
+            'imap_host' => $host,
+            'imap_port' => $port,
+            'smtp_host' => $smtpHost,
+            'smtp_port' => $smtpPort
+        ]);
+
+        try {
+            (new Imap)->connect($email, $password, $host, (int) $port);
+
+            $this->account->create();
+
+            Session::notify(
+                'Your account configuration has been saved! You can '.
+                'now start the sync process.',
+                Session::SUCCESS);
+
+            Url::redirect('/account');
+            // User sent to the account page now, script halted
+        } catch (ServerException $e) {
+            Session::formData($this->account->getData());
+            Session::notify(
+                'There was a problem with your account configuration. '.
+                $e->getMessage(),
+                Session::ERROR
+            );
+        }
+
+        Url::redirectBack('/setup');
+    }
+
     public function updateAccount()
     {
         session_start();
 
-        $name = $_POST['name'] ?? '';
-        $port = $_POST['port'] ?? 993;
-        $email = $_POST['email'] ?? '';
-        $password = $_POST['password'] ?? '';
-        $host = $_POST['host'] ?? 'imap.gmail.com';
+        $name = Url::postParam('name', '');
+        $port = Url::postParam('port', 993);
+        $email = Url::postParam('email', '');
+        $password = Url::postParam('password', '');
+        $host = Url::postParam('host', 'imap.gmail.com');
+
         list($smtpHost, $smtpPort) = Config::getSmtpSettings($host);
 
         try {
@@ -179,7 +238,7 @@ class Controller
             );
 
             Session::notify(
-                'Your account configuration has been updated! You will'.
+                'Your account configuration has been updated! You will '.
                 'most likely need to restart the sync process.',
                 Session::SUCCESS
             );
@@ -363,11 +422,6 @@ class Controller
         Url::redirectRaw(Url::preview(Url::postParam('id')));
     }
 
-    public function error404()
-    {
-        throw new NotFoundException;
-    }
-
     public function outbox()
     {
         $select = Url::getParam('select');
@@ -493,6 +547,24 @@ class Controller
                 'notifications' => Session::get(Session::NOTIFICATIONS, []),
                 'hideJsAlert' => Session::getFlag(Session::FLAG_HIDE_JS_ALERT, false)
             ], $data)
+        );
+    }
+
+    public function error404()
+    {
+        throw new NotFoundException;
+    }
+
+    public function errorNoFolders()
+    {
+        View::showError(
+            View::HTTP_200,
+            'No Folders Found',
+            'Start the sync engine to begin downloading your email. '.
+            'Once the sync runs, you will be able to see your mail. ',
+            [
+                'showSettingsMenu' => true
+            ]
         );
     }
 }
