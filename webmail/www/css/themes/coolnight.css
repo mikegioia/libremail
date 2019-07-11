@@ -239,7 +239,8 @@ body.theme-coolnight .dropdown li input[type="submit"] {
 }
 
 /* Very light borders */
-body.theme-coolnight .msg-label {
+body.theme-coolnight .msg-label,
+body.theme-coolnight section #msg-list .mailbox-checkbox:checked + h5 {
   border-color: #2b2b2b;
 }
 
