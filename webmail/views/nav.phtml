@@ -68,8 +68,8 @@ if ($folders->getCount() > 0): ?>
                 'view' => $view,
                 'folders' => $folders,
                 'activeId' => $activeId,
-                'folder' => $item['folder'],
-                'children' => $item['children']
+                'folder' => $item['folder'] ?? null,
+                'children' => $item['children'] ?? []
             ]);
         endforeach; ?>
         </ul>
