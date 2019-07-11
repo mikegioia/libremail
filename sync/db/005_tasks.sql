@@ -16,5 +16,5 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   INDEX (`batch_id`),
   INDEX (`outbox_id`),
   INDEX (`account_id`),
-  INDEX (`message_id`),
+  INDEX (`message_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

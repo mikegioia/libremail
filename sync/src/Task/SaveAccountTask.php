@@ -16,8 +16,10 @@ class SaveAccountTask extends AbstractTask
 {
     public $host;
     public $port;
+    public $name;
     public $email;
     public $password;
+
     protected $type = Task::SAVE_ACCOUNT;
 
     /**
@@ -54,7 +56,8 @@ class SaveAccountTask extends AbstractTask
             return $this->fail(
                 'There was a problem testing the IMAP connection: '.
                 $e->getMessage().'.',
-                $server);
+                $server
+            );
         }
 
         // Save the account

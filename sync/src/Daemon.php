@@ -246,7 +246,8 @@ class Daemon
     {
         $this->broadcast(
             new HealthMessage(
-                $this->diagnostics, [
+                $this->diagnostics,
+                [
                     PROC_SYNC => isset($this->processPids[PROC_SYNC]),
                     PROC_SERVER => isset($this->processPids[PROC_SERVER])
                 ],

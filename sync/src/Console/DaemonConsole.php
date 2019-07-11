@@ -10,6 +10,11 @@ class DaemonConsole extends Console
     public $help;
     public $sync;
     public $webServer;
+    public $diagnostics;
+
+    // These cannot be overwritten from the CLI
+    public $daemon = false;
+    public $interactive = false;
 
     public function __construct()
     {
@@ -38,7 +43,13 @@ class DaemonConsole extends Console
                 'longPrefix' => 'help',
                 'description' => 'Prints a usage statement',
                 'noValue' => true
-            ]
+            ],
+            'diagnostics' => [
+                'prefix' => 'd',
+                'longPrefix' => 'diagnostics',
+                'description' => 'Runs a series of diagnostic tests',
+                'noValue' => true
+            ],
         ]);
     }
 
@@ -48,9 +59,15 @@ class DaemonConsole extends Console
     protected function parseArgs()
     {
         $this->cli->arguments->parse();
+
         $this->help = $this->cli->arguments->get('help');
         $this->sync = ! $this->cli->arguments->get('disable-sync');
+        $this->diagnostics = $this->cli->arguments->get('diagnostics');
         $this->webServer = ! $this->cli->arguments->get('disable-webserver');
+
+        if ($this->diagnostics) {
+            $this->interactive = true;
+        }
     }
 
     /**

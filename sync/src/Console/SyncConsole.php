@@ -139,6 +139,7 @@ class SyncConsole extends Console
     protected function parseArgs()
     {
         $this->cli->arguments->parse();
+
         $this->help = $this->cli->arguments->get('help');
         $this->once = $this->cli->arguments->get('once');
         $this->quick = $this->cli->arguments->get('quick');

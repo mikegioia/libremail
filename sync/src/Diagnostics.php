@@ -116,14 +116,6 @@ class Diagnostics
     }
 
     /**
-     * No-op used to instantiate class if we're not running this
-     * on startup.
-     */
-    public function init()
-    {
-    }
-
-    /**
      * Check if the log path is writable.
      */
     public function testLogPathWritable()
@@ -220,7 +212,9 @@ class Diagnostics
         try {
             $attachmentPath = self::checkAttachmentsPath(
                 'test@example.org',
-                false); // don't create the directory
+                false // don't create the directory
+            );
+
             $this->endTest(STATUS_SUCCESS, self::TEST_ATTACH_PATH);
         } catch (AttachmentsPathNotWriteableException $e) {
             $this->endTest(STATUS_ERROR, self::TEST_ATTACH_PATH, $e);
@@ -267,7 +261,8 @@ class Diagnostics
         if ($this->hasError()) {
             $this->cli->comment(
                 'There were errors encountered during the tests that '.
-                'prevent this application from running!');
+                'prevent this application from running!'
+            );
         }
     }
 
@@ -299,18 +294,19 @@ class Diagnostics
     private function endTest(string $status, string $test, Exception $e = null)
     {
         $code = $this->tests[$test]['code'];
-        $message = ($e)
+        $message = $e
             ? $e->getMessage()
             : 'Testing '.$this->tests[$test]['name'];
         $this->tests[$test]['status'] = $status;
         $this->tests[$test]['message'] = $message;
 
-        // If we're not in diagnostic mode (and not daemon mode), then
-        // use exceptions
+        // If we're not in diagnostic mode (and not daemon mode),
+        // then use exceptions
         if (! $this->console->diagnostics) {
             if (STATUS_ERROR === $status && ! $this->console->daemon) {
                 throw new FatalException(
-                    "Failed diagnostic test #$code, $message");
+                    "Failed diagnostic test #$code, $message"
+                );
             }
 
             if (! $this->console->interactive) {
@@ -385,7 +381,8 @@ class Diagnostics
             $account['email'],
             $account['password'],
             $folder = null,
-            $setRunning = false);
+            $setRunning = false
+        );
     }
 
     /**

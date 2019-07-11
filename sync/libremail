@@ -9,11 +9,14 @@
  * abusive sync and server scripts.
  */
 use App\Log;
+use App\Model;
 use App\Daemon;
 use App\Command;
 use App\Message;
 use App\Startup;
 use App\Constants;
+use App\Diagnostics;
+use Pb\PDO\Database;
 use Pimple\Container;
 use Exception as Exception;
 use React\EventLoop\Factory;
@@ -112,6 +115,11 @@ $di['daemon'] = new Daemon(
     $config['daemon']
 );
 
+// Diagnostic test service
+$di['diagnostics'] = function ($container) {
+    return new Diagnostics($container);
+};
+
 // This event is fired to start or restart the sync process.
 $di['emitter']->addListener(
     EV_START_SYNC,
@@ -184,6 +192,48 @@ $di['emitter']->addListener(
 // Trigger the events to load the timers
 $di['emitter']->dispatch(EV_START_SYNC);
 $di['emitter']->dispatch(EV_START_SERVER);
+
+// PDO factory, this uses a wrapper around PDO
+$di['db_factory'] = $di->factory(function ($container, $config = null) {
+    $dbConfig = $config ?: $container['config']['sql'];
+    $dsn = sprintf(
+        'mysql:host=%s;dbname=%s;charset=%s',
+        $dbConfig['hostname'],
+        $dbConfig['database'],
+        $dbConfig['charset']
+    );
+
+    try {
+        $db = new Database(
+            $dsn,
+            $dbConfig['username'],
+            $dbConfig['password']);
+        $db->query('SET SESSION wait_timeout = 28800;');
+        $db->query('SET NAMES '.$dbConfig['charset'].';');
+
+        return $db;
+    } catch (PDOException $e) {
+        throw new TerminateException(
+            'There was a problem connecting to the database. '.
+            'Are you sure it exists? Here are the details: '.
+            $e->getMessage()
+        );
+    }
+});
+
+// Run the diagnostic tests. If specified from the CLI, then
+// output the results to the console and exit.
+$di['diagnostics']->run();
+
+// PDO connection. This attempts to connect to the database.
+// If it fails here, the script will halt.
+$di['db'] = $di['db_factory'];
+
+// Statically set the services in the base model
+Model::setDb($di['db']);
+Model::setCLI($di['cli']);
+Model::setConfig($di['config']);
+Model::setLog($di['log']->getLogger());
 
 try {
     // Kick off the server application

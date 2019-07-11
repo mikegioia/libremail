@@ -59,26 +59,26 @@ $di['config'] = $config;
 
 // Console/CLI service
 $di['console'] = new SyncConsole($config);
-$di['cli'] = function ($c) {
-    return $c['console']->getCLI();
+$di['cli'] = function ($container) {
+    return $container['console']->getCLI();
 };
 
 // Diagnostic test service
-$di['diagnostics'] = function ($c) {
-    return new Diagnostics($c);
+$di['diagnostics'] = function ($container) {
+    return new Diagnostics($container);
 };
 
 // Statistics logging and printing service
-$di['stats'] = function ($c) {
-    return new Stats($c['console']);
+$di['stats'] = function ($container) {
+    return new Stats($container['console']);
 };
 
 // Logging service
-$di['log'] = function ($c) {
+$di['log'] = function ($container) {
     return new Log(
-        $c['cli'],
-        $c['config']['log'],
-        true === $c['console']->interactive
+        $container['cli'],
+        $container['config']['log'],
+        true === $container['console']->interactive
     );
 };
 
@@ -88,11 +88,11 @@ $di['log']->init();
 // Store a static reference to the threading system. This should be
 // saved in the container because the threading operation needs to
 // query and organize a large amount of data during the first pass.
-$di['threader'] = function ($c) {
+$di['threader'] = function ($container) {
     return new ThreadSync(
-        $c['log']->getLogger(),
-        $c['cli'],
-        true === $c['console']->interactive
+        $container['log']->getLogger(),
+        $container['cli'],
+        true === $container['console']->interactive
     );
 };
 
@@ -155,8 +155,8 @@ pcntl_signal(SIGURG, function ($signo) use ($di) {
 });
 
 // PDO factory, this uses a wrapper around PDO
-$di['db_factory'] = $di->factory(function ($c, $config = null) {
-    $dbConfig = $config ?: $c['config']['sql'];
+$di['db_factory'] = $di->factory(function ($container, $config = null) {
+    $dbConfig = $config ?: $container['config']['sql'];
     $dsn = sprintf(
         'mysql:host=%s;dbname=%s;charset=%s',
         $dbConfig['hostname'],
