@@ -1,0 +1,176 @@
+#!/bin/bash
+set -uo pipefail
+IFS=$'\n\t'
+#
+# Installs LibreMail, checks for any diagnostic errors,
+# and sets up the configuration files.
+#   1. Capture the SQL config information
+#   2. Create the database if it doesn't exist
+#   3. Write the local.ini file with this info
+#   4. Run `sync -d` to check for diagnostic errors
+#   5. Run `sync -u` to run the DB migration scripts
+##
+
+## Get working directory
+basepath="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)";
+## Sync local config file
+syncLocalIni="${basepath}/config/local.ini"
+## Flag, if DB connection is up
+dbConn=1
+## SQL credentials (user input)
+username=''
+password=''
+
+## REMOVE
+UPDATEDB="${basepath}/sync -u"
+
+## Store the colors based on platform
+if [[ "$(uname)" == "Darwin" ]] ; then
+  dim='\033[2;37m'
+  red='\033[0;31m'
+  green='\033[0;32m'
+  yellow='\033[0;33m'
+  redBold='\033[1;31m'
+  greenBold='\033[1;32m'
+  NC='\033[0m' ## No color
+else
+  dim='\e[2;37m'
+  red='\e[0;31m'
+  green='\e[0;32m'
+  yellow='\e[0;33m'
+  redBold='\e[1;31m'
+  greenBold='\e[1;32m'
+  NC='\e[0m' ## No color
+fi
+
+## Displays info at the beginning of execution
+function startup {
+  echo -e "  _     _ _              __  __       _ _ "
+  echo -e " | |   (_) |__  _ __ ___|  \/  | __ _(_) |"
+  echo -e " | |   | | '_ \| '__/ _ \ |\/| |/ _\` | | |"
+  echo -e " | |___| | |_) | | |  __/ |  | | (_| | | |"
+  echo -e " |_____|_|_.__/|_|  \___|_|  |_|\__,_|_|_|"
+  echo ''
+  echo -e "    The #1 GPL Email Application Suite"
+  echo -e "         Version 1.0 – Mike Gioia"
+  echo ''
+}
+
+## Checks if MySQL is installed on the machine
+function checkSqlInstalled {
+  type mysql >/dev/null 2>&1
+  result=$?
+
+  if [ $result -ne 0 ]; then
+    echo -e "${redBold}MySQL is not installed!${NC}"
+    echo -e "${red}You must install MySQL to use LibreMail.${NC}"
+    echo ''
+    echo -e "${yellow}See the README (sync/README.md) for more info.${NC}"
+    echo ''
+    exit 0
+  fi
+}
+
+## Calls the sync script to check the SQL database
+function checkDatabase {
+  echo -e "${green}Checking SQL connection${NC}"
+
+  ${basepath}/sync -x -b
+  result=$?
+
+  if [ $result -eq 1 ]; then
+    echo -e "[${red}fail${NC}] ${red}Connection failed${NC}"
+    echo ''
+    dbConn=0
+  elif [ $result -eq 2 ]; then
+    echo -e "[${red}fail${NC}] ${red}Database not found or not created yet${NC}"
+    echo ''
+  fi
+
+  if [ $result -ne 0 ]; then
+    setupDatabase
+  else
+    echo -e "[ ${green}ok${NC} ] ${dim}Successfully connected to SQL${NC}"
+    echo ''
+  fi
+}
+
+## Prompts the user for database credentials
+## Creates the database if not exist
+function setupDatabase {
+  if [ $dbConn -eq 1 ]; then
+    createDatabase
+  else
+    captureCredentials
+    saveCredentialsSync
+    saveCredentialsWebmail
+    createDatabase
+  fi
+}
+
+## Reads in temporary username/password to create database
+function createDatabase {
+  echo -e "${yellow}Please enter root user MySQL password${NC}"
+  echo -e "${yellow}This is needed to create the new database and won't be stored${NC}"
+  echo ''
+  read -sp 'Password: ' password
+  echo ''
+
+  mysql -uroot -p${password} -e "CREATE DATABASE libremail /*\!40100 DEFAULT CHARACTER SET utf8 */;"
+
+  if [ $result -ne 0 ]; then
+    exit 0
+  fi
+}
+
+## Reads in the SQL username/password
+function captureCredentials {
+  echo -e "${yellow}Please enter the database username and password${NC}"
+  echo -e "${yellow}These will be written to configuration files${NC}"
+  echo ''
+  read -p 'SQL username: ' username
+  read -sp 'SQL password: ' password
+  echo ''
+  echo ''
+}
+
+## Saves the username and password to the config file
+function saveCredentialsSync {
+  echo '; Put your local configuration and overrides here. This' > $syncLocalIni
+  echo '; extends default.ini.' >> $syncLocalIni
+  echo '' >> $syncLocalIni
+  echo '[sql]' >> $syncLocalIni
+  echo '' >> $syncLocalIni
+  echo "username = \"${username}\"" >> $syncLocalIni
+  echo "password = \"${password}\"" >> $syncLocalIni
+}
+
+## Saves the username and password to the config file
+function saveCredentialsWebmail {
+  ## If the .env file doesn't exist, copy .env.example
+  DB_USERNAME=root
+DB_PASSWORD=root
+}
+
+## Runs the sync script's diagnostic checks
+function runDiagnostics {
+  ${basepath}/sync -d
+  result=$?
+
+  if [ $result -ne 0 ]; then
+    echo "bad!"
+  fi
+}
+
+## Runs all the SQL database scripts
+function updateDatabase {
+  `${basepath}/sync -u`
+}
+
+## Run everything
+startup
+checkSqlInstalled
+checkDatabase
+#runDiagnostics
+
+echo "SHOULD NOT BE HERE"

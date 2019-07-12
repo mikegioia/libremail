@@ -103,6 +103,10 @@ class Diagnostics
      */
     public function run()
     {
+        if ($this->console->databaseExists) {
+            $this->runDatabaseTests(); // exits
+        }
+
         $this->start();
         $this->testLogPathWritable();
         $this->testDatabaseConnection();
@@ -114,6 +118,41 @@ class Diagnostics
         if ($this->console->diagnostics) {
             exit(0);
         }
+    }
+
+    /**
+     * Checks only of the database exists.
+     * Exit codes:
+     *   0: if OK
+     *   1: if database connection is down
+     *   2: if database doesn't exist
+     */
+    public function runDatabaseTests()
+    {
+        $this->testDatabaseConnection();
+        $this->testDatabaseExists();
+
+        if (STATUS_ERROR === $this->tests[self::TEST_DB_CONN]['status']) {
+            if ($this->console->interactive) {
+                $this->cli->red($this->tests[self::TEST_DB_CONN]['message']);
+            }
+
+            exit(1);
+        }
+
+        if (STATUS_ERROR === $this->tests[self::TEST_DB_EXISTS]['status']) {
+            if ($this->console->interactive) {
+                $this->cli->red($this->tests[self::TEST_DB_EXISTS]['message']);
+            }
+
+            exit(2);
+        }
+
+        if ($this->console->interactive) {
+            $this->cli->green('Database tests passsed!');
+        }
+
+        exit(0);
     }
 
     /**
@@ -196,7 +235,9 @@ class Diagnostics
             if (! $size || $size < $safeSize) {
                 $e = new MaxAllowedPacketException(
                     Fn\formatBytes($size, 0),
-                    Fn\formatBytes($safeSize, 0));
+                    Fn\formatBytes($safeSize, 0)
+                );
+
                 $this->endTest(STATUS_WARNING, self::TEST_MAX_PACKET, $e);
             } else {
                 $this->endTest(STATUS_SUCCESS, self::TEST_MAX_PACKET);
@@ -309,10 +350,12 @@ class Diagnostics
         $this->tests[$test]['status'] = $status;
         $this->tests[$test]['message'] = $message;
 
-        // If we're not in diagnostic mode (and not daemon mode),
-        // then use exceptions
+        // Use exceptions if we're not in a diagnostic or daemon mode
         if (! $this->console->diagnostics) {
-            if (STATUS_ERROR === $status && ! $this->console->daemon) {
+            if (STATUS_ERROR === $status
+                && ! $this->console->daemon
+                && ! $this->console->databaseExists
+            ) {
                 throw new FatalException(
                     "Failed diagnostic test #$code, $message"
                 );
