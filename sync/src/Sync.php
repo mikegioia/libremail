@@ -475,7 +475,7 @@ class Sync
     {
         return is_null($this->lastRunTime)
             ? self::READY_THRESHOLD
-            : self::READY_THRESHOLD - (microtime(true) - $this->lastRunTime);
+            : max(0, self::READY_THRESHOLD - (microtime(true) - $this->lastRunTime));
     }
 
     /**
