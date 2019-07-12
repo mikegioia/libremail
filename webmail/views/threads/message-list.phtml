@@ -19,6 +19,7 @@ foreach ($thread->getThreadIndex() as $i => $item):
             'open' => $item->open,
             'folders' => $folders,
             'message' => $item->message,
+            'last' =>  $threadCount === $i + 1,
             'locked' => $item->current || $threadCount === 1
         ]);
     elseif ($item->type === $thread::INDEX_GROUP):

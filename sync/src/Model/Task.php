@@ -211,7 +211,7 @@ class Task extends Model
     }
 
     /**
-     * Returns the un-synced tasks. If there are none,
+     * Returns the un-synced tasks. If there are none, then
      * this returns false.
      *
      * @param int $accountId

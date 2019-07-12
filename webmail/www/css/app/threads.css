@@ -281,3 +281,38 @@ input[type="checkbox"].thread-msg-more-checkbox {
   height: 2.875rem;
   line-height: 2.875rem;
 }
+
+/* Reply-all */
+
+.thread-msg-row > .reply-all {
+  display: none;
+  padding: 2rem 2rem 3rem 0;
+}
+
+.thread-msg-row > .reply-controls {
+  display: none;
+}
+
+.thread-msg-row:last-child > .reply-controls {
+  display: block;
+  padding: 2rem 0 3rem;
+}
+
+.thread-msg-row:last-child > .reply-controls .button:not(:last-child) {
+  margin-right: 0.75rem;
+}
+
+.thread-msg-row > .reply-all textarea {
+  margin-bottom: 1rem;
+  min-height: 10rem;
+  resize: vertical;
+  width: 100%;
+}
+
+.thread-msg-row > .reply-all:target {
+  display: block;
+}
+
+.thread-msg-row > .reply-all:target + .reply-controls {
+  display: none !important;
+}

@@ -35,8 +35,8 @@
             <iframe src="<?php echo App\Url::make('/star/thread/%s/%s/%s.html', $view->meta(PREF_THEME, 'default'), $message->id, $message->flagged == 1 ? 'on' : 'off'); ?>" class="star"></iframe>
             <span class="actions">
                 <span class="button-group">
-                    <a href="#" class="button">
-                        <i class="fa fa-reply"></i>
+                    <a href="#reply-all-<?php echo $message->id; ?>" class="button" title="Reply all">
+                        <i class="fa fa-reply-all"></i>
                     </a><!--
                     --><span class="dropdown short inline-blocked">
                         <a href="#" class="button">
@@ -45,15 +45,15 @@
                         <ul class="right-menu size-medium">
                             <li>
                                 <i class="fa left-icon fa-reply"></i>
-                                <a href="#">Reply</a>
+                                <a href="<?php echo App\Url::make('/reply/%s', $message->id); ?>">Reply</a>
                             </li>
                             <li>
                                 <i class="fa left-icon fa-reply-all"></i>
-                                <a href="#">Reply all</a>
+                                <a href="<?php echo App\Url::make('/replyall/%s', $message->id); ?>">Reply all</a>
                             </li>
                             <li>
-                                <i class="fa left-icon fa-forward"></i>
-                                <a href="#">Forward</a>
+                                <i class="fa left-icon fa-share"></i>
+                                <a href="<?php echo App\Url::make('/forward/%s', $message->id); ?>">Forward</a>
                             </li>
                             <li>
                                 <i class="fa left-icon fa-external-link-alt"></i>
@@ -94,4 +94,35 @@
         </label>
         <div class="message"><?php echo $message->body; ?></div>
     </article>
+    <?php
+    if (isset($last) && true === $last): ?>
+    <div id="reply-all-<?php echo $message->id; ?>" class="reply-all compose">
+        <textarea name="reply_all[<?php echo $message->id; ?>]"></textarea>
+        <div class="buttons">
+            <button type="submit" name="send_draft[<?php echo $message->id; ?>]" class="button button-secondary">
+                Save Draft
+            </button>
+            <button type="submit" name="send_preview[<?php echo $message->id; ?>]" class="button button-primary">
+                Preview + Send
+            </button>
+            <span>or</span>
+            <a href="#">Cancel</a>
+        </div>
+    </div>
+    <div class="reply-controls">
+        <a href="#reply-all-<?php echo $message->id; ?>" class="icon button control">
+            <i class="fa fa-reply-all"></i>
+            <span class="normal">Reply all</span>
+        </a>
+        <a href="<?php echo App\Url::make('/reply/%s', $message->id); ?>" class="icon button control">
+            <i class="fa fa-reply"></i>
+            <span class="normal">Reply</span>
+        </a>
+        <a href="<?php echo App\Url::make('/forward/%s', $message->id); ?>" class="icon button control">
+            <i class="fa fa-share"></i>
+            <span class="normal">Forward</span>
+        </a>
+    </div>
+    <?php
+    endif; ?>
 </div>
