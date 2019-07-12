@@ -182,7 +182,7 @@ class Message
                 case self::ACCOUNT:
                     Fn\expects($m)->toHave(['updated', 'email']);
 
-                    return new AccountMessage($m->updated, $m->email);
+                    return new AccountMessage((bool) $m->updated, $m->email);
                 case self::NO_ACCOUNTS:
                     return new NoAccountsMessage;
                 case self::ACCOUNT_INFO:

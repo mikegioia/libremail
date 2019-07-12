@@ -6,6 +6,12 @@
   "private": true,
   "dependencies": {},
   "devDependencies": {
+    "eslint": "^6.0.1",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-standard": "^3.1.0",
     "grunt": "^1.0.4",
     "grunt-contrib-concat": "^1.0.0",
     "grunt-contrib-copy": "^1.0.0",
@@ -15,6 +21,8 @@
   "scripts": {
     "build": "grunt build",
     "dist": "grunt dist",
-    "watch": "grunt"
+    "watch": "grunt",
+    "lint": "./node_modules/.bin/eslint --fix-dry-run src || exit 0",
+    "fix": "./node_modules/.bin/eslint --fix src || exit 0"
   }
 }

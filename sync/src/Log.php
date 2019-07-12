@@ -152,10 +152,10 @@ class Log
         $level = (true === $interactive)
             ? $config['level']['cli']
             : $config['level']['file'];
-        $this->level = (isset($levels[$level]))
+        $this->level = isset($levels[$level])
             ? $levels[$level]
             : Logger::WARNING;
-        $this->stackTrace = $config['stacktrace'];
+        $this->stackTrace = 1 === (int) $config['stacktrace'];
     }
 
     /**
@@ -174,7 +174,7 @@ class Log
             return true;
         }
 
-        $logPath = (DIRECTORY_SEPARATOR === substr($path, 0, 1))
+        $logPath = DIRECTORY_SEPARATOR === substr($path, 0, 1)
             ? dirname($path)
             : BASEPATH;
 

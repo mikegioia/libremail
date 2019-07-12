@@ -1,47 +1,48 @@
 /**
  * Notifications Component
  */
-LibreMail.Components.Notifications = (function ( Const, Socket, Mustache ) {
-// Returns a new instance
-return function ( $root ) {
+LibreMail.Components.Notifications = (function (Const, Socket, Mustache) {
+  // Returns a new instance
+  return function ($root) {
     'use strict';
-    // Event namespace
-    var namespace = '.notifications';
+
     // DOM template nodes
-    var $notification = document.getElementById( 'notification' );
+    var $notification = document.getElementById('notification');
     // Templates
     var tpl = {
-        notification: $notification.innerHTML
+      notification: $notification.innerHTML
     };
 
     // Parse the templates
-    Mustache.parse( tpl.notification );
+    Mustache.parse(tpl.notification);
 
     /**
      * Triggered from Global Page when socket opened.
      */
-    function insert ( data ) {
-        var newNode = document.createElement( 'div' );
+    function insert (data) {
+      var newNode = document.createElement('div');
 
-        newNode.className = 'notification';
-        newNode.innerHTML = Mustache.render( tpl.notification, data );
-        newNode.querySelector( '.close' ).onclick = function ( e ) {
-            $root.removeChild( newNode );
-        };
-        $root.appendChild( newNode );
+      newNode.className = 'notification';
+      newNode.innerHTML = Mustache.render(tpl.notification, data);
+      newNode.querySelector('.close').onclick = function () {
+        $root.removeChild(newNode);
+      };
+
+      $root.appendChild(newNode);
     }
 
     function closeAll () {
-        var i;
-        var notifications = $root.querySelectorAll( '.notification' );
+      var i;
+      var notifications = $root.querySelectorAll('.notification');
 
-        for ( i = 0; i < notifications.length; i++ ) {
-            $root.removeChild( notifications[ i ] );
-        }
+      for (i = 0; i < notifications.length; i++) {
+        $root.removeChild(notifications[ i ]);
+      }
     }
 
     return {
-        insert: insert,
-        closeAll: closeAll
+      insert: insert,
+      closeAll: closeAll
     };
-}}( LibreMail.Const, LibreMail.Socket, Mustache ));
+  };
+}(LibreMail.Const, LibreMail.Socket, Mustache));

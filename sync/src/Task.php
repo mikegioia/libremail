@@ -28,7 +28,9 @@ class Task
     {
         switch ($type) {
             case self::SAVE_ACCOUNT:
-                Fn\expects($data)->toHave(['email', 'password']);
+                Fn\expects($data)->toHave([
+                    'name', 'email', 'password'
+                ]);
 
                 return new SaveAccountTask($data);
 

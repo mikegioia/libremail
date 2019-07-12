@@ -11,9 +11,9 @@ class AccountMessage extends AbstractMessage
 
     protected $type = Message::ACCOUNT;
 
-    public function __construct($updated, string $email)
+    public function __construct(bool $updated, string $email)
     {
         $this->email = $email;
-        $this->updated = (bool) $updated;
+        $this->updated = $updated;
     }
 }

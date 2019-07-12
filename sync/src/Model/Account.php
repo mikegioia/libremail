@@ -17,6 +17,7 @@ class Account extends Model
     use ModelTrait;
 
     public $id;
+    public $name;
     public $email;
     public $service;
     public $password;
@@ -32,6 +33,7 @@ class Account extends Model
     {
         return [
             'id' => $this->id,
+            'name' => $this->name,
             'email' => $this->email,
             'service' => $this->service,
             'password' => $this->password,
@@ -128,6 +130,7 @@ class Account extends Model
     {
         $val = new Validator;
 
+        $val->required('name', 'Name')->lengthBetween(0, 100);
         $val->required('email', 'Email')->lengthBetween(0, 100);
         $val->required('service', 'Service type')->inArray(
             array_map(
@@ -202,6 +205,7 @@ class Account extends Model
 
         if (! isset($config[$emailParts[1]])) {
             $this->service = DEFAULT_SERVICE;
+
             $other = $this->config('email.other');
 
             if (! $this->imap_port) {

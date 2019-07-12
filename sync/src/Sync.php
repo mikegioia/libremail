@@ -58,6 +58,9 @@ class Sync
     private $retriesFolders;
     private $retriesMessages;
 
+    // Config
+    const READY_THRESHOLD = 60;
+
     // Options
     const OPT_SKIP_DOWNLOAD = 'skip_download';
     const OPT_ONLY_SYNC_ACTIONS = 'only_sync_actions';
@@ -142,7 +145,6 @@ class Sync
         while (true) {
             $this->gc();
             $this->checkForHalt();
-            $this->setRunning();
 
             if (true === $this->wake) {
                 $wakeUnix = 0;
@@ -151,9 +153,13 @@ class Sync
 
             if ((new DateTime)->getTimestamp() < $wakeUnix) {
                 // Run action sync every minute
-                $this->run(null, [self::OPT_ONLY_SYNC_ACTIONS => true]);
-                $this->setAsleep();
-                sleep(60);
+                if ($this->isReadyToRun()) {
+                    $this->setAsleep(false);
+                    $this->run(null, [self::OPT_ONLY_SYNC_ACTIONS => true]);
+                    $this->setAsleep(true);
+                }
+
+                sleep($this->getTimeBeforeReady());
                 continue;
             }
 
@@ -169,6 +175,8 @@ class Sync
 
             $wakeTime = Fn\timeFromNow($sleepMinutes);
             $wakeUnix = Fn\unixFromNow($sleepMinutes);
+
+            $this->setAsleep(true);
 
             $this->log->addInfo(
                 "Going to sleep for $sleepMinutes minutes. Sync will ".
@@ -194,6 +202,8 @@ class Sync
         if ($this->sleep) {
             return true;
         }
+
+        $this->setLastRunTime();
 
         if ($account) {
             $accounts = [$account];
@@ -287,18 +297,15 @@ class Sync
         $this->stats->setActiveAccount($account->email);
 
         try {
-            // Open a connection to the mailbox
             $this->disconnect();
-            $this->connect(
-                $account->imap_host,
-                $account->imap_port,
-                $account->email,
-                $account->password
-            );
+            $actionCount = 0;
 
             // Commit any pending actions to the mail server
             // If any actions are made, force a message refresh
-            $actionCount = $this->syncActions($account);
+            if ($this->getActionCount($account) > 0) {
+                $this->connect($account);
+                $actionCount = $this->syncActions($account);
+            }
 
             if ((true === Fn\get($options, self::OPT_ONLY_SYNC_ACTIONS)
                     && 0 === $actionCount)
@@ -310,6 +317,7 @@ class Sync
             }
 
             $this->log->info("Starting sync for {$account->email}");
+            $this->connect($account);
 
             // Check if we're only syncing one folder
             if ($this->folder) {
@@ -351,8 +359,6 @@ class Sync
                 // going to run again in 15 minutes, why not just do two passes
                 // and download any extra messages while we can?
                 $this->syncMessages($account, $folders);
-                // Disconnect the IMAP connection, but leave the running flag on
-                $this->disconnect(true);
             }
         } catch (PDOException $e) {
             throw $e;
@@ -385,39 +391,27 @@ class Sync
     /**
      * Connects to an IMAP mailbox using the supplied credentials.
      *
-     * @param string $host IMAP hostname, like 'imap.host.com'
-     * @param string $port IMAP port, usually 993 (not used)
-     * @param string $email
-     * @param string $password
-     * @param string $folder Optional, like "INBOX"
+     * @param AccountModel Account to connect to
      * @param bool $setRunning Optional
      *
      * @throws MissingIMAPConfigException
      */
-    public function connect(
-        string $host,
-        string $port,
-        string $email,
-        string $password,
-        string $folder = null,
-        bool $setRunning = true
-    ) {
-        // Check the attachment directory is writeable
-        $attachmentsPath = Diagnostics::checkAttachmentsPath($email);
-
-        // If the connection is active, then just select the folder
+    public function connect(AccountModel $account, bool $setRunning = true)
+    {
+        // Skip out if the connection is already active
         if ($this->mailbox) {
-            $this->mailbox->select($folder);
-
             return;
         }
 
+        // Check the attachment directory is writeable
+        $attachmentsPath = Diagnostics::checkAttachmentsPath($account->email);
+
         // Add connection settings and attempt the connection
         $this->mailbox = new Mailbox(
-            $host,
-            $email,
-            $password,
-            $folder ?: '',
+            $account->imap_host,
+            $account->email,
+            $account->password,
+            '',
             $attachmentsPath, [
                 Mailbox::OPT_SKIP_ATTACHMENTS => $this->quick
             ]);
@@ -434,15 +428,16 @@ class Sync
             try {
                 $this->mailbox->disconnect();
             } catch (Exception $e) {
+                $this->mailbox = null;
+                $this->setRunning($running);
                 $this->checkForClosedConnection($e);
 
                 throw $e;
             }
-        }
 
-        $this->mailbox = null;
-        $this->setAsleep(false);
-        $this->setRunning($running);
+            $this->mailbox = null;
+            $this->setRunning($running);
+        }
     }
 
     public function setAsleep(bool $asleep = true)
@@ -455,6 +450,32 @@ class Sync
     {
         $this->running = $running;
         $this->stats->setRunning($running);
+    }
+
+    public function setLastRunTime()
+    {
+        $this->lastRunTime = microtime(true);
+    }
+
+    /**
+     * The ready threshold is an amount of time to wait between doing
+     * any operations. This loop could be invoked many times and woken
+     * up many times. The ready threshold prevents the syncing from
+     * triggering on these wakeups.
+     *
+     * @return bool
+     */
+    public function isReadyToRun()
+    {
+        return is_null($this->lastRunTime)
+            || microtime(true) - $this->lastRunTime > self::READY_THRESHOLD;
+    }
+
+    public function getTimeBeforeReady()
+    {
+        return is_null($this->lastRunTime)
+            ? self::READY_THRESHOLD
+            : self::READY_THRESHOLD - (microtime(true) - $this->lastRunTime);
     }
 
     /**
@@ -697,6 +718,8 @@ class Sync
     /**
      * Runs task sync engine to sync any local actions with the
      * server. This should be run before any message/folder sync.
+     *
+     * @return int
      */
     private function syncActions(AccountModel $account)
     {
@@ -707,6 +730,26 @@ class Sync
             $this->mailbox,
             $this->interactive
         ))->run($account);
+
+        $this->checkForHalt();
+
+        return $count;
+    }
+
+    /**
+     * Returns the count of active tasks.
+     *
+     * @return int
+     */
+    private function getActionCount(AccountModel $account)
+    {
+        $count = (new ActionSync(
+            $this->log,
+            $this->cli,
+            $this->emitter,
+            $this->mailbox,
+            $this->interactive
+        ))->getCountForProcessing($account);
 
         $this->checkForHalt();
 

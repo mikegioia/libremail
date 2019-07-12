@@ -261,6 +261,7 @@ class SyncConsole extends Console
             $newAccount['smtp_port']
         ) = $this->promptAccountType();
 
+        $newAccount['name'] = $this->promptName();
         $newAccount['email'] = $this->promptEmail();
         $newAccount['password'] = $this->promptPassword();
 
@@ -330,9 +331,24 @@ class SyncConsole extends Console
         return [$service, $host, $port, $smtpHost, $smtpPort];
     }
 
+    private function promptName()
+    {
+        $input = $this->cli->input('Your name:');
+
+        $input->accept(function ($response) {
+            return strlen(trim($response)) > 0;
+        });
+
+        return $input->prompt();
+    }
+
     private function promptEmail()
     {
         $input = $this->cli->input('Email address:');
+
+        $input->accept(function ($response) {
+            return strpos($response, '@');
+        });
 
         return $input->prompt();
     }

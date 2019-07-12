@@ -74,8 +74,8 @@ class Actions
         Logger $log,
         CLImate $cli,
         Emitter $emitter,
-        Mailbox $mailbox,
-        bool $interactive
+        Mailbox $mailbox = null,
+        bool $interactive = false
     ) {
         $this->log = $log;
         $this->cli = $cli;
@@ -122,6 +122,27 @@ class Actions
     }
 
     /**
+     * Returns a count of the tasks to be synced.
+     *
+     * @return int Count of actions to be processed
+     */
+    public function getCountForProcessing(AccountModel $account)
+    {
+        $tasks = (new TaskModel)->getTasksForSync($account->id);
+        $count = count($tasks);
+
+        if (! $count) {
+            return 0;
+        }
+
+        // Compress them by removing any redundant tasks
+        // Redundant tasks are marked as `ignored`
+        $tasks = $this->processDuplicates($tasks, false);
+
+        return count($tasks);
+    }
+
+    /**
      * Iterates through the task list and removes any duplicates
      * or redundant tasks.
      *
@@ -129,7 +150,7 @@ class Actions
      *
      * @return array
      */
-    private function processDuplicates(array $allTasks)
+    private function processDuplicates(array $allTasks, bool $enableLog = true)
     {
         $tasks = [];
         $ignoreCount = 0;
@@ -171,7 +192,7 @@ class Actions
             loopEnd: // skip out of the loop
         }
 
-        if ($ignoreCount) {
+        if ($ignoreCount && true === $enableLog) {
             $noun = Fn\plural('task', $ignoreCount);
             $this->log->info("Ignored $ignoreCount $noun");
         }

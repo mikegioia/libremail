@@ -12,6 +12,7 @@ use App\Model\Account as AccountModel;
 class AccountInfoTask extends AbstractTask
 {
     public $email;
+
     protected $type = Task::ACCOUNT_INFO;
 
     /**
@@ -29,7 +30,8 @@ class AccountInfoTask extends AbstractTask
                 new NotificationMessage(
                     STATUS_ERROR,
                     'That account could not be found.'),
-                $server);
+                $server
+            );
 
             return false;
         }
