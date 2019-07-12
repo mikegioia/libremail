@@ -28,57 +28,58 @@ var LibreMail = {};
 
 // Constants used in application
 LibreMail.Const = {
-    // Message types
-    MSG: {
-        HEALTH: '!HEALTH\n',
-        RESTART: '!RESTART\n'
+  // Message types
+  MSG: {
+    HEALTH: '!HEALTH\n',
+    RESTART: '!RESTART\n'
+  },
+  // Events
+  EV: {
+    STATS: 'stats',
+    START: 'start',
+    ERROR: 'error',
+    HEALTH: 'health',
+    WS_OPEN: 'ws_open',
+    ACCOUNT: 'account',
+    WS_CLOSE: 'ws_close',
+    LOG_DATA: 'log_data',
+    STOP_UPDATE: 'stop_update',
+    START_UPDATE: 'start_update',
+    ACCOUNT_INFO: 'account_info',
+    NOTIFICATION: 'notification',
+    SHOW_FOLDERS: 'show_folders'
+  },
+  TASK: {
+    SAVE_ACCOUNT: 'save_account',
+    ACCOUNT_INFO: 'account_info',
+    REMOVE_ACCOUNT: 'remove_account'
+  },
+  // @TODO this should be based off config file
+  WS: {
+    URL: 'ws://localhost:9898/stats'
+  },
+  // Statuses
+  STATUS: {
+    error: 'error',
+    success: 'success'
+  },
+  // Language used in app
+  LANG: {
+    sprintf: function () {
+      var args = Array.prototype.slice.call(arguments);
+
+      return args.shift().replace(/%s/g, function () {
+        return args.shift();
+      });
     },
-    // Events
-    EV: {
-        STATS: 'stats',
-        START: 'start',
-        ERROR: 'error',
-        HEALTH: 'health',
-        WS_OPEN: 'ws_open',
-        ACCOUNT: 'account',
-        WS_CLOSE: 'ws_close',
-        LOG_DATA: 'log_data',
-        STOP_UPDATE: 'stop_update',
-        START_UPDATE: 'start_update',
-        ACCOUNT_INFO: 'account_info',
-        NOTIFICATION: 'notification',
-        SHOW_FOLDERS: 'show_folders'
-    },
-    TASK: {
-        SAVE_ACCOUNT: 'save_account',
-        ACCOUNT_INFO: 'account_info',
-        REMOVE_ACCOUNT: 'remove_account'
-    },
-    // @TODO this should be based off config file
-    WS: {
-        URL: 'ws://localhost:9898/stats'
-    },
-    // Statuses
-    STATUS: {
-        error: 'error',
-        success: 'success'
-    },
-    // Language used in app
-    LANG: {
-        sprintf: function () {
-            var args = Array.prototype.slice.call( arguments );
-            return args.shift().replace( /%s/g, function () {
-                return args.shift();
-            });
-        },
-        server_offline_heading: "Server Offline",
-        server_offline_message:
-            "There was a problem making a connection to the server. " +
-            "The application is probably offline.",
-        error_heading: "Uh oh...",
-        health_error_message: "An error was found when testing if the %s. %s",
-        system_error_message: "An error was encountered! %s"
-    }
+    server_offline_heading: 'Server Offline',
+    server_offline_message:
+      'There was a problem making a connection to the server. ' +
+      'The application is probably offline.',
+    error_heading: 'Uh oh...',
+    health_error_message: 'An error was found when testing if the %s. %s',
+    system_error_message: 'An error was encountered! %s'
+  }
 };
 
 // Containers
@@ -1091,123 +1092,131 @@ LibreMail.Components = {};
  * Event Emitter
  */
 LibreMail.Emitter = (function () {
-    'use strict';
+  'use strict';
 
-    // Private array of listeners
-    var _listeners = {};
+  // Private array of listeners
+  var _listeners = {};
 
-    function on ( type, listener ) {
-        if ( typeof _listeners[ type ] == "undefined" ) {
-            _listeners[ type ] = [];
-        }
-
-        _listeners[ type ].push( listener );
+  function on (type, listener) {
+    if (typeof _listeners[ type ] == 'undefined') {
+      _listeners[ type ] = [];
     }
 
-    function fire ( /* event, arg1, arg2, ... */ ) {
-        var event = ( arguments.length > 0 )
-            ? arguments[ 0 ]
-            : {};
-        var args = Array.prototype.slice.call( arguments, 1 );
+    _listeners[ type ].push(listener);
+  }
 
-        if ( typeof event == "string" ) {
-            event = { type: event };
-        }
+  function fire (/* event, arg1, arg2, ... */) {
+    var i;
+    var len;
+    var listeners;
+    var event = arguments[ 0 ] || {};
+    var args = Array.prototype.slice.call(arguments, 1);
 
-        if ( ! event.target ) {
-            event.target = this;
-        }
-
-        if ( ! event.type ) {  // falsy
-            throw new Error( "Event object missing 'type' property." );
-        }
-
-        args.push( event );
-
-        if ( _listeners[ event.type ] instanceof Array ) {
-            var listeners = _listeners[ event.type ];
-
-            for ( var i = 0, len = listeners.length; i < len; i++ ) {
-                listeners[ i ].apply( this, args );
-            }
-        }
+    if (typeof event == 'string') {
+      event = { type: event };
     }
 
-    function off ( type, listener ) {
-        if ( _listeners[ type ] instanceof Array ) {
-            var listeners = _listeners[ type ];
-
-            for ( var i = 0, len = listeners.length; i < len; i++ ) {
-                if ( listeners[ i ] === listener ) {
-                    listeners.splice( i, 1 );
-                    break;
-                }
-            }
-        }
+    if (!event.target) {
+      event.target = this;
     }
 
-    return {
-        on: on,
-        off: off,
-        fire: fire
-    };
-}());;
+    if (!event.type) { // falsy
+      throw new Error("Event object missing 'type' property.");
+    }
+
+    args.push(event);
+
+    if (_listeners[ event.type ] instanceof Array) {
+      listeners = _listeners[ event.type ];
+
+      for (i = 0, len = listeners.length; i < len; i++) {
+        listeners[ i ].apply(this, args);
+      }
+    }
+  }
+
+  function off (type, listener) {
+    var i;
+    var len;
+    var listeners;
+
+    if (_listeners[ type ] instanceof Array) {
+      listeners = _listeners[ type ];
+
+      for (i = 0, len = listeners.length; i < len; i++) {
+        if (listeners[ i ] === listener) {
+          listeners.splice(i, 1);
+          break;
+        }
+      }
+    }
+  }
+
+  return {
+    on: on,
+    off: off,
+    fire: fire
+  };
+}());
+;
 
 /**
  * Socket Manager
  */
-LibreMail.Socket = (function ( ReconnectingWebSocket, JSON, Const, Emitter ) {
-    'use strict';
+LibreMail.Socket = (function (ReconnectingWebSocket, JSON, Const, Emitter) {
+  'use strict';
 
-    var ws = new ReconnectingWebSocket( Const.WS.URL );
+  var ws = new ReconnectingWebSocket(Const.WS.URL);
 
-    ws.onopen = function () {
-        Emitter.fire( Const.EV.WS_OPEN );
-    };
+  ws.onopen = function () {
+    Emitter.fire(Const.EV.WS_OPEN);
+  };
 
-    ws.onclose = function () {
-        Emitter.fire( Const.EV.WS_CLOSE );
-    };
+  ws.onclose = function () {
+    Emitter.fire(Const.EV.WS_CLOSE);
+  };
 
-    /**
-     * Expects a data object with at least a "type" field. This
-     * event type is emitted to the application.
-     */
-    ws.onmessage = function ( evt ) {
-        var data = JSON.parse( evt.data );
+  /**
+   * Expects a data object with at least a "type" field. This
+   * event type is emitted to the application.
+   */
+  ws.onmessage = function (evt) {
+    var data = JSON.parse(evt.data);
 
-        // Check if the type field is present
-        if ( ! data.hasOwnProperty( 'type' )
-            || Const.EV.hasOwnProperty( data.type ) )
-        {
-            data.type = Const.EV.ERROR;
-        }
+    // Check if the type field is present
+    if (!data.hasOwnProperty('type') ||
+        Const.EV.hasOwnProperty(data.type)
+    ) {
+      data.type = Const.EV.ERROR;
+    }
 
-        Emitter.fire( data.type, data );
-    };
+    Emitter.fire(data.type, data);
+  };
 
-    /**
-     * Sends a message object for a task. This is just a helper and
-     * a wrapper around send().
-     */
-    ws.sendTask = function ( task, data ) {
-        ws.send( JSON.stringify({
-            data: data,
-            task: task,
-            type: 'task'
-        }));
-    };
+  /**
+   * Sends a message object for a task. This is just a helper and
+   * a wrapper around send().
+   */
+  ws.sendTask = function (task, data) {
+    ws.send(JSON.stringify({
+      data: data,
+      task: task,
+      type: 'task'
+    }));
+  };
 
-    return ws;
-}( ReconnectingWebSocket, JSON, LibreMail.Const, LibreMail.Emitter ));;
+  return ws;
+}(ReconnectingWebSocket, JSON, LibreMail.Const, LibreMail.Emitter));
+;
 
 /**
  * Global Page Controller
  */
-LibreMail.Pages.Global = (function ( Const, Emitter, Components ) {
-'use strict';
-// Returns a new instance
-return function () {
+LibreMail.Pages.Global = (function (Const, Emitter, Components) {
+  // Returns a new instance
+  return function () {
+    'use strict';
+
     // Components used
     var Accounts;
     var StatusMessage;
@@ -1217,208 +1226,214 @@ return function () {
      * Attach events and instantiate Components
      */
     function load () {
-        events();
-        components();
+      events();
+      components();
     }
 
     function events () {
-        Emitter.on( Const.EV.ERROR, error );
-        Emitter.on( Const.EV.HEALTH, health );
-        Emitter.on( Const.EV.WS_OPEN, online );
-        Emitter.on( Const.EV.ACCOUNT, account );
-        Emitter.on( Const.EV.WS_CLOSE, offline );
-        Emitter.on( Const.EV.ACCOUNT_INFO, editAccount );
-        Emitter.on( Const.EV.NOTIFICATION, notification );
+      Emitter.on(Const.EV.ERROR, error);
+      Emitter.on(Const.EV.HEALTH, health);
+      Emitter.on(Const.EV.WS_OPEN, online);
+      Emitter.on(Const.EV.ACCOUNT, account);
+      Emitter.on(Const.EV.WS_CLOSE, offline);
+      Emitter.on(Const.EV.ACCOUNT_INFO, editAccount);
+      Emitter.on(Const.EV.NOTIFICATION, notification);
     }
 
     function components () {
-        var main = document.querySelector( 'main' );
-        var notifications = document.getElementById( 'notifications' );
+      var main = document.querySelector('main');
+      var notifications = document.getElementById('notifications');
 
-        Accounts = new Components.Accounts( main );
-        StatusMessage = new Components.StatusMessage( main );
-        Notifications = new Components.Notifications( notifications );
+      Accounts = new Components.Accounts(main);
+      StatusMessage = new Components.StatusMessage(main);
+      Notifications = new Components.Notifications(notifications);
     }
 
     /**
      * The socket connection re-opened.
      */
     function online () {
-        StatusMessage.renderOnline();
+      StatusMessage.renderOnline();
     }
 
     /**
      * The socket closed, show an offline message.
      */
     function offline () {
-        StatusMessage.renderOffline();
+      StatusMessage.renderOffline();
     }
 
     /**
      * Parse the health report and show a message if something
      * went wrong.
      */
-    function health ( data ) {
-        var i;
-        var error;
-        var suggestion;
-        var tests = Object.keys( data.tests ).map( function ( k ) {
-            return data.tests[ k ];
-        });
+    function health (data) {
+      var i;
+      var error;
+      var suggestion;
+      var tests = Object.keys(data.tests).map(function (k) {
+        return data.tests[ k ];
+      });
 
-        // Sort by code first
-        tests.sort( function ( a, b ) {
-            return ( a.code > b.code)
-                ? 1
-                : (( b.code > a.code ) ? -1 : 0);
-            });
+      // Sort by code first
+      tests.sort(function (a, b) {
+        return (a.code > b.code)
+          ? 1
+          : ((b.code > a.code) ? -1 : 0);
+      });
 
-        // Check the response for any error messages
-        for ( i in tests ) {
-            if ( tests[ i ].status === Const.STATUS.error ) {
-                error = Const.LANG.sprintf(
-                    Const.LANG.health_error_message,
-                    tests[ i ].name,
-                    tests[ i ].message );
-                suggestion = tests[ i ].suggestion;
-                break;
-            }
+      // Check the response for any error messages
+      for (i in tests) {
+        if (tests[ i ].status === Const.STATUS.error) {
+          error = Const.LANG.sprintf(
+            Const.LANG.health_error_message,
+            tests[ i ].name,
+            tests[ i ].message);
+          suggestion = tests[ i ].suggestion;
+          break;
         }
+      }
 
-        if ( error ) {
-            StatusMessage.renderError( error, suggestion );
-        }
+      if (error) {
+        StatusMessage.renderError(error, suggestion);
+      }
 
-        // Check the response for a noAccounts flag
-        if ( data.no_accounts === true ) {
-            Accounts.render();
-        }
-        else {
-            Accounts.tearDown();
-        }
+      // Check the response for a noAccounts flag
+      if (data.no_accounts === true) {
+        Accounts.render();
+      } else {
+        Accounts.tearDown();
+      }
     }
 
     /**
      * System encountered an error, probably from the sync process.
      */
-    function error ( data ) {
-        StatusMessage.renderError(
-            Const.LANG.sprintf(
-                Const.LANG.system_error_message,
-                data.message ),
-            data.suggestion );
+    function error (data) {
+      StatusMessage.renderError(
+        Const.LANG.sprintf(
+          Const.LANG.system_error_message,
+          data.message
+        ),
+        data.suggestion
+      );
     }
 
     /**
      * Renders a notification to the main element.
      */
-    function notification ( data ) {
-        Notifications.insert( data );
+    function notification (data) {
+      Notifications.insert(data);
     }
 
     /**
      * Updates the account form with data from the server.
      */
-    function account ( data ) {
-        Accounts.update( data );
+    function account (data) {
+      Accounts.update(data);
     }
 
     /**
      * Opens the account edit screen and prevents stats from
      * over-writing until the user closes it.
      */
-    function editAccount ( data ) {
-        Accounts.render( data );
+    function editAccount (data) {
+      Accounts.render(data);
     }
 
     return {
-        load: load
+      load: load
     };
-}}(
-    LibreMail.Const,
-    LibreMail.Emitter,
-    LibreMail.Components
-));;
+  };
+}(
+  LibreMail.Const,
+  LibreMail.Emitter,
+  LibreMail.Components
+));
+;
 
 /**
  * Stats Page Controller
  */
-LibreMail.Pages.Stats = (function ( Const, Emitter, Components ) {
-'use strict';
-// Returns a new instance
-return function () {
+LibreMail.Pages.Stats = (function (Const, Emitter, Components) {
+  // Returns a new instance
+  return function () {
+    'use strict';
+
     // Components used
     var Header;
     var Folders;
     // Private state
     var data = {};
-    var account = null;
     var flagStop = false;
 
     /**
      * Attach events and instantiate Components
      */
     function load () {
-        events();
-        components();
+      events();
+      components();
     }
 
     function events () {
-        Emitter.on( Const.EV.STATS, render );
-        Emitter.on( Const.EV.ERROR, offline );
-        Emitter.on( Const.EV.LOG_DATA, logData );
-        Emitter.on( Const.EV.WS_CLOSE, offline );
-        Emitter.on( Const.EV.SHOW_FOLDERS, update );
-        Emitter.on( Const.EV.ACCOUNT, accountUpdated );
-        Emitter.on( Const.EV.STOP_UPDATE, stopUpdate );
-        Emitter.on( Const.EV.START_UPDATE, startUpdate );
+      Emitter.on(Const.EV.STATS, render);
+      Emitter.on(Const.EV.ERROR, offline);
+      Emitter.on(Const.EV.LOG_DATA, logData);
+      Emitter.on(Const.EV.WS_CLOSE, offline);
+      Emitter.on(Const.EV.SHOW_FOLDERS, update);
+      Emitter.on(Const.EV.ACCOUNT, accountUpdated);
+      Emitter.on(Const.EV.STOP_UPDATE, stopUpdate);
+      Emitter.on(Const.EV.START_UPDATE, startUpdate);
     }
 
     function components () {
-        Header = new Components.Header(
-            document.querySelector( 'header' ));
-        Folders = new Components.Folders(
-            document.querySelector( 'main' ));
+      Header = new Components.Header(
+        document.querySelector('header')
+      );
+
+      Folders = new Components.Folders(
+        document.querySelector('main')
+      );
     }
 
     /**
      * Render the components.
      */
-    function render ( _data ) {
-        data = _data;
+    function render (_data) {
+      data = _data;
 
-        if ( data.account && ! flagStop ) {
-            Header.render( data );
-            Folders.render( data );
-        }
+      if (data.account && !flagStop) {
+        Header.render(data);
+        Folders.render(data);
+      }
     }
 
     function update () {
-        if ( ! data || ! Object.keys( data ? data : {} ).length ) {
-            return;
-        }
+      if (!data || !Object.keys(data || {}).length) {
+        return;
+      }
 
-        Folders.tearDown();
-        Header.render( data );
-        Folders.render( data );
+      Folders.tearDown();
+      Header.render(data);
+      Folders.render(data);
     }
 
     function stopUpdate () {
-        flagStop = true;
+      flagStop = true;
     }
 
     function startUpdate () {
-        flagStop = false;
+      flagStop = false;
     }
 
     function logData () {
-        console.log( data );
+      console.log(data);
     }
 
     function offline () {
-        Header.reset();
-        Header.tearDown();
-        Folders.tearDown();
+      Header.reset();
+      Header.tearDown();
+      Folders.tearDown();
     }
 
     /**
@@ -1426,35 +1441,36 @@ return function () {
      * task is successful, then tear down the folders so that
      * they are triggered to be re-rendered.
      */
-    function accountUpdated ( data ) {
-        if ( data.updated ) {
-            Folders.tearDown();
-        }
+    function accountUpdated (data) {
+      if (data.updated) {
+        Folders.tearDown();
+      }
     }
 
     return {
-        load: load
+      load: load
     };
-}}(
-    LibreMail.Const,
-    LibreMail.Emitter,
-    LibreMail.Components
-));;
+  };
+}(
+  LibreMail.Const,
+  LibreMail.Emitter,
+  LibreMail.Components
+));
+;
 
 /**
  * Accounts Component
  */
 LibreMail.Components.Accounts = (function (Const, Socket, Emitter, Mustache) {
-// Returns a new instance
-return function ($root) {
+  // Returns a new instance
+  return function ($root) {
     'use strict';
-    // Event namespace
-    var namespace = '.accounts';
+
     // DOM template nodes
-    var $accountForm = document.getElementById( 'account-form' );
+    var $accountForm = document.getElementById('account-form');
     // Templates
     var tpl = {
-        account_form: $accountForm.innerHTML
+      account_form: $accountForm.innerHTML
     };
     // DOM nodes
     var $cancelButton;
@@ -1463,125 +1479,125 @@ return function ($root) {
     var isRendered = false;
 
     // Parse the templates
-    Mustache.parse( tpl.account_form );
+    Mustache.parse(tpl.account_form);
 
     /**
      * Load the account info edit form. This will let the user create
      * an account or edit their existing account.
+     *
      * @param Object data Optional account config to load into form
      */
-    function render ( /* data */ ) {
-        var data = ( arguments.length )
-            ? arguments[ 0 ]
-            : {};
+    function render (/* data */) {
+      var data = arguments[ 0 ] || {};
 
-        if ( isRendered && ! data ) {
-            return;
-        }
+      if (isRendered && !data) {
+        return;
+      }
 
-        isRendered = true;
-        $root.innerHTML = Mustache.render( tpl.account_form, data );
-        $accountInfoForm = $root.querySelector( 'form#account-info' );
-        $cancelButton = $accountInfoForm.querySelector( '#account-cancel' );
-        $accountInfoForm.onsubmit = save;
+      isRendered = true;
+      $root.innerHTML = Mustache.render(tpl.account_form, data);
+      $accountInfoForm = $root.querySelector('form#account-info');
+      $cancelButton = $accountInfoForm.querySelector('#account-cancel');
+      $accountInfoForm.onsubmit = save;
 
-        if ( $cancelButton ) {
-            $cancelButton.onclick = cancel;
-        }
+      if ($cancelButton) {
+        $cancelButton.onclick = cancel;
+      }
     }
 
     function tearDown () {
-        isRendered = false;
-        $cancelButton = null;
-        $accountInfoForm = null;
+      isRendered = false;
+      $cancelButton = null;
+      $accountInfoForm = null;
     }
 
     /**
      * Saves the account info form. This expects to be called in the
      * context of a DOM event.
      */
-    function save ( e ) {
-        e.preventDefault();
-        showAltTitle();
-        lockForm( true );
-        Socket.sendTask(
-            Const.TASK.SAVE_ACCOUNT, {
-                host: $accountInfoForm.host.value,
-                port: $accountInfoForm.port.value,
-                email: $accountInfoForm.email.value,
-                password: $accountInfoForm.password.value
-            });
+    function save (e) {
+      e.preventDefault();
+      showAltTitle();
+      lockForm(true);
+      Socket.sendTask(
+        Const.TASK.SAVE_ACCOUNT, {
+          host: $accountInfoForm.host.value,
+          port: $accountInfoForm.port.value,
+          name: $accountInfoForm.name.value,
+          email: $accountInfoForm.email.value,
+          password: $accountInfoForm.password.value
+        });
     }
 
-    function cancel ( e ) {
-        Emitter.fire( Const.EV.SHOW_FOLDERS );
+    function cancel () {
+      Emitter.fire(Const.EV.SHOW_FOLDERS);
     }
 
     /**
      * Update the state of the account form.
      */
-    function update ( data ) {
-        if ( ! isRendered ) {
-            return;
-        }
+    function update (data) {
+      if (!isRendered) {
+        return;
+      }
 
-        lockForm( false );
+      lockForm(false);
 
-        if ( data.updated ) {
-            Socket.send( Const.MSG.RESTART );
-        }
-        else {
-            showTitle();
-        }
+      if (data.updated) {
+        Socket.send(Const.MSG.RESTART);
+      } else {
+        showTitle();
+      }
     }
 
-    function lockForm ( disabled ) {
-        var i;
-        var elements = $accountInfoForm.elements;
+    function lockForm (disabled) {
+      var i;
+      var elements = $accountInfoForm.elements;
 
-        for ( i = 0; i < elements.length; i++ ) {
-            elements[ i ].disabled = disabled;
-        }
+      for (i = 0; i < elements.length; i++) {
+        elements[ i ].disabled = disabled;
+      }
     }
 
     function showAltTitle () {
-        $accountInfoForm
-            .querySelector( 'h1.title' )
-            .style
-            .display = 'none';
-        $accountInfoForm
-            .querySelector( 'h1.alt-title' )
-            .style
-            .display = 'block';
+      $accountInfoForm
+        .querySelector('h1.title')
+        .style
+        .display = 'none';
+      $accountInfoForm
+        .querySelector('h1.alt-title')
+        .style
+        .display = 'block';
     }
 
     function showTitle () {
-        $accountInfoForm
-            .querySelector( 'h1.title' )
-            .style
-            .display = 'block';
-        $accountInfoForm
-            .querySelector( 'h1.alt-title' )
-            .style
-            .display = 'none';
+      $accountInfoForm
+        .querySelector('h1.title')
+        .style
+        .display = 'block';
+      $accountInfoForm
+        .querySelector('h1.alt-title')
+        .style
+        .display = 'none';
     }
 
     return {
-        render: render,
-        update: update,
-        tearDown: tearDown
+      render: render,
+      update: update,
+      tearDown: tearDown
     };
-}}(LibreMail.Const, LibreMail.Socket, LibreMail.Emitter, Mustache));;
+  };
+}(LibreMail.Const, LibreMail.Socket, LibreMail.Emitter, Mustache));
+;
 
 /**
  * Folders Component
  */
 LibreMail.Components.Folders = (function (Mustache) {
-// Returns a new instance
-return function ( $root ) {
+  // Returns a new instance
+  return function ($root) {
     'use strict';
-    // Event namespace
-    var namespace = '.folders';
+
     // Flag if the system is "auto-scrolling"
     var syncActive;
     // Flag to reset scroll
@@ -1599,321 +1615,327 @@ return function ( $root ) {
     // incomplete flag on them.
     var spiderTimer;
     var spiderStore = {};
-    // This is not used, see crawlFolders
+    // This is not used, see crawlFolders()
     var spiderWaitMs = 0;
     var activeFlag = false;
     var spiderDelayMs = 5000;
     var spiderTimeoutMs = 2000;
     var redrawTimeoutMs = 10000;
     // DOM template nodes
-    var $folder = document.getElementById( 'folder' );
-    var $folders = document.getElementById( 'folders' );
+    var $folder = document.getElementById('folder');
+    var $folders = document.getElementById('folders');
     // Templates
     var tpl = {
-        folder: $folder.innerHTML,
-        folders: $folders.innerHTML
+      folder: $folder.innerHTML,
+      folders: $folders.innerHTML
     };
 
     // Parse the templates
-    Mustache.parse( tpl.folder );
-    Mustache.parse( tpl.folders );
+    Mustache.parse(tpl.folder);
+    Mustache.parse(tpl.folders);
 
-    function render ( d ) {
-        var i;
-        var folders;
-        var folderNames;
+    function render (d) {
+      var i;
+      var folders;
+      var folderNames;
 
-        if ( ! d.account
-            || ! d.accounts
-            || ! Object.keys( d.accounts ).length )
-        {
-            return;
+      if (!d.account || !d.accounts || !Object.keys(d.accounts).length) {
+        return;
+      }
+
+      folderNames = Object.keys(d.accounts[ d.account ]);
+      folders = formatFolders(d.accounts[ d.account ], d.active);
+
+      // If we already rendered the folders, just perform
+      // an update on the folder meta.
+      if (folderList.length &&
+          arraysEqual(folderList, folderNames)
+      ) {
+        update(folders, d.active);
+      } else {
+        draw(folders);
+      }
+
+      folderList = folderNames;
+      startSpiderCrawl(spiderDelayMs);
+
+      if (d.asleep || (!d.active && !activeFlag)) {
+        if (hasScrolled === true && syncActive === true) {
+          window.scrollTo(0, 0);
+          syncActive = false;
         }
 
-        folderNames = Object.keys( d.accounts[ d.account ] );
-        folders = formatFolders( d.accounts[ d.account ], d.active );
+        return;
+      }
 
-        // If we already rendered the folders, just perform
-        // an update on the folder meta.
-        if ( folderList.length
-            && arraysEqual( folderList, folderNames ) )
-        {
-            update( folders, d.active );
+      for (i in folders) {
+        if (folders[ i ].active) {
+          syncActive = true;
+          scrollTo(folders[ i ].id);
+          break;
         }
-        else {
-            draw( folders );
-        }
-
-        folderList = folderNames;
-        startSpiderCrawl( spiderDelayMs );
-
-        if ( d.asleep || ( ! d.active && ! activeFlag ) ) {
-            if ( hasScrolled === true && syncActive === true ) {
-                window.scrollTo( 0, 0 );
-                syncActive = false;
-            }
-
-            return;
-        }
-
-        for ( i in folders ) {
-            if ( folders[ i ].active ) {
-                syncActive = true;
-                scrollTo( folders[ i ].id );
-                break;
-            }
-        }
+      }
     }
 
-    function draw ( folders ) {
-        $root.innerHTML = Mustache.render(
-            tpl.folders, {
-                folders: folders
-            }, {
-                folder: tpl.folder
-            });
+    function draw (folders) {
+      $root.innerHTML = Mustache.render(
+        tpl.folders, {
+          folders: folders
+        }, {
+          folder: tpl.folder
+        });
     }
 
-    function update( folders, active ) {
-        var i;
-        var node;
-        var activeNode;
-        var activeNodes;
+    function update (folders, active) {
+      var i;
+      var node;
+      var activeNodes;
 
-        // If there's an active folder, just update the active one
-        if ( active ) {
-            extendRedrawTimer();
-            activeNodes = document.querySelectorAll( '.folder.active' );
+      // If there's an active folder, just update the active one
+      if (active) {
+        extendRedrawTimer();
+        activeNodes = document.querySelectorAll('.folder.active');
 
-            for ( i = 0; activeNode = activeNodes[ i ]; i++ ) {
-                activeNode.className = activeNode
-                    .className
-                    .replace( "active", "" );
-            }
+        if (activeNodes[ 0 ]) {
+          activeNodes[ 0 ].className = activeNodes[ 0 ]
+            .className
+            .replace('active', '');
+        }
+      }
+
+      for (i in folders) {
+        node = document.getElementById(folders[ i ].id);
+
+        if (!node) {
+          continue;
         }
 
-        for ( i in folders ) {
-            node = document.getElementById( folders[ i ].id );
+        node.innerHTML = Mustache.render(tpl.folder, folders[ i ]);
 
-            if ( ! node ) {
-                continue;
-            }
-
-            node.innerHTML = Mustache.render( tpl.folder, folders[ i ] );
-
-            if ( ( ! active && ! activeFlag )
-                || ( active && folders[ i ].path == active )
-                || ( ! folders[ i ].incomplete
-                    && node.className.indexOf( "incomplete" ) !== -1 )
-                || ( folders[ i ].incomplete
-                    && node.className.indexOf( "incomplete" ) === -1 ) )
-            {
-                updateFolderClasses( node, folders[ i ] );
-            }
-
-            node = null;
+        if ((!active && !activeFlag) ||
+            (active && folders[ i ].path === active) ||
+            (!folders[ i ].incomplete &&
+              node.className.indexOf('incomplete') !== -1) ||
+            (folders[ i ].incomplete &&
+              node.className.indexOf('incomplete') === -1)
+        ) {
+          updateFolderClasses(node, folders[ i ]);
         }
+
+        node = null;
+      }
     }
 
-    function updateFolderClasses ( node, folder ) {
-        var classes = [ "folder" ];
+    function updateFolderClasses (node, folder) {
+      var classes = [ 'folder' ];
 
-        if ( folder.active ) {
-            classes.push( "active" );
-        }
+      if (folder.active) {
+        classes.push('active');
+      }
 
-        if ( folder.incomplete ) {
-            classes.push( "incomplete" );
-        }
+      if (folder.incomplete) {
+        classes.push('incomplete');
+      }
 
-        node.className = classes.join( " " );
-        spiderStore[ folder.id ] = (new Date).getTime();
+      node.className = classes.join(' ');
+      spiderStore[ folder.id ] = (new Date()).getTime();
     }
 
-    function cleanupFolderClasses ( node ) {
-        var count;
-        var synced;
-        var classes;
+    function cleanupFolderClasses (node) {
+      var count;
+      var synced;
 
-        if ( ! node
-            || ! node.className
-            || node.className.indexOf( "active" ) !== -1 )
-        {
-            return;
-        }
+      if (!node ||
+          !node.className ||
+          node.className.indexOf('active') !== -1
+      ) {
+        return;
+      }
 
-        count = parseInt(
-            node.querySelector( 'input.count' ).value,
-            10 );
-        synced = parseInt(
-            node.querySelector( 'input.synced' ).value,
-            10 );
+      count = parseInt(node.querySelector('input.count').value, 10);
+      synced = parseInt(node.querySelector('input.synced').value, 10);
 
-        if ( synced >= count ) {
-            node.className = node.className.replace( "incomplete", "" );
-        }
-        else if ( node.className.indexOf( "incomplete" ) === -1 ) {
-            node.className = node.className + " incomplete";
-        }
+      if (synced >= count) {
+        node.className = node.className.replace('incomplete', '');
+      } else if (node.className.indexOf('incomplete') === -1) {
+        node.className = node.className + ' incomplete';
+      }
     }
 
     function tearDown () {
-        folderList = [];
-        syncActive = false;
-        activeFlag = false;
-        hasScrolled = false;
+      folderList = [];
+      syncActive = false;
+      activeFlag = false;
+      hasScrolled = false;
     }
 
     /**
-     * Reads in a collection of accounts with folder metadata
-     * and prepares it into a format for Mustache.
-     * @param Object accounts
-     * @param String active Active folder being synced
-     * @return Array
-     */
-    function formatFolders ( folders, active ) {
-        var i;
-        var formatted = [];
+   * Reads in a collection of accounts with folder metadata
+   * and prepares it into a format for Mustache.
+   * @param Object accounts
+   * @param String active Active folder being synced
+   * @return Array
+   */
+    function formatFolders (folders, active) {
+      var i;
+      var formatted = [];
 
-        for ( i in folders ) {
-            formatted.push({
-                path: i,
-                active: ( active === i ),
-                count: folders[ i ].count,
-                name: i.split( '/' ).pop(),
-                synced: folders[ i ].synced,
-                percent: folders[ i ].percent,
-                id: 'folder-' + i.split( '/' ).join( '-' ),
-                incomplete: folders[ i ].synced < folders[ i ].count,
-                crumbs: function () {
-                    var crumbs = this.path.split( '/' ).slice( 0, -1 );
-                    return ( crumbs.length > 0 )
-                        ? crumbs.join( '&nbsp;&rsaquo;&nbsp;' )
-                        : '&nbsp;';
-                }
-            });
-        }
+      for (i in folders) {
+        formatted.push({
+          path: i,
+          active: active === i,
+          count: folders[ i ].count,
+          name: i.split('/').pop(),
+          synced: folders[ i ].synced,
+          percent: folders[ i ].percent,
+          id: 'folder-' + i.split('/').join('-'),
+          incomplete: folders[ i ].synced < folders[ i ].count,
+          crumbs: function () {
+            var crumbs = this.path.split('/').slice(0, -1);
 
-        return formatted;
+            return (crumbs.length > 0)
+              ? crumbs.join('&nbsp;&rsaquo;&nbsp;')
+              : '&nbsp;';
+          }
+        });
+      }
+
+      return formatted;
     }
 
-    function yPosition ( node ) {
-        var elt = node;
-        var y = elt.offsetTop;
+    function yPosition (node) {
+      var elt = node;
+      var y = elt.offsetTop;
 
-        while ( elt.offsetParent && elt.offsetParent != document.body ) {
-            elt = elt.offsetParent;
-            y += elt.offsetTop;
-        }
+      while (elt.offsetParent && elt.offsetParent !== document.body) {
+        elt = elt.offsetParent;
+        y += elt.offsetTop;
+      }
 
-        return y;
+      return y;
     }
 
-    function scrollTo ( id ) {
-        var yPos;
-        var node = document.getElementById( id );
+    function scrollTo (id) {
+      var yPos;
+      var node = document.getElementById(id);
 
-        if ( ! node ) {
-            return;
-        }
+      if (!node) {
+        return;
+      }
 
-        yPos = yPosition( node );
+      yPos = yPosition(node);
 
-        // If the element is fully visible, then don't scroll
-        if ( yPos + node.clientHeight < window.innerHeight + window.scrollY
-            && yPos > window.scrollY )
-        {
-            return;
-        }
+      // If the element is fully visible, then don't scroll
+      if (yPos + node.clientHeight < window.innerHeight + window.scrollY &&
+          yPos > window.scrollY
+      ) {
+        return;
+      }
 
-        window.scrollTo( 0, node.offsetTop );
-        hasScrolled = true;
+      window.scrollTo(0, node.offsetTop);
+
+      hasScrolled = true;
     }
 
-    function arraysEqual ( a, b ) {
-        var i;
-        if ( a === b ) return true;
-        if ( a == null || b == null ) return false;
-        if ( a.length != b.length ) return false;
+    function arraysEqual (a, b) {
+      var i;
 
-        a.sort();
-        b.sort();
-
-        for ( i = 0; i < a.length; i++ ) {
-            if ( a[ i ] !== b[ i ] ) return false;
-        }
-
+      if (a === b) {
         return true;
+      }
+
+      if (a == null || b == null) {
+        return false;
+      }
+
+      if (a.length !== b.length) {
+        return false;
+      }
+
+      a.sort();
+      b.sort();
+
+      for (i = 0; i < a.length; i++) {
+        if (a[ i ] !== b[ i ]) {
+          return false;
+        }
+      }
+
+      return true;
     }
 
     function extendRedrawTimer () {
-        activeFlag = true;
-        clearTimeout( redrawTimer );
-        redrawTimer = setTimeout( function () {
-            activeFlag = false;
-        }, redrawTimeoutMs );
+      activeFlag = true;
+
+      clearTimeout(redrawTimer);
+
+      redrawTimer = setTimeout(function () {
+        activeFlag = false;
+      }, redrawTimeoutMs);
     }
 
     /**
-     * Crawls the folders on a timer, looking for any that
-     * should have their classname cleaned up.
-     */
-    function startSpiderCrawl ( timeout ) {
-        clearTimeout( spiderTimer );
-        spiderTimer = setTimeout( crawlFolders, spiderDelayMs );
+   * Crawls the folders on a timer, looking for any that
+   * should have their classname cleaned up.
+   */
+    function startSpiderCrawl (timeout) {
+      clearTimeout(spiderTimer);
+      spiderTimer = setTimeout(crawlFolders, timeout);
     }
 
     function crawlFolders () {
-        var i;
-        var folders;
-        var time = (new Date).getTime();
+      var i;
+      var folders;
+      var time = (new Date()).getTime();
 
-        if ( ! activeFlag ) {
-            startSpiderCrawl( spiderTimeoutMs );
-            return;
+      if (!activeFlag) {
+        startSpiderCrawl(spiderTimeoutMs);
+
+        return;
+      }
+
+      folders = document.querySelectorAll('.folder:not(.active)');
+
+      for (i in folders) {
+        // If it's been active within a wait period, ignore it
+        if (spiderWaitMs &&
+            spiderStore[ folders[ i ].id ] &&
+            time - spiderStore[ folders[ i ].id ] < spiderWaitMs
+        ) {
+          continue;
         }
 
-        folders = document.querySelectorAll( '.folder:not(.active)' );
+        cleanupFolderClasses(folders[ i ]);
+      }
 
-        for ( i in folders ) {
-            // If it's been active within a wait period, ignore it
-            if ( spiderWaitMs
-                && spiderStore[ folders[ i ].id ]
-                && time - spiderStore[ folders[ i ].id ] < spiderWaitMs )
-            {
-                continue;
-            }
-
-            cleanupFolderClasses( folders[ i ] );
-        }
-
-        startSpiderCrawl( spiderTimeoutMs );
+      startSpiderCrawl(spiderTimeoutMs);
     }
 
     return {
-        render: render,
-        tearDown: tearDown
+      render: render,
+      tearDown: tearDown
     };
-}}(Mustache));;
+  };
+}(Mustache));
+;
 
 /**
  * Header Component
  */
-LibreMail.Components.Header = (function ( Const, Socket, Emitter, Mustache ) {
-'use strict';
-// Returns a new instance
-return function ( $root ) {
-    // Event namespace
-    var namespace = '.header';
+LibreMail.Components.Header = (function (Const, Socket, Emitter, Mustache) {
+  // Returns a new instance
+  return function ($root) {
+    'use strict';
+
     // DOM template nodes
-    var $header = document.getElementById( 'header' );
-    var $status = document.getElementById( 'status' );
-    var $accounts = document.getElementById( 'accounts' );
+    var $header = document.getElementById('header');
+    var $status = document.getElementById('status');
+    var $accounts = document.getElementById('accounts');
     // Templates
     var tpl = {
-        header: $header.innerHTML,
-        status: $status.innerHTML,
-        accounts: $accounts.innerHTML
+      header: $header.innerHTML,
+      status: $status.innerHTML,
+      accounts: $accounts.innerHTML
     };
     // Account email
     var account;
@@ -1930,328 +1952,338 @@ return function ( $root ) {
     var $removeAccountButton;
 
     // Parse the templates
-    Mustache.parse( tpl.header );
-    Mustache.parse( tpl.status );
-    Mustache.parse( tpl.accounts );
+    Mustache.parse(tpl.header);
+    Mustache.parse(tpl.status);
+    Mustache.parse(tpl.accounts);
 
     /**
      * Triggered from Stats Page
+     *
      * @param Object data
      */
-    function render ( data ) {
-        account = data.account;
-        // Store this for the restart button
-        isAsleep = data.asleep;
+    function render (data) {
+      account = data.account;
+      isAsleep = data.asleep; // store this for the restart button
 
-        if ( rootIsRendered === true ) {
-            update( data );
-            return;
-        }
+      if (rootIsRendered === true) {
+        update(data);
+        return;
+      }
 
-        $root.innerHTML = Mustache.render(
-            tpl.header, {
-                asleep: data.asleep,
-                uptime: data.uptime,
-                account: data.account,
-                running: data.running,
-                runningTime: function () {
-                    return formatTime( this.uptime )
-                },
-                accounts: Object.keys( data.accounts )
-            }, {
-                status: tpl.status,
-                accounts: tpl.accounts
-            });
-        rootIsRendered = true;
-        loadDomElements();
-        // Attach event handlers to DOM elements.
-        $restartButton.onclick = restart;
-        $editAccountButton.onclick = editAccount;
-        $removeAccountButton.onclick = removeAccount;
+      $root.innerHTML = Mustache.render(
+        tpl.header, {
+          uptime: data.uptime,
+          account: data.account,
+          running: data.running,
+          online: data.uptime && data.uptime > 0,
+          asleep: data.asleep || !data.running,
+          runningTime: function () {
+            return formatTime(this.uptime);
+          },
+          accounts: Object.keys(data.accounts)
+        }, {
+          status: tpl.status,
+          accounts: tpl.accounts
+        });
+
+      rootIsRendered = true;
+
+      loadDomElements();
+
+      // Attach event handlers to DOM elements.
+      $restartButton.onclick = restart;
+      $editAccountButton.onclick = editAccount;
+      $removeAccountButton.onclick = removeAccount;
     }
 
     function tearDown () {
-        // Disable the buttons
-        if ( rootIsRendered ) {
-            $restartButton.className = 'disabled';
-            $optionsButton.className = 'disabled';
-            $accountsSection.className += ' disabled';
-        }
+      // Disable the buttons
+      if (rootIsRendered) {
+        $restartButton.className = 'disabled';
+        $optionsButton.className = 'disabled';
+        $accountsSection.className += ' disabled';
+      }
 
-        // Release memory
-        account = null;
-        isAsleep = false;
-        $statusSection = null;
-        $restartButton = null;
-        $optionsButton = null;
-        rootIsRendered = false;
-        $accountsSection = null;
-        $editAccountButton = null
-        $removeAccountButton = null;
+      // Release memory
+      account = null;
+      isAsleep = false;
+      $statusSection = null;
+      $restartButton = null;
+      $optionsButton = null;
+      rootIsRendered = false;
+      $accountsSection = null;
+      $editAccountButton = null;
+      $removeAccountButton = null;
     }
 
     function reset () {
-        $root.innerHTML = Mustache.render(
-            tpl.header, {
-                asleep: true,
-                accounts: [],
-                offline: true,
-                running: false,
-                account: account,
-            }, {
-                status: tpl.status,
-                accounts: tpl.accounts
-            });
-        rootIsRendered = true;
-        loadDomElements();
+      $root.innerHTML = Mustache.render(
+        tpl.header, {
+          asleep: true,
+          accounts: [],
+          offline: true,
+          running: false,
+          account: account
+        }, {
+          status: tpl.status,
+          accounts: tpl.accounts
+        });
+      rootIsRendered = true;
+
+      loadDomElements();
     }
 
     function restart () {
-        if ( ! isAsleep ) {
-            return;
-        }
+      if (!isAsleep) {
+        return;
+      }
 
-        Socket.send( Const.MSG.RESTART );
+      Socket.send(Const.MSG.RESTART);
     }
 
     function editAccount () {
-        Socket.sendTask(
-            Const.TASK.ACCOUNT_INFO, {
-                email: account
-            });
+      Socket.sendTask(
+        Const.TASK.ACCOUNT_INFO, {
+          email: account
+        });
     }
 
     function removeAccount () {
-        var email = window.prompt(
-            "If you're sure you want to remove this account, " +
-            "then please type the full email address. " );
+      var email = window.prompt(
+        "If you're sure you want to remove this account, " +
+        'then please type the full email address. '
+      );
 
-        if ( ! email ) {
-            return;
-        }
+      if (!email) {
+        return;
+      }
 
-        if ( email === account ) {
-            Socket.sendTask(
-                Const.TASK.REMOVE_ACCOUNT, {
-                    email: account
-                });
-        }
-        else {
-            Emitter.fire(
-                Const.EV.NOTIFICATION, {
-                    status: Const.STATUS.error,
-                    message: "You didn't type in the correct address."
-                });
-        }
+      if (email === account) {
+        Socket.sendTask(
+          Const.TASK.REMOVE_ACCOUNT, {
+            email: account
+          });
+      } else {
+        Emitter.fire(
+          Const.EV.NOTIFICATION, {
+            status: Const.STATUS.error,
+            message: "You didn't type in the correct address."
+          });
+      }
     }
 
-    function update ( data ) {
-        $statusSection.innerHTML = Mustache.render(
-            tpl.status, {
-                asleep: data.asleep,
-                uptime: data.uptime,
-                running: data.running,
-                runningTime: function () {
-                    return formatTime( this.uptime )
-                }
-            });
-        $accountsSection.innerHTML = Mustache.render(
-            tpl.accounts, {
-                account: data.account,
-                accounts: Object.keys( data.accounts )
-            });
+    function update (data) {
+      $statusSection.innerHTML = Mustache.render(
+        tpl.status, {
+          uptime: data.uptime,
+          running: data.running,
+          online: data.uptime && data.uptime > 0,
+          asleep: data.asleep || !data.running,
+          runningTime: function () {
+            return formatTime(this.uptime);
+          }
+        });
+      $accountsSection.innerHTML = Mustache.render(
+        tpl.accounts, {
+          account: data.account,
+          accounts: Object.keys(data.accounts)
+        });
 
-        // Mark button disabled if the sync is running
-        $restartButton.className = ( ! isAsleep )
-            ? 'disabled'
-            : '';
+      // Mark button disabled if the sync is running
+      $restartButton.className = isAsleep
+        ? ''
+        : 'disabled';
     }
 
     function loadDomElements () {
-        $statusSection = $root.querySelector( 'section.status' );
-        $restartButton = $root.querySelector( 'button#restart' );
-        $accountsSection = $root.querySelector( 'section.accounts' );
-        $editAccountButton = $root.querySelector( 'a#account-edit' );
-        $removeAccountButton = $root.querySelector( 'a#account-remove' );
-        $optionsButton = $root.querySelector( 'button#account-options' );
+      $statusSection = $root.querySelector('section.status');
+      $restartButton = $root.querySelector('button#restart');
+      $accountsSection = $root.querySelector('section.accounts');
+      $editAccountButton = $root.querySelector('a#account-edit');
+      $removeAccountButton = $root.querySelector('a#account-remove');
+      $optionsButton = $root.querySelector('button#account-options');
     }
 
-    function formatTime ( seconds ) {
-        var days;
-        var hours;
-        var minutes;
+    function formatTime (seconds) {
+      var days;
+      var hours;
+      var minutes;
 
-        if ( seconds < 60 ) {
-            return seconds + "s";
-        }
-        else if ( seconds < 3600 ) {
-            return Math.floor( seconds / 60 ) + "m";
-        }
-        else if ( seconds < 86400 ) {
-            minutes = Math.floor( (seconds % 3600) / 60 );
+      if (seconds < 60) {
+        return seconds + 's';
+      } else if (seconds < 3600) {
+        return Math.floor(seconds / 60) + 'm';
+      } else if (seconds < 86400) {
+        minutes = Math.floor((seconds % 3600) / 60);
 
-            return Math.floor( seconds / 3600 ) + "h"
-                + ( minutes ? " " + minutes + "m" : "" );
-        }
-        else if ( seconds < 31536000 ) {
-            hours = Math.floor( (seconds / 3600) % 24 );
+        return Math.floor(seconds / 3600) + 'h' +
+        (minutes ? ' ' + minutes + 'm' : '');
+      } else if (seconds < 31536000) {
+        hours = Math.floor((seconds / 3600) % 24);
 
-            return Math.floor( (seconds / 3600) / 24 ) + "d"
-                + ( hours ? " " + hours + "h" : "" );
-        }
-        else {
-            days = Math.floor( seconds % 31536000 );
+        return Math.floor((seconds / 3600) / 24) + 'd' +
+        (hours ? ' ' + hours + 'h' : '');
+      }
 
-            return Math.floor( seconds / 31536000 ) + "y"
-                + ( days ? " " + days + "d" : "" );
-        }
+      days = Math.floor(seconds % 31536000);
+
+      return Math.floor(seconds / 31536000) + 'y' +
+        (days ? ' ' + days + 'd' : '');
     }
 
     return {
-        reset: reset,
-        render: render,
-        tearDown: tearDown
+      reset: reset,
+      render: render,
+      tearDown: tearDown
     };
-}}( LibreMail.Const, LibreMail.Socket, LibreMail.Emitter, Mustache ));;
+  };
+}(LibreMail.Const, LibreMail.Socket, LibreMail.Emitter, Mustache));
+;
 
 /**
  * Notifications Component
  */
-LibreMail.Components.Notifications = (function ( Const, Socket, Mustache ) {
-// Returns a new instance
-return function ( $root ) {
+LibreMail.Components.Notifications = (function (Const, Socket, Mustache) {
+  // Returns a new instance
+  return function ($root) {
     'use strict';
-    // Event namespace
-    var namespace = '.notifications';
+
     // DOM template nodes
-    var $notification = document.getElementById( 'notification' );
+    var $notification = document.getElementById('notification');
     // Templates
     var tpl = {
-        notification: $notification.innerHTML
+      notification: $notification.innerHTML
     };
 
     // Parse the templates
-    Mustache.parse( tpl.notification );
+    Mustache.parse(tpl.notification);
 
     /**
      * Triggered from Global Page when socket opened.
      */
-    function insert ( data ) {
-        var newNode = document.createElement( 'div' );
+    function insert (data) {
+      var newNode = document.createElement('div');
 
-        newNode.className = 'notification';
-        newNode.innerHTML = Mustache.render( tpl.notification, data );
-        newNode.querySelector( '.close' ).onclick = function ( e ) {
-            $root.removeChild( newNode );
-        };
-        $root.appendChild( newNode );
+      newNode.className = 'notification';
+      newNode.innerHTML = Mustache.render(tpl.notification, data);
+      newNode.querySelector('.close').onclick = function () {
+        $root.removeChild(newNode);
+      };
+
+      $root.appendChild(newNode);
     }
 
     function closeAll () {
-        var i;
-        var notifications = $root.querySelectorAll( '.notification' );
+      var i;
+      var notifications = $root.querySelectorAll('.notification');
 
-        for ( i = 0; i < notifications.length; i++ ) {
-            $root.removeChild( notifications[ i ] );
-        }
+      for (i = 0; i < notifications.length; i++) {
+        $root.removeChild(notifications[ i ]);
+      }
     }
 
     return {
-        insert: insert,
-        closeAll: closeAll
+      insert: insert,
+      closeAll: closeAll
     };
-}}( LibreMail.Const, LibreMail.Socket, Mustache ));;
+  };
+}(LibreMail.Const, LibreMail.Socket, Mustache));
+;
 
 /**
  * Status Message Component
  */
-LibreMail.Components.StatusMessage = (function ( Const, Socket, Mustache ) {
-// Returns a new instance
-return function ( $root ) {
+LibreMail.Components.StatusMessage = (function (Const, Socket, Mustache) {
+  // Returns a new instance
+  return function ($root) {
     'use strict';
-    // Event namespace
-    var namespace = '.statusmessage';
+
     // DOM template nodes
-    var $warmup = document.getElementById( 'warmup' );
-    var $statusMessage = document.getElementById( 'status-message' );
+    var $warmup = document.getElementById('warmup');
+    var $statusMessage = document.getElementById('status-message');
     // Templates
     var tpl = {
-        warmup: $warmup.innerHTML,
-        status_message: $statusMessage.innerHTML
+      warmup: $warmup.innerHTML,
+      status_message: $statusMessage.innerHTML
     };
     // DOM nodes for updating
     var $recheckButton;
 
     // Parse the templates
-    Mustache.parse( tpl.status_message );
+    Mustache.parse(tpl.status_message);
 
     /**
      * Triggered from Global Page when socket opened.
      */
     function renderOnline () {
-        $root.innerHTML = Mustache.render( tpl.warmup );
+      $root.innerHTML = Mustache.render(tpl.warmup);
     }
 
     /**
      * Triggered from Global Page
+     *
      * @param Object data
      */
     function renderOffline () {
-        tearDown();
-        draw({
-            restart: false,
-            suggestion: "",
-            heading: Const.LANG.server_offline_heading,
-            message: Const.LANG.server_offline_message
-        });
+      tearDown();
+      draw({
+        restart: false,
+        suggestion: '',
+        heading: Const.LANG.server_offline_heading,
+        message: Const.LANG.server_offline_message
+      });
     }
 
-     /**
+    /**
      * Handles diagnostic error messages from Global Page.
      */
-    function renderDiagnosticError ( message, suggestion ) {
-        tearDown();
-        draw({
-            restart: true,
-            message: message,
-            suggestion: suggestion,
-            heading: Const.LANG.error_heading
-        });
+    function renderDiagnosticError (message, suggestion) {
+      tearDown();
 
-        $recheckButton = $root.querySelector( 'button#recheck' );
-        $recheckButton.onclick = recheck;
+      draw({
+        restart: true,
+        message: message,
+        suggestion: suggestion,
+        heading: Const.LANG.error_heading
+      });
+
+      $recheckButton = $root.querySelector('button#recheck');
+      $recheckButton.onclick = recheck;
     }
 
     /**
      * Triggered from Global Page when an error hits.
      */
-    function renderError ( message, suggestion ) {
-        tearDown();
-        draw({
-            restart: false,
-            message: message,
-            suggestion: suggestion,
-            heading: Const.LANG.error_heading
-        });
+    function renderError (message, suggestion) {
+      tearDown();
+
+      draw({
+        restart: false,
+        message: message,
+        suggestion: suggestion,
+        heading: Const.LANG.error_heading
+      });
     }
 
-    function draw ( data ) {
-        $root.innerHTML = Mustache.render( tpl.status_message, data );
+    function draw (data) {
+      $root.innerHTML = Mustache.render(tpl.status_message, data);
     }
 
     function recheck () {
-        Socket.send( Const.MSG.START );
+      Socket.send(Const.MSG.START);
     }
 
     function tearDown () {
-        $recheckButton = null;
+      $recheckButton = null;
     }
 
     return {
-        renderError: renderError,
-        renderOnline: renderOnline,
-        renderOffline: renderOffline,
-        renderDiagnosticError: renderDiagnosticError
+      renderError: renderError,
+      renderOnline: renderOnline,
+      renderOffline: renderOffline,
+      renderDiagnosticError: renderDiagnosticError
     };
-}}( LibreMail.Const, LibreMail.Socket, Mustache ));
+  };
+}(LibreMail.Const, LibreMail.Socket, Mustache));
+
 //# sourceMappingURL=libremail.js.map

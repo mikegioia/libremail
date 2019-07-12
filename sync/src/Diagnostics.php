@@ -8,6 +8,7 @@ use PDOException;
 use Pimple\Container;
 use App\Message\ErrorMessage;
 use App\Message\DiagnosticsMessage;
+use App\Model\Account as AccountModel;
 use App\Model\Migration as MigrationModel;
 use App\Exceptions\Fatal as FatalException;
 use App\Exceptions\Terminate as TerminateException;
@@ -113,6 +114,14 @@ class Diagnostics
         if ($this->console->diagnostics) {
             exit(0);
         }
+    }
+
+    /**
+     * No-op for container to load this service.
+     */
+    public function init()
+    {
+        // does nothing
     }
 
     /**
@@ -375,14 +384,12 @@ class Diagnostics
     {
         $sync = new Sync;
         $sync->setConfig(self::$config);
-        $sync->connect(
-            $account['imap_host'],
-            $account['imap_port'],
-            $account['email'],
-            $account['password'],
-            $folder = null,
-            $setRunning = false
-        );
+        $sync->connect(new AccountModel([
+            'email' => $account['email'],
+            'password' => $account['password'],
+            'imap_host' => $account['imap_host'],
+            'imap_port' => $account['imap_port']
+        ]), false);
     }
 
     /**

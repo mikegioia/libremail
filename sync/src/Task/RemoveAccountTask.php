@@ -13,6 +13,7 @@ use App\Model\Account as AccountModel;
 class RemoveAccountTask extends AbstractTask
 {
     public $email;
+
     protected $type = Task::ACCOUNT_INFO;
 
     /**
@@ -32,7 +33,8 @@ class RemoveAccountTask extends AbstractTask
                 new NotificationMessage(
                     STATUS_ERROR,
                     'That account could not be found.'),
-                $server);
+                $server
+            );
 
             return false;
         }
@@ -45,7 +47,8 @@ class RemoveAccountTask extends AbstractTask
         } catch (Exception $e) {
             Message::send(
                 new NotificationMessage(STATUS_ERROR, $e->getMessage()),
-                $server);
+                $server
+            );
 
             return false;
         }
