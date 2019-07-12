@@ -15,11 +15,16 @@ IFS=$'\n\t'
 basepath="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)";
 ## Sync local config file
 syncLocalIni="${basepath}/config/local.ini"
-## Flag, if DB connection is up
-dbConn=1
+## Webmail local environment file
+webmailLocalEnv="${basepath}/../webmail/.env"
+webmailDefaultEnv="${basepath}/../webmail/.env.example"
 ## SQL credentials (user input)
 username=''
 password=''
+## Flag, if DB connection is up
+dbConn=1
+## Name of the database, could be prompted in the future
+dbName='libremail'
 
 ## REMOVE
 UPDATEDB="${basepath}/sync -u"
@@ -113,10 +118,12 @@ function createDatabase {
   echo -e "${yellow}Please enter root user MySQL password${NC}"
   echo -e "${yellow}This is needed to create the new database and won't be stored${NC}"
   echo ''
-  read -sp 'Password: ' password
+  read -sp '  Password: ' password
+  echo ''
   echo ''
 
-  mysql -uroot -p${password} -e "CREATE DATABASE libremail /*\!40100 DEFAULT CHARACTER SET utf8 */;"
+  mysql -uroot -p${password} -e "CREATE DATABASE IF NOT EXISTS ${dbName} /*\!40100 DEFAULT CHARACTER SET utf8 */;"
+  result=$?
 
   if [ $result -ne 0 ]; then
     exit 0
@@ -128,8 +135,8 @@ function captureCredentials {
   echo -e "${yellow}Please enter the database username and password${NC}"
   echo -e "${yellow}These will be written to configuration files${NC}"
   echo ''
-  read -p 'SQL username: ' username
-  read -sp 'SQL password: ' password
+  read -p '  SQL username: ' username
+  read -sp '  SQL password: ' password
   echo ''
   echo ''
 }
@@ -148,8 +155,13 @@ function saveCredentialsSync {
 ## Saves the username and password to the config file
 function saveCredentialsWebmail {
   ## If the .env file doesn't exist, copy .env.example
-  DB_USERNAME=root
-DB_PASSWORD=root
+  if [[ ! -f $webmailLocalEnv ]]; then
+    cp $webmailDefaultEnv $webmailLocalEnv
+  fi
+
+  ## Update the credential lines
+  sed -i -e "/DB_USERNAME=/ s/=.*/=${username}/" $webmailLocalEnv
+  sed -i -e "/DB_PASSWORD=/ s/=.*/=${password}/" $webmailLocalEnv
 }
 
 ## Runs the sync script's diagnostic checks
@@ -158,19 +170,33 @@ function runDiagnostics {
   result=$?
 
   if [ $result -ne 0 ]; then
-    echo "bad!"
+    exit 0
+  else
+    echo ''
   fi
 }
 
-## Runs all the SQL database scripts
+## Runs the database update scripts
 function updateDatabase {
-  `${basepath}/sync -u`
+  ${basepath}/sync -u
+  result=$?
+
+  if [ $result -ne 0 ]; then
+    exit 0
+  else
+    echo ''
+  fi
+}
+
+## Prints closing message
+function shutdown {
+  echo -e "${green}Installation finished!${NC}"
 }
 
 ## Run everything
 startup
 checkSqlInstalled
 checkDatabase
-#runDiagnostics
-
-echo "SHOULD NOT BE HERE"
+runDiagnostics
+updateDatabase
+shutdown

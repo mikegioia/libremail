@@ -116,7 +116,7 @@ class Diagnostics
         $this->finish();
 
         if ($this->console->diagnostics) {
-            exit(0);
+            exit($this->hasError() ? 1 : 0);
         }
     }
 
@@ -411,7 +411,8 @@ class Diagnostics
         if ($this->hasError()) {
             $this->cli->br()->boldRedBackgroundBlack(
                 'There were errors encountered during the tests that '.
-                'prevent this application from running!');
+                'prevent this application from running!'
+            );
         }
     }
 
@@ -520,7 +521,8 @@ class Diagnostics
                 'Going to halt now, please see the log file for info.');
         } else {
             $di['log']->getLogger()->addDebug(
-                'Database connection lost: '.$e->getMessage());
+                'Database connection lost: '.$e->getMessage()
+            );
         }
 
         // This should drop the DB connection
