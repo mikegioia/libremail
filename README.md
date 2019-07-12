@@ -26,7 +26,7 @@ application.
 Both email clients in this project utilize the syncing engine provided in the
 [`sync`](sync) app. This application is designed to continually download emails
 from any number of IMAP servers and accounts. The data is saved in the format
-outlined in [`DATA_FORMAT.md`](DATA_FORMAT.md).
+outlined in [`DATA_FORMAT.md`](docs/DATA_FORMAT.md).
 
 Please see the `sync` directory for full documentation on setting up the sync
 engine; i.e. connecting accounts, populating test data, and the different ways
