@@ -182,6 +182,11 @@ body.theme-coolnight .thread-msg-row > .reply-all {
   background-color: #424242;
 }
 
+body.theme-coolnight .thread-msg-row > .reply-all span.address {
+  background-color: #137ca0;
+  color: #eee;
+}
+
 /* Preview */
 body.theme-coolnight .compose .outbox-preview,
 body.theme-coolnight section#error > div {

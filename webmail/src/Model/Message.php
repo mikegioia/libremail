@@ -137,9 +137,23 @@ class Message extends Model implements MessageInterface
         return $this->raw_headers."\r\n".$this->raw_content;
     }
 
-    public function getReplyAllAddresses(bool $stringify = true)
+    /**
+     * @param bool $stringify If true, return string, otherwise array
+     * @param string $ignoreFrom If set, ignore this email in the response
+     *
+     * @return string|array
+     */
+    public function getReplyAllAddresses(bool $stringify = true, string $ignoreFrom = '')
     {
         $addresses = [$this->from];
+
+        if ($ignoreFrom) {
+            if (trim($this->from, '<> ') === $ignoreFrom
+                || strpos($this->from, '<'.$ignoreFrom.'>') !== false
+            ) {
+                $addresses = [];
+            }
+        }
 
         foreach (['to', 'cc'] as $field) {
             if ($this->$field) {
@@ -147,12 +161,15 @@ class Message extends Model implements MessageInterface
             }
         }
 
-        $list = array_filter(array_map('trim', $addresses));
-        $list = array_values(array_unique($list));
+        $list = array_unique(array_filter(array_map('trim', $addresses)));
+
+        if (! $list) {
+            $list = [$this->from];
+        }
 
         return $stringify
             ? implode(', ', $list)
-            : $list;
+            : array_values($list);
     }
 
     public function loadById()
@@ -771,7 +788,7 @@ class Message extends Model implements MessageInterface
             ->fetchObject();
     }
 
-    private function getName(string $from)
+    public function getName(string $from)
     {
         $from = trim($from);
         $pos = strpos($from, '<');

@@ -17,6 +17,7 @@ foreach ($thread->getThreadIndex() as $i => $item):
         $view->render('threads/message', [
             'view' => $view,
             'open' => $item->open,
+            'account' => $account,
             'folders' => $folders,
             'message' => $item->message,
             'last' =>  $threadCount === $i + 1,
@@ -46,6 +47,7 @@ foreach ($thread->getThreadIndex() as $i => $item):
                 'open' => false,
                 'view' => $view,
                 'locked' => false,
+                'account' => $account,
                 'message' => $message,
                 'folders' => $folders
             ]);

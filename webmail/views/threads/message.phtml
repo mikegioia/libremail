@@ -102,10 +102,16 @@
                 <label class="align-right">To:</label>
             </div>
             <div class="ten columns inherit">
-                <span><?php $view->clean($message->getReplyAllAddresses()); ?></span>
+                <span><!--
+                <?php
+                foreach ($message->getReplyAllAddresses(false, $account->email) as $address): ?>
+                    --><span class="address" title="<?php $view->clean($address); ?>"><?php $view->clean($message->getName($address)); ?></span><!--
+                <?php
+                endforeach; ?>
+                --></span>
             </div>
             <div class="one columns">
-                <a href="#" class="align-right">Edit</a>
+                <a href="<?php echo App\Url::make('/replyall/%s#edit', $message->id); ?>" class="align-right">Edit</a>
             </div>
         </div>
         <textarea name="reply_all[<?php echo $message->id; ?>]"></textarea>

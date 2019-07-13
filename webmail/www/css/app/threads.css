@@ -316,7 +316,24 @@ input[type="checkbox"].thread-msg-more-checkbox {
 
 .thread-msg-row > .reply-all .row.padded {
   border-bottom: none !important;
-  margin-bottom: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.thread-msg-row > .reply-all .ten.columns {
+  margin: 0 1% 0 3%;
+}
+
+.thread-msg-row > .reply-all span.address {
+  background: #b6e4f4;
+  border-radius: 0.25rem;
+  display: inline-block;
+  font-size: 90%;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.thread-msg-row > .reply-all span.address:not(:last-child) {
+  margin-right: 0.5rem;
 }
 
 .thread-msg-row > .reply-all textarea {
