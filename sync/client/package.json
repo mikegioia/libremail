@@ -2,7 +2,7 @@
   "name": "libremail-sync-client",
   "version": "1.0.0",
   "license": "GPLv3",
-  "author": "Mike Gioia <mike@particlebis.com>",
+  "author": "Mike Gioia <mike@particlebits.com>",
   "private": true,
   "dependencies": {},
   "devDependencies": {
