@@ -5,7 +5,7 @@ if (isset($meta) && $meta): ?>
             <div class="status u-pull-left">
                 <div class="running">
                 <?php
-                if ((int) $meta->asleep === 1 || (int) $meta->running === 1): ?>
+                if (((int) $meta->asleep === 1 || (int) $meta->running === 1) && time() < $meta->heartbeat + 120): ?>
                     <i class="fa fa-wifi"></i>
                     <span>Online</span>
                 <?php

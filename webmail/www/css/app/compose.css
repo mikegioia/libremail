@@ -31,7 +31,7 @@ section.compose {
   display: block !important;
 }
 
-.compose .ten.columns {
+.compose .ten.columns:not(.inherit) {
   margin-left: 2rem;
   padding-bottom: 0.75rem;
 }

@@ -137,6 +137,24 @@ class Message extends Model implements MessageInterface
         return $this->raw_headers."\r\n".$this->raw_content;
     }
 
+    public function getReplyAllAddresses(bool $stringify = true)
+    {
+        $addresses = [$this->from];
+
+        foreach (['to', 'cc'] as $field) {
+            if ($this->$field) {
+                $addresses = array_merge($addresses, explode(',', $this->$field));
+            }
+        }
+
+        $list = array_filter(array_map('trim', $addresses));
+        $list = array_values(array_unique($list));
+
+        return $stringify
+            ? implode(', ', $list)
+            : $list;
+    }
+
     public function loadById()
     {
         if (! $this->id) {
