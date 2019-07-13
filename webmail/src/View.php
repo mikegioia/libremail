@@ -28,6 +28,11 @@ class View
     const DEFAULT_TZ = 'America/New_York';
     const DATE_DISPLAY_TIME = 'F jS \a\t g:i a';
 
+    const HTTP_200 = 'HTTP/1.1 200 OK';
+    const HTTP_400 = 'HTTP/1.1 400 Bad Request';
+    const HTTP_404 = 'HTTP/1.1 404 Not Found';
+    const HTTP_500 = 'HTTP/1.1 500 Server Error';
+
     /**
      * Returns the system-wide nonce for the current request.
      * Only generated on the first call.
@@ -220,5 +225,48 @@ class View
     public function meta(string $key, $default = null)
     {
         return Meta::get($key, $default);
+    }
+
+    /**
+     * Renders the 404 error page.
+     */
+    public static function show404()
+    {
+        header(self::HTTP_404);
+
+        $view = new self;
+        $view->htmlHeaders(false);
+
+        $view->render('error', [
+            'view' => $view,
+            'heading' => 'Page Not Found',
+            'message' => 'The page you requested could not be found.'
+        ]);
+    }
+
+    /**
+     * Renders an error page with custom messages.
+     */
+    public static function showError(
+        string $error,
+        string $heading,
+        string $message = null,
+        array $data = [],
+        bool $exit = true
+    ) {
+        header($error);
+
+        $view = new self;
+        $view->htmlHeaders(false);
+
+        $view->render('error', array_merge($data, [
+            'view' => $view,
+            'heading' => $heading,
+            'message' => $message
+        ]));
+
+        if (true === $exit) {
+            exit(1);
+        }
     }
 }

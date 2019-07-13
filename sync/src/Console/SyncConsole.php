@@ -30,6 +30,7 @@ class SyncConsole extends Console
     public $background;
     public $diagnostics;
     public $interactive;
+    public $databaseExists;
 
     public function __construct(array $config)
     {
@@ -129,6 +130,12 @@ class SyncConsole extends Console
                 'longPrefix' => 'updatedb',
                 'description' => 'Run the database migration scripts to update the schema',
                 'noValue' => true
+            ],
+            'exists' => [
+                'prefix' => 'x',
+                'longPrefix' => 'database-exists',
+                'description' => 'Checks if the database exists',
+                'noValue' => true
             ]
         ]);
     }
@@ -155,6 +162,7 @@ class SyncConsole extends Console
         $this->background = $this->cli->arguments->get('background');
         $this->diagnostics = $this->cli->arguments->get('diagnostics');
         $this->interactive = $this->cli->arguments->get('interactive');
+        $this->databaseExists = $this->cli->arguments->get('exists');
 
         // Some flags also enable interactive mode
         if (true === $this->sleep
@@ -194,9 +202,11 @@ class SyncConsole extends Console
 
         // If updatedb is set, just run the migration script
         if (true === $this->updatedb) {
-            $migrate = new MigrationModel;
-            $migrate->run();
-            exit(0);
+            if ((new MigrationModel)->run()) {
+                exit(0);
+            } else {
+                exit(1);
+            }
         }
 
         // If we're in rolling back changes, run it now
@@ -261,6 +271,7 @@ class SyncConsole extends Console
             $newAccount['smtp_port']
         ) = $this->promptAccountType();
 
+        $newAccount['name'] = $this->promptName();
         $newAccount['email'] = $this->promptEmail();
         $newAccount['password'] = $this->promptPassword();
 
@@ -330,9 +341,24 @@ class SyncConsole extends Console
         return [$service, $host, $port, $smtpHost, $smtpPort];
     }
 
+    private function promptName()
+    {
+        $input = $this->cli->input('Your name:');
+
+        $input->accept(function ($response) {
+            return strlen(trim($response)) > 0;
+        });
+
+        return $input->prompt();
+    }
+
     private function promptEmail()
     {
         $input = $this->cli->input('Email address:');
+
+        $input->accept(function ($response) {
+            return strpos($response, '@');
+        });
 
         return $input->prompt();
     }

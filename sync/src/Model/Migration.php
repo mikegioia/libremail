@@ -28,7 +28,7 @@ class Migration extends Model
      * if it's been run before. If so, skip it. If not, run
      * the script and log it in the migrations table.
      *
-     * @param string $scriptDir Path to script files
+     * @return bool     
      */
     public function run()
     {
@@ -55,7 +55,7 @@ class Migration extends Model
                         ->br()
                         ->error($this->getError());
 
-                    return;
+                    return false;
                 }
             }
 
@@ -66,6 +66,8 @@ class Migration extends Model
                 ->inline("] Running {$script}.sql")
                 ->br();
         }
+
+        return true;
     }
 
     public function setMaxAllowedPacket(int $mb = 16)
@@ -74,8 +76,9 @@ class Migration extends Model
         $newSize = (int) ($mb * 1024 * 1024);
 
         if (! $value || $value < $newSize) {
-            $stmt = $this->db()
-                ->query("SET GLOBAL max_allowed_packet = $newSize;");
+            $this->db()->query(
+                "SET GLOBAL max_allowed_packet = $newSize;"
+            );
 
             return false;
         }
@@ -95,9 +98,7 @@ class Migration extends Model
     public function getMaxAllowedPacket(Database $db = null)
     {
         $db = $db ?: $this->db();
-        $size = $db
-            ->query("SHOW VARIABLES LIKE 'max_allowed_packet';")
-            ->fetch();
+        $size = $db->query("SHOW VARIABLES LIKE 'max_allowed_packet';")->fetch();
 
         return Fn\get($size, 'Value');
     }

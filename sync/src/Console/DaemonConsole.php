@@ -15,6 +15,7 @@ class DaemonConsole extends Console
     // These cannot be overwritten from the CLI
     public $daemon = false;
     public $interactive = false;
+    public $databaseExists = false;
 
     public function __construct()
     {

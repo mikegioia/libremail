@@ -1,227 +1,235 @@
 <!doctype html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title>LibreMail Sync</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" type="text/css" href="dist/libremail.css">
-        <link rel="icon" type="image/png" href="dist/favicon.ico">
-    </head>
-    <body>
-        <!-- Application layout -->
-        <header>
-            <section class="accounts">LibreMail</section>
-        </header>
-        <main>
-            <div class="loading">
-                <i class="icon-mail"></i>
-                <span>Warming up</span>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>LibreMail Sync</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="dist/libremail.css">
+    <link rel="icon" type="image/png" href="dist/favicon.ico">
+  </head>
+  <body>
+    <!-- Application layout -->
+    <header>
+      <section class="accounts">LibreMail</section>
+    </header>
+    <main>
+      <div class="loading">
+        <i class="icon-mail"></i>
+        <span>Warming up</span>
+      </div>
+    </main>
+    <section id="notifications" class="notifications"></section>
+    <!-- Warming up -->
+    <script id="warmup" type="text/template">
+      <div class="loading">
+        <i class="icon-mail"></i>
+        <span>Waiting for signal<br>&hellip;</span>
+      </div>
+    </script>
+    <!-- Status message -->
+    <script id="status-message" type="text/template">
+      <section class="status-message">
+        <h1>{{heading}}</h1>
+        <div class="note">
+          <div class="message">{{message}}</div>
+        {{#suggestion}}
+          <div class="suggestion">{{suggestion}}</div>
+        {{/suggestion}}
+        {{#restart}}
+          <div class="recheck">
+            <button id="recheck">
+              <i class="icon-restart"></i>
+              Check Again
+            </button>
+          </div>
+        {{/restart}}
+        </div>
+      </section>
+    </script>
+    <!-- Header navigation -->
+    <script id="header" type="text/template">
+      <div class="container u-max-full-width u-full-width">
+        <div class="row">
+          <section class="accounts column one-third">
+            {{> accounts}}
+          </section>
+          <section class="status column one-third">
+            {{> status}}
+          </section>
+          <section class="actions column one-third">
+            <button id="restart" class="{{^asleep}}disabled{{/asleep}}">
+              <i class="icon-restart"></i>
+              <span>Restart</span>
+            </button>
+            <div class="dropdown u-pull-right">
+              <button id="account-options">
+                <i class="icon-cog"></i>
+              </button>
+              <ul class="right-menu">
+                <li>
+                  <a href="javascript:;" id="account-edit">Edit Account</a>
+                </li>
+                <li>
+                  <a href="javascript:;" id="account-remove">Remove Account</a>
+                </li>
+              </ul>
             </div>
-        </main>
-        <section id="notifications" class="notifications"></section>
-        <!-- Warming up -->
-        <script id="warmup" type="text/template">
-            <div class="loading">
-                <i class="icon-mail"></i>
-                <span>Waiting for signal<br>&hellip;</span>
+          </section>
+        </div>
+      </div>
+    </script>
+    <!-- Account list -->
+    <script id="accounts" type="text/template">
+      {{account}}
+      {{^account}}
+        No account
+      {{/account}}
+    </script>
+    <!-- Status panel -->
+    <script id="status" type="text/template">
+      <div class="icon">
+      {{#online}}
+        <i class="icon-running green"></i>
+        <div class="label">Online</div>
+      {{/online}}
+      {{^online}}
+        <i class="icon-running red"></i>
+        <div class="label red">Offline!</div>
+      {{/online}}
+      </div>
+      <div class="icon">
+      {{#asleep}}
+        <i class="icon-moon blue"></i>
+        <div class="label">Asleep</div>
+      {{/asleep}}
+      {{^asleep}}
+        <i class="icon-sun yellow"></i>
+        <div class="label">Awake</div>
+      {{/asleep}}
+      </div>
+      <div class="time">
+      {{#offline}}
+        <span class="offline">&mdash;</span>
+      {{/offline}}
+      {{^offline}}
+        <span class="timespan">{{runningTime}}</span>
+      {{/offline}}
+        <div class="label">Uptime</div>
+      </div>
+    </script>
+    <!-- List of all folders -->
+    <script id="folders" type="text/template">
+      <section class="folders u-cf">
+      {{#folders}}
+        <div id="{{id}}" class="folder{{#active}} active{{/active}}{{#incomplete}} incomplete{{/incomplete}}">
+          {{> folder}}
+        </div>
+      {{/folders}}
+      {{^folders}}
+        <div class="none">No folders to display</div>
+      {{/folders}}
+      </section>
+    </script>
+    <!-- Individual folder -->
+    <script id="folder" type="text/template">
+      <div class="progress" style="width: {{percent}}"></div>
+      <div class="top">
+        <div class="name">{{name}}</div>
+      </div>
+      <div class="bottom">
+        <span class="crumbs">{{&crumbs}}</span>
+        <span class="count">{{synced}} / {{count}}</span>
+      </div>
+      <input type="hidden" value="{{count}}" class="count" />
+      <input type="hidden" value="{{synced}}" class="synced" />
+    </script>
+    <!-- Account edit form -->
+    <script id="account-form" type="text/template">
+      <form id="account-info" autocomplete="off" spellcheck="false">
+      {{#email}}
+        <h1 class="title">Account Info</h1>
+      {{/email}}
+      {{^email}}
+        <h1 class="title">Add an Email Account</h1>
+      {{/email}}
+        <h1 class="alt-title">Saving Account&hellip;</h1>
+        <div class="row">
+          <div class="three columns">
+            <label>Email</label>
+          </div>
+          <div class="eight columns">
+            <input type="email" name="email" value="{{email}}" placeholder="you@mail.com" required />
+          </div>
+        </div>
+        <div class="row">
+          <div class="three columns">
+            <label>Password</label>
+          </div>
+          <div class="eight columns">
+            <input type="text" name="password" value="{{password}}" required />
+            <div class="note">
+              It's wise to
+              <a href="https://security.google.com/settings/security/apppasswords" target="_blank">use a token</a>
+              here!
             </div>
-        </script>
-        <!-- Status message -->
-        <script id="status-message" type="text/template">
-            <section class="status-message">
-                <h1>{{heading}}</h1>
-                <div class="note">
-                    <div class="message">{{message}}</div>
-                {{#suggestion}}
-                    <div class="suggestion">{{suggestion}}</div>
-                {{/suggestion}}
-                {{#restart}}
-                    <div class="recheck">
-                        <button id="recheck">
-                            <i class="icon-restart"></i>
-                            Check Again
-                        </button>
-                    </div>
-                {{/restart}}
-                </div>
-            </section>
-        </script>
-        <!-- Header navigation -->
-        <script id="header" type="text/template">
-            <div class="container u-max-full-width u-full-width">
-                <div class="row">
-                    <section class="accounts column one-third">
-                        {{> accounts}}
-                    </section>
-                    <section class="status column one-third">
-                        {{> status}}
-                    </section>
-                    <section class="actions column one-third">
-                        <button id="restart" class="{{^asleep}}disabled{{/asleep}}">
-                            <i class="icon-restart"></i>
-                            <span>Restart</span>
-                        </button>
-                        <div class="dropdown u-pull-right">
-                            <button id="account-options">
-                                <i class="icon-cog"></i>
-                            </button>
-                            <ul class="right-menu">
-                                <li>
-                                    <a href="javascript:;" id="account-edit">Edit Account</a>
-                                </li>
-                                <li>
-                                    <a href="javascript:;" id="account-remove">Remove Account</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </script>
-        <!-- Account list -->
-        <script id="accounts" type="text/template">
-            {{account}}
-            {{^account}}
-                No account
-            {{/account}}
-        </script>
-        <!-- Status panel -->
-        <script id="status" type="text/template">
-            <div class="icon">
-            {{#running}}
-                <i class="icon-running green"></i>
-                <div class="label">Online</div>
-            {{/running}}
-            {{^running}}
-                <i class="icon-running red"></i>
-                <div class="label red">Offline!</div>
-            {{/running}}
-            </div>
-            <div class="icon">
-            {{#asleep}}
-                <i class="icon-moon blue"></i>
-                <div class="label">Asleep</div>
-            {{/asleep}}
-            {{^asleep}}
-                <i class="icon-sun yellow"></i>
-                <div class="label">Awake</div>
-            {{/asleep}}
-            </div>
-            <div class="time">
-            {{#offline}}
-                <span class="offline">&mdash;</span>
-            {{/offline}}
-            {{^offline}}
-                <span class="timespan">{{runningTime}}</span>
-            {{/offline}}
-                <div class="label">Uptime</div>
-            </div>
-        </script>
-        <!-- List of all folders -->
-        <script id="folders" type="text/template">
-            <section class="folders u-cf">
-            {{#folders}}
-                <div id="{{id}}" class="folder{{#active}} active{{/active}}{{#incomplete}} incomplete{{/incomplete}}">
-                    {{> folder}}
-                </div>
-            {{/folders}}
-            {{^folders}}
-                <div class="none">No folders to display</div>
-            {{/folders}}
-            </section>
-        </script>
-        <!-- Individual folder -->
-        <script id="folder" type="text/template">
-            <div class="progress" style="width: {{percent}}"></div>
-            <div class="top">
-                <div class="name">{{name}}</div>
-            </div>
-            <div class="bottom">
-                <span class="crumbs">{{&crumbs}}</span>
-                <span class="count">{{synced}} / {{count}}</span>
-            </div>
-            <input type="hidden" value="{{count}}" class="count" />
-            <input type="hidden" value="{{synced}}" class="synced" />
-        </script>
-        <!-- Account edit form -->
-        <script id="account-form" type="text/template">
-            <form id="account-info" autocomplete="off" spellcheck="false">
-            {{#email}}
-                <h1 class="title">Account Info</h1>
-            {{/email}}
-            {{^email}}
-                <h1 class="title">Add an Email Account</h1>
-            {{/email}}
-                <h1 class="alt-title">Saving Account&hellip;</h1>
-                <div class="row">
-                    <div class="three columns">
-                        <label>Email</label>
-                    </div>
-                    <div class="eight columns">
-                        <input type="email" name="email" value="{{email}}" placeholder="you@gmail.com" required />
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="three columns">
-                        <label>Password</label>
-                    </div>
-                    <div class="eight columns">
-                        <input type="text" name="password" value="{{password}}" required />
-                        <div class="note">
-                            It's wise to
-                            <a href="https://security.google.com/settings/security/apppasswords" target="_blank">use a token</a>
-                            here!
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="three columns">
-                        <label>IMAP Address</label>
-                    </div>
-                    <div class="eight columns">
-                        <input type="text" name="host" value="{{host}}" placeholder="imap.gmail.com" />
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="three columns">
-                        <label>IMAP Port</label>
-                    </div>
-                    <div class="three columns">
-                        <input type="text" name="port" value="{{port}}" placeholder="993" />
-                    </div>
-                </div>
-                <div class="buttons">
-                    <button type="submit" class="button-primary" id="save">
-                        <i class="icon-check"></i>
-                        Save Account
-                    </button>
-                {{#email}}
-                    <button type="button" class="cancel u-pull-right" id="account-cancel">
-                        Cancel
-                    </button>
-                {{/email}}
-                </div>
-            </form>
-        </script>
-        <!-- Notification -->
-        <script id="notification" type="text/template">
-            <div class="box {{status}}">
-                <a class="close" href="javascript:;">
-                    <i class="icon-cross"></i>
-                </a>
-                <div class="message">{{message}}</div>
-            </div>
-        </script>
-        <!-- Load built JS -->
-        <script type="text/javascript" src="dist/libremail.js"></script>
-        <!-- Load the stats page -->
-        <script type="text/javascript">
-            (function (Pages) {
-                (Pages.Global()).load();
-                (Pages.Stats()).load();
-            }(window.LibreMail.Pages));
-        </script>
-    </body>
+          </div>
+        </div>
+        <div class="row">
+          <div class="three columns">
+            <label>Name</label>
+          </div>
+          <div class="eight columns">
+            <input type="text" name="name" value="{{name}}" placeholder="Your name" required />
+          </div>
+        </div>
+        <div class="row">
+          <div class="three columns">
+            <label>IMAP Address</label>
+          </div>
+          <div class="eight columns">
+            <input type="text" name="host" value="{{host}}" placeholder="imap.gmail.com" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="three columns">
+            <label>IMAP Port</label>
+          </div>
+          <div class="three columns">
+            <input type="text" name="port" value="{{port}}" placeholder="993" />
+          </div>
+        </div>
+        <div class="buttons">
+          <button type="submit" class="button-primary" id="save">
+            <i class="icon-check"></i>
+            Save Account
+          </button>
+        {{#email}}
+          <button type="button" class="cancel u-pull-right" id="account-cancel">
+            Cancel
+          </button>
+        {{/email}}
+        </div>
+      </form>
+    </script>
+    <!-- Notification -->
+    <script id="notification" type="text/template">
+      <div class="box {{status}}">
+        <a class="close" href="javascript:;">
+          <i class="icon-cross"></i>
+        </a>
+        <div class="message">{{message}}</div>
+      </div>
+    </script>
+    <!-- Load built JS -->
+    <script type="text/javascript" src="dist/libremail.js"></script>
+    <!-- Load the stats page -->
+    <script type="text/javascript">
+      (function (Pages) {
+        (Pages.Global()).load();
+        (Pages.Stats()).load();
+      }(window.LibreMail.Pages));
+    </script>
+  </body>
 </html>

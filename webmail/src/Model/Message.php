@@ -146,7 +146,7 @@ class Message extends Model implements MessageInterface
         $message = $this->getById($this->id);
 
         if ($message) {
-            $this->setData($message);
+            $this->setData((array) $message);
         }
 
         return $this;
@@ -172,6 +172,10 @@ class Message extends Model implements MessageInterface
 
     public function getByIds(array $ids)
     {
+        if (! $ids) {
+            return [];
+        }
+
         return $this->db()
             ->select()
             ->from('messages')
@@ -670,16 +674,19 @@ class Message extends Model implements MessageInterface
         $unseenThreadIds = $this->getUnseenThreads($accountId, $skipFolderIds);
 
         if ($unseenThreadIds) {
-            $folderThreads = $this->db()
+            $qry = $this->db()
                 ->select(['folder_id', 'thread_id'])
                 ->from('messages')
                 ->where('deleted', '=', 0)
                 ->where('seen', '=', 0)
                 ->whereIn('thread_id', $unseenThreadIds)
-                ->whereNotIn('folder_id', $skipFolderIds)
-                ->groupBy(['folder_id', 'thread_id'])
-                ->execute()
-                ->fetchAll(PDO::FETCH_CLASS);
+                ->groupBy(['folder_id', 'thread_id']);
+
+            if ($skipFolderIds) {
+                $qry->whereNotIn('folder_id', $skipFolderIds);
+            }
+
+            $folderThreads = $qry->execute()->fetchAll(PDO::FETCH_CLASS);
 
             foreach ($folderThreads as $thread) {
                 if (! isset($indexed[$thread->folder_id])) {
@@ -691,13 +698,16 @@ class Message extends Model implements MessageInterface
         }
 
         // Set all messages as unread for the drafts mailbox
-        $draftThreads = $this->db()
-            ->select(['count(distinct(thread_id)) as count'])
-            ->from('messages')
-            ->where('deleted', '=', 0)
-            ->where('folder_id', '=', $draftMailboxId)
-            ->execute()
-            ->fetch();
+        if ($draftMailboxId) {
+            $draftThreads = $this->db()
+                ->select(['count(distinct(thread_id)) as count'])
+                ->from('messages')
+                ->where('deleted', '=', 0)
+                ->where('folder_id', '=', $draftMailboxId)
+                ->execute()
+                ->fetch();
+        }
+
         $indexed[$draftMailboxId] = $draftThreads['count'] ?? 0;
 
         return $indexed;
@@ -706,15 +716,18 @@ class Message extends Model implements MessageInterface
     private function getUnseenThreads(int $accountId, array $skipFolderIds)
     {
         $threadIds = [];
-        $threads = $this->db()
+        $qry = $this->db()
             ->select(['thread_id'])
             ->from('messages')
             ->where('seen', '=', 0)
             ->where('deleted', '=', 0)
-            ->where('account_id', '=', $accountId)
-            ->whereNotIn('folder_id', $skipFolderIds)
-            ->execute()
-            ->fetchAll(PDO::FETCH_CLASS);
+            ->where('account_id', '=', $accountId);
+
+        if ($skipFolderIds) {
+            $qry->whereNotIn('folder_id', $skipFolderIds);
+        }
+
+        $threads = $qry->execute()->fetchAll(PDO::FETCH_CLASS);
 
         if (! $threads) {
             return [];

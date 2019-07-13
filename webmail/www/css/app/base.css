@@ -50,6 +50,26 @@ section#main > .notifications {
   margin-top: 1.5rem;
 }
 
+/* Error page */
+section#error {
+  margin: 0 auto;
+  max-width: 50rem;
+  min-width: 40rem;
+  padding: 10rem 0 0;
+}
+
+section#error > div {
+  background-color: #f7f7f7;
+  box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.1);
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+section#error > div > p {
+  font-size: 1.75rem;
+  margin: 0;
+  padding: 0;
+}
+
 a {
   color: #0378eb;
 }

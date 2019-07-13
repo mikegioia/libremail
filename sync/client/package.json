@@ -2,19 +2,28 @@
   "name": "libremail-sync-client",
   "version": "1.0.0",
   "license": "GPLv3",
-  "author": "Mike Gioia <mike@particlebis.com>",
+  "author": "Mike Gioia <mike@particlebits.com>",
   "private": true,
   "dependencies": {},
   "devDependencies": {
+    "eslint": "^6.0.1",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-standard": "^3.1.0",
     "grunt": "^1.0.4",
     "grunt-contrib-concat": "^1.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-watch": "^1.1.0",
-    "grunt-text-replace": "^0.4.0"
+    "grunt-text-replace": "^0.4.0",
+    "lodash": ">=4.17.13"
   },
   "scripts": {
     "build": "grunt build",
     "dist": "grunt dist",
-    "watch": "grunt"
+    "watch": "grunt",
+    "lint": "./node_modules/.bin/eslint --fix-dry-run src || exit 0",
+    "fix": "./node_modules/.bin/eslint --fix src || exit 0"
   }
 }

@@ -29,8 +29,8 @@ Start reading the LibreMail code and you'll get the hang of it. We optimize for 
 Please see the following documents for more information:
 
   * [README.md](README.md)
-  * [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
-  * [DATA_FORMAT.md](DATA_FORMAT.md)
+  * [CODE_OF_CONDUCT.md](docs/CODE_OF_CONDUCT.md)
+  * [DATA_FORMAT.md](docs/DATA_FORMAT.md)
 
 Thanks,
 

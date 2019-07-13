@@ -54,22 +54,22 @@ $di = new Container;
 $di['config'] = $config;
 
 // Diagnostic test service
-$di['diagnostics'] = function ($c) {
-    return new Diagnostics($c);
+$di['diagnostics'] = function ($container) {
+    return new Diagnostics($container);
 };
 
 // Console/CLI service
 $di['console'] = new ServerConsole($config);
-$di['cli'] = function ($c) {
-    return $c['console']->getCLI();
+$di['cli'] = function ($container) {
+    return $container['console']->getCLI();
 };
 
 // Logging service
-$di['log'] = function ($c) {
+$di['log'] = function ($container) {
     return new Log(
-        $c['cli'],
-        $c['config']['serverlog'],
-        true === $c['console']->interactive
+        $container['cli'],
+        $container['config']['serverlog'],
+        true === $container['console']->interactive
     );
 };
 
@@ -110,8 +110,8 @@ $pcntl->on(SIGTERM, $HALT);
 $pcntl->on(SIGQUIT, $HALT);
 
 // PDO factory, this uses a wrapper around PDO
-$di['db_factory'] = $di->factory(function ($c, $config = null) {
-    $dbConfig = ($config) ?: $c['config']['sql'];
+$di['db_factory'] = $di->factory(function ($container, $config = null) {
+    $dbConfig = ($config) ?: $container['config']['sql'];
     $dsn = sprintf(
         'mysql:host=%s;dbname=%s;charset=%s',
         $dbConfig['hostname'],
@@ -123,12 +123,14 @@ $di['db_factory'] = $di->factory(function ($c, $config = null) {
         return new Database(
             $dsn,
             $dbConfig['username'],
-            $dbConfig['password']);
+            $dbConfig['password']
+        );
     } catch (PDOException $e) {
         throw new PDOException(
             'There was a problem connecting to the database. '.
             'Are you sure it exists? Here are the details: '.
-            $e->getMessage());
+            $e->getMessage()
+        );
     }
 });
 

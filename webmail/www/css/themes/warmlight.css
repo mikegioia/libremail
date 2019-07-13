@@ -84,7 +84,8 @@ body.theme-warmlight .thread-msg label.thread-msg-header .from span {
 }
 
 /* Preview */
-body.theme-warmlight .compose .outbox-preview {
+body.theme-warmlight .compose .outbox-preview,
+body.theme-warmlight section#error > div {
   background: #fdf5ef;
   box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.1);
   padding-top: 1rem;

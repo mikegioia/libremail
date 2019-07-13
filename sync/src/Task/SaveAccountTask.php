@@ -32,6 +32,7 @@ class SaveAccountTask extends AbstractTask
     {
         $account = [
             'is_active' => 1,
+            'name' => $this->name,
             'email' => $this->email,
             'imap_host' => $this->host,
             'imap_port' => $this->port,
