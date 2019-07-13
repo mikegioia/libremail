@@ -337,7 +337,7 @@ class Controller
     {
         session_start();
 
-        $isPreview = ! is_null(Url::postParam('send_preview'));
+        $isPreview = array_key_exists('send_preview', $_POST);
         $folders = new Folders($this->account, []);
         $draftId = $folders->getDraftsId();
 
@@ -350,7 +350,7 @@ class Controller
             (new Message)->createOrUpdateDraft($outbox, $draftId);
             Session::notify('Draft message saved.', Session::SUCCESS);
 
-            if ($isPreview) {
+            if ($isPreview && ! Session::hasErrors()) {
                 Url::redirectRaw(Url::preview($outbox->id));
             } else {
                 Url::redirectRaw(Url::edit($outbox->id));
@@ -382,7 +382,7 @@ class Controller
             Url::redirectRaw(Url::compose());
         }
 
-        if (! is_null(Url::postParam('edit'))) {
+        if (array_key_exists('edit', $_POST)) {
             Url::redirectRaw(Url::edit(Url::postParam('id')));
         }
 
@@ -405,7 +405,7 @@ class Controller
             Url::redirectRaw(Url::compose());
         }
 
-        if (! is_null(Url::postParam('send_outbox'))) {
+        if (array_key_exists('send_outbox', $_POST)) {
             (new QueueAction)->run(
                 [$draftMessage->id],
                 $folders,

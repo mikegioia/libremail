@@ -192,7 +192,7 @@ class Message extends Model implements MessageInterface
             ->where('outbox_id', '=', $outboxId)
             ->where('folder_id', '=', $folderId)
             ->execute()
-            ->fetchObject();
+            ->fetch();
 
         return new self($message ?: null);
     }

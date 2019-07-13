@@ -36,6 +36,10 @@ h5.thread-title mark a {
   text-decoration: none;
 }
 
+h5.thread-title mark a:hover {
+  color: inherit;
+}
+
 /* Collapsed messages */
 
 input[type="checkbox"].thread-msg-checkbox {
@@ -50,7 +54,7 @@ input[type="checkbox"].thread-msg-checkbox {
   display: block;
 }
 
-.thread-msg-row label {
+.thread-msg-row > label {
   box-sizing: border-box;
   cursor: pointer;
   display: block;
@@ -285,8 +289,16 @@ input[type="checkbox"].thread-msg-more-checkbox {
 /* Reply-all */
 
 .thread-msg-row > .reply-all {
+  background: #f7f7f7;
+  border: 1px solid #eee;
+  border-radius: 0.25rem;
   display: none;
-  padding: 2rem 2rem 3rem 0;
+  margin: 2rem 2rem 3rem 0;
+  padding: 1.5rem;
+}
+
+.thread-msg-row > .reply-all .button {
+  margin-bottom: 0;
 }
 
 .thread-msg-row > .reply-controls {
@@ -300,6 +312,10 @@ input[type="checkbox"].thread-msg-more-checkbox {
 
 .thread-msg-row:last-child > .reply-controls .button:not(:last-child) {
   margin-right: 0.75rem;
+}
+
+.thread-msg-row > .reply-all .row.padded {
+  border-bottom: none !important;
 }
 
 .thread-msg-row > .reply-all textarea {

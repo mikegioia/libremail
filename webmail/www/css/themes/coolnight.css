@@ -165,7 +165,8 @@ body.theme-coolnight .thread-msg-row label.thread-msg-label,
 body.theme-coolnight .thread-msg-group .placeholder,
 body.theme-coolnight .folder-selector h4,
 body.theme-coolnight .folder-selector .actions,
-body.theme-coolnight .folder-selector .list label {
+body.theme-coolnight .folder-selector .list label,
+body.theme-coolnight .thread-msg-row > .reply-all {
   border-color: #323232;
 }
 
@@ -175,6 +176,10 @@ body.theme-coolnight .thread-msg label.thread-msg-header .from span,
 body.theme-coolnight .thread-msg-row label .snippet strong,
 body.theme-coolnight .thread-msg-row label .date {
   color: #aaa;
+}
+
+body.theme-coolnight .thread-msg-row > .reply-all {
+  background-color: #424242;
 }
 
 /* Preview */
