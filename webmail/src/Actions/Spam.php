@@ -5,7 +5,7 @@ namespace App\Actions;
 use App\Thread;
 use App\Actions;
 use App\Folders;
-use App\MessageInterface;
+use App\Messages\MessageInterface;
 use App\Exceptions\ServerException;
 use App\Actions\Copy as CopyAction;
 

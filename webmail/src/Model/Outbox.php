@@ -7,7 +7,7 @@ use Parsedown;
 use App\View;
 use App\Model;
 use App\Session;
-use App\MessageInterface;
+use App\Messages\MessageInterface;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ValidationException;
 use App\Exceptions\DatabaseInsertException;
@@ -95,6 +95,10 @@ class Outbox extends Model implements MessageInterface
         // If the user approves the preview, remove draft flag
         if (isset($data['send_outbox'])) {
             $this->draft = 0;
+        }
+
+        if (isset($data['thread_id'])) {
+            $this->thread_id = $data['thread_id'];
         }
 
         return $this;

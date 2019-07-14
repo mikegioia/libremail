@@ -33,8 +33,12 @@ class Folders
     // Convert certain folder names
     private $convert = [
         'INBOX' => 'Inbox',
-        '[Gmail]/Trash' => 'Trash',
-        '[Gmail]/Cestino' => 'Cestino'
+        '[Gmail]/Bozze' => 'Bozze',
+        '[Gmail]/Cestino' => 'Cestino',
+        '[Gmail]/Drafts' => 'Drafts',
+        '[Gmail]/Posta inviata' => 'Posta inviata',
+        '[Gmail]/Sent' => 'Sent Mail',
+        '[Gmail]/Trash' => 'Trash'
     ];
     // Mailbox constants
     const INBOX = 'inbox';
@@ -251,7 +255,7 @@ class Folders
     public function getById(int $id)
     {
         // Load folders if not set
-        $this->get();
+        $this->get(true);
 
         foreach ($this->folders as $folder) {
             if ($folder->id == $id) {
@@ -446,12 +450,17 @@ class Folders
         int $offset,
         int $parentOffset
     ) {
+        if (! isset($branch['folder'])) {
+            return;
+        }
+
         if ($branch['folder']->is_mailbox) {
             return;
         }
 
         ++$index;
         $childIndex = 0;
+
         $this->index[$branch['folder']->id] = (object) [
             'pos' => $index,
             'offset' => $offset,

@@ -11,8 +11,6 @@ use App\Model\Settings;
 use App\Exceptions\ClientException;
 use App\Exceptions\ServerException;
 use App\Exceptions\NotFoundException;
-use App\Exceptions\ValidationException;
-use App\Actions\Queue as QueueAction;
 use App\Actions\MarkRead as MarkReadAction;
 
 class Controller
@@ -39,30 +37,20 @@ class Controller
         $this->mailbox($id, $page);
     }
 
+    public function outbox()
+    {
+        $select = Url::getParam('select');
+
+        $this->page('outbox', [
+            'select' => $select,
+            'messages' => (new Outbox($this->account))->getActive(),
+            'totals' => (new Message)->getSizeCounts($this->account->id)
+        ]);
+    }
+
     public function starred(string $page)
     {
         $this->mailbox(STARRED, $page);
-    }
-
-    public function update()
-    {
-        session_start();
-
-        (new Actions(
-            new Folders($this->account, getConfig('colors')),
-            $_POST + $_GET
-        ))->run();
-    }
-
-    public function action()
-    {
-        session_start();
-        Session::validateToken();
-
-        (new Actions(
-            new Folders($this->account, getConfig('colors')),
-            $_GET + ['url_id' => THREAD]
-        ))->run();
     }
 
     public function undo(int $batchId)
@@ -266,10 +254,6 @@ class Controller
         Url::redirectBack('/settings');
     }
 
-    /**
-     * @throws NotFoundException Sends back a 404 if message
-     *   is sent or if it doesn't exist
-     */
     public function compose(int $outboxId = null)
     {
         $message = new Outbox($this->account);
@@ -337,36 +321,9 @@ class Controller
     {
         session_start();
 
-        $isPreview = array_key_exists('send_preview', $_POST);
-        $folders = new Folders($this->account, []);
-        $draftId = $folders->getDraftsId();
-
-        try {
-            $outbox = new Outbox($this->account);
-            $outbox->setPostData($_POST)->save($isPreview);
-
-            // Update the draft if it exists, and optionally create
-            // a new one if this message is a draft
-            (new Message)->createOrUpdateDraft($outbox, $draftId);
-            Session::notify('Draft message saved.', Session::SUCCESS);
-
-            if ($isPreview && ! Session::hasErrors()) {
-                Url::redirectRaw(Url::preview($outbox->id));
-            } else {
-                Url::redirectRaw(Url::edit($outbox->id));
-            }
-        } catch (ValidationException $e) {
-            // Store the POST data back in the session and set the
-            // errors in the session for the page to display
-            Session::formErrors($e->getErrors());
-            Session::formData($_POST);
-
-            if (isset($outbox->id) && $outbox->exists()) {
-                Url::redirectRaw(Url::edit($outbox->id));
-            } else {
-                Url::redirectRaw(Url::compose());
-            }
-        }
+        $sendPreview = array_key_exists('send_preview', $_POST);
+        $compose = new Compose($this->account);
+        $compose->draft($sendPreview);
     }
 
     public function send()
@@ -374,63 +331,43 @@ class Controller
         session_start();
 
         $id = intval(Url::postParam('id'));
-        $outboxMessage = (new Outbox($this->account))->getById($id);
-        $folders = new Folders($this->account, getConfig('colors'));
+        $edit = array_key_exists('edit', $_POST);
+        $queue = array_key_exists('send_outbox', $_POST);
 
-        if (! $outboxMessage->exists()) {
-            Session::notify('Message not found!', Session::ERROR);
-            Url::redirectRaw(Url::compose());
-        }
-
-        if (array_key_exists('edit', $_POST)) {
-            Url::redirectRaw(Url::edit(Url::postParam('id')));
-        }
-
-        if (! $outboxMessage->isDraft()) {
-            Session::notify('Message not available to send!', Session::ERROR);
-            Url::redirectBack('/compose');
-        }
-
-        $draftMessage = (new Message)->getByOutboxId(
-            $outboxMessage->id,
-            $folders->getDraftsId()
-        );
-
-        if (! $draftMessage->exists()) {
-            Session::notify(
-                'Draft message not found! This is a grave error and '.
-                'means you will need to delete this message and create '.
-                'a new one!',
-                Session::ERROR);
-            Url::redirectRaw(Url::compose());
-        }
-
-        if (array_key_exists('send_outbox', $_POST)) {
-            (new QueueAction)->run(
-                [$draftMessage->id],
-                $folders,
-                [Actions::OUTBOX_MESSAGE => $outboxMessage]
-            );
-
-            Session::notify(
-                'Your message was queued for delivery! You still have '.
-                'time to review it and make any changes.');
-            Url::redirectRaw(Url::outbox());
-        }
-
-        Session::notify('No message delivery type specified!', Session::ERROR);
-        Url::redirectRaw(Url::preview(Url::postParam('id')));
+        $compose = new Compose($this->account);
+        $compose->send($id, $edit, $queue);
     }
 
-    public function outbox()
+    public function update()
     {
-        $select = Url::getParam('select');
+        session_start();
 
-        $this->page('outbox', [
-            'select' => $select,
-            'messages' => (new Outbox($this->account))->getActive(),
-            'totals' => (new Message)->getSizeCounts($this->account->id)
-        ]);
+        $sendPreview = array_key_exists('send_preview', $_POST)
+            && is_array(Url::postParam('send_preview'))
+            && count(Url::postParam('send_preview')) === 1;
+
+        // Quick reply-all can POST here
+        if (true === $sendPreview) {
+            (new Compose($this->account))->reply(
+                key(Url::postParam('send_preview'))
+            );
+        } else {
+            (new Actions(
+                new Folders($this->account, getConfig('colors')),
+                $_POST + $_GET
+            ))->run();
+        }
+    }
+
+    public function action()
+    {
+        session_start();
+        Session::validateToken();
+
+        (new Actions(
+            new Folders($this->account, getConfig('colors')),
+            $_GET + ['url_id' => THREAD]
+        ))->run();
     }
 
     /**
@@ -505,6 +442,7 @@ class Controller
             $limit, [
                 Message::SPLIT_FLAGGED => INBOX === $id,
                 Message::ONLY_FLAGGED => STARRED === $id,
+                Message::IS_DRAFTS => $folderId === $folders->getDraftsId(),
                 Message::INCLUDE_DELETED => $folderId === $folders->getTrashId()
             ]);
 

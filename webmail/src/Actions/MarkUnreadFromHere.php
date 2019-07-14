@@ -3,7 +3,7 @@
 namespace App\Actions;
 
 use App\Folders;
-use App\MessageInterface;
+use App\Messages\MessageInterface;
 use App\Model\Task as TaskModel;
 use App\Model\Message as MessageModel;
 
