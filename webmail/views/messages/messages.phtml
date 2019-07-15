@@ -2,7 +2,9 @@
 
 foreach ($messages as $message):
     if ($isDrafts && $message->outbox_id): // For drafts the URL goes to the edit page
-        $url = App\Url::edit($message->outbox_id);
+        $url = $message->getOutboxMessage->isReply()
+            ? App\Url::thread($folderId, $message->thread_id)
+            : App\Url::edit($message->outbox_id);
     else: // URL goes to the first un-read message in the thread
         $url = App\Url::thread($folderId, $message->thread_id);
     endif;

@@ -294,6 +294,11 @@ class Outbox extends Model implements MessageInterface
             && $this->send_after;
     }
 
+    public function isReply()
+    {
+        return 0 !== (int) $this->parent_id;
+    }
+
     public function exists()
     {
         return is_numeric($this->id)
