@@ -128,6 +128,10 @@ class Outbox extends Model implements MessageInterface
 
     public function getById(int $id, bool $includeDeleted = false)
     {
+        if (! $id) {
+            return new self;
+        }
+
         $qry = $this->db()
             ->select()
             ->from('outbox')
@@ -264,6 +268,11 @@ class Outbox extends Model implements MessageInterface
             && ! $this->text_plain;
     }
 
+    public function isSent()
+    {
+        return 1 === (int) $this->sent;
+    }
+
     public function isDraft()
     {
         return 1 === (int) $this->draft;
@@ -276,6 +285,13 @@ class Outbox extends Model implements MessageInterface
 
         return ! $this->isDraft()
             && (! $this->send_after || $now >= $sendAfter);
+    }
+
+    public function isScheduled()
+    {
+        return ! $this->isSent()
+            && ! $this->isDraft()
+            && $this->send_after;
     }
 
     public function exists()
@@ -347,6 +363,15 @@ class Outbox extends Model implements MessageInterface
         }
 
         return $sendAfter->format(View::DATE_SHORT);
+    }
+
+    public function getAddresses()
+    {
+        $this->convertAddresses();
+
+        return array_values(array_unique(
+            array_merge($this->to, $this->cc, $this->bcc)
+        ));
     }
 
     /**

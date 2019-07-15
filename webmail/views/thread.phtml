@@ -38,7 +38,8 @@ $view->render('nav', [
                 'view' => $view,
                 'thread' => $thread,
                 'account' => $account,
-                'folders' => $folders
+                'folders' => $folders,
+                'threadCount' => count($thread->getThreadIndex())
             ]);
 
             $view->render('messages/footer', [

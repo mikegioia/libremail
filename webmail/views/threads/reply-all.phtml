@@ -1,0 +1,41 @@
+<div id="reply-all-<?php echo $message->id; ?>" class="reply-all compose<?php echo $visible ? ' visible' : ''; ?>">
+    <div class="row padded">
+        <div class="one columns label">
+            <label class="align-right">To:</label>
+        </div>
+        <div class="ten columns inherit">
+            <span><!--
+        <?php
+        foreach ($message->getReplyAllAddresses(false, $account->email) as $address): ?>
+            --><span class="address" title="<?php $view->clean($address); ?>"><?php $view->clean($message->getName($address)); ?></span><!--
+        <?php
+        endforeach; ?>
+            --></span>
+        </div>
+        <div class="one columns">
+            <a href="<?php echo App\Url::make('/replyall/%s#edit', $message->id); ?>" class="align-right">Edit</a>
+        </div>
+    </div>
+    <textarea name="reply_all[<?php echo $message->id; ?>]"><?php echo $outbox->text_plain ?? ''; ?></textarea>
+    <div class="buttons">
+        <button type="submit" name="send_preview[<?php echo $message->id; ?>]" class="button button-primary">
+            Preview + Send
+        </button>
+        <span>or</span>
+        <a href="#">Cancel</a>
+    </div>
+</div>
+<div class="reply-controls">
+    <a href="#reply-all-<?php echo $message->id; ?>" class="icon button control">
+        <i class="fa fa-reply-all"></i>
+        <span class="normal">Reply all</span>
+    </a>
+    <a href="<?php echo App\Url::make('/reply/%s', $message->id); ?>" class="icon button control">
+        <i class="fa fa-reply"></i>
+        <span class="normal">Reply</span>
+    </a>
+    <a href="<?php echo App\Url::make('/forward/%s', $message->id); ?>" class="icon button control">
+        <i class="fa fa-share"></i>
+        <span class="normal">Forward</span>
+    </a>
+</div>

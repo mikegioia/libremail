@@ -11,7 +11,6 @@ endforeach; ?>
 <!-- Message List -->
 <section class="thread-msg-list">
 <?php
-$threadCount = count($thread->getThreadIndex());
 foreach ($thread->getThreadIndex() as $i => $item):
     if ($item->type === $thread::INDEX_MESSAGE):
         $view->render('threads/message', [
@@ -20,8 +19,11 @@ foreach ($thread->getThreadIndex() as $i => $item):
             'account' => $account,
             'folders' => $folders,
             'message' => $item->message,
-            'last' =>  $threadCount === $i + 1,
-            'locked' => $item->current || $threadCount === 1
+            'last' => $threadCount === $i + 1,
+            'outbox' => $item->message->getOutboxMessage(),
+            'locked' => $item->current || $threadCount === 1,
+            'showReplyAll' => $item->message->getOutboxMessage()->exists()
+                && $item->message->getOutboxMessage()->isDraft()
         ]);
     elseif ($item->type === $thread::INDEX_GROUP):
         if ($item->count > 1): ?>
@@ -49,7 +51,8 @@ foreach ($thread->getThreadIndex() as $i => $item):
                 'locked' => false,
                 'account' => $account,
                 'message' => $message,
-                'folders' => $folders
+                'folders' => $folders,
+                'outbox' => $message->getOutboxMessage()
             ]);
         endforeach;
         if ($item->count > 1): ?>

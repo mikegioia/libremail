@@ -51,9 +51,12 @@ class Message extends Model implements MessageInterface
     public $attachments;
     public $raw_headers;
     public $raw_content;
+
     // Computed properties
     public $thread_count;
 
+    // Lazy-loaded outbox message
+    private $outboxMessage;
     // Cache for threading info
     private $threadCache = [];
     // Cache for attachments
@@ -247,6 +250,17 @@ class Message extends Model implements MessageInterface
             ->fetch();
 
         return new self($message ?: null);
+    }
+
+    public function getOutboxMessage()
+    {
+        if ($this->outboxMessage) {
+            return $this->outboxMessage;
+        }
+
+        $this->outboxMessage = (new Outbox)->getById($this->outbox_id ?: 0);
+
+        return $this->outboxMessage;
     }
 
     /**

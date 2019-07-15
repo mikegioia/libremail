@@ -148,7 +148,6 @@ class Actions
             $this->moveMessages($messageIds, $moveTo, $folderId);
         } catch (Exception $e) {
             Model::getDb()->rollBack();
-
             throw $e;
         }
 
@@ -273,7 +272,7 @@ class Actions
         $nounUpper = 'Conversation';
         $nounPlural = 'conversations';
         $folderName = count($folders) > 1
-            ? count($folders) + ' folders'
+            ? count($folders).' folders'
             : implode(', ', $folders);
 
         if (self::MARK_ALL_READ === $action

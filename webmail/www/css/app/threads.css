@@ -233,6 +233,14 @@ input[type="checkbox"].thread-msg-more-checkbox {
   white-space: normal;
 }
 
+.thread-msg .draft-notice {
+  padding: 0 0 0 4rem;
+}
+
+.thread-msg .draft-notice.is-draft {
+  margin-bottom: -3rem;
+}
+
 .thread-msg .actions {
   display: inline-block;
   padding-top: 0.125rem;
@@ -343,10 +351,12 @@ input[type="checkbox"].thread-msg-more-checkbox {
   width: 100%;
 }
 
-.thread-msg-row > .reply-all:target {
+.thread-msg-row > .reply-all:target,
+.thread-msg-row > .reply-all.visible {
   display: block;
 }
 
-.thread-msg-row > .reply-all:target + .reply-controls {
+.thread-msg-row > .reply-all:target + .reply-controls,
+.thread-msg-row > .reply-all.visible + .reply-controls {
   display: none !important;
 }
