@@ -79,6 +79,14 @@
   }
 }
 
+/* Larger than medium */
+@media (min-width: 992px) {
+  .folder-selector input[type="search"] {
+    height: calc(4.5rem + 1px);
+    top: 4.5rem;
+  }
+}
+
 /* Medium devices (laptops) */
 @media (max-width: 991px) {
   html {
