@@ -192,10 +192,10 @@ class Stats
         (new MetaModel)->update([
             MetaModel::HEARTBEAT => time(),
             MetaModel::SYNC_PID => $this->pid,
-            MetaModel::START_TIME => $this->startTime,
             MetaModel::ASLEEP => $this->asleep ? 1 : 0,
             MetaModel::FOLDER_STATS => $jsonStats ?: '',
             MetaModel::RUNNING => $this->running ? 1 : 0,
+            MetaModel::START_TIME => $this->startTime ?: 0,
             MetaModel::LAST_SYNC_TIME => $this->stopTime ?: 0,
             MetaModel::ACTIVE_FOLDER => $this->activeFolder ?: '',
             MetaModel::ACTIVE_ACCOUNT => $this->activeAccount ?: ''
