@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `subject` varchar(270) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `message_id` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `in_reply_to` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `recv_str` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `recv_str` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `size` int(10) unsigned DEFAULT NULL,
   `message_no` int(10) unsigned DEFAULT NULL,
   `to` text COLLATE utf8mb4_unicode_ci,
