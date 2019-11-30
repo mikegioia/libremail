@@ -176,3 +176,18 @@ function contains($subject, $list)
 
     return false;
 }
+
+/**
+ * Cleans a subject line of extra characters.
+ */
+function cleanSubject(string $subject)
+{
+    $subject = trim(
+        preg_replace(
+            "/Re\:|re\:|RE\:|Fwd\:|fwd\:|FWD\:/i",
+            '',
+            $subject
+        ));
+
+    return trim($subject, '[]()');
+}

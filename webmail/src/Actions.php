@@ -8,12 +8,13 @@
 
 namespace App;
 
-use App\Model\Task as TaskModel;
 use App\Actions\Copy as CopyAction;
-use App\Actions\Flag as FlagAction;
 use App\Actions\Delete as DeleteAction;
+use App\Actions\Flag as FlagAction;
 use App\Actions\MarkRead as MarkReadAction;
 use App\Actions\MarkUnread as MarkUnreadAction;
+use App\Exceptions\NotFoundException;
+use App\Model\Task as TaskModel;
 
 class Actions
 {
@@ -146,6 +147,8 @@ class Actions
             // Copy and/or move any messages that were sent in
             $this->copyMessages($messageIds, $copyTo, $action);
             $this->moveMessages($messageIds, $moveTo, $folderId);
+        } catch (NotFoundException $e) {
+            // Ignore these
         } catch (Exception $e) {
             Model::getDb()->rollBack();
 
@@ -176,14 +179,15 @@ class Actions
         array $options = []
     ) {
         if (self::MARK_ALL_READ === $action) {
-            return (new MarkReadAction)->run($allMessageIds, $this->folders);
+            (new MarkReadAction)->run($allMessageIds, $this->folders);
         } elseif (self::MARK_ALL_UNREAD === $action) {
-            return (new MarkUnreadAction)->run($allMessageIds, $this->folders);
+            (new MarkUnreadAction)->run($allMessageIds, $this->folders);
         } elseif (self::FLAG === $action) {
-            return (new FlagAction)->run(
+            (new FlagAction)->run(
                 [end($allMessageIds)],
                 $this->folders,
-                $options);
+                $options
+            );
         } elseif (array_key_exists($action, self::ACTION_CLASSES)) {
             $class = self::ACTION_CLASSES[$action];
             $actionHandler = new $class;
