@@ -123,9 +123,13 @@ class Message
     public function merge(Message $message)
     {
         $this->ids = array_unique(
-            array_merge($this->ids, $message->ids));
+            array_merge($this->ids, $message->ids)
+        );
         $this->references = $this->references + $message->references;
-        $this->addresses = array_merge($this->addresses, $message->addresses);
+        $this->addresses = array_merge(
+            $this->addresses,
+            array_filter($message->addresses)
+        );
 
         // If any message in this thread is missing a thread ID, then
         // we want to update the whole collection
@@ -143,7 +147,11 @@ class Message
     {
         $this->references = [];
         $this->references[] = $this->messageId;
-        $replyTo = trim($message->in_reply_to);
+
+        // This sometimes contain's junk, and anything after
+        // a newline should be ignored
+        $replyToParts = explode("\n", trim($message->in_reply_to));
+        $replyTo = trim($replyToParts[0]);
 
         if ($replyTo) {
             $this->references[] = $replyTo;
@@ -166,13 +174,14 @@ class Message
 
     private function storeAddresses(MessageModel $message)
     {
-        $this->addresses = array_map(
-            'trim',
-            array_merge(
+        $this->addresses = array_filter(
+            array_map('trim', array_merge(
                 explode(',', $message->to),
                 explode(',', $message->cc),
                 explode(',', $message->bcc)
-            ));
+            ))
+        );
+
         $this->addresses[] = trim($message->from);
     }
 }

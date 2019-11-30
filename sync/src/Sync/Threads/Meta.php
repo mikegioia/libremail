@@ -65,11 +65,19 @@ class Meta
             ));
     }
 
+    /**
+     * Two messages are "close to" each other if their thread
+     * start and end dates are within a specified amount of time.
+     * This can be tweaked to the help the user experience of the
+     * threading system.
+     *
+     * @return bool
+     */
     public function isCloseTo(Meta $meta)
     {
         return $meta->start < $this->end
-            || $meta->end > $this->start
-            || $meta->start - $this->end < self::FIVE_DAYS
-            || $this->start - $meta->end < self::FIVE_DAYS;
+            || ($meta->end > $this->start && $meta->end < $this->end)
+            || abs($meta->start - $this->end) < self::FIVE_DAYS
+            || abs($this->start - $meta->end) < self::FIVE_DAYS;
     }
 }
