@@ -63,6 +63,7 @@ class Compose
             }
         } catch (Exception $e) {
             Model::getDb()->rollback();
+
             throw $e;
         }
     }
@@ -110,6 +111,7 @@ class Compose
                 );
             } catch (Exception $e) {
                 Model::getDb()->rollback();
+
                 throw $e;
             }
 
@@ -165,6 +167,7 @@ class Compose
             }
         } catch (Exception $e) {
             Model::getDb()->rollback();
+
             throw $e;
         }
     }
@@ -176,7 +179,7 @@ class Compose
         $cc = $parent->getReplyAllAddresses(false, $email, ['cc'], true);
 
         // Add "Re:" to the subject but only if there isn't one
-        $subject = strpos(trim($parent->subject), 're:') === 0
+        $subject = 0 === strpos(trim($parent->subject), 're:')
             ? $parent->subject
             : 'Re: '.$parent->subject;
 

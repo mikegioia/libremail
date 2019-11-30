@@ -178,7 +178,7 @@ class Message extends Model implements MessageInterface
                 $list,
                 function ($address) use ($ignoreAddress) {
                     if (trim($address, '<> ') === $ignoreAddress
-                        || strpos($address, '<'.$ignoreAddress.'>') !== false
+                        || false !== strpos($address, '<'.$ignoreAddress.'>')
                     ) {
                         return false;
                     } else {
@@ -582,9 +582,11 @@ class Message extends Model implements MessageInterface
 
         if (true === $options[self::SPLIT_FLAGGED]) {
             $flagged = $this->getThreads(
-                $meta->flaggedIds, $accountId, $limit, $offset, $options);
+                $meta->flaggedIds, $accountId, $limit, $offset, $options
+            );
             $unflagged = $this->getThreads(
-                $meta->unflaggedIds, $accountId, $limit, $offset, $options);
+                $meta->unflaggedIds, $accountId, $limit, $offset, $options
+            );
             $messages = array_merge($flagged, $unflagged);
         } elseif (true === $options[self::ONLY_FLAGGED]) {
             $messages = $this->getThreads(
@@ -773,7 +775,7 @@ class Message extends Model implements MessageInterface
 
                 $name = $this->getName($row->from);
 
-                $threads[$row->thread_id]->count += 1;
+                ++$threads[$row->thread_id]->count;
                 $threads[$row->thread_id]->id = $row->id;
                 $threads[$row->thread_id]->names[] = $name;
                 $threads[$row->thread_id]->seens[] = $row->seen;

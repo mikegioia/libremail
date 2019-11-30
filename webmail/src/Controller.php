@@ -344,7 +344,7 @@ class Controller
 
         $sendPreview = array_key_exists('send_preview', $_POST)
             && is_array(Url::postParam('send_preview'))
-            && count(Url::postParam('send_preview')) === 1;
+            && 1 === count(Url::postParam('send_preview'));
 
         // Quick reply-all can POST here
         if (true === $sendPreview) {

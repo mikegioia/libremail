@@ -148,6 +148,7 @@ class Actions
             $this->moveMessages($messageIds, $moveTo, $folderId);
         } catch (Exception $e) {
             Model::getDb()->rollBack();
+
             throw $e;
         }
 
