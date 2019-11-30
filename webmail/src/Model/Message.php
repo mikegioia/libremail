@@ -164,22 +164,28 @@ class Message extends Model implements MessageInterface
 
         foreach ($fields as $field) {
             if ($this->$field) {
-                $addresses = array_merge($addresses, explode(',', $this->$field));
+                $addresses = array_merge(
+                    $addresses,
+                    explode(',', $this->$field)
+                );
             }
         }
 
         $list = array_unique(array_filter(array_map('trim', $addresses)));
 
         if ($ignoreAddress) {
-            $list = array_filter($list, function ($address) use ($ignoreAddress) {
-                if (trim($address, '<> ') === $ignoreAddress
-                    || strpos($address, '<'.$ignoreAddress.'>') !== false
-                ) {
-                    return false;
-                } else {
-                    return true;
+            $list = array_filter(
+                $list,
+                function ($address) use ($ignoreAddress) {
+                    if (trim($address, '<> ') === $ignoreAddress
+                        || strpos($address, '<'.$ignoreAddress.'>') !== false
+                    ) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
-            });
+            );
         }
 
         if (! $list && false === $allowEmpty) {
