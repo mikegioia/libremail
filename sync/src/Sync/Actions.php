@@ -115,6 +115,7 @@ class Actions
             }
 
             $this->updateProgress($i + 1);
+            $this->emitter->emit(Sync::EVENT_CHECK_HALT);
         }
 
         $this->expungeFolders();
@@ -274,8 +275,6 @@ class Actions
                 $task->fail(self::ERR_FAIL_IMAP_SYNC);
             }
 
-            $this->emitter->emit(Sync::EVENT_CHECK_HALT);
-
             return false;
         }
 
@@ -341,7 +340,6 @@ class Actions
             }
 
             $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
-            $this->emitter->emit(Sync::EVENT_CHECK_HALT);
 
             return;
         }
@@ -371,7 +369,6 @@ class Actions
                 'Failed expunging folder {folder}: '.$e->getMessage()
             );
             $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
-            $this->emitter->emit(Sync::EVENT_CHECK_HALT);
         }
     }
 
