@@ -6,10 +6,10 @@ use DateTime;
 use App\Folders;
 use DateTimeZone;
 use DateInterval;
-use App\MessageInterface;
 use App\Model\Task as TaskModel;
-use App\Model\Outbox as OutboxModel;
+use App\Messages\MessageInterface;
 use App\Exceptions\ServerException;
+use App\Model\Outbox as OutboxModel;
 
 class Queue extends Delete
 {

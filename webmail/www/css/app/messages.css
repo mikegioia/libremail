@@ -279,8 +279,10 @@ input[type="checkbox"].msg-checkbox {
   width: 19rem;
 }
 
-.msg-contents .names span.red {
+.msg-contents .names span.red,
+.msg-contents .names var {
   color: #cc0000;
+  font-style: normal;
 }
 
 .msg-contents .subject {

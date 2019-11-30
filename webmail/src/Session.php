@@ -64,6 +64,19 @@ class Session
         $_SESSION[self::NOTIFICATIONS] = $notifications;
     }
 
+    public static function hasErrors()
+    {
+        $notifications = self::get(self::NOTIFICATIONS, [], false);
+
+        foreach ($notifications as $notification) {
+            if (self::ERROR === $notification['type']) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Stores a flag in the session.
      *

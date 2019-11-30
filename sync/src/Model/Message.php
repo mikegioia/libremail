@@ -204,9 +204,24 @@ class Message extends Model
         return new self($message ?: null);
     }
 
+    /**
+     * Returns a hash of the simplified subject line.
+     *
+     * @return string
+     */
     public function getSubjectHash()
     {
-        return self::makeSubjectHash($this->subject ?: '');
+        return md5(Fn\cleanSubject($this->subject ?: ''));
+    }
+
+    /**
+     * Returns a simplified subject line.
+     *
+     * @return string
+     */
+    public function getCleanSubject()
+    {
+        return Fn\cleanSubject($this->subject ?: '');
     }
 
     /**
@@ -1050,24 +1065,5 @@ class Message extends Model
                 $this->getError()
             );
         }
-    }
-
-    /**
-     * Creates a hash of the simplified subject line.
-     *
-     * @param string $subject
-     *
-     * @return string
-     */
-    private static function makeSubjectHash(string $subject)
-    {
-        $subject = trim(
-            preg_replace(
-                "/Re\:|re\:|RE\:|Fwd\:|fwd\:|FWD\:/i",
-                '',
-                $subject
-            ));
-
-        return md5(trim($subject, '[]()'));
     }
 }

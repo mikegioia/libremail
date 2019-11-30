@@ -315,6 +315,7 @@ class Thread
         $group = [];
         $this->threadIndex = [];
         $count = $this->messageCount;
+
         // Adds a group of collapsed messages to the index
         $closeGroup = function (array &$group) {
             if (count($group) > 0) {
@@ -327,6 +328,7 @@ class Thread
 
             $group = [];
         };
+
         // Adds an individual message
         $addItem = function (Message $message, bool $open, bool $current = false) {
             $this->threadIndex[] = (object) [

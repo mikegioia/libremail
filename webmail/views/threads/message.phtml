@@ -35,8 +35,8 @@
             <iframe src="<?php echo App\Url::make('/star/thread/%s/%s/%s.html', $view->meta(PREF_THEME, 'default'), $message->id, $message->flagged == 1 ? 'on' : 'off'); ?>" class="star"></iframe>
             <span class="actions">
                 <span class="button-group">
-                    <a href="#" class="button">
-                        <i class="fa fa-reply"></i>
+                    <a href="#reply-all-<?php echo $message->id; ?>" class="button" title="Reply all">
+                        <i class="fa fa-reply-all"></i>
                     </a><!--
                     --><span class="dropdown short inline-blocked">
                         <a href="#" class="button">
@@ -45,15 +45,15 @@
                         <ul class="right-menu size-medium">
                             <li>
                                 <i class="fa left-icon fa-reply"></i>
-                                <a href="#">Reply</a>
+                                <a href="<?php echo App\Url::make('/reply/%s', $message->id); ?>">Reply</a>
                             </li>
                             <li>
                                 <i class="fa left-icon fa-reply-all"></i>
-                                <a href="#">Reply all</a>
+                                <a href="<?php echo App\Url::make('/replyall/%s', $message->id); ?>">Reply all</a>
                             </li>
                             <li>
-                                <i class="fa left-icon fa-forward"></i>
-                                <a href="#">Forward</a>
+                                <i class="fa left-icon fa-share"></i>
+                                <a href="<?php echo App\Url::make('/forward/%s', $message->id); ?>">Forward</a>
                             </li>
                             <li>
                                 <i class="fa left-icon fa-external-link-alt"></i>
@@ -92,6 +92,41 @@
                 </span>
             </span>
         </label>
+    <?php
+    if ($outbox->exists()):
+        if ($outbox->isDraft()): ?>
+        <div class="draft-notice is-draft notifications">
+            <div class="notification warning">
+                This message is a draft, you can edit and send the message below.
+            </div>
+        </div>
+        <?php
+        elseif ($outbox->isScheduled()): ?>
+        <div class="draft-notice notifications">
+            <div class="notification info">
+                This message is scheduled for delivery at <?php echo $message->getDeliveryDate(); ?>.
+                <a href="<?php echo App\Url::preview($outbox->id); ?>">View outgoing message</a>.
+            </div>
+        </div>
+        <?php
+        endif;
+    endif;
+    if (! $outbox->exists() && ! $outbox->isDraft()): ?>
         <div class="message"><?php echo $message->body; ?></div>
+    <?php
+    endif; ?>
     </article>
+    <?php
+    if (true === ($last ?? false) || true === ($showReplyAll ?? false)):
+        $view->render('threads/reply-all', [
+            'view' => $view,
+            'outbox' => $outbox,
+            'account' => $account,
+            'message' => $message,
+            'visible' => true === ($showReplyAll ?? false),
+            'addresses' => $outbox->exists() && $outbox->getAddresses()
+                ? $outbox->getAddresses()
+                : $message->getReplyAllAddresses(false, $account->email)
+        ]);
+    endif; ?>
 </div>

@@ -83,6 +83,10 @@ body.theme-warmlight .thread-msg label.thread-msg-header .from span {
   color: #846b58;
 }
 
+body.theme-warmlight .thread-msg-row > .reply-all {
+  background-color: #fbf1e9;
+}
+
 /* Preview */
 body.theme-warmlight .compose .outbox-preview,
 body.theme-warmlight section#error > div {
@@ -138,7 +142,8 @@ body.theme-warmlight .dropdown li input[type="submit"] {
 
 /* Very light border */
 body.theme-warmlight nav #mailboxes-divider,
-body.theme-warmlight .compose .row:not(.message):not(.buttons) {
+body.theme-warmlight .compose .row:not(.message):not(.buttons),
+body.theme-warmlight .thread-msg-row > .reply-all {
   border-color: #e8d3c2;
 }
 

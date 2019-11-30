@@ -6,7 +6,8 @@ use PDO;
 use stdClass;
 use Exception;
 use App\Model;
-use App\MessageInterface;
+use App\Config;
+use App\Messages\MessageInterface;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ValidationException;
 use App\Exceptions\DatabaseInsertException;
@@ -51,9 +52,12 @@ class Message extends Model implements MessageInterface
     public $raw_headers;
     public $raw_content;
     public $uid_validity;
+
     // Computed properties
     public $thread_count;
 
+    // Lazy-loaded outbox message
+    private $outboxMessage;
     // Cache for threading info
     private $threadCache = [];
     // Cache for attachments
@@ -64,6 +68,7 @@ class Message extends Model implements MessageInterface
     const FLAG_FLAGGED = 'flagged';
     const FLAG_DELETED = 'deleted';
     // Options
+    const IS_DRAFTS = 'is_drafts';
     const ALL_SIBLINGS = 'all_siblings';
     const ONLY_FLAGGED = 'only_flagged';
     const ONLY_DELETED = 'only_deleted';
@@ -72,6 +77,7 @@ class Message extends Model implements MessageInterface
     const ONLY_FUTURE_SIBLINGS = 'only_future';
     // Default options
     const DEFAULTS = [
+        'is_drafts' => false,
         'only_future' => false,
         'all_siblings' => false,
         'only_flagged' => false,
@@ -139,23 +145,72 @@ class Message extends Model implements MessageInterface
         return $this->raw_headers."\r\n".$this->raw_content;
     }
 
+    /**
+     * @param bool $stringify If true, return string, otherwise array
+     * @param string $ignoreAddress If set, ignore this email in the response
+     * @param array $allowedFields Defaults to `from`, `to`, `cc`
+     *
+     * @return string|array
+     */
+    public function getReplyAllAddresses(
+        bool $stringify = true,
+        string $ignoreAddress = '',
+        array $allowedFields = [],
+        bool $allowEmpty = false
+    ) {
+        $addresses = [$this->from];
+        $fields = array_intersect(['from', 'to', 'cc'], $allowedFields);
+        $fields = $fields ?: ['from', 'to', 'cc'];
+
+        foreach ($fields as $field) {
+            if ($this->$field) {
+                $addresses = array_merge(
+                    $addresses,
+                    explode(',', $this->$field)
+                );
+            }
+        }
+
+        $list = array_unique(array_filter(array_map('trim', $addresses)));
+
+        if ($ignoreAddress) {
+            $list = array_filter(
+                $list,
+                function ($address) use ($ignoreAddress) {
+                    if (trim($address, '<> ') === $ignoreAddress
+                        || false !== strpos($address, '<'.$ignoreAddress.'>')
+                    ) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            );
+        }
+
+        if (! $list && false === $allowEmpty) {
+            $list = [$this->from];
+        }
+
+        return $stringify
+            ? implode(', ', $list)
+            : array_values($list);
+    }
+
     public function loadById()
     {
         if (! $this->id) {
             throw new NotFoundException;
         }
 
-        $message = $this->getById($this->id);
-
-        if ($message) {
-            $this->setData((array) $message);
-        }
-
-        return $this;
+        return $this->getById($this->id, false, true);
     }
 
-    public function getById(int $id, bool $throwExceptionOnNotFound = false)
-    {
+    public function getById(
+        int $id,
+        bool $throwExceptionOnNotFound = false,
+        bool $useSelf = false
+    ) {
         $message = $this->db()
             ->select()
             ->from('messages')
@@ -167,8 +222,14 @@ class Message extends Model implements MessageInterface
             throw new NotFoundException;
         }
 
+        if (true === $useSelf) {
+            $this->setData((array) $message);
+
+            return $this;
+        }
+
         return $message
-            ? new self($message)
+            ? new self((array) $message)
             : false;
     }
 
@@ -194,9 +255,20 @@ class Message extends Model implements MessageInterface
             ->where('outbox_id', '=', $outboxId)
             ->where('folder_id', '=', $folderId)
             ->execute()
-            ->fetchObject();
+            ->fetch();
 
         return new self($message ?: null);
+    }
+
+    public function getOutboxMessage()
+    {
+        if ($this->outboxMessage) {
+            return $this->outboxMessage;
+        }
+
+        $this->outboxMessage = (new Outbox)->getById($this->outbox_id ?: 0);
+
+        return $this->outboxMessage;
     }
 
     /**
@@ -509,13 +581,21 @@ class Message extends Model implements MessageInterface
         }
 
         if (true === $options[self::SPLIT_FLAGGED]) {
-            $flagged = $this->getThreads($meta->flaggedIds, $accountId, $limit, $offset);
-            $unflagged = $this->getThreads($meta->unflaggedIds, $accountId, $limit, $offset);
+            $flagged = $this->getThreads(
+                $meta->flaggedIds, $accountId, $limit, $offset, $options
+            );
+            $unflagged = $this->getThreads(
+                $meta->unflaggedIds, $accountId, $limit, $offset, $options
+            );
             $messages = array_merge($flagged, $unflagged);
         } elseif (true === $options[self::ONLY_FLAGGED]) {
-            $messages = $this->getThreads($meta->flaggedIds, $accountId, $limit, $offset);
+            $messages = $this->getThreads(
+                $meta->flaggedIds, $accountId, $limit, $offset, $options
+            );
         } else {
-            $messages = $this->getThreads($threadIds, $accountId, $limit, $offset);
+            $messages = $this->getThreads(
+                $threadIds, $accountId, $limit, $offset, $options
+            );
         }
 
         // Load all messages in these threads. We need to get the names
@@ -544,7 +624,8 @@ class Message extends Model implements MessageInterface
             $threadMessages,
             $messages,
             $skipFolderIds,
-            $onlyFolderIds
+            $onlyFolderIds,
+            $options[self::IS_DRAFTS] ?? false
         );
 
         return $messages ?: [];
@@ -558,8 +639,13 @@ class Message extends Model implements MessageInterface
      *
      * @return array Messages
      */
-    private function getThreads(array $threadIds, int $accountId, int $limit, int $offset)
-    {
+    private function getThreads(
+        array $threadIds,
+        int $accountId,
+        int $limit,
+        int $offset,
+        array $options = []
+    ) {
         if (! count($threadIds)) {
             return [];
         }
@@ -594,7 +680,7 @@ class Message extends Model implements MessageInterface
         );
 
         // Then, load the messages for each thread
-        return $this->db()
+        $qry = $this->db()
             ->select([
                 'id', '`to`', 'cc', '`from`', '`date`',
                 'seen', 'subject', 'flagged', 'thread_id',
@@ -602,10 +688,35 @@ class Message extends Model implements MessageInterface
                 'outbox_id'
             ])
             ->from('messages')
-            ->whereIn('id', $messageIds)
+            ->where('deleted', '=', 0)
+            ->where('account_id', '=', $accountId)
+            ->whereIn('thread_id', $threadIds)
             ->orderBy('date', Model::DESC)
-            ->execute()
-            ->fetchAll(PDO::FETCH_CLASS, get_class());
+            ->limit($limit, $offset);
+
+        if (false === ($options[self::IS_DRAFTS] ?? false)) {
+            return $qry
+                ->groupBy(['thread_id'])
+                ->execute()
+                ->fetchAll(PDO::FETCH_CLASS, get_class());
+        }
+
+        // In some cases we always want the newest message
+        // This is only used with the drafts folder currently
+        $flat = $qry->execute()->fetchAll(PDO::FETCH_CLASS, get_class());
+        $threads = [];
+        $found = [];
+
+        foreach ($flat as $message) {
+            if (isset($found[$message->thread_id])) {
+                continue;
+            }
+
+            $threads[] = $message;
+            $found[$message->thread_id] = true;
+        }
+
+        return $threads;
     }
 
     /**
@@ -619,13 +730,15 @@ class Message extends Model implements MessageInterface
         array $threadMessages,
         array $messages,
         array $skipFolderIds,
-        array $onlyFolderIds
+        array $onlyFolderIds,
+        bool $preferNewest = false
     ) {
         $threads = [];
         $messageIds = [];
 
         foreach ($threadMessages as $row) {
-            if (! isset($threads[$row->thread_id])) {
+            // Store the first message we find for the thread
+            if (! isset($threads[$row->thread_id]) || $preferNewest) {
                 $threads[$row->thread_id] = (object) [
                     'count' => 0,
                     'names' => [],
@@ -650,6 +763,7 @@ class Message extends Model implements MessageInterface
                 continue;
             }
 
+            // Update the list of folders in this thread
             $threads[$row->thread_id]->folders[$row->folder_id] = true;
 
             if ($row->message_id) {
@@ -660,11 +774,13 @@ class Message extends Model implements MessageInterface
                 }
 
                 $name = $this->getName($row->from);
+
                 ++$threads[$row->thread_id]->count;
                 $threads[$row->thread_id]->id = $row->id;
                 $threads[$row->thread_id]->names[] = $name;
                 $threads[$row->thread_id]->seens[] = $row->seen;
                 $threads[$row->thread_id]->date = $row->date_recv ?: $row->date;
+
                 $messageIds[$row->message_id] = true;
             }
         }
@@ -677,6 +793,7 @@ class Message extends Model implements MessageInterface
 
             if (isset($threads[$message->thread_id])) {
                 $found = $threads[$message->thread_id];
+
                 $message->id = $found->id;
                 $message->date = $found->date;
                 $message->names = $found->names;
@@ -784,7 +901,7 @@ class Message extends Model implements MessageInterface
             ->fetchObject();
     }
 
-    private function getName(string $from)
+    public function getName(string $from)
     {
         $from = trim($from);
         $pos = strpos($from, '<');
@@ -888,9 +1005,13 @@ class Message extends Model implements MessageInterface
      *
      * @param Outbox $outbox
      * @param int $draftsId Drafts mailbox (folder) ID
+     * @param Message $parent Message being replied to
      */
-    public function createOrUpdateDraft(Outbox $outbox, int $draftsId)
-    {
+    public function createOrUpdateDraft(
+        Outbox $outbox,
+        int $draftsId,
+        Message $parent = null
+    ) {
         // Only create the draft if the outbox message is a draft
         if (1 !== (int) $outbox->draft) {
             return;
@@ -922,6 +1043,17 @@ class Message extends Model implements MessageInterface
         $message->date = $utcDate->format(DATE_DATABASE);
         $message->date_str = $localDate->format(DATE_RFC822);
         $message->date_recv = $utcDate->format(DATE_DATABASE);
+
+        if ($parent) {
+            $message->thread_id = $parent->thread_id;
+            $message->in_reply_to = $parent->message_id;
+            $message->message_id = Config::newMessageId();
+            $message->references = $parent->references
+                ? $parent->references.', '.$parent->message_id
+                : $parent->message_id;
+
+            return $this->createOrUpdate($message, true, false);
+        }
 
         return $this->createOrUpdate($message);
     }

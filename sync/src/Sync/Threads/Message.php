@@ -14,6 +14,8 @@ class Message
     public $messageId;
     // Unix time for the message
     public $timestamp;
+    // Simplified subject line
+    public $subject;
     // Unique hash of the simplified subject line
     public $subjectHash;
     // Collection of to, cc, bcc, and from addresses
@@ -28,6 +30,7 @@ class Message
         $this->threadId = $message->thread_id;
         $this->timestamp = strtotime($message->date);
         $this->messageId = trim($message->message_id);
+        $this->subject = $message->getCleanSubject();
         $this->subjectHash = $message->getSubjectHash();
 
         if ($message->id) {

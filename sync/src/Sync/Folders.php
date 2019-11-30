@@ -98,6 +98,7 @@ class Folders
                 'account_id' => $account->getId(),
                 'ignored' => $this->getIgnored($folderName)
             ]);
+
             $folder->save();
             $folders[$folder->getId()] = $folder;
 

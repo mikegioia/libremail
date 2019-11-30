@@ -36,6 +36,10 @@ h5.thread-title mark a {
   text-decoration: none;
 }
 
+h5.thread-title mark a:hover {
+  color: inherit;
+}
+
 /* Collapsed messages */
 
 input[type="checkbox"].thread-msg-checkbox {
@@ -50,7 +54,7 @@ input[type="checkbox"].thread-msg-checkbox {
   display: block;
 }
 
-.thread-msg-row label {
+.thread-msg-row > label {
   box-sizing: border-box;
   cursor: pointer;
   display: block;
@@ -229,6 +233,14 @@ input[type="checkbox"].thread-msg-more-checkbox {
   white-space: normal;
 }
 
+.thread-msg .draft-notice {
+  padding: 0 0 0 4rem;
+}
+
+.thread-msg .draft-notice.is-draft {
+  margin-bottom: -3rem;
+}
+
 .thread-msg .actions {
   display: inline-block;
   padding-top: 0.125rem;
@@ -280,4 +292,71 @@ input[type="checkbox"].thread-msg-more-checkbox {
 .thread-msg .actions .button-group .dropdown li .left-icon {
   height: 2.875rem;
   line-height: 2.875rem;
+}
+
+/* Reply-all */
+
+.thread-msg-row > .reply-all {
+  background: #f7f7f7;
+  border: 1px solid #eee;
+  border-radius: 0.25rem;
+  display: none;
+  margin: 2rem 2rem 3rem 0;
+  padding: 1.5rem;
+}
+
+.thread-msg-row > .reply-all .button {
+  margin-bottom: 0;
+}
+
+.thread-msg-row > .reply-controls {
+  display: none;
+}
+
+.thread-msg-row:last-child > .reply-controls {
+  display: block;
+  padding: 2rem 0 3rem;
+}
+
+.thread-msg-row:last-child > .reply-controls .button:not(:last-child) {
+  margin-right: 0.75rem;
+}
+
+.thread-msg-row > .reply-all .row.padded {
+  border-bottom: none !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.thread-msg-row > .reply-all .ten.columns {
+  margin: 0 1% 0 3%;
+}
+
+.thread-msg-row > .reply-all span.address {
+  background: #b6e4f4;
+  border-radius: 0.25rem;
+  display: inline-block;
+  font-size: 90%;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.thread-msg-row > .reply-all span.address:not(:last-child) {
+  margin-right: 0.5rem;
+}
+
+.thread-msg-row > .reply-all textarea {
+  margin-bottom: 1rem;
+  min-height: 10rem;
+  resize: vertical;
+  width: 100%;
+}
+
+.thread-msg-row > .reply-all:target,
+.thread-msg-row > .reply-all.visible {
+  display: block;
+}
+
+.thread-msg-row > .reply-all:target + .reply-controls,
+.thread-msg-row > .reply-all.visible + .reply-controls {
+  display: none !important;
 }

@@ -40,6 +40,8 @@ class Threads
 
     const EVENT_MESSAGE_DIRTY = 'message_dirty';
 
+    const SUBJECT_SIMILARITY = 80;
+
     // Index of the most recent message known
     private $maxId;
     // Total IDs to fetch
@@ -233,6 +235,7 @@ class Threads
             $processed = [];
             $threadId = null;
             $message = $this->messages[$unthreadedId];
+
             $this->updateMessageThread($message, $refs, $processed, $threadId);
 
             if (0 === $count % self::BATCH_SIZE) {
@@ -254,14 +257,19 @@ class Threads
             // and store an index with information about each thread. This
             // index will be used for the final thread pass (subject line).
             foreach ($refs as $messageId => $index) {
-                $message = $this->messages[$messageId];
-                $message->setThreadId($threadId);
-                $threadMeta->addMessage($message);
+                $refMessage = $this->messages[$messageId];
+
+                // This should only be stored for messages that match
+                // on the subject line
+                if ($this->subjectIsSimilar($message, $refMessage)) {
+                    $refMessage->setThreadId($threadId);
+                    $threadMeta->addMessage($refMessage);
+                }
             }
 
             // Set the indexes with this thread meta info. Also build the
             // index arrays for the subject => thread ID lookup, and the
-            // the thread ID => thread meta lookup.
+            // the thread ID => thread meta lookup
             if ($threadMeta->exists()) {
                 $key = $threadMeta->getKey();
                 $hash = $threadMeta->subjectHash;
@@ -301,12 +309,15 @@ class Threads
 
         $refs = $message->addReferences($refs);
         $processed[$message->messageId] = true;
+
         $this->allProcessed[$message->messageId] = true;
 
         // For each reference, add it's references to our set
-        // and then recursively process it.
+        // and then recursively process it
         foreach ($message->references as $refId => $index) {
-            if (! isset($this->messages[$refId])) {
+            $exists = isset($this->messages[$refId]);
+
+            if (! $exists) {
                 $this->messages[$refId] = new ThreadMessage(
                     new MessageModel([
                         'id' => null,
@@ -318,12 +329,19 @@ class Threads
                 );
             }
 
-            $this->updateMessageThread(
-                $this->messages[$refId],
-                $refs,
-                $processed,
-                $threadId
-            );
+            // Only process references that have a similar subject
+            // This is to prevent from grouping messages that should
+            // really be separate threads
+            if (! $exists
+                || $this->subjectIsSimilar($message, $this->messages[$refId])
+            ) {
+                $this->updateMessageThread(
+                    $this->messages[$refId],
+                    $refs,
+                    $processed,
+                    $threadId
+                );
+            }
         }
     }
 
@@ -502,5 +520,16 @@ class Threads
             ', real usage: '.Fn\formatBytes(memory_get_usage(true)).
             ', peak usage: '.Fn\formatBytes(memory_get_peak_usage())
         );
+    }
+
+    private function subjectIsSimilar(ThreadMessage $base, ThreadMessage $ref)
+    {
+        similar_text(
+            strtolower($base->subject),
+            strtolower($ref->subject),
+            $percent
+        );
+
+        return $percent > self::SUBJECT_SIMILARITY;
     }
 }

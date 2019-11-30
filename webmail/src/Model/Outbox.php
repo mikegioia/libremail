@@ -7,7 +7,7 @@ use Parsedown;
 use App\View;
 use App\Model;
 use App\Session;
-use App\MessageInterface;
+use App\Messages\MessageInterface;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ValidationException;
 use App\Exceptions\DatabaseInsertException;
@@ -97,6 +97,10 @@ class Outbox extends Model implements MessageInterface
             $this->draft = 0;
         }
 
+        if (isset($data['thread_id'])) {
+            $this->thread_id = $data['thread_id'];
+        }
+
         return $this;
     }
 
@@ -124,6 +128,10 @@ class Outbox extends Model implements MessageInterface
 
     public function getById(int $id, bool $includeDeleted = false)
     {
+        if (! $id) {
+            return new self;
+        }
+
         $qry = $this->db()
             ->select()
             ->from('outbox')
@@ -260,6 +268,11 @@ class Outbox extends Model implements MessageInterface
             && ! $this->text_plain;
     }
 
+    public function isSent()
+    {
+        return 1 === (int) $this->sent;
+    }
+
     public function isDraft()
     {
         return 1 === (int) $this->draft;
@@ -272,6 +285,18 @@ class Outbox extends Model implements MessageInterface
 
         return ! $this->isDraft()
             && (! $this->send_after || $now >= $sendAfter);
+    }
+
+    public function isScheduled()
+    {
+        return ! $this->isSent()
+            && ! $this->isDraft()
+            && $this->send_after;
+    }
+
+    public function isReply()
+    {
+        return 0 !== (int) $this->parent_id;
     }
 
     public function exists()
@@ -343,6 +368,15 @@ class Outbox extends Model implements MessageInterface
         }
 
         return $sendAfter->format(View::DATE_SHORT);
+    }
+
+    public function getAddresses()
+    {
+        $this->convertAddresses();
+
+        return array_values(array_unique(
+            array_merge($this->to, $this->cc, $this->bcc)
+        ));
     }
 
     /**

@@ -39,6 +39,10 @@ form > section > .notifications .notification:first-of-type {
   background-color: #b1d8ff;
 }
 
+.notifications .notification.warning {
+  background-color: #ffcbb1;
+}
+
 .notifications .notification label {
   color: rgba(0, 0, 0, 0.33);
   cursor: pointer;

@@ -186,7 +186,8 @@ class Messages
         $unique = array_values(array_unique($message->names));
         $message->names = $messageNames->get(
             $message->names,
-            $message->seens
+            $message->seens,
+            $message->has_draft
         );
 
         if ($message->thread_count > 1) {
@@ -212,6 +213,10 @@ class Messages
      */
     private function setFolders(Message &$message, array $folders)
     {
+        $message->folder_ids = $message->folders;
+        $message->has_draft = in_array(
+            $this->folders->getDraftsId(),
+            $message->folders);
         $message->folders = array_intersect_key(
             $folders,
             array_flip($message->folders)
@@ -249,6 +254,7 @@ class Messages
         uasort($folders, function ($a, $b) {
             return $a->name <=> $b->name;
         });
+
         // and then put the mailboxes first
         uasort($folders, function ($a, $b) {
             return $b->is_mailbox <=> $a->is_mailbox;

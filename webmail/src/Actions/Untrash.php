@@ -4,7 +4,7 @@ namespace App\Actions;
 
 use App\Actions;
 use App\Folders;
-use App\MessageInterface;
+use App\Messages\MessageInterface;
 use App\Exceptions\ServerException;
 
 class Untrash extends Delete

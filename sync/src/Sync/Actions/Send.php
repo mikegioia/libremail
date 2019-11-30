@@ -202,4 +202,16 @@ class Send extends Base
         $contentTypeHeader = $message->getHeaders()->get('Content-Type');
         $contentTypeHeader->setType(self::MULTIPART_ALTERNATIVE);
     }
+
+    /**
+     * Adds the References and In-Reply-To headers for responding to
+     * another message within a thread.
+     */
+    private function addReplyHeaders(MessageModel $parent)
+    {
+        $referencesHeader = $message->getHeaders()->get('References');
+        $inReplyToHeader = $message->getHeaders()->get('In-Reply-To');
+
+        // @todo
+    }
 }
