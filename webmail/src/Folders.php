@@ -402,7 +402,9 @@ class Folders
         $parentOffset = count($this->folderTree);
 
         foreach ($this->folderTree as $branch) {
-            $this->updateTreePositions($branch, $index, $offset, $parentOffset);
+            $this->updateTreePositions(
+                $branch, $index, $offset, $parentOffset
+            );
         }
     }
 
@@ -411,8 +413,12 @@ class Folders
      *
      * @return array
      */
-    private function treeify(array &$tree, array $parts, Folder $folder, int $depth)
-    {
+    private function treeify(
+        array &$tree,
+        array $parts,
+        Folder $folder,
+        int $depth
+    ) {
         $part = array_shift($parts);
 
         if (! isset($tree[$part])) {
@@ -446,18 +452,20 @@ class Folders
         int $offset,
         int $parentOffset
     ) {
-        if ($branch['folder']->is_mailbox) {
-            return;
+        if (isset($branch['folder'])) {
+            if ($branch['folder']->is_mailbox) {
+                return;
+            }
+
+            ++$index;
+            $this->index[$branch['folder']->id] = (object) [
+                'pos' => $index,
+                'offset' => $offset,
+                'depth' => $branch['depth']
+            ];
         }
 
-        ++$index;
         $childIndex = 0;
-        $this->index[$branch['folder']->id] = (object) [
-            'pos' => $index,
-            'offset' => $offset,
-            'depth' => $branch['depth']
-        ];
-
         $offset = $parentOffset;
         $parentOffset = count($branch['children']);
 
@@ -481,11 +489,13 @@ class Folders
         $folder->name = str_replace(
             array_keys($this->convert),
             array_values($this->convert),
-            $folder->name);
+            $folder->name
+        );
         $folder->full_name = str_replace(
             array_keys($this->convert),
             array_values($this->convert),
-            $folder->full_name);
+            $folder->full_name
+        );
 
         // Shortened label for display in the inbox
         $parts = explode('/', $folder->full_name);

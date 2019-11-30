@@ -15,6 +15,7 @@ class Folder extends Model
     public $ignored;
     public $account_id;
     public $created_at;
+    public $uid_validity;
 
     /**
      * Returns a list of folders by an account ID. This is useful for

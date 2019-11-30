@@ -54,6 +54,7 @@ class Message extends Model
     public $attachments;
     public $raw_headers;
     public $raw_content;
+    public $uid_validity;
 
     private $unserializedAttachments;
 
@@ -105,7 +106,8 @@ class Message extends Model
             'in_reply_to' => $this->in_reply_to,
             'attachments' => $this->attachments,
             'raw_headers' => $this->raw_headers,
-            'raw_content' => $this->raw_content
+            'raw_content' => $this->raw_content,
+            'uid_validity' => $this->uid_validity
         ];
     }
 
@@ -233,6 +235,7 @@ class Message extends Model
             ->from('messages')
             ->where('id', '>=', $minId)
             ->where('id', '<=', $maxId)
+            ->where('deleted', '=', 0)
             ->where('account_id', '=', $accountId)
             ->limit($limit)
             ->execute()
@@ -252,6 +255,7 @@ class Message extends Model
             ->select(['max(id) as max'])
             ->from('messages')
             ->where('account_id', '=', $accountId)
+            ->where('deleted', '=', 0)
             ->execute()
             ->fetch();
 
@@ -271,6 +275,7 @@ class Message extends Model
             ->select(['min(id) as min'])
             ->from('messages')
             ->where('account_id', '=', $accountId)
+            ->where('deleted', '=', 0)
             ->execute()
             ->fetch();
 
@@ -323,6 +328,7 @@ class Message extends Model
             ->count(1, 'count')
             ->from('messages')
             ->where('account_id', '=', $accountId)
+            ->where('deleted', '=', 0)
             ->execute()
             ->fetch();
 
@@ -703,6 +709,33 @@ class Message extends Model
             ->where('folder_id', '=', $folderId)
             ->where('account_id', '=', $accountId)
             ->whereIn('unique_id', $uniqueIds)
+            ->execute();
+
+        $this->errorHandle($updated);
+    }
+
+    /**
+     * Marks an entire folder as deleted, and optionally for purge too.
+     *
+     * @param int $accountId
+     * @param int $folderId
+     * @param bool $purge If true, will also set purge=1
+     *
+     * @throws DatabaseUpdateException
+     */
+    public function markFolderDeleted(int $accountId, int $folderId, bool $purge = true)
+    {
+        $changes = ['deleted' => 1];
+
+        if (true === $purge) {
+            $changes['purge'] = 1;
+        }
+
+        $updated = $this->db()
+            ->update($changes)
+            ->table('messages')
+            ->where('folder_id', '=', $folderId)
+            ->where('account_id', '=', $accountId)
             ->execute();
 
         $this->errorHandle($updated);

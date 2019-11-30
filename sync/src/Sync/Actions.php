@@ -58,6 +58,7 @@ class Actions
         TaskModel::TYPE_UNREAD => 'App\Sync\Actions\Unread'
     ];
 
+    const ERR_FAIL_DELETE_NOT_FOUND = 'Failed get message num for delete';
     const ERR_FAIL_IMAP_SYNC = 'Failed IMAP sync';
     const ERR_NO_IMAP_MESSAGE = 'No message found in IMAP mailbox';
     const ERR_NO_SQL_FOLDER = 'No folder found in SQL';
@@ -265,12 +266,15 @@ class Actions
 
             $this->log->warning(
                 "Failed syncing IMAP action for task {$task->id}: ".
-                $e->getMessage());
+                $e->getMessage()
+            );
             $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
 
             if (! $task->isFailed()) {
                 $task->fail(self::ERR_FAIL_IMAP_SYNC);
             }
+
+            $this->emitter->emit(Sync::EVENT_CHECK_HALT);
 
             return false;
         }
@@ -326,12 +330,20 @@ class Actions
             $msgNo = $this->mailbox->getNumberByUniqueId($message->unique_id);
             $imapMessage = $this->mailbox->getMessage($msgNo);
         } catch (Exception $e) {
-            $this->log->warning(
-                "Failed downloading message for task {$task->id}: ".
-                $e->getMessage());
-            $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
+            if ($this->deleteNotFoundExcetion($e, $task)) {
+                $task->fail(self::ERR_FAIL_DELETE_NOT_FOUND, $e);
+            } else {
+                $this->log->warning(
+                    "Failed downloading message for task {$task->id}: ".
+                    $e->getMessage()
+                );
+                $task->fail(self::ERR_NO_IMAP_MESSAGE, $e);
+            }
 
-            return $task->fail(self::ERR_NO_IMAP_MESSAGE, $e);
+            $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
+            $this->emitter->emit(Sync::EVENT_CHECK_HALT);
+
+            return;
         }
 
         return true;
@@ -356,8 +368,10 @@ class Actions
             }
         } catch (Exception $e) {
             $this->log->warning(
-                'Failed expunging folder {folder}: '.$e->getMessage());
+                'Failed expunging folder {folder}: '.$e->getMessage()
+            );
             $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
+            $this->emitter->emit(Sync::EVENT_CHECK_HALT);
         }
     }
 
@@ -375,5 +389,24 @@ class Actions
         if ($this->progress) {
             $this->progress->current($count);
         }
+    }
+
+    /**
+     * Certain exceptions are being ignored for the time being.
+     * Deleting messages appears to throw "message not found"
+     * for delete operations. Perhaps Libremail is too aggressive
+     * with how we're deleting messages, or perhaps the mail
+     * server is deleting all copies when one is deleted. Maybe
+     * it's something else entirely.
+     */
+    private function deleteNotFoundExcetion(Exception $e, TaskModel $task)
+    {
+        if (TaskModel::TYPE_DELETE === $task->type
+            && 'unique id not found' === trim($e->getMessage())
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -62,7 +62,8 @@ CREATE TABLE IF NOT EXISTS `folders` (
   `account_id` int(10) unsigned NULL,
   `name` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `count` int(10) unsigned DEFAULT '0',
-  `synced` int(10) unsigned DEFAULT '0',
+  `synced` int(10) unsigned DEFAULT '0'
+  `uid_validity` int(10) unsigned DEFAULT '0',
   `deleted` tinyint(1) unsigned DEFAULT '0',
   `ignored` tinyint(1) unsigned DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -77,6 +78,8 @@ CREATE TABLE IF NOT EXISTS `folders` (
    example, this would be 'Accounts/Listserv/LibreMail' instead of 'LibreMail'.
 - `count` Total number of messages in the folder.
 - `synced` Number of messages that have been downloaded for this folder.
+- `uid_validity` The UIDVALIDITY flag on the IMAP folder. This is used with
+   the message's unique ID to uniquely identify a message across sessions.
 - `deleted` Boolean flag denoting if the folder was deleted on the IMAP server.
    Deleted folders should not be synced.
 - `ignored` Boolean flag denoting if the folder should be ignored from sycning
@@ -94,6 +97,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `unique_id` int(10) unsigned DEFAULT NULL,
   `thread_id` int(10) unsigned DEFAULT NULL,
   `outbox_id` int(10) unsigned DEFAULT NULL,
+  `uid_validity` int(10) unsigned DEFAULT NULL,
   `date_str` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `charset` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `subject` varchar(270) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -154,6 +158,11 @@ CREATE TABLE IF NOT EXISTS `messages` (
 - `outbox_id` Foreign key referencing the message in the `outbox` table.
   This is usually a draft message in the drafts mailbox and `outbox_id` is the
   link between the two.
+- `uid_validity` The UIDVALIDITY flag on the IMAP folder at the time this
+   message was downloaded. This is used with the unique ID to uniquely identify
+   the message across sessions. When the UIDVALIDITY changes, this message
+   should be marked `deleted=1` and `purge=1` to remove it entirely, so that
+   it can be cleanly re-downloaded.
 - `date_str` The date string as stored in the mail header. This can take
   many different formats and sometimes not even be a valid date string. It
   should be stored here regardless. The `date` field is a cleansed version of
@@ -196,7 +205,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
 - `draft` Boolean value, 1 if the `\Draft` flag exists on the message.
 - `recent` Boolean value, 1 if the `\Recent` flag exists on the message.
 - `flagged` Boolean value, 1 if the `\Flagged` flag exists on the message.
-- `deleted` Boolean value denoting if the message was deleted on the server.
+- `deleted` Boolean value, 1 if the message was deleted on the server.
 - `answered` Boolean value, 1 if the `\Answered` flag exists on the message.
 - `synced` Boolean value denoting if the message has been synced with the IMAP
   server. This is a placeholder for now but if the syncing process was multi-

@@ -25,6 +25,7 @@ class Folder extends Model
     public $ignored;
     public $account_id;
     public $created_at;
+    public $uid_validity;
 
     const DRAFTS = [
         '[Gmail]/Drafts',
@@ -44,7 +45,8 @@ class Folder extends Model
             'deleted' => $this->deleted,
             'ignored' => $this->ignored,
             'account_id' => $this->account_id,
-            'created_at' => $this->created_at
+            'created_at' => $this->created_at,
+            'uid_validity' => $this->uid_validity
         ];
     }
 
@@ -70,6 +72,11 @@ class Folder extends Model
     public function getAccountId()
     {
         return (int) $this->account_id;
+    }
+
+    public function getUidValidity()
+    {
+        return (int) $this->uid_validity;
     }
 
     public function isIgnored()
@@ -140,6 +147,7 @@ class Folder extends Model
         $val->optional('synced', 'Synced count')->numeric();
         $val->required('account_id', 'Account ID')->numeric();
         $val->required('name', 'Name')->lengthBetween(0, 255);
+        $val->optional('uid_validity', 'UID validity')->numeric();
 
         $this->setData($data);
 
@@ -163,18 +171,19 @@ class Folder extends Model
             ->execute()
             ->fetchObject();
 
+        // In all cases, unset deleted flag
+        $data['deleted'] = 0;
         // If it exists, unset deleted
         if ($exists) {
             $this->deleted = 0;
             $this->id = $exists->id;
             $this->ignored = $exists->ignored;
 
+            $data['count'] = $this->getCount();
+            $data['synced'] = $this->getSynced();
+
             $updated = $this->db()
-                ->update([
-                    'deleted' => 0,
-                    'count' => $this->getCount(),
-                    'synced' => $this->getSynced()
-                ])
+                ->update($data)
                 ->table('folders')
                 ->where('id', '=', $this->id)
                 ->execute();
@@ -186,12 +195,10 @@ class Folder extends Model
             return;
         }
 
-        $createdAt = new DateTime;
-
         unset($data['id']);
 
-        $data['deleted'] = 0;
-        $data['created_at'] = $createdAt->format(DATE_DATABASE);
+        $data['created_at'] = (new DateTime)->format(DATE_DATABASE);
+
         $newFolderId = $this->db()
             ->insert(array_keys($data))
             ->into('folders')
@@ -236,6 +243,20 @@ class Folder extends Model
     {
         $this->count = $count;
         $this->synced = $synced;
+
+        return $this->save();
+    }
+
+    /**
+     * Updates a new UID validity flag on the folder.
+     *
+     * @param int $uidValidity
+     *
+     * @return bool
+     */
+    public function saveUidValidity(int $uidValidity)
+    {
+        $this->uid_validity = $uidValidity;
 
         return $this->save();
     }
