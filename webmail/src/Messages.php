@@ -42,12 +42,14 @@ class Messages
             ($page - 1) * $limit,
             $this->folders->getSkipIds($folderId),
             $this->folders->getRestrictIds($folderId),
-            $options);
+            $options
+        );
         $messageCounts = $messageModel->getThreadCountsByFolder(
             $this->accountId,
             $folderId,
             $this->folders->getSkipIds($folderId),
-            $this->folders->getRestrictIds($folderId));
+            $this->folders->getRestrictIds($folderId)
+        );
 
         return $this->loadThreads(
             $messages,

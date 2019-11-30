@@ -51,6 +51,7 @@ class Message extends Model implements MessageInterface
     public $attachments;
     public $raw_headers;
     public $raw_content;
+    public $uid_validity;
 
     // Computed properties
     public $thread_count;
@@ -123,7 +124,8 @@ class Message extends Model implements MessageInterface
             'in_reply_to' => $this->in_reply_to,
             'attachments' => $this->attachments,
             'raw_headers' => $this->raw_headers,
-            'raw_content' => $this->raw_content
+            'raw_content' => $this->raw_content,
+            'uid_validity' => $this->uid_validity
         ];
     }
 
@@ -580,10 +582,12 @@ class Message extends Model implements MessageInterface
             $messages = array_merge($flagged, $unflagged);
         } elseif (true === $options[self::ONLY_FLAGGED]) {
             $messages = $this->getThreads(
-                $meta->flaggedIds, $accountId, $limit, $offset, $options);
+                $meta->flaggedIds, $accountId, $limit, $offset, $options
+            );
         } else {
             $messages = $this->getThreads(
-                $threadIds, $accountId, $limit, $offset, $options);
+                $threadIds, $accountId, $limit, $offset, $options
+            );
         }
 
         // Load all messages in these threads. We need to get the names
@@ -620,7 +624,10 @@ class Message extends Model implements MessageInterface
     }
 
     /**
-     * Load the messages for threading.
+     * Load the messages for threading. The limit and offset need to
+     * be applied after the threads are loaded. This is because we need
+     * to load all messages before figuring out the date sorting, and
+     * subsequent slicing of the array into the page.
      *
      * @return array Messages
      */
@@ -635,8 +642,36 @@ class Message extends Model implements MessageInterface
             return [];
         }
 
-        $found = [];
-        $threads = [];
+        // First load the message IDs for the given threads
+        $threadDates = $this->db()
+            ->select(['thread_id', 'max(date) as max_date'])
+            ->from('messages')
+            ->where('deleted', '=', 0)
+            ->where('account_id', '=', $accountId)
+            ->whereIn('thread_id', $threadIds)
+            ->orderBy('date', Model::DESC)
+            ->groupBy(['thread_id'])
+            ->execute()
+            ->fetchAll();
+
+        if (! $threadDates || ! count($threadDates)) {
+            return [];
+        }
+
+        // Order the set by max_date and take the slice
+        usort($threadDates, function (array $a, array $b) {
+            return $b['max_date'] <=> $a['max_date'];
+        });
+
+        // Take the slice of this list before querying
+        // for the large payload of data below
+        $messageIds = array_slice(
+            array_column($threadDates, 'thread_id'),
+            $offset,
+            $limit
+        );
+
+        // Then, load the messages for each thread
         $qry = $this->db()
             ->select([
                 'id', '`to`', 'cc', '`from`', '`date`',
@@ -661,6 +696,8 @@ class Message extends Model implements MessageInterface
         // In some cases we always want the newest message
         // This is only used with the drafts folder currently
         $flat = $qry->execute()->fetchAll(PDO::FETCH_CLASS, get_class());
+        $threads = [];
+        $found = [];
 
         foreach ($flat as $message) {
             if (isset($found[$message->thread_id])) {

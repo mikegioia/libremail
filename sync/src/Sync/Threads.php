@@ -162,7 +162,8 @@ class Threads
 
         $this->log->debug(
             "Threading: storing {$total} messages for threading for ".
-            "{$this->account->email}");
+            "{$this->account->email}"
+        );
         $this->printMemory();
         $this->startProgress(1, $total);
 
@@ -222,7 +223,8 @@ class Threads
 
         $this->log->debug(
             "Threading Pass 2: updating {$total} {$noun} for ".
-            "{$this->account->email}");
+            "{$this->account->email}"
+        );
         $this->printMemory();
 
         foreach ($this->unthreaded as $unthreadedId) {
@@ -312,7 +314,8 @@ class Threads
                         'thread_id' => null,
                         'in_reply_to' => '',
                         'message_id' => $refId
-                    ]));
+                    ])
+                );
             }
 
             $this->updateMessageThread(
@@ -332,13 +335,15 @@ class Threads
     {
         $this->log->debug(
             'Threading Pass 3: combining threads by subject for '.
-            "{$this->account->email}");
+            "{$this->account->email}"
+        );
         $this->printMemory();
 
         foreach ($this->subjectHashes as $hash => $threads) {
-            $master = null;
             // Sort the thread keys (dates) oldest to newest
             ksort($threads);
+
+            $master = null;
 
             foreach ($threads as $threadId) {
                 if (is_null($master)) {
@@ -383,7 +388,9 @@ class Threads
         $total = count($this->messages);
 
         $this->log->debug(
-            "Threading: saving new thread IDs for {$this->account->email}");
+            'Threading: saving new thread IDs for '.
+            $this->account->email
+        );
         $this->printMemory();
         $this->startProgress(4, $total);
 

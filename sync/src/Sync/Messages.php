@@ -66,15 +66,36 @@ class Messages
      *
      * @param AccountModel $account
      * @param FolderModel $folder
+     * @param array $selectStats Response from selecting IMAP folder
      * @param array $options (see syncMessages)
      */
-    public function run(AccountModel $account, FolderModel $folder, array $options)
-    {
+    public function run(
+        AccountModel $account,
+        FolderModel $folder,
+        array $selectStats,
+        array $options
+    ) {
+        $uidValidity = (int) ($selectStats['uidvalidity'] ?? 0);
+        $savedIds = [];
+
+        if ($uidValidity === $folder->getUidValidity()) {
+            $savedIds = (new MessageModel)->getSyncedIdsByFolder(
+                $account->getId(),
+                $folder->getId()
+            );
+        } else {
+            // If the UIDVALIDITY value on the folder is different
+            // from the one we have stored, then mark all messages
+            // for this folder as deleted and to be purged on the
+            // next sync. This is because the unique IDs osn the
+            // messages can no longer be trusted. We need to re-sync
+            // the entire folder.
+            $this->log->notice("UID validity changed in {$folder->name}!");
+            $folder->saveUidValidity($uidValidity);
+            $this->markDeletedAndPurged($folder);
+        }
+
         $newIds = $this->mailbox->getUniqueIds();
-        $savedIds = (new MessageModel)->getSyncedIdsByFolder(
-            $account->getId(),
-            $folder->getId()
-        );
 
         $this->updateMessageNumbers($newIds, $savedIds, $folder);
         $this->downloadMessages($newIds, $savedIds, $folder, $options);
@@ -185,6 +206,7 @@ class Messages
                 'synced' => 1,
                 'folder_id' => $folder->getId(),
                 'account_id' => $folder->getAccountId(),
+                'uid_validity' => $folder->getUidValidity()
             ]);
             // We interpret any message received as valid, regardless
             // of the \Deleted flag. If the message's UID no longer
@@ -264,6 +286,38 @@ class Messages
         } catch (ValidationException $e) {
             $this->log->notice(
                 'Failed validation for marking deleted messages: '.
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * When the UID validity flag changes for a folder, we need
+     * to resync all of the messages in that folder. This deletes
+     * everything for the resync to work.
+     *
+     * @param FolderModel $folder
+     */
+    private function markDeletedAndPurged(FolderModel $folder)
+    {
+        $this->log->info(
+            "Marking entire folder {$folder->name} for deletion."
+        );
+
+        try {
+            (new MessageModel)->markFolderDeleted(
+                $folder->getAccountId(),
+                $folder->getId(),
+                true
+            );
+        } catch (PDOException $e) {
+            $this->log->notice(
+                "Failed deleting all messages in {$folder->name}: ".
+                $e->getMessage()
+            );
+        } catch (ValidationException $e) {
+            $this->log->notice(
+                'Failed validation for deleting all messages: '.
                 $e->getMessage()
             );
         }

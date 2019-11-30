@@ -659,7 +659,8 @@ class Sync
                 "The account '{$account->email}' has exceeded the max ".
                 "amount of retries ({$this->maxRetries}) after trying ".
                 "to sync the folder '{$folder->name}'. Skipping to the ".
-                'next folder.');
+                'next folder.'
+            );
 
             throw new MessagesSyncException($folder->name);
         }
@@ -669,7 +670,8 @@ class Sync
         $this->log->debug(
             'Memory usage: '.Fn\formatBytes(memory_get_usage()).
             ', real usage: '.Fn\formatBytes(memory_get_usage(true)).
-            ', peak usage: '.Fn\formatBytes(memory_get_peak_usage()));
+            ', peak usage: '.Fn\formatBytes(memory_get_peak_usage())
+        );
 
         // Syncing a folder of messages is done using the following
         // algorithm:
@@ -689,8 +691,8 @@ class Sync
                 ]);
             // Select the folder's mailbox, this is sent to the
             // messages sync library to perform operations on
-            $this->mailbox->select($folder->name);
-            $messageSync->run($account, $folder, $options);
+            $selectStats = $this->mailbox->select($folder->name);
+            $messageSync->run($account, $folder, $selectStats, $options);
             $this->checkForHalt();
         } catch (PDOException $e) {
             throw $e;

@@ -4576,6 +4576,10 @@ section#main > h5 {
   padding-bottom: 0.3rem;
 }
 
+section#main > h5.w-notification {
+  margin-bottom: 1.5rem;
+}
+
 section#main > h5 a {
   float: right;
   font-size: 1.5rem;
@@ -4590,8 +4594,28 @@ section#main > h5 + .help-text {
 }
 
 /* Margin with notifications */
-section#main > #notifications {
+section#main > .notifications {
   margin-top: 1.5rem;
+}
+
+/* Error page */
+section#error {
+  margin: 0 auto;
+  max-width: 50rem;
+  min-width: 40rem;
+  padding: 10rem 0 0;
+}
+
+section#error > div {
+  background-color: #f7f7f7;
+  box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.1);
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+section#error > div > p {
+  font-size: 1.75rem;
+  margin: 0;
+  padding: 0;
 }
 
 a {
@@ -4683,12 +4707,17 @@ aside a {
   font-weight: 600;
 }
 
-/* Z-Index layers */
+/* Z-index layers */
 .top-layer {
   height: 5rem;
   padding-top: 0.75rem;
   position: relative;
   z-index: 30;
+}
+
+/* Padding helpers */
+.pb-0 {
+  padding-bottom: 0 !important;
 }
 
 /**
@@ -4988,6 +5017,11 @@ nav li.w-unread {
   font-weight: bold;
 }
 
+nav > .alert {
+  font-size: 1.25rem;
+  padding: 1rem 1.25rem;
+  margin-right: 3.5rem;
+}
 /**
  * Actions Menu
  * This is the menu above the mailboxes that allows for interactivity
@@ -5267,15 +5301,15 @@ input[type="button"].button-primary:focus {
 }
 
 .button.button-danger {
-  background: #ff524e;
-  border-color: #ff524e;
+  background: #e03d39;
+  border-color: #e03d39;
   font-weight: 400;
 }
 
 .button.button-danger:hover,
 .button.button-danger:focus {
-  background-color: #d43633;
-  border-color: #d43633;
+  background-color: #b92c28; /* #d43633; */
+  border-color: #b92c28;
   color: #fff;
 }
 
@@ -5384,7 +5418,7 @@ input[type="button"].button-primary:focus {
 }
 
 .alerts .alert {
-  animation: slideUpDown 8s 0s ease forwards;
+  animation: slideUpDown 15s 0s ease forwards;
   background-color: #333;
   border-radius: 0.375rem;
   bottom: 2rem;
@@ -5446,8 +5480,8 @@ input[type="button"].button-primary:focus {
   100% {
     transform: translateY(7rem);
   }
-  5%,
-  95% {
+  3%,
+  97% {
     transform: translateY(0);
   }
 }
@@ -5516,15 +5550,19 @@ input[type="button"].button-primary:focus {
  * These messages appear at the top of the page.
 */
 
-#notifications {
+.notifications {
   padding-right: 2rem;
 }
 
-#notifications input[type="checkbox"] {
+.notifications input[type="checkbox"] {
   display: none;
 }
 
-#notifications .notification {
+form > section > .notifications {
+  padding-right: 1rem;
+}
+
+.notifications .notification {
   border-radius: 0.375rem;
   font-weight: 400;
   margin: 0.25rem 0 1rem;
@@ -5532,15 +5570,23 @@ input[type="button"].button-primary:focus {
   position: relative;
 }
 
-#notifications .notification.success {
+form > section > .notifications .notification:first-of-type {
+  margin-top: 1.5rem;
+}
+
+.notifications .notification.success {
   background-color: #b7e1ae;
 }
 
-#notifications .notification.error {
+.notifications .notification.error {
   background-color: #fcc;
 }
 
-#notifications .notification label {
+.notifications .notification.info {
+  background-color: #b1d8ff;
+}
+
+.notifications .notification label {
   color: rgba(0, 0, 0, 0.33);
   cursor: pointer;
   font-size: 2rem;
@@ -5549,12 +5595,26 @@ input[type="button"].button-primary:focus {
   top: 0.5625rem;
 }
 
-#notifications .notification label:hover {
+.notifications .notification label:hover {
   color: rgba(0, 0, 0, 0.66);
 }
 
-#notifications input[type="checkbox"]:checked+.notification {
+.notifications input[type="checkbox"]:checked + .notification {
   display: none;
+}
+
+.notifications .notification-actions {
+  margin-top: 1rem;
+}
+
+.notifications .notification-actions .button {
+  margin-bottom: 0.25rem;
+}
+
+.notifications .notification-actions span {
+  color: rgba(0, 0, 0, 0.66);
+  font-size: 90%;
+  margin-left: 1rem;
 }
 /**
  * Dropdowns
@@ -5662,6 +5722,10 @@ input[type="button"].button-primary:focus {
   margin-top: 0.25rem;
   padding: 0.66rem 1rem;
   font-size: 1.2rem;
+}
+
+.dropdown li.notice:first-child {
+  border-top: none !important;
 }
 
 .dropdown li .left-icon {
@@ -5935,6 +5999,16 @@ input[type="checkbox"].msg-checkbox {
   padding-right: 0.2rem;
   text-align: center;
   width: 3rem;
+}
+
+.msg-contents .queued-for-delivery {
+  color: #ab51c4;
+  float: left;
+  height: 3rem;
+  line-height: 3rem;
+  padding-right: 0.2rem;
+  text-align: center;
+  width: 2.5rem;
 }
 
 .msg-contents .names {
@@ -6307,7 +6381,11 @@ section.compose {
   margin: 0 2rem 2.5rem 0;
 }
 
-.compose .row:not(.message) {
+.compose .notifications {
+  margin-bottom: 1.5rem;
+}
+
+.compose .row:not(.message):not(.buttons) {
   border-bottom: 1px solid #eee;
   margin-bottom: 0.75rem;
 }
@@ -6405,6 +6483,10 @@ blank address input between two valid inputs.
   top: 0;
 }
 
+.compose .addresses.from .show-hidden-addresses label a {
+  text-decoration: underline;
+}
+
 .compose .addresses.from .show-hidden-addresses label + label {
   margin-left: 0.5rem;
 }
@@ -6451,19 +6533,35 @@ blank address input between two valid inputs.
   margin-left: calc(13.333% + 2rem);
 }
 
-.compose .buttons a,
+.compose .buttons a:not(.button),
 .compose .buttons span {
   display: inline-block;
   transform: translateY(-0.125rem);
 }
 
-.compose .buttons button {
+.compose .buttons button,
+.compose .buttons a.button {
+  letter-spacing: 0;
   margin-right: 0.25rem;
+}
+
+.compose .buttons a.button {
+  border: none;
+  position: relative;
+  top: -0.125rem;
 }
 
 .compose .buttons span {
   color: #aaa;
   margin: 0 0.25rem;
+}
+
+.compose input[type="datetime-local"] {
+  border: 1px solid #d1d1d1;
+  border-radius: 0.25rem;
+  box-sizing: border-box;
+  font-size: 1.5rem;
+  padding: 0.5rem 0.75rem;
 }
 
 .compose .has-error label {
@@ -6494,6 +6592,28 @@ blank address input between two valid inputs.
 .compose.preview .help-text {
   margin-top: 1rem;
   max-width: calc(22% + 50rem);
+}
+
+.compose.preview #schedule {
+  display: none;
+}
+
+.compose.preview #schedule label {
+  margin: 0 0.25rem 0 0.5rem;
+}
+
+.compose.preview #schedule:target {
+  display: inline;
+}
+
+.compose.preview #schedule:target + a {
+  display: none;
+}
+
+.outbox-preview {
+  background: #fbfbfb;
+  box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.1);
+  padding-top: 1rem;
 }
 
 .outbox-preview {
@@ -6531,6 +6651,11 @@ blank address input between two valid inputs.
 .outbox-preview .text-html {
   padding-right: 0.75rem;
 }
+
+.outbox-preview .text-html > :last-child {
+  margin-bottom: 0rem;
+}
+
 /**
  * Settings and Accounts
  */
@@ -6634,6 +6759,10 @@ blank address input between two valid inputs.
   text-decoration: underline;
 }
 
+.settings .theme .theme-body .theme-links a {
+  text-decoration: underline;
+}
+
 .settings .theme + label {
   font-size: 1.25rem;
   margin: 0.5rem 0;
@@ -6645,6 +6774,13 @@ blank address input between two valid inputs.
   transform: translateY(0.0625rem);
 }
 
+/* Account setup page */
+
+section.settings.setup {
+  left: 2rem !important;
+  margin: 0 auto;
+  max-width: 64rem;
+}
 /**
  * Media Queries
  */
@@ -6703,7 +6839,7 @@ blank address input between two valid inputs.
     width: 18rem;
   }
   #logo {
-    width: 20rem;
+    width: 21rem;
   }
   #search {
     width: calc(100% - 42rem)
@@ -6726,6 +6862,14 @@ blank address input between two valid inputs.
   }
 }
 
+/* Larger than medium */
+@media (min-width: 992px) {
+  .folder-selector input[type="search"] {
+    height: calc(4.5rem + 1px);
+    top: 4.5rem;
+  }
+}
+
 /* Medium devices (laptops) */
 @media (max-width: 991px) {
   html {
@@ -6745,12 +6889,45 @@ blank address input between two valid inputs.
   html {
     font-size: 62.5%;
   }
+
+  section#error {
+    margin: 0;
+    max-width: none;
+    min-width: auto;
+    padding: 6rem 0 0;
+  }
+
+  section#error > div {
+    background: none !important;
+    box-shadow: none !important;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
 
 /* Small devices (landscape phones) */
 @media (max-width: 575px) {
   html {
     font-size: 62.5%;
+  }
+
+  section#main > h5 + .help-text {
+    margin-bottom: 1.5rem;
+  }
+
+  .settings .row input[type="text"],
+  .settings .row input[type="email"],
+  .settings .row input[type="password"] {
+    margin-bottom: 1rem;
+  }
+
+  .settings .row .three.columns label {
+    text-align: left;
+    transform: none;
+  }
+
+  .settings form > .row > .columns.input {
+    width: calc(100% - 6rem);
   }
 }
 
@@ -6840,7 +7017,8 @@ body.theme-warmlight .thread-msg label.thread-msg-header .from span {
 }
 
 /* Preview */
-body.theme-warmlight .compose .outbox-preview {
+body.theme-warmlight .compose .outbox-preview,
+body.theme-warmlight section#error > div {
   background: #fdf5ef;
   box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.1);
   padding-top: 1rem;
@@ -6864,6 +7042,7 @@ body.theme-warmlight input[type="search"],
 body.theme-warmlight input[type="text"],
 body.theme-warmlight input[type="email"],
 body.theme-warmlight input[type="password"],
+body.theme-warmlight input[type="datetime-local"],
 body.theme-warmlight .settings .row input[readonly],
 body.theme-warmlight textarea,
 body.theme-warmlight select {
@@ -6877,7 +7056,8 @@ body.theme-warmlight #main > h5,
 body.theme-warmlight section #msg-actions,
 body.theme-warmlight .dropdown li.notice,
 body.theme-warmlight article.thread-msg,
-body.theme-warmlight section #msg-list h5 .sort-controls {
+body.theme-warmlight section #msg-list h5 .sort-controls,
+body.theme-warmlight section #msg-list .mailbox-checkbox:checked + h5 {
   border-color: #dcc5b3;
 }
 
@@ -6891,7 +7071,7 @@ body.theme-warmlight .dropdown li input[type="submit"] {
 
 /* Very light border */
 body.theme-warmlight nav #mailboxes-divider,
-body.theme-warmlight .compose .row:not(.message) {
+body.theme-warmlight .compose .row:not(.message):not(.buttons) {
   border-color: #e8d3c2;
 }
 
@@ -6914,14 +7094,18 @@ body.theme-warmlight code {
   border-color: #dcc9bd;
 }
 
-body.theme-warmlight #notifications .notification.success {
+body.theme-warmlight .notifications .notification.success {
   background-color: #4da74d;
   color: #fff;
 }
 
-body.theme-warmlight #notifications .notification.error {
+body.theme-warmlight .notifications .notification.error {
   background-color: #d05b5b;
   color: #fff;
+}
+
+body.theme-warmlight .notifications .notification.info {
+  color: #000;
 }
 
 /* Update blue links */
@@ -6980,7 +7164,8 @@ body.theme-warmlight .folder-selector {
 /* Overwrite #aaa */
 body.theme-warmlight .folder-selector h4 .close,
 body.theme-warmlight .settings .buttons.row span,
-body.theme-warmlight section #msg-list footer span.bg {
+body.theme-warmlight section #msg-list footer span.bg,
+body.theme-warmlight .compose.preview #schedule label {
   color: #b19c8c;
 }
 
@@ -7057,8 +7242,9 @@ body.theme-coolnight .alert {
 body.theme-coolnight aside a {
   color: #fff;
 }
-body.theme-coolnight .alert .icon.button {
-  box-shadow: none;
+body.theme-coolnight .alert .icon.button,
+body.theme-coolnight .notification .button {
+  box-shadow: none !important;
 }
 
 /* Default background */
@@ -7189,6 +7375,17 @@ body.theme-coolnight .thread-msg-row label .date {
   color: #aaa;
 }
 
+/* Preview */
+body.theme-coolnight .compose .outbox-preview,
+body.theme-coolnight section#error > div {
+  background: #323232;
+  box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.25);
+}
+
+body.theme-coolnight .compose .outbox-preview .row:not(.message):not(.buttons) {
+  border-color: #222;
+}
+
 /* Default buttons and dropdowns */
 body.theme-coolnight .dropdown ul,
 body.theme-coolnight .button:not(.button-primary):not(.button-secondary):not(.button-danger):not(.button-success),
@@ -7209,6 +7406,7 @@ body.theme-coolnight input[type="search"],
 body.theme-coolnight input[type="text"],
 body.theme-coolnight input[type="email"],
 body.theme-coolnight input[type="password"],
+body.theme-coolnight input[type="datetime-local"],
 body.theme-coolnight .settings .row input[readonly],
 body.theme-coolnight textarea,
 body.theme-coolnight select {
@@ -7240,13 +7438,14 @@ body.theme-coolnight .dropdown li input[type="submit"] {
 }
 
 /* Very light borders */
-body.theme-coolnight .msg-label {
+body.theme-coolnight .msg-label,
+body.theme-coolnight section #msg-list .mailbox-checkbox:checked + h5 {
   border-color: #2b2b2b;
 }
 
 body.theme-coolnight nav #mailboxes-divider,
 body.theme-coolnight article.thread-msg,
-body.theme-coolnight .compose .row:not(.message) {
+body.theme-coolnight .compose .row:not(.message):not(.buttons) {
   border-color: #323232;
 }
 
@@ -7352,16 +7551,16 @@ body.theme-coolnight ::placeholder {
   color: #aaa;
 }
 
-body.theme-coolnight #notifications .notification {
+body.theme-coolnight .notifications .notification {
   color: #333;
 }
 
-body.theme-coolnight #notifications .notification.success {
+body.theme-coolnight .notifications .notification.success {
   border: 1px solid #193114;
   box-shadow: 0 1px 2px #2b2b2b;
 }
 
-body.theme-coolnight #notifications .notification.error {
+body.theme-coolnight .notifications .notification.error {
   border: 1px solid #2d1414;
   box-shadow: 0 1px 2px #2b2b2b;
 }

@@ -83,7 +83,8 @@ class Folders
 
         if ($this->interactive) {
             $this->cli->whisper(
-                "Adding $count new ".Fn\plural('folder', $count).':');
+                "Adding $count new ".Fn\plural('folder', $count).':'
+            );
             $progress = $this->cli->progress()->total($count);
         } else {
             $this->log->info(

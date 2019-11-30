@@ -55,7 +55,8 @@ class Meta extends Model
             if (! Belt::isNumber($updated)) {
                 throw new DatabaseUpdateException(
                     META,
-                    $this->db()->getError());
+                    $this->db()->getError()
+                );
             }
         }
     }

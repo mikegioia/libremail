@@ -28,7 +28,7 @@ class Migration extends Model
      * if it's been run before. If so, skip it. If not, run
      * the script and log it in the migrations table.
      *
-     * @return bool     
+     * @return bool
      */
     public function run()
     {
