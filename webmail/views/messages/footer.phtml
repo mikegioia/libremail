@@ -1,8 +1,16 @@
 <footer class="row">
     <div class="one-half column size-md">
-        <?php echo $view->humanFileSize($totals->size); ?>
+        <span><?php echo $view->humanFileSize($totals->size); ?></span>
+        <span class="spacer">&nbsp;</span>
         <span class="bg">&mdash;</span>
-        <?php echo number_format($totals->count); ?> messages
+        <span class="spacer">&nbsp;</span>
+        <span title="<?php echo number_format($totals->count); ?> messages">
+            <?php echo $view->humanNumber($totals->count); ?> messages
+        </span>
+        <span class="spacer">&nbsp;&nbsp;</span>
+        <span title="<?php echo number_format($totals->thread_count); ?> threads">
+            <?php echo $view->humanNumber($totals->thread_count); ?> threads
+        </span>
     </div>
     <div class="one-half column size-md align-right">
         <span class="bg">Last sync:</span>

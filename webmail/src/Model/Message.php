@@ -197,6 +197,11 @@ class Message extends Model implements MessageInterface
             : array_values($list);
     }
 
+    public function getReplyAddress(bool $stringify = true)
+    {
+        return $this->getReplyAllAddresses($stringify, '', ['from']);
+    }
+
     public function loadById()
     {
         if (! $this->id) {
@@ -888,15 +893,21 @@ class Message extends Model implements MessageInterface
         return array_values(array_unique($threadIds));
     }
 
+    /**
+     * @return stdClass Object with three properties:
+     *   count, thread_count, and size
+     */
     public function getSizeCounts(int $accountId)
     {
         return $this->db()
             ->select([
                 'count(distinct(message_id)) as count',
+                'count(distinct(thread_id)) as thread_count',
                 'sum(size) as size'
             ])
             ->from('messages')
             ->where('deleted', '=', 0)
+            ->where('account_id', '=', $accountId)
             ->execute()
             ->fetchObject();
     }

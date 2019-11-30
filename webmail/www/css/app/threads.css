@@ -294,9 +294,9 @@ input[type="checkbox"].thread-msg-more-checkbox {
   line-height: 2.875rem;
 }
 
-/* Reply-all */
+/* Quick reply form */
 
-.thread-msg-row > .reply-all {
+.thread-msg-row > .reply-form {
   background: #f7f7f7;
   border: 1px solid #eee;
   border-radius: 0.25rem;
@@ -305,7 +305,7 @@ input[type="checkbox"].thread-msg-more-checkbox {
   padding: 1.5rem;
 }
 
-.thread-msg-row > .reply-all .button {
+.thread-msg-row > .reply-form .button {
   margin-bottom: 0;
 }
 
@@ -322,16 +322,16 @@ input[type="checkbox"].thread-msg-more-checkbox {
   margin-right: 0.75rem;
 }
 
-.thread-msg-row > .reply-all .row.padded {
+.thread-msg-row > .reply-form .row.padded {
   border-bottom: none !important;
   margin-bottom: 0.5rem !important;
 }
 
-.thread-msg-row > .reply-all .ten.columns {
+.thread-msg-row > .reply-form .ten.columns {
   margin: 0 1% 0 3%;
 }
 
-.thread-msg-row > .reply-all span.address {
+.thread-msg-row > .reply-form span.address {
   background: #b6e4f4;
   border-radius: 0.25rem;
   display: inline-block;
@@ -340,23 +340,27 @@ input[type="checkbox"].thread-msg-more-checkbox {
   padding: 0.25rem 0.5rem;
 }
 
-.thread-msg-row > .reply-all span.address:not(:last-child) {
+.thread-msg-row > .reply-form span.address:not(:last-child) {
   margin-right: 0.5rem;
 }
 
-.thread-msg-row > .reply-all textarea {
+.thread-msg-row > .reply-form textarea {
   margin-bottom: 1rem;
   min-height: 10rem;
   resize: vertical;
   width: 100%;
 }
 
-.thread-msg-row > .reply-all:target,
-.thread-msg-row > .reply-all.visible {
+.thread-msg-row > .reply-form:target,
+.thread-msg-row > .reply-form.visible {
   display: block;
 }
 
-.thread-msg-row > .reply-all:target + .reply-controls,
-.thread-msg-row > .reply-all.visible + .reply-controls {
+.thread-msg-row > .reply-form.visible ~ .reply-form {
+  display: none !important;
+}
+
+.thread-msg-row > .reply-form:target ~ .reply-controls,
+.thread-msg-row > .reply-form.visible ~ .reply-controls {
   display: none !important;
 }

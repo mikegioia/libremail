@@ -83,7 +83,7 @@ body.theme-warmlight .thread-msg label.thread-msg-header .from span {
   color: #846b58;
 }
 
-body.theme-warmlight .thread-msg-row > .reply-all {
+body.theme-warmlight .thread-msg-row > .reply-form {
   background-color: #fbf1e9;
 }
 
@@ -143,7 +143,7 @@ body.theme-warmlight .dropdown li input[type="submit"] {
 /* Very light border */
 body.theme-warmlight nav #mailboxes-divider,
 body.theme-warmlight .compose .row:not(.message):not(.buttons),
-body.theme-warmlight .thread-msg-row > .reply-all {
+body.theme-warmlight .thread-msg-row > .reply-form {
   border-color: #e8d3c2;
 }
 
