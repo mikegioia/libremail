@@ -28,11 +28,14 @@
 }
 
 /* Base elements */
-body.theme-coolnight a {
+body.theme-coolnight a,
+body.theme-coolnight .button.link-button {
   color: #1eaedb;
 }
 body.theme-coolnight a:hover,
-body.theme-coolnight a:focus {
+body.theme-coolnight a:focus,
+body.theme-coolnight .button.link-button:hover,
+body.theme-coolnight .button.link-button:focus {
   color: #36cfff;
 }
 

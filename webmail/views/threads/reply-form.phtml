@@ -6,7 +6,7 @@
         <div class="ten columns inherit">
             <span><!--
         <?php
-        foreach ($message->getReplyAllAddresses(false, $account->email) as $address): ?>
+        foreach ($message->getReplyAllAddresses(false) as $address): ?>
             --><span class="address" title="<?php $view->clean($address); ?>"><?php $view->clean($message->getName($address)); ?></span><!--
         <?php
         endforeach; ?>
@@ -34,10 +34,11 @@
             <span class="address" title="<?php $view->clean($message->getReplyAddress()); ?>"><?php $view->clean($message->getName($message->getReplyAddress())); ?></span>
         </div>
         <div class="one columns">
-            <a href="<?php echo App\Url::make('/reply/%s#edit', $message->id); ?>" class="align-right">Edit</a>
+            <!-- href="<?php echo App\Url::make('/reply/%s#edit', $message->id); ?>" -->
+            <button type="submit" class="button link-button align-right">Edit</button>
         </div>
     </div>
-    <textarea name="reply_all[<?php echo $message->id; ?>]"><?php echo $outbox->text_plain ?? ''; ?></textarea>
+    <textarea name="reply[<?php echo $message->id; ?>]"><?php echo $outbox->text_plain ?? ''; ?></textarea>
     <div class="buttons">
         <button type="submit" name="send_preview[<?php echo $message->id; ?>]" class="button button-primary">
             Preview + Send

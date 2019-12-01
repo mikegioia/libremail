@@ -118,7 +118,7 @@
     </article>
     <?php
     if (true === ($last ?? false) || true === ($showReplyAll ?? false)):
-        $view->render('threads/reply-all', [
+        $view->render('threads/reply-form', [
             'view' => $view,
             'outbox' => $outbox,
             'account' => $account,

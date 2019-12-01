@@ -79,10 +79,10 @@ $view->render('nav', [
                 <div class="ten columns">
                 <?php
                 if ($message->to): ?>
-                    <span><?php $view->clean(implode(',', $message->to)); ?></span>
+                    <span><?php $view->clean(implode(', ', $message->to)); ?></span>
                 <?php
                 else: ?>
-                    <em class="error"><?php $view->clean($message->to ? implode(',', $message->to) : 'Missing'); ?></em>
+                    <em class="error"><?php $view->clean($message->to ? implode(', ', $message->to) : 'Missing'); ?></em>
                 <?php
                 endif; ?>
                 </div>
