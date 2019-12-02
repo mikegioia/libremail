@@ -13,12 +13,12 @@
             --></span>
         </div>
         <div class="one columns">
-            <a href="<?php echo App\Url::make('/replyall/%s#edit', $message->id); ?>" class="align-right">Edit</a>
+            <button type="submit" name="reply_all_edit" value="<?php echo $message->id; ?>" class="button link-button align-right">Edit</button>
         </div>
     </div>
     <textarea name="reply_all[<?php echo $message->id; ?>]"><?php echo $outbox->text_plain ?? ''; ?></textarea>
     <div class="buttons">
-        <button type="submit" name="send_preview[<?php echo $message->id; ?>]" class="button button-primary">
+        <button type="submit" name="reply_all_preview" value="<?php echo $message->id; ?>" class="button button-primary">
             Preview + Send
         </button>
         <span>or</span>
@@ -34,13 +34,12 @@
             <span class="address" title="<?php $view->clean($message->getReplyAddress()); ?>"><?php $view->clean($message->getName($message->getReplyAddress())); ?></span>
         </div>
         <div class="one columns">
-            <!-- href="<?php echo App\Url::make('/reply/%s#edit', $message->id); ?>" -->
-            <button type="submit" class="button link-button align-right">Edit</button>
+            <button type="submit" name="reply_edit" value="<?php echo $message->id; ?>" class="button link-button align-right">Edit</button>
         </div>
     </div>
     <textarea name="reply[<?php echo $message->id; ?>]"><?php echo $outbox->text_plain ?? ''; ?></textarea>
     <div class="buttons">
-        <button type="submit" name="send_preview[<?php echo $message->id; ?>]" class="button button-primary">
+        <button type="submit" name="reply_preview" value="<?php echo $message->id; ?>" class="button button-primary">
             Preview + Send
         </button>
         <span>or</span>

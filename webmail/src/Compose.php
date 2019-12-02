@@ -127,13 +127,15 @@ class Compose
     }
 
     /**
+     * Creates a new outbox message and redirects to the preview page.
+     *
      * @throws NotFoundException
      */
-    public function reply(int $parentId)
+    public function reply(int $parentId, bool $replyAll = true)
     {
         $parent = (new Message)->getById($parentId);
         $draftId = $this->folders->getDraftsId();
-        $data = $this->getReplyData($parent, $_POST);
+        $data = $this->getReplyData($parent, $_POST, $replyAll);
 
         try {
             Model::getDb()->beginTransaction();
@@ -144,6 +146,7 @@ class Compose
             // Update the draft if it exists, and optionally create
             // a new one if this message is a draft
             (new Message)->createOrUpdateDraft($outbox, $draftId, $parent);
+
             Session::notify('Draft message saved.', Session::SUCCESS);
 
             Model::getDb()->commit();
@@ -155,6 +158,7 @@ class Compose
             }
         } catch (ValidationException $e) {
             Model::getDb()->rollback();
+
             // Store the POST data back in the session and set the
             // errors in the session for the page to display
             Session::formErrors($e->getErrors());
@@ -172,22 +176,59 @@ class Compose
         }
     }
 
-    private function getReplyData(Message $parent, array $data)
+    /**
+     * Stores reply data in the session and redirects to the full
+     * reply editor page.
+     *
+     * @throws NotFoundException
+     */
+    public function replyEdit(int $parentId, bool $replyAll = true)
+    {
+        $parent = (new Message)->getById($parentId);
+        $data = $this->getReplyData($parent, $_POST, $replyAll);
+
+        Session::formData($data);
+
+        Url::redirectRaw(Url::reply($parentId));
+    }
+
+    private function getReplyData(Message $parent, array $data, bool $replyAll = true)
     {
         $email = $this->account->email;
-        $to = $parent->getReplyAllAddresses(false, $email, ['to', 'from'], true);
-        $cc = $parent->getReplyAllAddresses(false, $email, ['cc'], true);
+
+        if (true === $replyAll) {
+            $to = $parent->getReplyAllAddresses(false, $email, ['to', 'from'], true);
+            $cc = $parent->getReplyAllAddresses(false, $email, ['cc'], true);
+        } else {
+            $to = $parent->getReplyAddress(false);
+            $cc = [];
+        }
 
         // Add "Re:" to the subject but only if there isn't one
-        $subject = 0 === strpos(trim($parent->subject), 're:')
-            ? $parent->subject
-            : 'Re: '.$parent->subject;
+        $subject = 'Re: '.$this->cleanSubject($parent->subject);
 
         return [
             'to' => $to,
             'cc' => $cc,
             'subject' => $subject,
-            'text_plain' => $data['reply_all'][$parent->id] ?? ''
+            'text_plain' => $replyAll
+                ? ($data['reply_all'][$parent->id] ?? '')
+                : ($data['reply'][$parent->id] ?? '')
         ];
+    }
+
+    /**
+     * Cleans a subject line of extra characters.
+     */
+    private function cleanSubject(string $subject)
+    {
+        $subject = trim(
+            preg_replace(
+                "/Re\:|re\:|RE\:|Fwd\:|fwd\:|FWD\:/i",
+                '',
+                $subject
+            ));
+
+        return trim($subject, '[]()');
     }
 }

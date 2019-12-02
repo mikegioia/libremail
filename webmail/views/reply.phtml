@@ -1,0 +1,50 @@
+<?php
+
+$view->render('header', [
+    'view' => $view,
+    'folders' => $folders,
+    'pageClass' => 'compose',
+    'pageTitle' => 'Reply to'
+]);
+
+$view->render('nav', [
+    'view' => $view,
+    'activeId' => 0,
+    'folders' => $folders
+]); ?>
+
+<section id="main" class="compose">
+    <?php
+    $view->render('notifications', [
+        'messages' => $notifications
+    ]); ?>
+
+    <h5>
+        <span>Re: <?php $view->clean($parent->subject); ?></span>
+    </h5>
+    <div class="help-text">
+        Your message will remain a draft until you click <code>Preview + Send</code>.
+        From there, you can send either send your message now, or schedule a specific
+        delivery time.
+    </div>
+
+    <?php print_r($formData['to'] ?? []); ?>
+    <?php print_r($formData['cc'] ?? []); ?>
+    <?php print_r($formData['subject'] ?? ''); ?>
+    <?php print_r($formData['text_plain'] ?? ''); ?>
+</section>
+
+<!-- Datalist for contacts -->
+<datalist id="contacts">
+<?php
+foreach ($contacts as $contact): ?>
+    <option value="<?php $view->clean($contact->name); ?>"><?php $view->clean($contact->name); ?></option>
+<?php
+endforeach; ?>
+</datalist>
+
+<?php
+$view->render('footer', [
+    'meta' => $meta,
+    'alert' => $alert
+]); ?>

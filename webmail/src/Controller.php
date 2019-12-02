@@ -286,6 +286,16 @@ class Controller
         ]);
     }
 
+    public function reply(int $parentId)
+    {
+        $parent = (new Message)->getById($parentId, true);
+
+        $this->page('reply', [
+            'parent' => $parent,
+            'contacts' => Contact::getByAccount($this->account->id)
+        ]);
+    }
+
     public function deleteDraft()
     {
         session_start();
@@ -342,14 +352,25 @@ class Controller
     {
         session_start();
 
-        $sendPreview = array_key_exists('send_preview', $_POST)
-            && is_array(Url::postParam('send_preview'))
-            && 1 === count(Url::postParam('send_preview'));
-
-        // Quick reply-all can POST here
-        if (true === $sendPreview) {
+        // Quick reply or reply-all can POST here
+        // Editing a message will update the session and redirect
+        if (is_numeric(Url::postParam('reply_preview'))) {
             (new Compose($this->account))->reply(
-                key(Url::postParam('send_preview'))
+                Url::postParam('reply_preview'),
+                false
+            );
+        } elseif (is_numeric(Url::postParam('reply_all_preview'))) {
+            (new Compose($this->account))->reply(
+                Url::postParam('reply_all_preview')
+            );
+        } elseif (is_numeric(Url::postParam('reply_edit'))) {
+            (new Compose($this->account))->replyEdit(
+                Url::postParam('reply_edit'),
+                false
+            );
+        } elseif (is_numeric(Url::postParam('reply_all_edit'))) {
+            (new Compose($this->account))->replyEdit(
+                Url::postParam('reply_all_edit')
             );
         } else {
             (new Actions(

@@ -51,8 +51,7 @@ define('ERR_TASK_ROLLBACK', 1020);
 define('PREF_THEME', 'wm.theme');
 
 // Helper to load external config files
-function getConfig(string $file)
-{
+function getConfig(string $file) {
     return include BASEDIR.'/config/'.$file.'.php';
 }
 
@@ -149,6 +148,8 @@ if (! $account->exists()) {
     $router->get('/compose/(\d+)', [$controller, 'compose']);
     // Send a new message
     $router->post('/compose', [$controller, 'draft']);
+    // Reply to a message
+    $router->get('/reply/(\d+)', [$controller, 'reply']);
     // View the outbox messages
     $router->get('/outbox', [$controller, 'outbox']);
     // Delete draft
