@@ -11,11 +11,11 @@ use DateInterval;
  * and either returns that value or the specified
  * default.
  *
- * @param mixes $object
+ * @param mixed $object
  * @param string $key
  * @param mixed $default
  */
-function get($object, $key, $default = null)
+function get($object, string $key, $default = null)
 {
     if (is_array($object)
         && array_key_exists($key, $object)
@@ -40,9 +40,9 @@ function get($object, $key, $default = null)
  *
  * @return bool
  */
-function intEq($int1, $int2)
+function intEq(int $int1, int $int2)
 {
-    return (int) $int1 === (int) $int2;
+    return $int1 === $int2;
 }
 
 /**
@@ -53,9 +53,9 @@ function intEq($int1, $int2)
  *
  * @return bool
  */
-function strEq($str1, $str2)
+function strEq(string $str1, string $str2)
 {
-    return (string) $str1 === (string) $str2;
+    return $str1 === $str2;
 }
 
 /**
@@ -66,7 +66,7 @@ function strEq($str1, $str2)
  *
  * @return string
  */
-function formatBytes($bytes, $precision = 2)
+function formatBytes(int $bytes, int $precision = 2)
 {
     $units = ['B', 'KB', 'MB', 'GB', 'TB'];
     $bytes = max($bytes, 0);
@@ -84,7 +84,7 @@ function formatBytes($bytes, $precision = 2)
  *
  * @param float $value
  */
-function percent($value, $precision = 2)
+function percent(float $value, int $precision = 2)
 {
     return round($value * 100, $precision).'%';
 }
@@ -97,7 +97,7 @@ function percent($value, $precision = 2)
  *
  * @return string
  */
-function plural($word, $count)
+function plural(string $word, int $count)
 {
     if (1 === $count) {
         return $word;
@@ -119,7 +119,7 @@ function plural($word, $count)
  *
  * @return array
  */
-function reindex($array, $key)
+function reindex(array $array, string $key)
 {
     $new = [];
 
@@ -139,7 +139,7 @@ function reindex($array, $key)
  *
  * @return string
  */
-function timeFromNow($minutes, $format = 'g:i a')
+function timeFromNow(int $minutes, string $format = 'g:i a')
 {
     $time = new DateTime;
     $time->add(new DateInterval('PT'.$minutes.'M'));
@@ -147,7 +147,7 @@ function timeFromNow($minutes, $format = 'g:i a')
     return $time->format($format);
 }
 
-function unixFromNow($minutes)
+function unixFromNow(int $minutes)
 {
     $time = new DateTime;
     $time->add(new DateInterval('PT'.$minutes.'M'));
@@ -166,7 +166,7 @@ function expects($data)
 /**
  * Look for a string in an array of possibilities.
  */
-function contains($subject, $list)
+function contains(string $subject, array $list)
 {
     foreach ($list as $item) {
         if (false !== strpos($subject, $item)) {

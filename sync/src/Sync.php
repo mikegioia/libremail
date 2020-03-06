@@ -298,17 +298,27 @@ class Sync
 
         try {
             $this->disconnect();
-            $actionCount = 0;
 
             // Commit any pending actions to the mail server
-            // If any actions are made, force a message refresh
             if ($this->getActionCount($account) > 0) {
                 $this->connect($account);
                 $actionCount = $this->syncActions($account);
+
+                $this->log->info(sprintf(
+                    '%s action%s synced for %s',
+                    $actionCount,
+                    1 === $actionCount ? ' was' : 's were',
+                    $account->email
+                ));
+
+                // There may be more actions that have been added
+                // since we started the sync. Re-run the account.
+                if ($this->getActionCount($account) > 0) {
+                    return $this->runAccount($account, $options);
+                }
             }
 
-            if ((true === Fn\get($options, self::OPT_ONLY_SYNC_ACTIONS)
-                    && 0 === $actionCount)
+            if (true === Fn\get($options, self::OPT_ONLY_SYNC_ACTIONS)
                 || true === $this->actions
             ) {
                 $this->disconnect();
@@ -558,7 +568,8 @@ class Sync
                 $this->log,
                 $this->cli,
                 $this->emitter,
-                $this->interactive);
+                $this->interactive
+            );
             $folderList = $this->mailbox->getFolders();
             $savedFolders = (new FolderModel)->getByAccount($account->getId());
             $folderSync->run($folderList, $savedFolders, $account);
@@ -684,6 +695,7 @@ class Sync
             $messageSync = new MessageSync(
                 $this->log,
                 $this->cli,
+                $this->stats,
                 $this->emitter,
                 $this->mailbox,
                 $this->interactive, [

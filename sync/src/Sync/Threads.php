@@ -419,6 +419,10 @@ class Threads
                 );
             }
 
+            if ($message->hasThreadId()) {
+                $message->setThreadId($message->getThreadId());
+            }
+
             if ($message->hasUpdate()) {
                 $updateCount += count($message->ids);
             }
@@ -439,7 +443,8 @@ class Threads
 
             $this->addresses = array_merge(
                 $this->addresses,
-                $message->getAddresses());
+                $message->getAddresses()
+            );
 
             $this->updateProgress(++$count, $total);
 

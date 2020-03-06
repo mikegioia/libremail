@@ -84,6 +84,7 @@ class Thread
 
         $this->updateMessages($allMessages);
         $this->buildThreadIndex();
+
         $this->message = reset($this->messages);
 
         foreach ($this->folders->get() as $folder) {

@@ -85,14 +85,16 @@ class Messages
             $sortBy,
             $this->folders->getSkipIds($folderId),
             $this->folders->getRestrictIds($folderId),
-            $options);
+            $options
+        );
         $messageCounts = $messageModel->getThreadCountsBySearch(
             $this->accountId,
             $query,
             $folderId,
             $sortBy,
             $this->folders->getSkipIds($folderId),
-            $this->folders->getRestrictIds($folderId));
+            $this->folders->getRestrictIds($folderId)
+        );
 
         return $this->loadThreads(
             $messages,
@@ -141,7 +143,8 @@ class Messages
             $messageCounts,
             $page,
             $limit,
-            $splitFlagged);
+            $splitFlagged
+        );
         $totals = (new Message)->getSizeCounts($this->accountId);
 
         return [$flagged, $unflagged, $paging, $totals];

@@ -28,11 +28,14 @@
 }
 
 /* Base elements */
-body.theme-coolnight a {
+body.theme-coolnight a,
+body.theme-coolnight .button.link-button {
   color: #1eaedb;
 }
 body.theme-coolnight a:hover,
-body.theme-coolnight a:focus {
+body.theme-coolnight a:focus,
+body.theme-coolnight .button.link-button:hover,
+body.theme-coolnight .button.link-button:focus {
   color: #36cfff;
 }
 
@@ -166,7 +169,7 @@ body.theme-coolnight .thread-msg-group .placeholder,
 body.theme-coolnight .folder-selector h4,
 body.theme-coolnight .folder-selector .actions,
 body.theme-coolnight .folder-selector .list label,
-body.theme-coolnight .thread-msg-row > .reply-all {
+body.theme-coolnight .thread-msg-row > .reply-form {
   border-color: #323232;
 }
 
@@ -178,11 +181,11 @@ body.theme-coolnight .thread-msg-row label .date {
   color: #aaa;
 }
 
-body.theme-coolnight .thread-msg-row > .reply-all {
+body.theme-coolnight .thread-msg-row > .reply-form {
   background-color: #424242;
 }
 
-body.theme-coolnight .thread-msg-row > .reply-all span.address {
+body.theme-coolnight .thread-msg-row > .reply-form span.address {
   background-color: #137ca0;
   color: #eee;
 }

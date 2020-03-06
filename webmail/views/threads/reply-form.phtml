@@ -1,0 +1,62 @@
+<div id="reply-all-<?php echo $message->id; ?>" class="reply-form compose<?php echo $visible ? ' visible' : ''; ?>">
+    <div class="row padded">
+        <div class="one columns label">
+            <label class="align-right">To:</label>
+        </div>
+        <div class="ten columns inherit">
+            <span><!--
+        <?php
+        foreach ($message->getReplyAllAddresses(false) as $address): ?>
+            --><span class="address" title="<?php $view->clean($address); ?>"><?php $view->clean($message->getName($address)); ?></span><!--
+        <?php
+        endforeach; ?>
+            --></span>
+        </div>
+        <div class="one columns">
+            <button type="submit" name="reply_all_edit" value="<?php echo $message->id; ?>" class="button link-button align-right">Edit</button>
+        </div>
+    </div>
+    <textarea name="reply_all[<?php echo $message->id; ?>]"><?php echo $outbox->text_plain ?? ''; ?></textarea>
+    <div class="buttons">
+        <button type="submit" name="reply_all_preview" value="<?php echo $message->id; ?>" class="button button-primary">
+            Preview + Send
+        </button>
+        <span>or</span>
+        <a href="#">Cancel</a>
+    </div>
+</div>
+<div id="reply-<?php echo $message->id; ?>" class="reply-form compose">
+    <div class="row padded">
+        <div class="one columns label">
+            <label class="align-right">To:</label>
+        </div>
+        <div class="ten columns inherit">
+            <span class="address" title="<?php $view->clean($message->getReplyAddress()); ?>"><?php $view->clean($message->getName($message->getReplyAddress())); ?></span>
+        </div>
+        <div class="one columns">
+            <button type="submit" name="reply_edit" value="<?php echo $message->id; ?>" class="button link-button align-right">Edit</button>
+        </div>
+    </div>
+    <textarea name="reply[<?php echo $message->id; ?>]"><?php echo $outbox->text_plain ?? ''; ?></textarea>
+    <div class="buttons">
+        <button type="submit" name="reply_preview" value="<?php echo $message->id; ?>" class="button button-primary">
+            Preview + Send
+        </button>
+        <span>or</span>
+        <a href="#">Cancel</a>
+    </div>
+</div>
+<div class="reply-controls">
+    <a href="#reply-<?php echo $message->id; ?>" class="icon button control">
+        <i class="fa fa-reply"></i>
+        <span class="normal">Reply</span>
+    </a>
+    <a href="#reply-all-<?php echo $message->id; ?>" class="icon button control">
+        <i class="fa fa-reply-all"></i>
+        <span class="normal">Reply all</span>
+    </a>
+    <a href="<?php echo App\Url::make('/forward/%s', $message->id); ?>" class="icon button control">
+        <i class="fa fa-share"></i>
+        <span class="normal">Forward</span>
+    </a>
+</div>

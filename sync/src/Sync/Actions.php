@@ -58,7 +58,7 @@ class Actions
         TaskModel::TYPE_UNREAD => 'App\Sync\Actions\Unread'
     ];
 
-    const ERR_FAIL_DELETE_NOT_FOUND = 'Failed get message num for delete';
+    const ERR_DELETE_NOT_FOUND = 'Failed get message num for delete';
     const ERR_FAIL_IMAP_SYNC = 'Failed IMAP sync';
     const ERR_NO_IMAP_MESSAGE = 'No message found in IMAP mailbox';
     const ERR_NO_SQL_FOLDER = 'No folder found in SQL';
@@ -330,7 +330,11 @@ class Actions
             $imapMessage = $this->mailbox->getMessage($msgNo);
         } catch (Exception $e) {
             if ($this->deleteNotFoundExcetion($e, $task)) {
-                $task->fail(self::ERR_FAIL_DELETE_NOT_FOUND, $e);
+                $task->fail(
+                    self::ERR_DELETE_NOT_FOUND,
+                    $e,
+                    TaskModel::STATUS_IGNORED
+                );
             } else {
                 $this->log->warning(
                     "Failed downloading message for task {$task->id}: ".

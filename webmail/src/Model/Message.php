@@ -2,6 +2,7 @@
 
 namespace App\Model;
 
+use Fn;
 use PDO;
 use stdClass;
 use Exception;
@@ -195,6 +196,11 @@ class Message extends Model implements MessageInterface
         return $stringify
             ? implode(', ', $list)
             : array_values($list);
+    }
+
+    public function getReplyAddress(bool $stringify = true)
+    {
+        return $this->getReplyAllAddresses($stringify, '', ['from']);
     }
 
     public function loadById()
@@ -582,19 +588,27 @@ class Message extends Model implements MessageInterface
 
         if (true === $options[self::SPLIT_FLAGGED]) {
             $flagged = $this->getThreads(
-                $meta->flaggedIds, $accountId, $limit, $offset, $options
+                $meta->flaggedIds,
+                $accountId, $limit, $offset,
+                $skipFolderIds, $onlyFolderIds
             );
             $unflagged = $this->getThreads(
-                $meta->unflaggedIds, $accountId, $limit, $offset, $options
+                $meta->unflaggedIds,
+                $accountId, $limit, $offset,
+                $skipFolderIds, $onlyFolderIds
             );
             $messages = array_merge($flagged, $unflagged);
         } elseif (true === $options[self::ONLY_FLAGGED]) {
             $messages = $this->getThreads(
-                $meta->flaggedIds, $accountId, $limit, $offset, $options
+                $meta->flaggedIds,
+                $accountId, $limit, $offset,
+                $skipFolderIds, $onlyFolderIds
             );
         } else {
             $messages = $this->getThreads(
-                $threadIds, $accountId, $limit, $offset, $options
+                $threadIds,
+                $accountId, $limit, $offset,
+                $skipFolderIds, $onlyFolderIds
             );
         }
 
@@ -644,79 +658,108 @@ class Message extends Model implements MessageInterface
         int $accountId,
         int $limit,
         int $offset,
-        array $options = []
+        array $skipFolderIds,
+        array $onlyFolderIds
     ) {
         if (! count($threadIds)) {
             return [];
         }
 
-        // First load the message IDs for the given threads
-        $threadDates = $this->db()
+        // Load all of the threads and sort by date
+        $allThreadIds = $this->getThreadDates($threadIds, $accountId);
+
+        // Take the slice of this list before querying
+        // for the large payload of data below
+        $sliceIds = array_slice($allThreadIds, $offset, $limit);
+
+        // Load all of the unique messages along with some
+        // meta data. This is used to then locate the most
+        // recent messages.
+        $messages = $this->db()
+            ->select([
+                'id', 'thread_id', 'seen', 'folder_id', '`date`'
+            ])
+            ->from('messages')
+            ->whereIn('thread_id', $sliceIds)
+            ->whereNotIn('folder_id', array_diff($skipFolderIds, $onlyFolderIds))
+            ->where('deleted', '=', 0)
+            ->groupBy('message_id')
+            ->orderBy('thread_id', Model::ASC)
+            ->orderBy('date', Model::DESC)
+            ->execute()
+            ->fetchAll();
+
+        // Locate the most recent message ID and the oldest
+        // unseen message ID. These are used for querying
+        // the full message data.
+        $recents = [];
+        $unseens = [];
+
+        foreach ($messages as $message) {
+            if (! isset($recents[$message['thread_id']])) {
+                $recents[$message['thread_id']] = $message['id'];
+            }
+
+            // We want the snippet to contain the oldest
+            // unread message unless 
+            if (0 === (int) $message['seen']) {
+                $unseens[$message['thread_id']] = $message['id'];
+            }
+        }
+
+        // Load all of the recent messages
+        $threads = $this->db()
+            ->select([
+                'id', '`to`', 'cc', '`from`', '`date`',
+                'seen', 'subject', 'flagged', 'thread_id',
+                'charset', 'message_id', 'outbox_id',
+                'text_plain'
+            ])
+            ->from('messages')
+            ->whereIn('id', $recents)
+            ->execute()
+            ->fetchAll(PDO::FETCH_CLASS, get_class());
+        $textPlains = $this->db()
+            ->select(['thread_id', 'text_plain'])
+            ->from('messages')
+            ->whereIn('id', $unseens)
+            ->execute()
+            ->fetchAll();
+        $textPlains = array_combine(
+            array_column($textPlains, 'thread_id'),
+            array_column($textPlains, 'text_plain')
+        );
+
+        foreach ($threads as $thread) {
+            if (isset($textPlains[$thread->thread_id])) {
+                $thread->text_plain = $textPlains[$thread->thread_id];
+            }
+        }
+
+        return $threads;
+    }
+
+    /**
+     * Returns thread and message IDs for the most recent
+     * message in a set of threads. Result set includes
+     * an array of rows containing thread_id and date.
+     *
+     * @return array
+     */
+    private function getThreadDates(array $threadIds, int $accountId)
+    {
+        $results = $this->db()
             ->select(['thread_id', 'max(date) as max_date'])
             ->from('messages')
             ->where('deleted', '=', 0)
             ->where('account_id', '=', $accountId)
             ->whereIn('thread_id', $threadIds)
-            ->orderBy('date', Model::DESC)
             ->groupBy(['thread_id'])
+            ->orderBy('max_date', Model::DESC)
             ->execute()
             ->fetchAll();
 
-        if (! $threadDates || ! count($threadDates)) {
-            return [];
-        }
-
-        // Order the set by max_date and take the slice
-        usort($threadDates, function (array $a, array $b) {
-            return $b['max_date'] <=> $a['max_date'];
-        });
-
-        // Take the slice of this list before querying
-        // for the large payload of data below
-        $messageIds = array_slice(
-            array_column($threadDates, 'thread_id'),
-            $offset,
-            $limit
-        );
-
-        // Then, load the messages for each thread
-        $qry = $this->db()
-            ->select([
-                'id', '`to`', 'cc', '`from`', '`date`',
-                'seen', 'subject', 'flagged', 'thread_id',
-                'text_plain', 'charset', 'message_id',
-                'outbox_id'
-            ])
-            ->from('messages')
-            ->where('deleted', '=', 0)
-            ->where('account_id', '=', $accountId)
-            ->whereIn('thread_id', $threadIds)
-            ->orderBy('date', Model::DESC)
-            ->limit($limit, $offset);
-
-        if (false === ($options[self::IS_DRAFTS] ?? false)) {
-            return $qry
-                ->groupBy(['thread_id'])
-                ->execute()
-                ->fetchAll(PDO::FETCH_CLASS, get_class());
-        }
-
-        // In some cases we always want the newest message
-        // This is only used with the drafts folder currently
-        $flat = $qry->execute()->fetchAll(PDO::FETCH_CLASS, get_class());
-        $threads = [];
-        $found = [];
-
-        foreach ($flat as $message) {
-            if (isset($found[$message->thread_id])) {
-                continue;
-            }
-
-            $threads[] = $message;
-            $found[$message->thread_id] = true;
-        }
-
-        return $threads;
+        return array_column($results ?: [], 'thread_id');
     }
 
     /**
@@ -888,15 +931,21 @@ class Message extends Model implements MessageInterface
         return array_values(array_unique($threadIds));
     }
 
+    /**
+     * @return stdClass Object with three properties:
+     *   count, thread_count, and size
+     */
     public function getSizeCounts(int $accountId)
     {
         return $this->db()
             ->select([
                 'count(distinct(message_id)) as count',
+                'count(distinct(thread_id)) as thread_count',
                 'sum(size) as size'
             ])
             ->from('messages')
             ->where('deleted', '=', 0)
+            ->where('account_id', '=', $accountId)
             ->execute()
             ->fetchObject();
     }

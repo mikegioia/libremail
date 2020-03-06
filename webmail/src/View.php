@@ -188,6 +188,28 @@ class View
     }
 
     /**
+     * Returns a readable version of a positive integer.
+     *
+     * @param int $number
+     *
+     * @return string
+     */
+    public function humanNumber(int $number)
+    {
+        $length = strlen((string) $number);
+
+        if ($number < 1000) {
+            return $number;
+        } elseif ($number < 1000000) {
+            return round($number / pow(10, $length - 1), 1).'k';
+        } elseif ($number < 1000000000) {
+            return round($number / pow(10, $length - 1), 1).'m';
+        }
+
+        return '&#8734;'; // infinity
+    }
+
+    /**
      * Returns the best string representation of a time span.
      * i.e. "20 minutes ago", "1 day ago", or the date time.
      *

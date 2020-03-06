@@ -139,3 +139,21 @@ input[type="button"].button-primary:focus {
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
 }
+
+.button.link-button {
+  border: none;
+  color: #0378eb;
+  font-size: inherit;
+  font-weight: normal;
+  height: auto;
+  letter-spacing: normal;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.button.link-button:hover,
+.button.link-button:focus {
+  color: #0365c5;
+}
