@@ -60,11 +60,11 @@ The Web Client includes the following 3rd party packages:
         * [MIT License](https://opensource.org/licenses/MIT)
     3. [PDO](https://github.com/ParticleBits/pdo), _Mike Gioia, ParticleBits_
         * [MIT License](https://opensource.org/licenses/MIT)
-    4. [Zend Mail](https://github.com/zendframework/zend-mail),
-       _Zend Technologies USA, Inc._
+    4. [Laminas Mail](https://github.com/laminas/laminas-mail),
+       _Laminas Project_
         * [BSD 3-Clause](https://opensource.org/licenses/BSD-3-Clause)
-    5. [Zend Escaper](https://github.com/zendframework/zend-escaper),
-       _Zend Technologies USA, Inc._
+    5. [Laminas Escaper](https://github.com/laminas/laminas-escaper),
+       _Laminas Project_
         * [BSD 3-Clause](https://opensource.org/licenses/BSD-3-Clause)
     6. [Parsedown](https://parsedown.org), _Emanuil Rusev_
         * [MIT License](https://opensource.org/licenses/MIT)
