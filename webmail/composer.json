@@ -12,8 +12,8 @@
         "erusev/parsedown": "^1.7",
         "particlebits/pdo": "^2.0",
         "ezyang/htmlpurifier": "^4.10",
-        "zendframework/zend-mail": "^2.10",
-        "zendframework/zend-escaper": "^2.5"
+        "laminas/laminas-mail": "^2.10",
+        "laminas/laminas-escaper": "^2.6"
     },
     "scripts": {
         "fix": "php-cs-fixer fix",

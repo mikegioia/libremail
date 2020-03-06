@@ -27,6 +27,7 @@ is meant to run forever with almost zero maintenance :D
 - [Run the IMAP Sync](https://github.com/mikegioia/libremail/tree/master/sync#run-the-sync)
 - [Using an Init Script or Supervisor](https://github.com/mikegioia/libremail/tree/master/sync#using-an-init-script-or-supervisor)
 - [Submitting Bugs](https://github.com/mikegioia/libremail/tree/master/sync#submitting-bugs)
+- [Software Licenses](https://github.com/mikegioia/libremail/tree/master/sync/#software-licenses)
 
 ## Dependencies
 
@@ -167,3 +168,61 @@ guarantee that anything that you report will be looked at or fixed! However I
 will make a personal effort to resolve everything in a timely manner, and odds
 are good that I'll check it out quickly as I'm personally using this project to
 manage my own email.
+
+## Software Licenses
+
+The Sync application includes the following 3rd party packages:
+
+1. JavaScript
+    1. [Reconnecting WebSocket](https://github.com/joewalnes/reconnecting-websocket),
+       _Joe Walnes_
+        * [MIT License](https://opensource.org/licenses/MIT)
+    2. [Mustache.js](https://github.com/janl/mustache.js), _Jan Lehnardt_
+        * [MIT License](https://opensource.org/licenses/MIT)
+2. CSS
+    1. [Skeleton CSS Boilerplate](https://github.com/dhg/Skeleton),
+       _Dave Gamache_
+        * [MIT License](https://opensource.org/licenses/MIT)
+    2. [Normalize CSS](https://github.com/necolas/normalize.css),
+       _Nicolas Gallagher_
+        * [MIT License](https://opensource.org/licenses/MIT)
+3. PHP
+    1. [PDO](https://github.com/ParticleBits/pdo), _Mike Gioia, ParticleBits_
+        * [MIT License](https://opensource.org/licenses/MIT)
+    2. [IMAP](https://github.com/ParticleBits/imap), _Mike Gioia, ParticleBits_
+        * [MIT License](https://opensource.org/licenses/MIT)
+    3. [Laminas Mail](https://github.com/particlebits/zend-mail),
+       _Laminas Project_, forked maintained by _Mike Gioia, ParticleBits_
+        * [BSD 3-Clause](https://opensource.org/licenses/BSD-3-Clause)
+    4. [Laminas Mime)](https://github.com/particlebits/zend-mime),
+       _Laminas Project_, forked maintained by _Mike Gioia, ParticleBits_
+        * [BSD 3-Clause](https://opensource.org/licenses/BSD-3-Clause)
+    5. [Laminas Service Manager)](https://github.com/laminas/laminas-servicemanager),
+       _Laminas Project_
+        * [BSD 3-Clause](https://opensource.org/licenses/BSD-3-Clause)
+    6. [Pimple](https://pimple.symfony.com/), _Fabien Potencier, Symfony_
+        * [MIT License](https://opensource.org/licenses/MIT)
+    7. [Monolog](https://github.com/Seldaek/monolog), _Jordi Boggiano_
+        * [MIT License](https://opensource.org/licenses/MIT)
+    8. [CLImate](https://climate.thephpleague.com), _Joe Tannenbaum, PHP League_
+        * [MIT License](https://opensource.org/licenses/MIT)
+    9. [Particle Validator](https://github.com/particle/validator), _Jordi Boggiano_
+        * [BSD 3-Clause](https://opensource.org/licenses/BSD-3-Clause)
+    10. [Belt](https://github.com/ilya-dev/belt), _Ilya S._
+        * [MIT License](https://opensource.org/licenses/MIT)
+    11. [Force UTF-8](https://github.com/neitanod/forceutf8), _Sebastián Grignoli_
+        * [BSD 3-Clause](https://opensource.org/licenses/BSD-3-Clause)
+    12. [ReactPHP EventLoop](https://reactphp.org/event-loop),
+        _Igor Wiedler and Chris Boden, ReactPHP_
+        * [MIT License](https://opensource.org/licenses/MIT)
+    13. [ReactPHP ChildProcess](https://reactphp.org/child-process),
+        _Igor Wiedler and Chris Boden, ReactPHP_
+        * [MIT License](https://opensource.org/licenses/MIT)
+    14. [ReactPHP PCNTL bindings](https://github.com/mkraemer/react-pcntl),
+        _Marius Krämer_
+        * [MIT License](https://opensource.org/licenses/MIT)
+    15. [Événement](https://github.com/igorw/evenement), _Igor Wiedler_
+        * [MIT License](https://opensource.org/licenses/MIT)
+    16. [Symfony Event Dispatcher](https://github.com/symfony/event-dispatcher),
+        _Fabien Potencier, Symfony_
+        * [MIT License](https://opensource.org/licenses/MIT)
