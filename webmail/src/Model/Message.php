@@ -2,6 +2,7 @@
 
 namespace App\Model;
 
+use Fn;
 use PDO;
 use stdClass;
 use Exception;
@@ -655,73 +656,89 @@ class Message extends Model implements MessageInterface
             return [];
         }
 
-        // First load the message IDs for the given threads
-        $threadDates = $this->db()
+        // Load all of the threads and sort by date
+        $allThreadIds = $this->getThreadDates($threadIds, $accountId);
+
+        // Take the slice of this list before querying
+        // for the large payload of data below
+        $sliceIds = array_slice($allThreadIds, $offset, $limit);
+
+        // Load the latest message for each thread
+        $threads = $this->db()
+            ->select([
+                'id', '`to`', 'cc', '`from`', '`date`',
+                'seen', 'subject', 'flagged', 'thread_id',
+                'charset', 'message_id', 'outbox_id',
+                'text_plain'
+            ])
+            ->from('messages')
+            ->whereIn('thread_id', $sliceIds)
+            ->orderBy('date', Model::DESC)
+            ->execute()
+            ->fetchAll(PDO::FETCH_CLASS, get_class());
+
+        // In some cases we always want the latest message
+        // This is only used with the drafts folder currently
+        if (true === ($options[self::IS_DRAFTS] ?? false)) {
+            return $threads;
+        }
+
+        // Load any text_plains for the most recent unread message
+        // and overwrite any existing threads with them
+        $sliceIds = array_slice(
+            array_column($threadDates, 'thread_id'),
+            $offset,
+            $limit
+        );
+        $threadDates = $this->getThreadDates($sliceIds, $accountId, true);
+        $messageIds = array_slice(
+            array_column($threadDates, 'id'),
+            $offset,
+            $limit
+        );
+        $textPlains = $this->db()
+            ->select(['id', 'text_plain'])
+            ->from('messages')
+            ->whereIn('id', $messageIds)
+            ->execute()
+            ->fetchAll();
+        $textPlains = array_combine(
+            array_column($textPlains, 'id'),
+            array_column($textPlains, 'text_plain')
+        );
+//print_r($textPlains);exit;
+        foreach ($threads as $thread) {
+            if (isset($textPlains[$thread->id])) {
+                $thread->text_plain = $textPlains[$thread->id];
+            }
+        }
+        return $threads;
+    }
+
+    /**
+     * Returns thread and message IDs for the most recent
+     * message in a set of threads. Result set includes
+     * an array of rows containing thread_id and date.
+     *
+     * @return array
+     */
+    private function getThreadDates(
+        array $threadIds,
+        int $accountId,
+        bool $unseen = false
+    ) {
+        $results = $this->db()
             ->select(['thread_id', 'max(date) as max_date'])
             ->from('messages')
             ->where('deleted', '=', 0)
             ->where('account_id', '=', $accountId)
             ->whereIn('thread_id', $threadIds)
-            ->orderBy('date', Model::DESC)
             ->groupBy(['thread_id'])
+            ->orderBy('max_date', Model::DESC)
             ->execute()
             ->fetchAll();
 
-        if (! $threadDates || ! count($threadDates)) {
-            return [];
-        }
-
-        // Order the set by max_date and take the slice
-        usort($threadDates, function (array $a, array $b) {
-            return $b['max_date'] <=> $a['max_date'];
-        });
-
-        // Take the slice of this list before querying
-        // for the large payload of data below
-        $messageIds = array_slice(
-            array_column($threadDates, 'thread_id'),
-            $offset,
-            $limit
-        );
-
-        // Then, load the messages for each thread
-        $qry = $this->db()
-            ->select([
-                'id', '`to`', 'cc', '`from`', '`date`',
-                'seen', 'subject', 'flagged', 'thread_id',
-                'text_plain', 'charset', 'message_id',
-                'outbox_id'
-            ])
-            ->from('messages')
-            ->where('deleted', '=', 0)
-            ->where('account_id', '=', $accountId)
-            ->whereIn('thread_id', $threadIds)
-            ->orderBy('date', Model::DESC)
-            ->limit($limit, $offset);
-
-        if (false === ($options[self::IS_DRAFTS] ?? false)) {
-            return $qry
-                ->groupBy(['thread_id'])
-                ->execute()
-                ->fetchAll(PDO::FETCH_CLASS, get_class());
-        }
-
-        // In some cases we always want the newest message
-        // This is only used with the drafts folder currently
-        $flat = $qry->execute()->fetchAll(PDO::FETCH_CLASS, get_class());
-        $threads = [];
-        $found = [];
-
-        foreach ($flat as $message) {
-            if (isset($found[$message->thread_id])) {
-                continue;
-            }
-
-            $threads[] = $message;
-            $found[$message->thread_id] = true;
-        }
-
-        return $threads;
+        return array_column($results ?: [], 'thread_id');
     }
 
     /**

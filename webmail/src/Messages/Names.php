@@ -40,7 +40,7 @@ class Names
 
         // Finally, we need to combine the names in the most
         // space efficient way possible
-        if (1 === count($list)) {
+        if (1 === count(array_filter(array_column($list, 'name')))) {
             return $this->getSingleName(
                 $list[1]->name, $list[1]->seen, $list[1]->draft
             );
@@ -157,12 +157,16 @@ class Names
         // If nothing is in the middle and the first and third names
         // are the same,
         if (! $list[2] && $list[1]->name === $list[3]->name) {
-            // and if all messages are seen then kill the final one;
-            if ($list[1]->seen && $list[3]->seen) {
+            // and if both messages are seen or both unseen,
+            // then kill the final one;
+            if (($list[1]->seen && $list[3]->seen)
+                || (! $list[1]->seen && ! $list[3]->seen)
+            ) {
                 $list[3] = $this->getEmptyRow();
             } elseif (! $list[1]->seen && $list[3]->seen) {
-                // or if the last one is seen but the first is not, preserve
-                // the unseen nature of the thread, but collapse the two
+                // or if the last one is seen but the first is not,
+                // preserve the unseen nature of the thread, but
+                // collapse the two
                 $list[1] = $list[3];
                 $list[1]->seen = false;
                 $list[3] = $this->getEmptyRow();

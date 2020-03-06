@@ -112,7 +112,9 @@ class Message
         }
 
         $this->dirty = false;
-
+if (! $this->threadId) {
+    print_r($this);exit;
+}
         if ($this->ids) {
             $model->saveThreadId($this->ids, $this->threadId);
         }

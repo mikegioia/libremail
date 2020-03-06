@@ -439,7 +439,8 @@ class Threads
 
             $this->addresses = array_merge(
                 $this->addresses,
-                $message->getAddresses());
+                $message->getAddresses()
+            );
 
             $this->updateProgress(++$count, $total);
 

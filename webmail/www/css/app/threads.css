@@ -220,7 +220,8 @@ input[type="checkbox"].thread-msg-more-checkbox {
 }
 
 .thread-msg .message {
-  font-family: 'Nanum Gothic Coding', monospace;
+  font-family: 'Fira Code', monospace;
+  font-size: 1.125rem;
   max-width: 52rem;
   padding: 0 0 0 4rem;
   white-space: pre-wrap;

@@ -8,6 +8,7 @@ namespace App\Sync;
 
 use Fn;
 use App\Sync;
+use App\Stats;
 use Exception;
 use PDOException;
 use Monolog\Logger;
@@ -25,6 +26,7 @@ class Messages
 {
     private $log;
     private $cli;
+    private $stats;
     private $emitter;
     private $mailbox;
     private $interactive;
@@ -38,6 +40,7 @@ class Messages
     /**
      * @param Logger $log
      * @param CLImate $cli
+     * @param Stats $stats
      * @param Emitter $emitter
      * @param Mailbox $mailbox
      * @param bool $interactive
@@ -45,6 +48,7 @@ class Messages
     public function __construct(
         Logger $log,
         CLImate $cli,
+        Stats $stats,
         Emitter $emitter,
         Mailbox $mailbox,
         bool $interactive,
@@ -52,6 +56,7 @@ class Messages
     ) {
         $this->log = $log;
         $this->cli = $cli;
+        $this->stats = $stats;
         $this->emitter = $emitter;
         $this->mailbox = $mailbox;
         $this->interactive = $interactive;
@@ -136,6 +141,7 @@ class Messages
             $toDownload = array_diff($newIds, $savedIds);
         }
 
+        $start = time();
         $count = count($toDownload);
         $syncedCount = $total - $count;
         $noun = Fn\plural('message', $total);
@@ -162,8 +168,7 @@ class Messages
 
         if ($this->interactive) {
             $noun = Fn\plural('message', $count);
-            $this->cli->whisper(
-                "Syncing $count new $noun in {$folder->name}:");
+            $this->cli->whisper("Syncing $count new $noun in {$folder->name}:");
             $progress = $this->cli->progress()->total(100);
         }
 
@@ -172,6 +177,13 @@ class Messages
 
         foreach ($toDownload as $messageId => $uniqueId) {
             $this->downloadMessage($messageId, $uniqueId, $folder);
+
+            // For long running downloads, update the stats
+            // every minute or so
+            if (time() - $start >= 60) {
+                $this->stats->setRunning(true);
+                $start = time();
+            }
 
             if ($this->interactive) {
                 $progress->current(($i++ / $count) * 100);
