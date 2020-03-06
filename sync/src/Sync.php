@@ -305,9 +305,9 @@ class Sync
                 $actionCount = $this->syncActions($account);
 
                 $this->log->info(sprintf(
-                    '%s task%s synced for %s',
+                    '%s action%s synced for %s',
                     $actionCount,
-                    $actionCount === 1 ? ' was' : 's were',
+                    1 === $actionCount ? ' was' : 's were',
                     $account->email
                 ));
 
@@ -327,7 +327,6 @@ class Sync
             }
 
             $this->log->info("Starting sync for {$account->email}");
-return true;
             $this->connect($account);
 
             // Check if we're only syncing one folder

@@ -419,6 +419,10 @@ class Threads
                 );
             }
 
+            if ($message->hasThreadId()) {
+                $message->setThreadId($message->getThreadId());
+            }
+
             if ($message->hasUpdate()) {
                 $updateCount += count($message->ids);
             }

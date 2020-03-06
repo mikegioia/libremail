@@ -27,7 +27,7 @@ class Message
 
     public function __construct(MessageModel $message)
     {
-        $this->threadId = $message->thread_id;
+        $this->threadId = (int) $message->thread_id;
         $this->timestamp = strtotime($message->date);
         $this->messageId = trim($message->message_id);
         $this->subject = $message->getCleanSubject();
@@ -71,19 +71,24 @@ class Message
      *
      * @return array
      */
-    public function addReferences($references)
+    public function addReferences(array $references)
     {
         $this->references += $references;
 
         return $this->references;
     }
 
-    public function setThreadId($threadId)
+    public function setThreadId(int $threadId)
     {
-        if ($threadId && (int) $this->threadId !== (int) $threadId) {
+        if ($threadId && $this->threadId !== $threadId) {
             $this->dirty = true;
             $this->threadId = $threadId;
         }
+    }
+
+    public function hasThreadId()
+    {
+        return (int) $this->threadId > 0;
     }
 
     public function getAddresses()
@@ -112,9 +117,7 @@ class Message
         }
 
         $this->dirty = false;
-if (! $this->threadId) {
-    print_r($this);exit;
-}
+
         if ($this->ids) {
             $model->saveThreadId($this->ids, $this->threadId);
         }

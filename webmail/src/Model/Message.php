@@ -588,19 +588,19 @@ class Message extends Model implements MessageInterface
 
         if (true === $options[self::SPLIT_FLAGGED]) {
             $flagged = $this->getThreads(
-                $meta->flaggedIds, $accountId, $limit, $offset, $options
+                $meta->flaggedIds, $accountId, $limit, $offset
             );
             $unflagged = $this->getThreads(
-                $meta->unflaggedIds, $accountId, $limit, $offset, $options
+                $meta->unflaggedIds, $accountId, $limit, $offset
             );
             $messages = array_merge($flagged, $unflagged);
         } elseif (true === $options[self::ONLY_FLAGGED]) {
             $messages = $this->getThreads(
-                $meta->flaggedIds, $accountId, $limit, $offset, $options
+                $meta->flaggedIds, $accountId, $limit, $offset
             );
         } else {
             $messages = $this->getThreads(
-                $threadIds, $accountId, $limit, $offset, $options
+                $threadIds, $accountId, $limit, $offset
             );
         }
 
@@ -649,8 +649,7 @@ class Message extends Model implements MessageInterface
         array $threadIds,
         int $accountId,
         int $limit,
-        int $offset,
-        array $options = []
+        int $offset
     ) {
         if (! count($threadIds)) {
             return [];
@@ -663,8 +662,33 @@ class Message extends Model implements MessageInterface
         // for the large payload of data below
         $sliceIds = array_slice($allThreadIds, $offset, $limit);
 
-        // Load the latest message for each thread
-        $threads = $this->db()
+        // Load all of the unique messages along with some
+        // meta data. This is used to then locate the most
+        // recent messages.
+        $messages = $this->db()
+            ->select(['id', 'thread_id', 'seen', '`date`'])
+            ->from('messages')
+            ->whereIn('thread_id', $sliceIds)
+            ->where('deleted', '=', 0)
+            ->groupBy('message_id')
+            ->orderBy('thread_id', Model::ASC)
+            ->orderBy('date', Model::DESC)
+            ->execute()
+            ->fetchAll();
+
+        // Locate the most recent message ID and the oldest
+        // unseen message ID. These are used for querying
+        // the full message data.
+        $recents = [];
+
+        foreach ($messages as $message) {
+            if (! isset($recents[$message['thread_id']])) {
+                $recents[$message['thread_id']] = $message['id'];
+            }
+        }
+
+        // Load all of the recent messages
+        return $this->db()
             ->select([
                 'id', '`to`', 'cc', '`from`', '`date`',
                 'seen', 'subject', 'flagged', 'thread_id',
@@ -672,47 +696,10 @@ class Message extends Model implements MessageInterface
                 'text_plain'
             ])
             ->from('messages')
-            ->whereIn('thread_id', $sliceIds)
+            ->whereIn('id', $recents)
             ->orderBy('date', Model::DESC)
             ->execute()
             ->fetchAll(PDO::FETCH_CLASS, get_class());
-
-        // In some cases we always want the latest message
-        // This is only used with the drafts folder currently
-        if (true === ($options[self::IS_DRAFTS] ?? false)) {
-            return $threads;
-        }
-
-        // Load any text_plains for the most recent unread message
-        // and overwrite any existing threads with them
-        $sliceIds = array_slice(
-            array_column($threadDates, 'thread_id'),
-            $offset,
-            $limit
-        );
-        $threadDates = $this->getThreadDates($sliceIds, $accountId, true);
-        $messageIds = array_slice(
-            array_column($threadDates, 'id'),
-            $offset,
-            $limit
-        );
-        $textPlains = $this->db()
-            ->select(['id', 'text_plain'])
-            ->from('messages')
-            ->whereIn('id', $messageIds)
-            ->execute()
-            ->fetchAll();
-        $textPlains = array_combine(
-            array_column($textPlains, 'id'),
-            array_column($textPlains, 'text_plain')
-        );
-//print_r($textPlains);exit;
-        foreach ($threads as $thread) {
-            if (isset($textPlains[$thread->id])) {
-                $thread->text_plain = $textPlains[$thread->id];
-            }
-        }
-        return $threads;
     }
 
     /**
@@ -722,11 +709,8 @@ class Message extends Model implements MessageInterface
      *
      * @return array
      */
-    private function getThreadDates(
-        array $threadIds,
-        int $accountId,
-        bool $unseen = false
-    ) {
+    private function getThreadDates(array $threadIds, int $accountId)
+    {
         $results = $this->db()
             ->select(['thread_id', 'max(date) as max_date'])
             ->from('messages')
