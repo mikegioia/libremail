@@ -588,19 +588,27 @@ class Message extends Model implements MessageInterface
 
         if (true === $options[self::SPLIT_FLAGGED]) {
             $flagged = $this->getThreads(
-                $meta->flaggedIds, $accountId, $limit, $offset
+                $meta->flaggedIds,
+                $accountId, $limit, $offset,
+                $skipFolderIds, $onlyFolderIds
             );
             $unflagged = $this->getThreads(
-                $meta->unflaggedIds, $accountId, $limit, $offset
+                $meta->unflaggedIds,
+                $accountId, $limit, $offset,
+                $skipFolderIds, $onlyFolderIds
             );
             $messages = array_merge($flagged, $unflagged);
         } elseif (true === $options[self::ONLY_FLAGGED]) {
             $messages = $this->getThreads(
-                $meta->flaggedIds, $accountId, $limit, $offset
+                $meta->flaggedIds,
+                $accountId, $limit, $offset,
+                $skipFolderIds, $onlyFolderIds
             );
         } else {
             $messages = $this->getThreads(
-                $threadIds, $accountId, $limit, $offset
+                $threadIds,
+                $accountId, $limit, $offset,
+                $skipFolderIds, $onlyFolderIds
             );
         }
 
@@ -649,7 +657,9 @@ class Message extends Model implements MessageInterface
         array $threadIds,
         int $accountId,
         int $limit,
-        int $offset
+        int $offset,
+        array $skipFolderIds,
+        array $onlyFolderIds
     ) {
         if (! count($threadIds)) {
             return [];
@@ -666,9 +676,12 @@ class Message extends Model implements MessageInterface
         // meta data. This is used to then locate the most
         // recent messages.
         $messages = $this->db()
-            ->select(['id', 'thread_id', 'seen', '`date`'])
+            ->select([
+                'id', 'thread_id', 'seen', 'folder_id', '`date`'
+            ])
             ->from('messages')
             ->whereIn('thread_id', $sliceIds)
+            ->whereNotIn('folder_id', array_diff($skipFolderIds, $onlyFolderIds))
             ->where('deleted', '=', 0)
             ->groupBy('message_id')
             ->orderBy('thread_id', Model::ASC)
@@ -680,15 +693,22 @@ class Message extends Model implements MessageInterface
         // unseen message ID. These are used for querying
         // the full message data.
         $recents = [];
+        $unseens = [];
 
         foreach ($messages as $message) {
             if (! isset($recents[$message['thread_id']])) {
                 $recents[$message['thread_id']] = $message['id'];
             }
+
+            // We want the snippet to contain the oldest
+            // unread message unless 
+            if (0 === (int) $message['seen']) {
+                $unseens[$message['thread_id']] = $message['id'];
+            }
         }
 
         // Load all of the recent messages
-        return $this->db()
+        $threads = $this->db()
             ->select([
                 'id', '`to`', 'cc', '`from`', '`date`',
                 'seen', 'subject', 'flagged', 'thread_id',
@@ -697,9 +717,26 @@ class Message extends Model implements MessageInterface
             ])
             ->from('messages')
             ->whereIn('id', $recents)
-            ->orderBy('date', Model::DESC)
             ->execute()
             ->fetchAll(PDO::FETCH_CLASS, get_class());
+        $textPlains = $this->db()
+            ->select(['thread_id', 'text_plain'])
+            ->from('messages')
+            ->whereIn('id', $unseens)
+            ->execute()
+            ->fetchAll();
+        $textPlains = array_combine(
+            array_column($textPlains, 'thread_id'),
+            array_column($textPlains, 'text_plain')
+        );
+
+        foreach ($threads as $thread) {
+            if (isset($textPlains[$thread->thread_id])) {
+                $thread->text_plain = $textPlains[$thread->thread_id];
+            }
+        }
+
+        return $threads;
     }
 
     /**
