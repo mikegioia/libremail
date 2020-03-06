@@ -17,9 +17,9 @@ I'll soon be using this as my daily driver, which should shore up a lot of bugs.
        star/unstar actions for messages and threads~
  - [x] ~Edit account credentials and settings~
  - [x] ~Sync all actions with IMAP/SMTP server~
- - [x] Search and display search results
- - [ ] Compose new message
- - [ ] Reply to and forward messages
+ - [x] ~Search and display search results~
+ - [ ] Compose new message *[Started]*
+ - [ ] Reply to and forward messages *[Started]*
 
 #### Installation (Developers only)
 
@@ -42,7 +42,10 @@ The Web Client includes the following 3rd party packages:
     2. [Font Awesome 5 Free Web Font](https://fontawesome.com), _Fort Awesome_
         * SVG Icons — [CC BY 4.0 License](https://creativecommons.org/licenses/by/4.0/)
         * Web and Desktop Fonts — [SIL OFL 1.1 License](https://scripts.sil.org/OFL)
-    3. [Nanum Gothic Coding Font](https://en.wikipedia.org/wiki/Nanum_font),
+    3. [Fira Code Font](https://en.wikipedia.org/wiki/Fira_Sans#Fira_Code),
+       _Mozilla Foundation_
+        * [SIL OFL 1.1 License](https://scripts.sil.org/OFL)
+    4. [Nanum Gothic Coding Font](https://en.wikipedia.org/wiki/Nanum_font),
        _Sandoll Communication_
         * [SIL OFL 1.1 License](https://scripts.sil.org/OFL)
 2. CSS
