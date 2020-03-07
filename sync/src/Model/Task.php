@@ -230,6 +230,28 @@ class Task extends Model
     }
 
     /**
+     * Returns count of un-synced tasks, 0 if none.
+     *
+     * @param int $accountId
+     *
+     * @return int
+     */
+    public function getTaskCountForSync(int $accountId)
+    {
+        $result = $this->db()
+            ->select()
+            ->clear()
+            ->count('1', 'count')
+            ->from('tasks')
+            ->where('account_id', '=', $accountId)
+            ->where('status', '=', self::STATUS_NEW)
+            ->execute()
+            ->fetch();
+
+        return intval($result['count'] ?? 0);
+    }
+
+    /**
      * Returns ALL of the un-synced tasks for a rollback.
      * If there are none, this returns false.
      *

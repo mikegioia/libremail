@@ -6,21 +6,21 @@
 
 namespace App\Sync;
 
-use Fn;
-use App\Sync;
-use App\Stats;
-use Exception;
-use PDOException;
-use Monolog\Logger;
-use Pb\Imap\Mailbox;
-use League\CLImate\CLImate;
-use App\Model\Folder as FolderModel;
-use App\Model\Account as AccountModel;
-use App\Model\Message as MessageModel;
-use Evenement\EventEmitter as Emitter;
-use App\Exceptions\Validation as ValidationException;
 use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
+use App\Exceptions\Validation as ValidationException;
+use App\Model\Account as AccountModel;
+use App\Model\Folder as FolderModel;
+use App\Model\Message as MessageModel;
+use App\Stats;
+use App\Sync;
+use Evenement\EventEmitter as Emitter;
+use Exception;
+use Fn;
+use League\CLImate\CLImate;
+use Monolog\Logger;
 use Pb\Imap\Exceptions\MessageSizeLimit as MessageSizeLimitException;
+use Pb\Imap\Mailbox;
+use PDOException;
 
 class Messages
 {
@@ -195,9 +195,12 @@ class Messages
             // Save stats about the folder
             $folder->saveStats($total, ++$syncedCount);
 
-            // After each download, try to reclaim memory.
+            // After each download, try to reclaim memory
             $this->emitter->emit(Sync::EVENT_GARBAGE_COLLECT);
             $this->emitter->emit(Sync::EVENT_CHECK_HALT);
+
+            // Halts and restarts if there are new jobs to be processed
+            $this->stats->checkRestart();
         }
 
         $this->emitter->emit(Sync::EVENT_GARBAGE_COLLECT);
@@ -279,6 +282,9 @@ class Messages
             return;
         }
 
+        // Halts and restarts if there are new jobs to be processed
+        $this->stats->checkRestart();
+
         $this->log->info(
             "Marking $count deletion".(1 === $count ? '' : 's').
             " in {$folder->name}"
@@ -359,9 +365,13 @@ class Messages
         $count = count($toUpdate);
 
         if ($count) {
+            // Halts and restarts if there are new jobs to be processed
+            $this->stats->checkRestart();
             $this->log->debug(
                 "Updating $count with new message numbers in {$folder->name}"
             );
+        } else {
+            return;
         }
 
         try {
@@ -387,6 +397,9 @@ class Messages
      */
     private function updateSeenFlags(AccountModel $account, FolderModel $folder)
     {
+        // Halts and restarts if there are new jobs to be processed
+        $this->stats->checkRestart();
+
         // Fetch all unseen message IDs from the mailbox
         $unseenIds = $this->mailbox->search(self::FLAG_UNSEEN, true);
 
@@ -448,6 +461,9 @@ class Messages
      */
     private function updateFlaggedFlags(AccountModel $account, FolderModel $folder)
     {
+        // Halts and restarts if there are new jobs to be processed
+        $this->stats->checkRestart();
+
         // Fetch all flagged message IDs from the mailbox
         $flaggedIds = $this->mailbox->search(self::FLAG_FLAGGED, true);
 
@@ -513,6 +529,9 @@ class Messages
      */
     private function flushPurged(AccountModel $account, FolderModel $folder)
     {
+        // Halts and restarts if there are new jobs to be processed
+        $this->stats->checkRestart();
+
         // Mark as seen anything unseen that's not in this collection
         try {
             $updated = (new MessageModel)->deleteMarkedForPurge(

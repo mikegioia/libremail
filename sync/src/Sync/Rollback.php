@@ -45,9 +45,11 @@ class Rollback
                 ++$count;
             }
         } catch (Exception $e) {
-            $this->cli->whisper(
-                'Problem during rollback, rolling back the rollback :P');
             Model::getDb()->rollBack();
+
+            $this->cli->whisper(
+                'Problem during rollback, rolling back the rollback :P'
+            );
 
             throw new PDOException($e);
         }
@@ -56,7 +58,8 @@ class Rollback
 
         $this->cli->info(
             "Finished rolling back $count task".
-            (1 === $count ? '' : 's'));
+            (1 === $count ? '' : 's')
+        );
     }
 
     /**
