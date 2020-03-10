@@ -1,5 +1,6 @@
 bin
-logs
+logs/*
+!logs/.gitkeep
 build
 vendor
 test.php
