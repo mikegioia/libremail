@@ -305,17 +305,13 @@ class Controller
         )->updateMessage($parentMessage);
 
         $this->page('reply', [
-            'ccAddresses' => $parent->getReplyAllAddresses(
-                false, '', ['cc'], true
-            ),
+            'ccAddresses' => $parent->getReplyCcAddresses($this->account->email),
             'contacts' => Contact::getByAccount($this->account->id),
             'parent' => $parent,
             'replyAll' => $replyAll,
-            'toAddresses' => $parent->getReplyAllAddresses(
-                false,
-                $this->account->email,
-                ['reply_to', 'from', 'to']
-            )
+            'toAddresses' => $replyAll
+                ? $parent->getReplyAddresses($this->account->email)
+                : $parent->getReplyAddress(false)
         ]);
     }
 

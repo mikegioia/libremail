@@ -123,10 +123,7 @@
             'outbox' => $outbox,
             'account' => $account,
             'message' => $message,
-            'visible' => true === ($showReplyAll ?? false),
-            'addresses' => $outbox->exists() && $outbox->getAddresses()
-                ? $outbox->getAddresses()
-                : $message->getReplyAllAddresses(false, $account->email)
+            'visible' => true === ($showReplyAll ?? false)
         ]);
     endif; ?>
 </div>

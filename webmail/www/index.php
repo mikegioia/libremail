@@ -152,7 +152,7 @@ if (! $account->exists()) {
     // Reply to a message
     $router->get('/reply/(\d+)', [$controller, 'reply']);
     // Reply-all to a message
-    $router->get('/replyall/(\d+)', [$controller, 'reply']);
+    $router->get('/replyall/(\d+)', [$controller, 'replyAll']);
     // View the outbox messages
     $router->get('/outbox', [$controller, 'outbox']);
     // Delete draft

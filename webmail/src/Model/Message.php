@@ -206,6 +206,26 @@ class Message extends Model implements MessageInterface
         return $replyTo ?: $this->getReplyAllAddresses($stringify, '', ['from']);
     }
 
+    public function getReplyToAddresses(string $accountEmail = '', bool $stringify = false)
+    {
+        return $this->getReplyAllAddresses(
+            $stringify,
+            $accountEmail,
+            ['reply_to', 'from', 'to'],
+            false
+        );
+    }
+
+    public function getReplyCcAddresses(string $accountEmail = '', bool $stringify = false)
+    {
+        return $this->getReplyAllAddresses(
+            $stringify,
+            $accountEmail,
+            ['cc'],
+            true
+        );
+    }
+
     public function loadById()
     {
         if (! $this->id) {

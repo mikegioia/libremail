@@ -6,13 +6,13 @@
         <div class="ten columns inherit">
             <span><!--
         <?php
-        foreach ($message->getReplyAllAddresses(false) as $address): ?>
+        foreach ($message->getReplyToAddresses($account->email) as $address): ?>
             --><span class="address" title="<?php $view->clean($address); ?>"><?php $view->clean($message->getName($address)); ?></span><!--
         <?php
         endforeach; ?>
             --></span>
         </div>
-        <div class="one columns">
+        <div class="one columns align-right">
             <button type="submit" name="reply_all_edit" value="<?php echo $message->id; ?>" class="button link-button align-right">Edit</button>
         </div>
     </div>
@@ -33,7 +33,7 @@
         <div class="ten columns inherit">
             <span class="address" title="<?php $view->clean($message->getReplyAddress()); ?>"><?php $view->clean($message->getName($message->getReplyAddress())); ?></span>
         </div>
-        <div class="one columns">
+        <div class="one columns align-right">
             <button type="submit" name="reply_edit" value="<?php echo $message->id; ?>" class="button link-button align-right">Edit</button>
         </div>
     </div>
