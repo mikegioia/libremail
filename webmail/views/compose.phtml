@@ -37,6 +37,7 @@ $view->render('nav', [
     <?php
     endif; ?>
     <form action="<?php echo App\Url::compose(); ?>" method="post">
+        <!-- To -->
         <div class="row input-row addresses<?php echo isset($formErrors['to']) ? ' has-error' : ''; ?>">
             <div class="two columns label">
                 <label class="align-right">To</label>
@@ -46,7 +47,7 @@ $view->render('nav', [
             for ($i = 0; $i < 10; $i++): ?>
                 <input type="text" name="to[]" list="contacts" required
                     value="<?php $view->clean($formData['to'][$i] ?? ($message->to[$i] ?? '')); ?>"
-                    class="<?php echo isset($formErrors['to'][$i]) ? 'with-error' : ''; ?>" />
+                    class="<?php echo isset($formErrors['to'][$i]) ? 'with-error' : ''; ?>">
                 <?php
                 if (isset($formErrors['to'][$i])): ?>
                 <div class="error-message"><?php echo $formErrors['to'][$i]; ?></div>
@@ -55,7 +56,8 @@ $view->render('nav', [
             endfor; ?>
             </div>
         </div>
-        <input type="radio" id="toggle-cc" />
+        <!-- Cc -->
+        <input type="radio" id="toggle-cc">
         <div class="row input-row addresses <?php echo isset($formErrors['cc']) ? 'has-error' : 'hidden'; ?>">
             <div class="two columns label">
                 <label class="align-right">Cc</label>
@@ -65,12 +67,13 @@ $view->render('nav', [
             for ($i = 0; $i < 10; $i++): ?>
                 <input type="text" name="cc[]" list="contacts" required
                     value="<?php $view->clean($formData['cc'][$i] ?? ($message->cc[$i] ?? '')); ?>"
-                    class="<?php echo isset($formErrors['cc'][$i]) ? 'with-error' : ''; ?>" />
+                    class="<?php echo isset($formErrors['cc'][$i]) ? 'with-error' : ''; ?>">
             <?php
             endfor; ?>
             </div>
         </div>
-        <input type="radio" id="toggle-bcc" />
+        <!-- Bcc -->
+        <input type="radio" id="toggle-bcc">
         <div class="row input-row addresses <?php echo isset($formErrors['bcc']) ? 'has-error' : 'hidden'; ?>">
             <div class="two columns label">
                 <label class="align-right" for="settings-email">Bcc</label>
@@ -80,11 +83,12 @@ $view->render('nav', [
             for ($i = 0; $i < 10; $i++): ?>
                 <input type="text" name="bcc[]" list="contacts" required
                     value="<?php $view->clean($formData['bcc'][$i] ?? ($message->bcc[$i] ?? '')); ?>"
-                    class="<?php echo isset($formErrors['bcc'][$i]) ? 'with-error' : ''; ?>" />
+                    class="<?php echo isset($formErrors['bcc'][$i]) ? 'with-error' : ''; ?>">
             <?php
             endfor; ?>
             </div>
         </div>
+        <!-- From -->
         <div class="row addresses from">
             <div class="two columns label">
                 <label class="align-right">From</label>
@@ -104,14 +108,16 @@ $view->render('nav', [
                 </span>
             </div>
         </div>
+        <!-- Subject -->
         <div class="row input-row subject">
             <div class="two columns label">
                 <label class="align-right" for="settings-email">Subject</label>
             </div>
             <div class="ten columns">
-                <input type="text" name="subject" value="<?php $view->clean($formData['subject'] ?? $message->subject); ?>" />
+                <input type="text" name="subject" value="<?php $view->clean($formData['subject'] ?? $message->subject); ?>">
             </div>
         </div>
+        <!-- Message -->
         <div class="row input-row message">
             <div class="two columns label">
                 <label class="align-right" for="settings-email">Message</label>
@@ -123,6 +129,7 @@ $view->render('nav', [
                 </div>
             </div>
         </div>
+        <!-- Buttons -->
         <div class="row buttons">
             <div class="ten columns offset-by-two">
                 <button type="submit" name="send_draft" class="button button-secondary" formnovalidate>
@@ -133,7 +140,7 @@ $view->render('nav', [
                 </button>
                 <span>or</span>
                 <a href="/">Go back</a>
-                <input type="hidden" name="id" value="<?php echo $message->id ?? ''; ?>" />
+                <input type="hidden" name="id" value="<?php echo $message->id ?? ''; ?>">
             </div>
         </div>
     </form>

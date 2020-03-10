@@ -158,6 +158,25 @@ class Thread
     }
 
     /**
+     * Adds additional fields to a single message.
+     *
+     * @return Message
+     */
+    public function updateMessage(Message $message)
+    {
+        $escaper = new Escaper(self::UTF8);
+
+        $this->setTo($message);
+        $this->setFrom($message);
+        $this->setDate($message);
+        $this->setAvatar($message);
+        $this->setContent($message);
+        $this->setSnippet($message, $escaper);
+
+        return $message;
+    }
+
+    /**
      * Adds additional fields to each message.
      */
     private function updateMessages(array $allMessages)

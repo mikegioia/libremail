@@ -2,19 +2,6 @@
  * Media Queries
  */
 
-/* Massive screens */
-@media (min-width: 1800px) {
-  html {
-    font-size: 95%;
-  }
-  #search .icon.button {
-    top: 0.1875rem;
-  }
-  .thread-msg .message {
-    font-size: 1.25rem;
-  }
-}
-
 /* Very large devices */
 @media (min-width: 1400px) {
   section#main {
@@ -26,11 +13,37 @@
   nav #nav-wrapper {
     width: 21rem;
   }
+  section#main > h5 + .help-text {
+    max-width: none;
+  }
   #logo {
     width: 23rem;
   }
   #search {
     width: calc(100% - 45rem)
+  }
+  #search .icon.button {
+    top: 0.1rem;
+  }
+  .compose.reply form {
+    float: left;
+    width: calc(60% - 2rem);
+  }
+  .compose.reply .in-reply-to {
+    float: right;
+    width: calc(40% - 4rem);
+  }
+  .compose.reply .in-reply-to .panel-body {
+    height: 16rem;
+  }
+  .compose.reply input#toggle-reply-panel:checked + .panel {
+    margin-bottom: 0;
+  }
+  .compose.reply input#toggle-reply-panel:checked + .panel .panel-body {
+    max-height: calc(100vh - 19.5rem);
+  }
+  .compose.reply input#toggle-reply-panel:checked + .panel .panel-collapse {
+    display: none;
   }
 }
 
@@ -41,6 +54,25 @@
   }
   #search .icon.button {
     top: 0.125rem;
+  }
+}
+
+/* Massive screens */
+@media (min-width: 1800px) {
+  html {
+    font-size: 85%;
+  }
+  #search .icon.button {
+    top: 0.1875rem;
+  }
+  .thread-msg .message {
+    font-size: 1.25rem;
+  }
+  .compose.reply form {
+    width: calc(50% - 2rem);
+  }
+  .compose.reply .in-reply-to {
+    width: calc(50% - 4rem);
   }
 }
 
@@ -65,9 +97,6 @@
 
 /* Large devices (laptops) */
 @media (max-width: 1199px) {
-  html {
-    font-size: 80%;
-  }
   .settings form > .row > .seven.columns {
     max-width: none;
     width: 66%;

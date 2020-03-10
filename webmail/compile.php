@@ -9,6 +9,7 @@ $css = [
     'font-awesome.css',
     'open-sans.css',
     'nanum-gothic.css',
+    'fira-code.css',
     'normalize.css',
     'skeleton.css',
     // App files
@@ -19,6 +20,7 @@ $css = [
     'app/tooltips.css',
     'app/alerts.css',
     'app/dialogs.css',
+    'app/panels.css',
     'app/notifications.css',
     'app/dropdowns.css',
     'app/messages.css',

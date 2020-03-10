@@ -28,7 +28,7 @@ foreach ($thread->getThreadIndex() as $i => $item):
     elseif ($item->type === $thread::INDEX_GROUP):
         if ($item->count > 1): ?>
         <div class="thread-msg-group">
-            <input id="thread-msg-more-checkbox-<?php echo $i; ?>" type="checkbox" class="thread-msg-more-checkbox" />
+            <input id="thread-msg-more-checkbox-<?php echo $i; ?>" type="checkbox" class="thread-msg-more-checkbox">
             <label for="thread-msg-more-checkbox-<?php echo $i; ?>" class="thread-msg-show-more">
                 <?php
                 if ($item->count > 2): ?>

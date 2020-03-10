@@ -13,25 +13,205 @@ $view->render('nav', [
     'folders' => $folders
 ]); ?>
 
-<section id="main" class="compose">
+<section id="main" class="compose reply">
     <?php
     $view->render('notifications', [
         'messages' => $notifications
     ]); ?>
 
     <h5>
-        <span>Re: <?php $view->clean($parent->subject); ?></span>
+        <span>Reply to Message</span>
     </h5>
     <div class="help-text">
         Your message will remain a draft until you click <code>Preview + Send</code>.
         From there, you can send either send your message now, or schedule a specific
         delivery time.
     </div>
-
-    <?php print_r($formData['to'] ?? []); ?>
-    <?php print_r($formData['cc'] ?? []); ?>
-    <?php print_r($formData['subject'] ?? ''); ?>
-    <?php print_r($formData['text_plain'] ?? ''); ?>
+    <!-- Preview panel -->
+    <input type="checkbox" id="toggle-reply-panel" class="toggle">
+    <div class="panel in-reply-to">
+        <div class="panel-header">
+            <span class="panel-title">Replying to&hellip;</span>
+            <span class="float-right">
+                <a href="<?php echo App\Url::thread($parent->folder_id, $parent->thread_id); ?>" target="_blank">View full thread</a>
+                <i class="fas fa-external-link-alt"></i>
+            </span>
+        </div>
+        <div class="panel-body thread-msg">
+            <div class="headers">
+                <span class="avatar">
+                    <img src="<?php echo $parent->avatar_url; ?>">
+                </span>
+                <span class="from">
+                    <strong><?php $view->clean($parent->from_name); ?></strong>
+                    <span><?php $view->clean($parent->from_email); ?></span>
+                </span>
+                <span class="date" title="<?php echo $parent->datetime_string; ?>"><?php echo $parent->date_string; ?></span>
+            </div>
+            <div class="message"><?php $view->clean(trim($parent->text_plain)); ?></div>
+        </div>
+        <div class="panel-reveal">
+            <label for="toggle-reply-panel"></label>
+        </div>
+        <div class="panel-collapse">
+            <label for="toggle-reply-panel">
+                <i class="far fa-caret-square-up"></i>
+                <span>Collapse</span>
+            </label>
+        </div>
+    </div>
+    <!-- Form column -->
+    <form action="<?php echo App\Url::reply($parent->id); ?>" method="post">
+        <!-- To -->
+        <input type="radio" id="toggle-to">
+        <div class="row input-row addresses <?php echo isset($formErrors['to']) ? 'has-error' : 'hidden'; ?>">
+            <div class="two columns label">
+                <label class="align-right">To</label>
+            </div>
+            <div class="ten columns">
+            <?php
+            foreach ($formData['to'] ?? $parent->getReplyAddress(false) as $i => $to): ?>
+                <input type="text" name="to[]" list="contacts" required
+                    value="<?php $view->clean($to); ?>"
+                    class="<?php echo isset($formErrors['to'][$i]) ? 'with-error' : ''; ?>">
+                <?php
+                if (isset($formErrors['to'][$i])): ?>
+                <div class="error-message"><?php echo $formErrors['to'][$i]; ?></div>
+                <?php
+                endif;
+            endforeach;
+            for ($j = ($i ?? 0); $j < 10; $j++): ?>
+                <input type="text" name="to[]" list="contacts" value="" required>
+            <?php
+            endfor; ?>
+            </div>
+        </div>
+        <div class="row padded to<?php echo isset($formErrors['to']) ? ' hidden' : ''; ?>">
+            <div class="two columns label">
+                <label class="align-right">To</label>
+            </div>
+            <div class="ten columns">
+            <?php
+            if (isset($formData['to'])): ?>
+                <span><?php $view->clean(implode(', ', $formData['to'] ?? '')); ?></span>
+            <?php
+            else: ?>
+                <span><?php $view->clean($parent->getReplyAddress()); ?></span>
+            <?php
+            endif; ?>
+                <span class="show-hidden-addresses">
+                <?php
+                if (! isset($formErrors['to'])): ?>
+                    <label for="toggle-to"><a>Edit</a></label>
+                <?php
+                endif; ?>
+                </span>
+            </div>
+        </div>
+        <!-- Cc -->
+        <input type="radio" id="toggle-cc">
+        <div class="row input-row addresses <?php echo isset($formErrors['cc']) ? 'has-error' : 'hidden'; ?>">
+            <div class="two columns label">
+                <label class="align-right">Cc</label>
+            </div>
+            <div class="ten columns">
+            <?php
+            foreach ($formData['cc'] ?? [] as $k => $cc): ?>
+                <input type="text" name="cc[]" list="contacts" required
+                    value="<?php $view->clean($cc); ?>"
+                    class="<?php echo isset($formErrors['cc'][$k]) ? 'with-error' : ''; ?>">
+                <?php
+                if (isset($formErrors['cc'][$k])): ?>
+                <div class="error-message"><?php echo $formErrors['cc'][$k]; ?></div>
+                <?php
+                endif;
+            endforeach;
+            for ($m = ($k ?? 0); $m < 10; $m++): ?>
+                <input type="text" name="cc[]" list="contacts" value="" required>
+            <?php
+            endfor; ?>
+            </div>
+        </div>
+        <!-- Bcc -->
+        <input type="radio" id="toggle-bcc">
+        <div class="row input-row addresses <?php echo isset($formErrors['bcc']) ? 'has-error' : 'hidden'; ?>">
+            <div class="two columns label">
+                <label class="align-right" for="settings-email">Bcc</label>
+            </div>
+            <div class="ten columns">
+            <?php
+            foreach ($formData['bcc'] ?? [] as $n => $bcc): ?>
+                <input type="text" name="bcc[]" list="contacts" required
+                    value="<?php $view->clean($bcc); ?>"
+                    class="<?php echo isset($formErrors['bcc'][$n]) ? 'with-error' : ''; ?>">
+                <?php
+                if (isset($formErrors['bcc'][$n])): ?>
+                <div class="error-message"><?php echo $formErrors['bcc'][$n]; ?></div>
+                <?php
+                endif;
+            endforeach;
+            for ($o = ($n ?? 0); $o < 10; $o++): ?>
+                <input type="text" name="bcc[]" list="contacts" value="" required>
+            <?php
+            endfor; ?>
+            </div>
+        </div>
+        <!-- From -->
+        <div class="row addresses from">
+            <div class="two columns label">
+                <label class="align-right">From</label>
+            </div>
+            <div class="ten columns">
+                <span><?php $view->clean($account->fromAddress()); ?></span>
+                <span class="show-hidden-addresses">
+                <?php
+                if (! isset($formErrors['cc'])): ?>
+                    <label for="toggle-cc"><a>Cc</a></label>
+                <?php
+                endif;
+                if (! isset($formErrors['bcc'])): ?>
+                    <label for="toggle-bcc"><a>Bcc</a></label>
+                <?php
+                endif; ?>
+                </span>
+            </div>
+        </div>
+        <!-- Subject -->
+        <div class="row padded subject">
+            <div class="two columns label">
+                <label class="align-right" for="settings-email">Subject</label>
+            </div>
+            <div class="ten columns">
+                <span>Re: <?php $view->clean($formData['subject'] ?? $parent->subject); ?></span>
+            </div>
+        </div>
+        <!-- Message -->
+        <div class="row input-row message">
+            <div class="two columns label">
+                <label class="align-right" for="settings-email">Message</label>
+            </div>
+            <div class="ten columns pb-0">
+                <textarea name="text_plain"><?php echo $formData['text_plain'] ?? ''; ?></textarea>
+                <div class="help-text align-right">
+                    Markdown enabled
+                </div>
+            </div>
+        </div>
+        <!-- Buttons -->
+        <div class="row buttons">
+            <div class="ten columns offset-by-two">
+                <button type="submit" name="send_draft" class="button button-secondary" formnovalidate>
+                    Save Draft
+                </button>
+                <button type="submit" name="send_preview" class="button button-primary" formnovalidate>
+                    Preview + Send
+                </button>
+                <span>or</span>
+                <a href="/">Go back</a>
+                <input type="hidden" name="parent_id" value="<?php echo $parent->id; ?>">
+            </div>
+        </div>
+    </form>
 </section>
 
 <!-- Datalist for contacts -->

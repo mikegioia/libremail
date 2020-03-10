@@ -352,8 +352,27 @@ body.theme-coolnight .compose .has-error label,
 body.theme-coolnight .compose .has-error .error-message {
   color: #d05b5b;
 }
+
 body.theme-coolnight .compose .has-error input[type="text"] {
   border-color: #d05b5b;
+}
+
+/* Panels */
+body.theme-coolnight .panel {
+  border-color: #323232;
+}
+
+body.theme-coolnight .panel .panel-header {
+  background-color: #424242;
+  border-color: #323232;
+}
+
+body.theme-coolnight .panel .panel-body {
+  background-color: #424242;
+}
+
+body.theme-coolnight .compose.reply .in-reply-to .panel-reveal {
+  background: linear-gradient(rgba(59, 59, 59, 0), #3b3b3b);
 }
 
 /* Misc elements */
@@ -378,6 +397,11 @@ body.theme-coolnight .notifications .notification.success {
 body.theme-coolnight .notifications .notification.error {
   border: 1px solid #2d1414;
   box-shadow: 0 1px 2px #2b2b2b;
+}
+
+body.theme-coolnight .compose.reply .in-reply-to .panel-header i,
+body.theme-coolnight .compose.reply .in-reply-to .headers .date {
+  color: #aaa;
 }
 
 /* Shadows */

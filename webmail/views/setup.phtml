@@ -23,7 +23,7 @@ $view->render('header-light', [
                 <label class="align-right" for="settings-email">Email</label>
             </div>
             <div class="seven columns input">
-                <input type="email" id="settings-email" name="email" value="<?php $view->clean($account->email ?: ''); ?>" placeholder="you@mail.com" required />
+                <input type="email" id="settings-email" name="email" value="<?php $view->clean($account->email ?: ''); ?>" placeholder="you@mail.com" required>
             </div>
         </div>
         <div class="row">
@@ -31,7 +31,7 @@ $view->render('header-light', [
                 <label class="align-right" for="settings-password">Password</label>
             </div>
             <div class="seven columns input">
-                <input type="password" id="settings-password" name="password" value="<?php $view->clean($account->password ?: ''); ?>" required />
+                <input type="password" id="settings-password" name="password" value="<?php $view->clean($account->password ?: ''); ?>" required>
                 <div class="note align-right">
                     It's wise to
                     <a href="https://security.google.com/settings/security/apppasswords" target="_blank" title="Opens a new tab">use a token</a>
@@ -44,7 +44,7 @@ $view->render('header-light', [
                 <label class="align-right" for="settings-name">Name</label>
             </div>
             <div class="seven columns input">
-                <input type="text" id="settings-name" name="name" value="<?php $view->clean($account->name ?: ''); ?>" placeholder="Your Name" required />
+                <input type="text" id="settings-name" name="name" value="<?php $view->clean($account->name ?: ''); ?>" placeholder="Your Name" required>
             </div>
         </div>
         <div class="row">
@@ -52,7 +52,7 @@ $view->render('header-light', [
                 <label class="align-right" for="settings-host">IMAP Address</label>
             </div>
             <div class="seven columns input">
-                <input type="text" id="settings-host" name="host" value="<?php $view->clean($account->imap_host ?: ''); ?>" placeholder="imap.gmail.com" />
+                <input type="text" id="settings-host" name="host" value="<?php $view->clean($account->imap_host ?: ''); ?>" placeholder="imap.gmail.com">
             </div>
         </div>
         <div class="row">
@@ -60,7 +60,7 @@ $view->render('header-light', [
                 <label class="align-right" for="settings-host">IMAP Port</label>
             </div>
             <div class="three columns input">
-                <input type="text" id="settings-port" name="port" value="<?php $view->clean($account->imap_port ?: ''); ?>" placeholder="993" />
+                <input type="text" id="settings-port" name="port" value="<?php $view->clean($account->imap_port ?: ''); ?>" placeholder="993">
             </div>
         </div>
         <div class="buttons row">

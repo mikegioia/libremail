@@ -1,0 +1,23 @@
+/**
+ * Panels
+ */
+
+.panel {
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+}
+
+.panel .panel-header {
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #ddd;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  font-size: 1.25rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.panel .panel-body {
+  background-color: #fefefe;
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}

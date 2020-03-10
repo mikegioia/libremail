@@ -694,6 +694,7 @@ class Message extends Model implements MessageInterface
         // the full message data.
         $recents = [];
         $unseens = [];
+        $textPlains = [];
 
         foreach ($messages as $message) {
             if (! isset($recents[$message['thread_id']])) {
@@ -705,6 +706,10 @@ class Message extends Model implements MessageInterface
             if (0 === (int) $message['seen']) {
                 $unseens[$message['thread_id']] = $message['id'];
             }
+        }
+
+        if (! $recents) {
+            return [];
         }
 
         // Load all of the recent messages
@@ -719,16 +724,19 @@ class Message extends Model implements MessageInterface
             ->whereIn('id', $recents)
             ->execute()
             ->fetchAll(PDO::FETCH_CLASS, get_class());
-        $textPlains = $this->db()
-            ->select(['thread_id', 'text_plain'])
-            ->from('messages')
-            ->whereIn('id', $unseens)
-            ->execute()
-            ->fetchAll();
-        $textPlains = array_combine(
-            array_column($textPlains, 'thread_id'),
-            array_column($textPlains, 'text_plain')
-        );
+
+        if ($unseens) {
+            $textPlains = $this->db()
+                ->select(['thread_id', 'text_plain'])
+                ->from('messages')
+                ->whereIn('id', $unseens)
+                ->execute()
+                ->fetchAll();
+            $textPlains = array_combine(
+                array_column($textPlains, 'thread_id'),
+                array_column($textPlains, 'text_plain')
+            );
+        }
 
         foreach ($threads as $thread) {
             if (isset($textPlains[$thread->thread_id])) {
@@ -748,6 +756,10 @@ class Message extends Model implements MessageInterface
      */
     private function getThreadDates(array $threadIds, int $accountId)
     {
+        if (! $threadIds) {
+            return [];
+        }
+
         $results = $this->db()
             ->select(['thread_id', 'max(date) as max_date'])
             ->from('messages')

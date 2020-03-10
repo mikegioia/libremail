@@ -288,7 +288,11 @@ class Controller
 
     public function reply(int $parentId)
     {
-        $parent = (new Message)->getById($parentId, true);
+        $parentMessage = (new Message)->getById($parentId, true, true);
+        $parent = Thread::constructFromMessage(
+            $parentMessage,
+            new Folders($this->account, [])
+        )->updateMessage($parentMessage);
 
         $this->page('reply', [
             'parent' => $parent,
