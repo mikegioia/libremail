@@ -189,7 +189,11 @@ class Compose
 
         Session::formData($data);
 
-        Url::redirectRaw(Url::reply($parentId));
+        if ($replyAll) {
+            Url::redirectRaw(Url::replyAll($parentId));
+        } else {
+            Url::redirectRaw(Url::reply($parentId));
+        }
     }
 
     private function getReplyData(Message $parent, array $data, bool $replyAll = true)

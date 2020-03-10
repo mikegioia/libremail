@@ -310,7 +310,7 @@ class Controller
             'parent' => $parent,
             'replyAll' => $replyAll,
             'toAddresses' => $replyAll
-                ? $parent->getReplyAddresses($this->account->email)
+                ? $parent->getReplyToAddresses($this->account->email)
                 : $parent->getReplyAddress(false)
         ]);
     }
@@ -389,7 +389,8 @@ class Controller
             );
         } elseif (is_numeric(Url::postParam('reply_all_edit'))) {
             (new Compose($this->account))->replyEdit(
-                Url::postParam('reply_all_edit')
+                Url::postParam('reply_all_edit'),
+                true
             );
         } else {
             (new Actions(
