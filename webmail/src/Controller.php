@@ -288,6 +288,16 @@ class Controller
 
     public function reply(int $parentId)
     {
+        $this->replyPage($parentId, false);
+    }
+
+    public function replyAll(int $parentId)
+    {
+        $this->replyPage($parentId, true);
+    }
+
+    private function replyPage(int $parentId, bool $replyAll)
+    {
         $parentMessage = (new Message)->getById($parentId, true, true);
         $parent = Thread::constructFromMessage(
             $parentMessage,
@@ -295,8 +305,17 @@ class Controller
         )->updateMessage($parentMessage);
 
         $this->page('reply', [
+            'ccAddresses' => $parent->getReplyAllAddresses(
+                false, '', ['cc'], true
+            ),
+            'contacts' => Contact::getByAccount($this->account->id),
             'parent' => $parent,
-            'contacts' => Contact::getByAccount($this->account->id)
+            'replyAll' => $replyAll,
+            'toAddresses' => $parent->getReplyAllAddresses(
+                false,
+                $this->account->email,
+                ['reply_to', 'from', 'to']
+            )
         ]);
     }
 

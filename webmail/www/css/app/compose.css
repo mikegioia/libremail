@@ -28,8 +28,12 @@ section.compose {
   display: none;
 }
 
-.compose input[type="radio"]:checked + .hidden {
+.compose input[type="radio"]:checked + .addresses {
   display: block !important;
+}
+
+.compose input[type="radio"]:checked + .addresses + .address-list {
+  display: none;
 }
 
 .compose .ten.columns:not(.inherit) {
@@ -125,10 +129,6 @@ blank address input between two valid inputs.
   margin-left: 0.5rem;
 }
 
-.compose #toggle-to:checked + .addresses + .to {
-  display: none;
-}
-
 .compose #toggle-cc:checked ~ .from label[for="toggle-cc"] {
   display: none;
 }
@@ -138,14 +138,14 @@ blank address input between two valid inputs.
 }
 
 .compose .addresses.from .ten.columns,
-.compose .padded.to .ten.columns {
+.compose .padded.address-list .ten.columns {
   max-width: 50rem;
   padding-right: 6rem;
   position: relative;
 }
 
 .compose .addresses.from .ten.columns label,
-.compose .padded.to .ten.columns label {
+.compose .padded.address-list .ten.columns label {
   cursor: pointer;
   display: inline-block;
   font-weight: 400;

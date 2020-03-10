@@ -159,9 +159,10 @@ class Message extends Model implements MessageInterface
         array $allowedFields = [],
         bool $allowEmpty = false
     ) {
-        $addresses = [$this->from];
-        $fields = array_intersect(['from', 'to', 'cc'], $allowedFields);
-        $fields = $fields ?: ['from', 'to', 'cc'];
+        $addresses = [];
+        $allowedKeys = ['from', 'to', 'cc', 'reply_to'];
+        $fields = array_intersect($allowedKeys, $allowedFields);
+        $fields = $fields ?: ['reply_to', 'to', 'cc'];
 
         foreach ($fields as $field) {
             if ($this->$field) {
@@ -200,7 +201,9 @@ class Message extends Model implements MessageInterface
 
     public function getReplyAddress(bool $stringify = true)
     {
-        return $this->getReplyAllAddresses($stringify, '', ['from']);
+        $replyTo = $this->getReplyAllAddresses($stringify, '', ['reply_to']);
+
+        return $replyTo ?: $this->getReplyAllAddresses($stringify, '', ['from']);
     }
 
     public function loadById()
