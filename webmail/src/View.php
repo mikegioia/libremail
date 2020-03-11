@@ -238,7 +238,7 @@ class View
             return date('j F Y H:i', $timestamp);
         }
 
-        return $count.' '.$noun.(1 == $count ? '' : 's').' ago';
+        return $count.' '.$noun.(1 === $count ? '' : 's').' ago';
     }
 
     /**

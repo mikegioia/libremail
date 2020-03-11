@@ -224,7 +224,7 @@ class Folders
         $this->listFolders = array_filter(
             $this->get(),
             function ($folder) {
-                return 1 != $folder->ignored
+                return 1 !== (int) $folder->ignored
                     && false === $folder->is_mailbox;
             });
 
@@ -258,7 +258,7 @@ class Folders
         $this->get(true);
 
         foreach ($this->folders as $folder) {
-            if ($folder->id == $id) {
+            if ((int) $folder->id === $id) {
                 return $folder;
             }
         }
@@ -325,7 +325,7 @@ class Folders
     {
         $classes = [];
 
-        if ($folderId == $activeId) {
+        if ($folderId === $activeId) {
             $classes[] = 'active';
         }
 

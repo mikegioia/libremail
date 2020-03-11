@@ -684,10 +684,6 @@ class Message extends Model implements MessageInterface
         array $skipFolderIds,
         array $onlyFolderIds
     ) {
-        if (! count($threadIds)) {
-            return [];
-        }
-
         // Load all of the threads and sort by date
         $allThreadIds = $this->getThreadDates($threadIds, $accountId);
 
@@ -695,22 +691,32 @@ class Message extends Model implements MessageInterface
         // for the large payload of data below
         $sliceIds = array_slice($allThreadIds, $offset, $limit);
 
+        if (! count($sliceIds)) {
+            return [];
+        }
+
+        // Store additional query fields
+        $ignoreFolders = array_diff($skipFolderIds, $onlyFolderIds);
+
         // Load all of the unique messages along with some
         // meta data. This is used to then locate the most
         // recent messages.
-        $messages = $this->db()
+        $qry = $this->db()
             ->select([
                 'id', 'thread_id', 'seen', 'folder_id', '`date`'
             ])
             ->from('messages')
             ->whereIn('thread_id', $sliceIds)
-            ->whereNotIn('folder_id', array_diff($skipFolderIds, $onlyFolderIds))
             ->where('deleted', '=', 0)
             ->groupBy('message_id')
             ->orderBy('thread_id', Model::ASC)
-            ->orderBy('date', Model::DESC)
-            ->execute()
-            ->fetchAll();
+            ->orderBy('date', Model::DESC);
+
+        if ($ignoreFolders) {
+            $qry->whereNotIn('folder_id', $ignoreFolders);
+        }
+
+        $messages = $qry->execute()->fetchAll();
 
         // Locate the most recent message ID and the oldest
         // unseen message ID. These are used for querying
@@ -1034,7 +1040,7 @@ class Message extends Model implements MessageInterface
 
         // If there are any filters, first check this message
         foreach ($filters as $key => $value) {
-            if ($this->$key != $value) {
+            if ((string) $this->$key !== (string) $value) {
                 $addSelf = false;
                 break;
             }
@@ -1073,11 +1079,7 @@ class Message extends Model implements MessageInterface
         }
 
         foreach ($filters as $key => $value) {
-            if (is_array($value)) {
-                $query->whereIn($key, $value);
-            } else {
-                $query->where($key, '=', $value);
-            }
+            $query->where($key, '=', $value);
         }
 
         return $query->execute()->fetchAll(PDO::FETCH_CLASS, get_class());
