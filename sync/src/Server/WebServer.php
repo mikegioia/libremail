@@ -11,11 +11,9 @@ use Psr\Http\Message\RequestInterface;
 class WebServer implements HttpServerInterface
 {
     private $log;
-    private $loop;
 
-    public function __construct(Log $log, $config)
+    public function __construct(Log $log)
     {
-        $this->config = $config;
         $this->log = $log->getLogger();
     }
 
@@ -31,7 +29,9 @@ class WebServer implements HttpServerInterface
     public function onOpen(ConnectionInterface $conn, RequestInterface $request = null)
     {
         $this->log->debug(
-            'New web connection opened from #'.$conn->resourceId);
+            'New web connection opened from #'.$conn->resourceId
+        );
+
         $uri = $request->getUri();
         $path = $uri->getPath();
 
@@ -51,18 +51,22 @@ class WebServer implements HttpServerInterface
     public function onClose(ConnectionInterface $conn)
     {
         $this->log->debug(
-            'Closing web connection to #'.$conn->resourceId);
+            'Closing web connection to #'.$conn->resourceId
+        );
     }
 
     public function onError(ConnectionInterface $conn, Exception $e)
     {
         $this->log->notice(
-            'Error encountered from web connection: '.$e->getMessage());
+            'Error encountered from web connection: '.$e->getMessage()
+        );
+
         $conn->close();
     }
 
     public function onMessage(ConnectionInterface $conn, $msg)
     {
+        // Empty
     }
 
     /**
@@ -78,7 +82,8 @@ class WebServer implements HttpServerInterface
                 'X-Powered-By' => APP_NAME,
                 'Content-Type' => $this->getContentType($path)
             ],
-            file_get_contents($path));
+            file_get_contents($path)
+        );
 
         $conn->send($response);
         $conn->close();
@@ -101,7 +106,8 @@ class WebServer implements HttpServerInterface
                 '404 Not Found',
                 APP_NAME,
                 APP_VERSION
-            ));
+            )
+        );
 
         $conn->send($response);
         $conn->close();
@@ -114,7 +120,7 @@ class WebServer implements HttpServerInterface
      *
      * @return string
      */
-    private function getContentType($path)
+    private function getContentType(string $path)
     {
         $pathInfo = pathinfo($path);
         $types = [

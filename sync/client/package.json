@@ -22,7 +22,7 @@
   "scripts": {
     "build": "grunt build",
     "dist": "grunt dist",
-    "watch": "grunt",
+    "watch": "grunt dev",
     "lint": "./node_modules/.bin/eslint --fix-dry-run src || exit 0",
     "fix": "./node_modules/.bin/eslint --fix src || exit 0"
   }

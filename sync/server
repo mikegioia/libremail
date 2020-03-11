@@ -135,7 +135,7 @@ $di['db_factory'] = $di->factory(function ($container, $config = null) {
 });
 
 // Create a new socket server handler
-$di['server.web'] = new WebServer($di['log'], $di['config']);
+$di['server.web'] = new WebServer($di['log']);
 $di['server.stats'] = new StatsServer($di['log'], $di['loop']);
 
 // Ratchet web server instance

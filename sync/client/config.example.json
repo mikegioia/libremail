@@ -1,0 +1,9 @@
+{
+    /**
+     * N.B. When changing this, also extend the sync app's
+     * config settings, located in /sync/config/local.ini.
+     * For more info, see [server] in /sync/config/default.ini.
+     */
+    "server": "localhost",
+    "port": 9898
+}
