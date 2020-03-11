@@ -58,6 +58,7 @@ class Sync
     private $retriesFolders;
     private $retriesMessages;
     private $email;
+    private $ignoredFolders;
 
     // Config
     const READY_THRESHOLD = 60;
@@ -105,6 +106,11 @@ class Sync
             $this->actions = $di['console']->actions;
             $this->threading = $di['console']->threading;
             $this->interactive = $di['console']->interactive;
+            if (array_key_exists('ignored_folders', $di['config']['app'])) {
+                $this->ignoredFolders = $di['config']['app']['ignored_folders'];
+            } else {
+                $this->ignoredFolders = [];
+            }
         }
 
         $this->initGc();
@@ -148,6 +154,22 @@ class Sync
     public function setConfig(array $config)
     {
         $this->config = $config;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIgnoredFolders(): array
+    {
+        return $this->ignoredFolders;
+    }
+
+    /**
+     * @param array $ignoredFolders
+     */
+    public function setIgnoredFolders(array $ignoredFolders)
+    {
+        $this->ignoredFolders = $ignoredFolders;
     }
 
     /**
@@ -587,7 +609,8 @@ class Sync
                 $this->log,
                 $this->cli,
                 $this->emitter,
-                $this->interactive
+                $this->interactive,
+                $this->ignoredFolders
             );
             $folderList = $this->mailbox->getFolders();
             $savedFolders = (new FolderModel)->getByAccount($account->getId());
@@ -847,4 +870,6 @@ class Sync
             throw new StopException;
         }
     }
+
+
 }

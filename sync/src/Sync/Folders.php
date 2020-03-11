@@ -20,21 +20,20 @@ class Folders
     private $cli;
     private $emitter;
     private $interactive;
-
-    const IGNORED_LIST = [
-        '[Gmail]'
-    ];
+    private $ignoredFolders;
 
     public function __construct(
         Logger $log,
         CLImate $cli,
         Emitter $emitter,
-        bool $interactive
+        bool $interactive,
+        array $ignoredFolders
     ) {
         $this->log = $log;
         $this->cli = $cli;
         $this->emitter = $emitter;
         $this->interactive = $interactive;
+        $this->ignoredFolders = $ignoredFolders;
     }
 
     /**
@@ -155,8 +154,25 @@ class Folders
      */
     private function getIgnored(string $folderName)
     {
-        return in_array($folderName, self::IGNORED_LIST)
+        return in_array($folderName, $this->ignoredFolders)
             ? 1
             : 0;
     }
+
+    /**
+     * @return array
+     */
+    public function getIgnoredFolders(): array
+    {
+        return $this->ignoredFolders;
+    }
+
+    /**
+     * @param array $ignoredFolders
+     */
+    public function setIgnoredFolders(array $ignoredFolders)
+    {
+        $this->ignoredFolders = $ignoredFolders;
+    }
+
 }
