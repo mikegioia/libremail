@@ -76,7 +76,7 @@ larger packet size to be sent in a query. To do this, add the following line to
 your SQL config file:
 
     [mysqld]
-    max_allowed_pack = 512M
+    max_allowed_packet = 512M
 
 You don't have to use 512MB as your packet size, but anything 16MB or higher is
 advised.
