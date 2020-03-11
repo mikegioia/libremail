@@ -60,7 +60,7 @@
 /* Massive screens */
 @media (min-width: 1800px) {
   html {
-    font-size: 85%;
+    font-size: 86%;
   }
   #search .icon.button {
     top: 0.1875rem;
