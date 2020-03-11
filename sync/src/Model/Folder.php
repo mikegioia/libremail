@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use Fn;
+use App\Enum\FolderSyncStatus;
 use PDO;
 use DateTime;
 use App\Model;
@@ -338,5 +339,39 @@ class Folder extends Model
         }
 
         throw new NotFoundException('sent mail folder');
+    }
+
+    /**
+     * @param string $status
+     * @return int
+     * @throws DatabaseUpdateException
+     */
+    public function updateStatus(string $status)
+    {
+        if (!in_array($status, FolderSyncStatus::getValues())) {
+            throw new \LogicException("Unsupported folder sync status '{$status}'");
+        }
+
+        $updated = $this->db()
+            ->update(['status' => $status])
+            ->table('folders')
+            ->where('id', '=', $this->getId())
+            ->execute();
+        $this->errorHandle($updated);
+        return $updated;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus()
+    {
+        $row = $this->db()
+            ->select(['status'])
+            ->from('folders')
+            ->where('id', '=', $this->getId())
+            ->execute()
+            ->fetch();
+        return $row ? $row['status'] : FolderSyncStatus::__default;
     }
 }

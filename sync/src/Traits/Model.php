@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 use Belt\Belt;
 use App\Exceptions\NotFound as NotFoundException;
 use App\Exceptions\Validation as ValidationException;
@@ -148,6 +149,21 @@ trait Model
             }
 
             $data[$key] = @iconv('UTF-8', 'UTF-8//IGNORE', $data[$key]);
+        }
+    }
+
+    /**
+     * @param bool | int $updated Response from update operation
+     *
+     * @throws DatabaseUpdateException
+     */
+    protected function errorHandle($updated)
+    {
+        if (! Belt::isNumber($updated)) {
+            throw new DatabaseUpdateException(
+                MESSAGE,
+                $this->getError()
+            );
         }
     }
 }

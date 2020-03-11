@@ -7,6 +7,7 @@
 namespace App;
 
 use Fn;
+use App\Enum\FolderSyncStatus;
 use DateTime;
 use Exception;
 use PDOException;
@@ -654,12 +655,19 @@ class Sync
             $this->log->debug('Syncing messages in each folder');
         }
 
+        /** @var FolderModel $folder */
         foreach ($folders as $folder) {
             $this->retriesMessages[$account->email] = 1;
             $this->stats->setActiveFolder($folder->name);
 
             try {
+                $folder->updateStatus(FolderSyncStatus::Syncing);
                 $this->syncFolderMessages($account, $folder, $options);
+                // We received new 'mail' / 'update' / 'purge' event from IMAP server, during sync process.
+                if ($folder->getStatus() == FolderSyncStatus::SyncingNeedResync) {
+                    $this->syncFolderMessages($account, $folder, $options);
+                }
+                $folder->updateStatus(FolderSyncStatus::Synced);
             } catch (MessagesSyncException $e) {
                 $this->log->error($e->getMessage());
             }
@@ -749,12 +757,16 @@ class Sync
             $messageSync->run($account, $folder, $selectStats, $options);
             $this->checkForHalt();
         } catch (PDOException $e) {
+            $folder->updateStatus(FolderSyncStatus::Error);
             throw $e;
         } catch (StopException $e) {
+            $folder->updateStatus(FolderSyncStatus::Error);
             throw $e;
         } catch (TerminateException $e) {
+            $folder->updateStatus(FolderSyncStatus::Error);
             throw $e;
         } catch (Exception $e) {
+            $folder->updateStatus(FolderSyncStatus::Error);
             $this->stats->unsetActiveFolder();
             $this->log->error(substr($e->getMessage(), 0, 500));
             $this->checkForClosedConnection($e);
