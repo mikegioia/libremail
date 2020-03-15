@@ -17,6 +17,7 @@ class SyncConsole extends Console
     // Command line arguments
     public $help;
     public $once;
+    public $email;
     public $quick;
     public $sleep;
     public $create;
@@ -64,17 +65,22 @@ class SyncConsole extends Console
                 'description' => 'Create a new IMAP account',
                 'noValue' => true
             ],
-            'diagnostics' => [
+            'daemon' => [
                 'prefix' => 'd',
+                'longPrefix' => 'daemon',
+                'description' => 'Runs sync in daemon mode',
+                'noValue' => true
+            ],
+            'diagnostics' => [
+                'prefix' => 'D',
                 'longPrefix' => 'diagnostics',
                 'description' => 'Runs a series of diagnostic tests',
                 'noValue' => true
             ],
-            'daemon' => [
+            'email' => [
                 'prefix' => 'e',
-                'longPrefix' => 'daemon',
-                'description' => 'Runs sync in daemon mode',
-                'noValue' => true
+                'longPrefix' => 'email',
+                'description' => 'Sync the selected email account'
             ],
             'folder' => [
                 'prefix' => 'f',
@@ -149,6 +155,7 @@ class SyncConsole extends Console
 
         $this->help = $this->cli->arguments->get('help');
         $this->once = $this->cli->arguments->get('once');
+        $this->email = $this->cli->arguments->get('email');
         $this->quick = $this->cli->arguments->get('quick');
         $this->sleep = $this->cli->arguments->get('sleep');
         $this->create = $this->cli->arguments->get('create');
@@ -212,9 +219,12 @@ class SyncConsole extends Console
         // If we're in rolling back changes, run it now
         if (true === $this->rollback) {
             $this->cli->warning(
-                'Rollback mode enabled. This script will halt when finished.');
+                'Rollback mode enabled. This script will halt when finished.'
+            );
+
             $rollback = new Rollback($this->cli);
             $rollback->run();
+
             exit(0);
         }
 
@@ -308,7 +318,8 @@ class SyncConsole extends Console
         $validServices = $this->config['email']['services'];
         $input = $this->cli->radio(
             'Please choose from the supported email providers:',
-            $validServices);
+            $validServices
+        );
         $service = $input->prompt();
 
         if (! in_array($service, $validServices)) {
@@ -330,9 +341,11 @@ class SyncConsole extends Console
         // If the service was 'other' we need to ask them for the host.
         if ('other' === $service) {
             $host = $this->cli->input(
-                'Host address (like imap.host.com):')->prompt();
+                'Host address (like imap.host.com):'
+            )->prompt();
             $smtpHost = $this->cli->input(
-                'SMTP host address (like smtp.host.com):')->prompt();
+                'SMTP host address (like smtp.host.com):'
+            )->prompt();
         } else {
             $host = $this->config['email'][$service]['host'];
             $smtpHost = $this->config['email'][$service]['smtp_host'];
@@ -391,7 +404,9 @@ class SyncConsole extends Console
                 ));
             $this->cli->comment(
                 'There was a problem connecting using the account info '.
-                'you provided.');
+                'you provided.'
+            );
+
             $input = $this->cli->confirm('Do you want to try again?');
 
             if ($input->confirmed()) {

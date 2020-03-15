@@ -21,15 +21,20 @@ script:
 
   Run the sync script but only prompt for adding a new IMAP account.
 
-* `--diagnostics | -d`
+* `--daemon | -d`
+
+  Run the sync script in daemon mode. This supresses output to the console
+  and instead writes everything to the log files.
+
+* `--diagnostics | -D`
 
   Runs through the diagnostic tests and reports any errors. Use this to start
   debugging any failures.
 
-* `--daemon | -e`
+* `--email <address> | -e <address>`
 
-  Run the sync script in daemon mode. This supresses output to the console
-  and instead writes everything to the log files.
+  Runs the sync script for the specified email account only. By default, the
+  sync engine will run over all active accounts but this flag takes priority.
 
 * `--folder <folder> | -f <folder>`
 
