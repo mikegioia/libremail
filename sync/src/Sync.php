@@ -42,6 +42,7 @@ class Sync
     private $stop;
     private $wake;
     private $once;
+    private $email;
     private $sleep;
     private $quick;
     private $config;
@@ -97,6 +98,7 @@ class Sync
             $this->threader = $di['threader'];
             $this->once = $di['console']->once;
             $this->log = $di['log']->getLogger();
+            $this->email = $di['console']->email;
             $this->quick = $di['console']->quick;
             $this->sleep = $di['console']->sleep;
             $this->folder = $di['console']->folder;
@@ -208,9 +210,11 @@ class Sync
 
         if ($account) {
             $accounts = [$account];
+        } elseif ($this->email) {
+            $account = (new AccountModel)->getByEmail($this->email);
+            $accounts = $account ? [$account] : [];
         } else {
-            $accountModel = new AccountModel;
-            $accounts = $accountModel->getActive();
+            $accounts = (new AccountModel)->getActive();
         }
 
         if (! $accounts) {

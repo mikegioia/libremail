@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `unique_id` int(10) unsigned DEFAULT NULL,
   `thread_id` int(10) unsigned DEFAULT NULL,
   `outbox_id` int(10) unsigned DEFAULT NULL,
+  `uid_validity` int(10) unsigned DEFAULT NULL,
   `date_str` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `charset` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `subject` varchar(270) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
