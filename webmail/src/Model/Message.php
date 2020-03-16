@@ -675,19 +675,23 @@ class Message extends Model implements MessageInterface
         // Load all of the unique messages along with some
         // meta data. This is used to then locate the most
         // recent messages.
-        $messages = $this->db()
+        $statement = $this->db()
             ->select([
                 'id', 'thread_id', 'seen', 'folder_id', '`date`'
             ])
             ->from('messages')
-            ->whereIn('thread_id', $sliceIds)
-            ->whereNotIn('folder_id', array_diff($skipFolderIds, $onlyFolderIds))
+            ->whereIn('thread_id', $sliceIds);
+        $folderIdsNotIn = array_diff($skipFolderIds, $onlyFolderIds);
+        if (count($folderIdsNotIn) > 0) {
+            $statement
+                ->whereNotIn('folder_id', array_diff($skipFolderIds, $onlyFolderIds));
+        }
+        $statement
             ->where('deleted', '=', 0)
             ->groupBy('message_id')
             ->orderBy('thread_id', Model::ASC)
-            ->orderBy('date', Model::DESC)
-            ->execute()
-            ->fetchAll();
+            ->orderBy('date', Model::DESC);
+        $messages = $statement->execute()->fetchAll();
 
         // Locate the most recent message ID and the oldest
         // unseen message ID. These are used for querying
