@@ -718,6 +718,16 @@ class Sync
             throw $e;
         } catch (Exception $e) {
             $this->stats->unsetActiveFolder();
+            $attempts = intval($folder->sync_failed_attempts) + 1;
+            $maxAttempts = $sleepMinutes = $this->config['app']['sync']['folder_max_attempts'];
+            if ($attempts < $maxAttempts) {
+                $this->log->warning('Can not sync folder "'.$folder->name.'". Failed attempts: '.$attempts);
+                $folder->sync_failed_attempts = $attempts;
+            } else {
+                $this->log->error('Folder "'.$folder->name.'" mark as ignored (max attempts).');
+                $folder->ignored = 1;
+            }
+            $folder->save();
             $this->log->error(substr($e->getMessage(), 0, 500));
             $this->checkForClosedConnection($e);
             $retryCount = $this->retriesMessages[$account->email];

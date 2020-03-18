@@ -26,6 +26,7 @@ class Folder extends Model
     public $account_id;
     public $created_at;
     public $uid_validity;
+    public $sync_failed_attempts;
 
     const DRAFTS = [
         '[Gmail]/Drafts',
@@ -46,7 +47,8 @@ class Folder extends Model
             'ignored' => $this->ignored,
             'account_id' => $this->account_id,
             'created_at' => $this->created_at,
-            'uid_validity' => $this->uid_validity
+            'uid_validity' => $this->uid_validity,
+            'sync_failed_attempts' => $this->sync_failed_attempts
         ];
     }
 
@@ -148,6 +150,7 @@ class Folder extends Model
         $val->required('account_id', 'Account ID')->numeric();
         $val->required('name', 'Name')->lengthBetween(0, 255);
         $val->optional('uid_validity', 'UID validity')->numeric();
+        $val->optional('sync_failed_attempts', 'Sync failed attempts')->numeric();
 
         $this->setData($data);
 
