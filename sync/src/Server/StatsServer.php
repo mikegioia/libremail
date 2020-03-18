@@ -84,7 +84,8 @@ class StatsServer implements MessageComponentInterface
     public function onError(ConnectionInterface $conn, Exception $e)
     {
         $this->log->notice(
-            'Error encountered from socket connection: '.$e->getMessage());
+            'Error encountered from socket connection: '.$e->getMessage()
+        );
         $this->clients->detach($conn);
         $conn->close();
 
@@ -147,6 +148,7 @@ class StatsServer implements MessageComponentInterface
                 // Keep throwing these
                 throw $e;
             } catch (TerminateException $e) {
+                // And these
                 throw $e;
             } catch (Exception $e) {
                 // Otherwise just log and move on
