@@ -1,6 +1,7 @@
 module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    config: grunt.file.readJSON('config.json'),
     // File Watching
     watch: {
       js: {
@@ -81,6 +82,14 @@ module.exports = function (grunt) {
     },
     // HTML paths
     replace: {
+      config: {
+        overwrite: true,
+        src: [ 'build/libremail.js' ],
+        replacements: [{
+          from: '%WEBSOCKET_URL%',
+          to: 'ws://<%= config.server %>:<%= config.port %>/stats'
+        }]
+      },
       dist: {
         overwrite: true,
         src: [ 'index.html' ],
@@ -111,9 +120,10 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
 
-  grunt.registerTask('dist', [ 'replace:dist', 'copy:dist' ]);
-  grunt.registerTask('build', [ 'concat', 'copy:fonts', 'replace:build' ]);
-  grunt.registerTask('default', [ 'concat', 'copy:fonts', 'watch' ]);
+  grunt.registerTask('dist', [ 'build', 'replace:dist', 'copy:dist' ]);
+  grunt.registerTask('build', [ 'concat', 'copy:fonts', 'replace:config', 'replace:build' ]);
+  grunt.registerTask('dev', [ 'build', 'watch' ]);
+  grunt.registerTask('default', [ 'dist' ]);
   grunt.registerTask('printenv', function () {
     console.log(process.env);
   });

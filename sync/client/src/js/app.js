@@ -54,9 +54,9 @@ LibreMail.Const = {
     ACCOUNT_INFO: 'account_info',
     REMOVE_ACCOUNT: 'remove_account'
   },
-  // @TODO this should be based off config file
-  WS: {
-    URL: 'ws://localhost:9898/stats'
+  // Config loaded from config.json
+  CONFIG: {
+    WS_URL: '%WEBSOCKET_URL%'
   },
   // Statuses
   STATUS: {
