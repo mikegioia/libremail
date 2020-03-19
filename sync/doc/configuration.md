@@ -131,11 +131,26 @@ directory named `attachments`.
 
 #### [server]
 
+* `host`
+
+  The hostname for the JavaScript client and WebSocket stats server to
+  connect to. This MUST match the client's configuration located in
+  `/sync/client/config.json`. The default is `localhost` and the stats
+  server is accessible via `ws://localhost:9898/stats` by default.
+
 * `port`
 
-  The port for accessing the Web client. This defaults to `9898`, so to
-  access the client you would navigate to
-  [http://localhost:9898]([http://localhost:9898]).
+  The port for accessing the Web client and for the WebSocket server to
+  listen on. This defaults to `9898`, so to access the client you would
+  navigate to [http://localhost:9898]([http://localhost:9898]). This
+  MUST also match client's configuration in `/sync/client/config.json`.
+
+* `address`
+
+  The IP address for the WebSocket server to bind to. Default is
+  127.0.0.1 (localhost) only, '0.0.0.0' for any machine on the network.
+  Be careful when updating this, as it could expose your server in
+  unintended ways.
 
 #### [serverlog]
 

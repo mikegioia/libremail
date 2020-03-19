@@ -78,7 +78,8 @@ class RatchetApp extends BaseRatchetApp
                 ['_controller' => $decorated],
                 ['Origin' => $this->httpHost],
                 [],
-                $httpHost);
+                $httpHost
+            );
         }
 
         $this->routes->add('rr-'.++$this->_routeCounter, $route);

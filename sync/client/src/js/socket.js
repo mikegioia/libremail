@@ -4,7 +4,7 @@
 LibreMail.Socket = (function (ReconnectingWebSocket, JSON, Const, Emitter) {
   'use strict';
 
-  var ws = new ReconnectingWebSocket(Const.WS.URL);
+  var ws = new ReconnectingWebSocket(Const.CONFIG.WS_URL);
 
   ws.onopen = function () {
     Emitter.fire(Const.EV.WS_OPEN);
