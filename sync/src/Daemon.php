@@ -107,7 +107,8 @@ class Daemon
         // Only do this if the webserver is running.
         $this->loop->addPeriodicTimer(10, function ($timer) use ($syncProcess) {
             if (isset($this->processPids[PROC_SYNC])
-                && $this->webServerProcess) {
+                && $this->webServerProcess
+            ) {
                 posix_kill($this->processPids[PROC_SYNC], SIGUSR2);
             }
         });
