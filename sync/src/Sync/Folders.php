@@ -7,6 +7,7 @@
 namespace App\Sync;
 
 use Fn;
+use App\Enum\FolderSyncStatus;
 use App\Sync;
 use Monolog\Logger;
 use League\CLImate\CLImate;
@@ -96,7 +97,11 @@ class Folders
             $folder = new FolderModel([
                 'name' => $folderName,
                 'account_id' => $account->getId(),
-                'ignored' => $this->getIgnored($folderName)
+                'ignored' => $this->getIgnored($folderName),
+                'sync_status' => FolderSyncStatus::NOT_SYNCED,
+                'sync_host' => NULL,
+                'sync_pid' => NULL,
+                'synced_at' => NULL
             ]);
 
             $folder->save();

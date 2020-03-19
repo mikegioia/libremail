@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use Fn;
+use App\Enum\FolderSyncStatus;
 use PDO;
 use DateTime;
 use App\Model;
@@ -26,6 +27,10 @@ class Folder extends Model
     public $account_id;
     public $created_at;
     public $uid_validity;
+    public $sync_status;
+    public $sync_host;
+    public $sync_pid;
+    public $synced_at;
 
     const DRAFTS = [
         '[Gmail]/Drafts',
@@ -338,5 +343,52 @@ class Folder extends Model
         }
 
         throw new NotFoundException('sent mail folder');
+    }
+
+    /**
+     * @param string $status
+     * @param string $host
+     * @param int $pid
+     * @return int
+     * @throws DatabaseUpdateException
+     */
+    public function updateSyncData(string $status, string $host, int $pid)
+    {
+        if (!in_array($status, FolderSyncStatus::getValues())) {
+            throw new \LogicException("Unsupported folder sync status '{$status}'");
+        }
+        $data = [
+            'sync_status' => $status,
+            'sync_host' => $host,
+            'sync_pid' => $pid
+        ];
+        if ($status == FolderSyncStatus::SYNCED) {
+            // In UTC
+            $now = new \DateTime();
+            $date = date('Y-m-d H:i:s', $now->getTimestamp());
+            $data['synced_at'] = $date;
+        }
+        $updated = $this->db()
+            ->update($data)
+            ->table('folders')
+            ->where('id', '=', $this->getId())
+            ->execute();
+        $this->errorHandle($updated);
+        return $updated;
+
+    }
+
+    /**
+     * @return string
+     */
+    public function getActualSyncStatus()
+    {
+        $row = $this->db()
+            ->select(['sync_status'])
+            ->from('folders')
+            ->where('id', '=', $this->getId())
+            ->execute()
+            ->fetch();
+        return $row ? $row['sync_status'] : FolderSyncStatus::__default;
     }
 }
