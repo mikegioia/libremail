@@ -22,6 +22,7 @@ class SyncConsole extends Console
     public $sleep;
     public $create;
     public $folder;
+    public $email;
     public $daemon;
     public $actions;
     public $verbose;
@@ -86,6 +87,11 @@ class SyncConsole extends Console
                 'prefix' => 'f',
                 'longPrefix' => 'folder',
                 'description' => 'Sync the selected folder'
+            ],
+            'email' => [
+                'prefix' => 'm',
+                'longPrefix' => 'email',
+                'description' => 'Sync the selected email account (passing email)'
             ],
             'help' => [
                 'prefix' => 'h',
@@ -170,6 +176,7 @@ class SyncConsole extends Console
         $this->diagnostics = $this->cli->arguments->get('diagnostics');
         $this->interactive = $this->cli->arguments->get('interactive');
         $this->databaseExists = $this->cli->arguments->get('exists');
+        $this->email = $this->cli->arguments->get('email');
 
         // Some flags also enable interactive mode
         if (true === $this->sleep

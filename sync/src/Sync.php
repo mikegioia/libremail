@@ -58,6 +58,8 @@ class Sync
     private $maxRetries = 5;
     private $retriesFolders;
     private $retriesMessages;
+    private $email;
+    private $ignoredFolders;
 
     // Config
     const READY_THRESHOLD = 60;
@@ -101,13 +103,35 @@ class Sync
             $this->quick = $di['console']->quick;
             $this->sleep = $di['console']->sleep;
             $this->folder = $di['console']->folder;
+            $this->email = $di['console']->email;
             $this->daemon = $di['console']->daemon;
             $this->actions = $di['console']->actions;
             $this->threading = $di['console']->threading;
             $this->interactive = $di['console']->interactive;
+            if (array_key_exists('ignored_folders', $di['config']['app'])) {
+                $this->ignoredFolders = $di['config']['app']['ignored_folders'];
+            } else {
+                $this->ignoredFolders = [];
+            }
         }
 
         $this->initGc();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param mixed $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
     }
 
     /**
@@ -135,6 +159,22 @@ class Sync
     }
 
     /**
+     * @return array
+     */
+    public function getIgnoredFolders(): array
+    {
+        return $this->ignoredFolders;
+    }
+
+    /**
+     * @param array $ignoredFolders
+     */
+    public function setIgnoredFolders(array $ignoredFolders)
+    {
+        $this->ignoredFolders = $ignoredFolders;
+    }
+
+    /**
      * Runs sync forever. This is a while loop that runs a sync
      * for all accounts, then sleeps for a designated period of
      * time.
@@ -143,6 +183,7 @@ class Sync
     {
         $wakeUnix = 0;
         $sleepMinutes = $this->config['app']['sync']['sleep_minutes'];
+        $account = ((new AccountModel)->getByEmail($this->email)) ?: null;
 
         while (true) {
             $this->gc();
@@ -157,7 +198,7 @@ class Sync
                 // Run action sync every minute
                 if ($this->isReadyToRun()) {
                     $this->setAsleep(false);
-                    $this->run(null, [self::OPT_ONLY_SYNC_ACTIONS => true]);
+                    $this->run($account, [self::OPT_ONLY_SYNC_ACTIONS => true]);
                     $this->setAsleep(true);
                 }
 
@@ -167,7 +208,7 @@ class Sync
 
             $this->setAsleep(false);
 
-            if (! $this->run()) {
+            if (! $this->run($account)) {
                 throw new TerminateException('Sync was prevented from running');
             }
 
@@ -572,7 +613,8 @@ class Sync
                 $this->log,
                 $this->cli,
                 $this->emitter,
-                $this->interactive
+                $this->interactive,
+                $this->ignoredFolders
             );
             $folderList = $this->mailbox->getFolders();
             $savedFolders = (new FolderModel)->getByAccount($account->getId());
@@ -832,4 +874,6 @@ class Sync
             throw new StopException;
         }
     }
+
+
 }
