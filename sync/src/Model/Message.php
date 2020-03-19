@@ -1051,19 +1051,4 @@ class Message extends Model
 
         return json_encode($formatted, JSON_UNESCAPED_SLASHES);
     }
-
-    /**
-     * @param bool | int $updated Response from update operation
-     *
-     * @throws DatabaseUpdateException
-     */
-    private function errorHandle($updated)
-    {
-        if (! Belt::isNumber($updated)) {
-            throw new DatabaseUpdateException(
-                MESSAGE,
-                $this->getError()
-            );
-        }
-    }
 }

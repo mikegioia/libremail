@@ -7,6 +7,7 @@
 namespace App;
 
 use Fn;
+use App\Enum\FolderSyncStatus;
 use DateTime;
 use Exception;
 use PDOException;
@@ -616,6 +617,7 @@ class Sync
             $this->log->debug('Syncing messages in each folder');
         }
 
+        /** @var FolderModel $folder */
         foreach ($folders as $folder) {
             $this->retriesMessages[$account->email] = 1;
             $this->stats->setActiveFolder($folder->name);
@@ -708,15 +710,56 @@ class Sync
             // Select the folder's mailbox, this is sent to the
             // messages sync library to perform operations on
             $selectStats = $this->mailbox->select($folder->name);
+            if (! Fn\get($options, Sync::OPT_SKIP_DOWNLOAD)) {
+                $folder->updateSyncData(
+                    FolderSyncStatus::SYNCING,
+                    gethostname(),
+                    getmypid()
+                );
+            }
             $messageSync->run($account, $folder, $selectStats, $options);
+            /**
+             * If watcher received imap event and mark this folder to resync
+             * after sync is started => make sync one more time.
+             */
+            if ($folder->getActualSyncStatus() == FolderSyncStatus::SYNCING_NEED_RESYNC) {
+                $messageSync->run($account, $folder, $selectStats, $options);
+            }
+            if (! Fn\get($options, Sync::OPT_SKIP_DOWNLOAD)) {
+                $folder->updateSyncData(
+                    FolderSyncStatus::SYNCED,
+                    gethostname(),
+                    getmypid()
+                );
+            }
             $this->checkForHalt();
         } catch (PDOException $e) {
+            $folder->updateSyncData(
+                FolderSyncStatus::ERROR,
+                gethostname(),
+                getmypid()
+            );
             throw $e;
         } catch (StopException $e) {
+            $folder->updateSyncData(
+                FolderSyncStatus::ERROR,
+                gethostname(),
+                getmypid()
+            );
             throw $e;
         } catch (TerminateException $e) {
+            $folder->updateSyncData(
+                FolderSyncStatus::ERROR,
+                gethostname(),
+                getmypid()
+            );
             throw $e;
         } catch (Exception $e) {
+            $folder->updateSyncData(
+                FolderSyncStatus::ERROR,
+                gethostname(),
+                getmypid()
+            );
             $this->stats->unsetActiveFolder();
             $this->log->error(substr($e->getMessage(), 0, 500));
             $this->checkForClosedConnection($e);
