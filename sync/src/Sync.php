@@ -574,7 +574,18 @@ class Sync
                 $this->emitter,
                 $this->interactive
             );
-            $folderList = $this->mailbox->getFolders();
+            $mandatorySyncFolders = $this->config['app']['mandatory_sync_folders'];
+            if (boolval($this->config['app']['sync_only_subscribed_folders'])) {
+                $folderList = new \AppendIterator();
+                $folderList->append($this->mailbox->getFolders(null, true));
+                if (count($mandatorySyncFolders) > 0) {
+                    foreach ($mandatorySyncFolders as $folderName) {
+                        $folderList->append($this->mailbox->getFolders($folderName));
+                    }
+                }
+            } else {
+                $folderList = $this->mailbox->getFolders(null);
+            }
             $savedFolders = (new FolderModel)->getByAccount($account->getId());
             $folderSync->run($folderList, $savedFolders, $account);
         } catch (PDOException $e) {
