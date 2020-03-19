@@ -4,16 +4,3 @@ CREATE TABLE IF NOT EXISTS `meta` (
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-INSERT INTO `meta`
-  (`key`, `value`, `updated_at`)
-VALUES
-  ('asleep', 0, NOW()),
-  ('running', 0, NOW()),
-  ('sync_pid', '', NOW()),
-  ('heartbeat', '', NOW()),
-  ('start_time', '', NOW()),
-  ('folder_stats', '', NOW()),
-  ('active_folder', '', NOW()),
-  ('active_account', '', NOW()),
-  ('last_sync_time', 0, NOW());
