@@ -30,6 +30,7 @@ use App\Exceptions\FolderSync as FolderSyncException;
 use App\Exceptions\MessagesSync as MessagesSyncException;
 use App\Traits\GarbageCollection as GarbageCollectionTrait;
 use App\Exceptions\MissingIMAPConfig as MissingIMAPConfigException;
+use Zend\Mail\Storage\Exception\InvalidArgumentException;
 
 class Sync
 {
@@ -574,7 +575,23 @@ class Sync
                 $this->emitter,
                 $this->interactive
             );
-            $folderList = $this->mailbox->getFolders();
+            $mandatorySyncFolders = explode(",", $this->config['app']['mandatory_sync_folders']);
+            if (boolval($this->config['app']['sync_only_subscribed_folders'])) {
+                $folderList = new \AppendIterator();
+                $folderList->append($this->mailbox->getFolders(null, true));
+                if (count($mandatorySyncFolders) > 0) {
+                    foreach ($mandatorySyncFolders as $folderName) {
+                        try {
+                            $folderList->append($this->mailbox->getFolders($folderName));
+                        } catch (InvalidArgumentException $e) {
+                            $this->log->notice('Mandatory folder '.$folderName.' from config does not exists'.
+                            ' in account '.$account->email);
+                        }
+                    }
+                }
+            } else {
+                $folderList = $this->mailbox->getFolders(null);
+            }
             $savedFolders = (new FolderModel)->getByAccount($account->getId());
             $folderSync->run($folderList, $savedFolders, $account);
         } catch (PDOException $e) {
