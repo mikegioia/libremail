@@ -1038,9 +1038,16 @@ class Message extends Model implements MessageInterface
         $addSelf = true;
         $options = array_merge(self::DEFAULTS, $options);
 
-        // If there are any filters, first check this message
+        // If even one filter value is different from the 
+        // corresponding value on this message, then don't
+        // include this message in the query
         foreach ($filters as $key => $value) {
-            if ((string) $this->$key !== (string) $value) {
+            if (is_array($value)) {
+                if (! in_array($this->$key, $value)) {
+                    $addSelf = false;
+                    break;
+                }
+            } elseif ((string) $this->$key !== (string) $value) {
                 $addSelf = false;
                 break;
             }
@@ -1079,7 +1086,11 @@ class Message extends Model implements MessageInterface
         }
 
         foreach ($filters as $key => $value) {
-            $query->where($key, '=', $value);
+            if (is_array($value) && count($value)) {
+                $query->whereIn($key, $value);
+            } else {
+                $query->where($key, '=', $value);
+            }
         }
 
         return $query->execute()->fetchAll(PDO::FETCH_CLASS, get_class());
