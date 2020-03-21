@@ -24,7 +24,7 @@ $view->render('nav', [
             $view->render('notifications', [
                 'messages' => $notifications
             ]); ?>
-            <input type="checkbox" id="mailbox-outbox-checkbox" class="mailbox-checkbox" />
+            <input type="checkbox" id="mailbox-outbox-checkbox" class="mailbox-checkbox">
             <h5>
                 <span>Outbox</span>
             </h5>
@@ -51,7 +51,7 @@ $view->render('nav', [
                 'totals' => $totals
             ]); ?>
 
-            <input type="hidden" name="url_id" value="<?php echo OUTBOX; ?>" />
+            <input type="hidden" name="url_id" value="<?php echo OUTBOX; ?>">
         </section>
     </form>
 </section>

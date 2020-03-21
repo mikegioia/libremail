@@ -42,7 +42,7 @@ foreach ($messages as $message):
             <?php $view->clean($message->display_date); ?>
         </a>
     </div>
-    <input type="hidden" name="message_all[]" value="<?php echo $message->id; ?>" />
+    <input type="hidden" name="message_all[]" value="<?php echo $message->id; ?>">
     <div class="u-cf"></div>
 <?php
 endforeach; ?>

@@ -24,7 +24,7 @@ foreach ($messages as $message):
                 : $view::getDate($message->send_after, $view::DATE_SHORT); ?>
         </a>
     </div>
-    <input type="hidden" name="message_all[]" value="<?php echo $message->id; ?>" />
+    <input type="hidden" name="message_all[]" value="<?php echo $message->id; ?>">
     <div class="u-cf"></div>
 <?php
 endforeach; ?>

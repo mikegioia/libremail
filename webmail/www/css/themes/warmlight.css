@@ -160,6 +160,24 @@ body.theme-warmlight .dropdown li [type="submit"]:hover {
   background-color: #e8d3c2;
 }
 
+/* Panels */
+body.theme-warmlight .panel {
+  border-color: #dcc5b3;
+}
+
+body.theme-warmlight .panel .panel-header {
+  background-color: #fbf1e9;
+  border-color: #e8d3c2;
+}
+
+body.theme-warmlight .panel .panel-body {
+  background-color: #fbf1e9; /* or #fdf5ef */
+}
+
+body.theme-warmlight .compose.reply .in-reply-to .panel-reveal {
+  background: linear-gradient(rgba(245, 231, 220, 0), #f5e7dc);
+}
+
 /* Misc elements */
 body.theme-warmlight code {
   background-color: #fff3eb;

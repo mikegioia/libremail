@@ -129,14 +129,17 @@ abstract class Base
                 // Restore the sibling message
                 $this->setFlag(
                     $restore, MessageModel::FLAG_DELETED, false,
-                    [], [], true, TaskModel::TYPE_DELETE);
+                    [], [], true, TaskModel::TYPE_DELETE
+                );
                 // Copy additional flags
                 $this->setFlag(
-                    $restore, MessageModel::FLAG_SEEN, 1 == $trashed->seen,
-                    [], [], true, TaskModel::TYPE_READ);
+                    $restore, MessageModel::FLAG_SEEN, 1 === (int) $trashed->seen,
+                    [], [], true, TaskModel::TYPE_READ
+                );
                 $this->setFlag(
-                    $restore, MessageModel::FLAG_FLAGGED, 1 == $trashed->flagged,
-                    [], [], true, TaskModel::TYPE_FLAG);
+                    $restore, MessageModel::FLAG_FLAGGED, 1 === (int) $trashed->flagged,
+                    [], [], true, TaskModel::TYPE_FLAG
+                );
             }
 
             // Delete this message from the trash

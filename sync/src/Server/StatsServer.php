@@ -134,7 +134,7 @@ class StatsServer implements MessageComponentInterface
             try {
                 $message = Message::make($parsed);
 
-                if (Message::TASK == $message->getType()) {
+                if (Message::TASK === $message->getType()) {
                     $task = Task::make($message->task, (array) $message->data);
                     $response = $task->run($this);
 

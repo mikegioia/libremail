@@ -23,12 +23,17 @@ section.compose {
   margin-bottom: 0.75rem;
 }
 
-.compose input[type="radio"] {
+.compose input[type="radio"],
+.compose input[type="checkbox"].toggle {
   display: none;
 }
 
-.compose input[type="radio"]:checked + .hidden {
+.compose input[type="radio"]:checked + .addresses {
   display: block !important;
+}
+
+.compose input[type="radio"]:checked + .addresses + .address-list {
+  display: none;
 }
 
 .compose .ten.columns:not(.inherit) {
@@ -110,17 +115,17 @@ blank address input between two valid inputs.
   margin: 0;
 }
 
-.compose .addresses.from .show-hidden-addresses {
+.compose .row .show-hidden-addresses {
   position: absolute;
   right: 0;
   top: 0;
 }
 
-.compose .addresses.from .show-hidden-addresses label a {
+.compose .row .show-hidden-addresses label a {
   text-decoration: underline;
 }
 
-.compose .addresses.from .show-hidden-addresses label + label {
+.compose .row .show-hidden-addresses label + label {
   margin-left: 0.5rem;
 }
 
@@ -132,17 +137,23 @@ blank address input between two valid inputs.
   display: none;
 }
 
-.compose .addresses.from .ten.columns {
+.compose .addresses.from .ten.columns,
+.compose .padded.address-list .ten.columns {
   max-width: 50rem;
   padding-right: 6rem;
   position: relative;
 }
 
-.compose .addresses.from .ten.columns label {
+.compose .addresses.from .ten.columns label,
+.compose .padded.address-list .ten.columns label {
   cursor: pointer;
   display: inline-block;
   font-weight: 400;
   text-decoration: underline;
+}
+
+.compose .padded.subject .ten.columns {
+  max-width: 50rem;
 }
 
 .compose .message textarea {
@@ -155,7 +166,7 @@ blank address input between two valid inputs.
 .compose .help-text {
   color: #555;
   font-size: 1.125rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 1rem;
 }
 
 .compose textarea + .help-text {
@@ -287,4 +298,121 @@ blank address input between two valid inputs.
 
 .outbox-preview .text-html > :last-child {
   margin-bottom: 0rem;
+}
+
+/* Reply to message */
+
+.compose.reply .in-reply-to {
+  margin: -1rem 2rem 2rem 0;
+  position: relative;
+  width: calc(22% + 50rem);
+}
+
+.compose.reply .in-reply-to .panel-header i {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 1rem;
+  margin-left: 0.25rem;
+  transform: translateY(-0.0625rem);
+}
+
+.compose.reply .in-reply-to .panel-body {
+  height: 12rem;
+  overflow: hidden;
+}
+
+.compose.reply .in-reply-to .panel-reveal {
+  background: linear-gradient(rgba(255, 255, 255, 0), #fff);
+  bottom: -0.25rem;
+  left: -1px;
+  position: absolute;
+  right: -1px;
+  height: 12rem;
+}
+
+.compose.reply .in-reply-to .panel-reveal label {
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.compose.reply .panel .panel-collapse {
+  display: none;
+}
+
+.compose.reply input#toggle-reply-panel:checked + .panel {
+  margin-bottom: 4rem
+}
+
+.compose.reply input#toggle-reply-panel:checked + .panel .panel-body {
+  height: auto;
+  max-height: calc(100vh - 24rem);
+  overflow-y: auto;
+}
+
+.compose.reply input#toggle-reply-panel:checked + .panel .panel-reveal {
+  display: none;
+}
+
+.compose.reply input#toggle-reply-panel:checked + .panel .panel-collapse {
+  bottom: -2.75rem;
+  display: block;
+  position: absolute;
+  right: 0rem;
+}
+
+.compose.reply input#toggle-reply-panel:checked + .panel .panel-collapse label {
+  cursor: pointer;
+}
+
+.compose.reply input#toggle-reply-panel:checked + .panel .panel-collapse label span {
+  font-size: 1.125rem;
+  font-weight: 400;
+  text-decoration: underline;
+}
+
+.compose.reply input#toggle-reply-panel:checked + .panel .panel-collapse label i {
+  font-size: 1.125rem;
+  position: relative;
+  top: 0.125rem;
+}
+
+.compose.reply .in-reply-to .headers {
+  padding: 0.5rem 1rem 1rem 4rem;
+}
+
+.compose.reply .in-reply-to .headers .avatar {
+  display: inline-block;
+  width: 3rem;
+}
+
+.compose.reply .in-reply-to .headers .avatar img {
+  height: 1.75rem;
+  transform: translateY(-0.05rem);
+  vertical-align: middle;
+  width: 1.75rem;
+}
+
+.compose.reply .in-reply-to .headers .from {
+  display: inline-block;
+  font-size: 1.25rem;
+  width: calc(100% - 9rem);
+}
+
+.compose.reply .in-reply-to .headers .date {
+  box-sizing: border-box;
+  color: #333;
+  display: inline-block;
+  float: right;
+  font-size: 1.25rem;
+  font-weight: 400;
+  text-align: right;
+  text-decoration: none;
+  width: 8rem;
+}
+
+.compose.reply .in-reply-to .message {
+  margin-top: 1rem;
+  padding-bottom: 1rem;
+  padding-right: 1rem;
 }

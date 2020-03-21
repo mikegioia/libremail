@@ -1,4 +1,5 @@
 .env
-.orig
 .DS_Store
 vendor
+*.idea
+*.orig

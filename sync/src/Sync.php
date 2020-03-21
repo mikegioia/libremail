@@ -6,33 +6,36 @@
 
 namespace App;
 
-use Fn;
-use DateTime;
-use Exception;
-use PDOException;
-use Monolog\Logger;
-use Pb\Imap\Mailbox;
-use Pimple\Container;
-use League\CLImate\CLImate;
-use App\Message\NoAccountsMessage;
-use App\Sync\Actions as ActionSync;
-use App\Sync\Folders as FolderSync;
-use App\Message\NotificationMessage;
-use App\Model\Folder as FolderModel;
-use App\Sync\Messages as MessageSync;
-use App\Model\Account as AccountModel;
-use Evenement\EventEmitter as Emitter;
-use App\Exceptions\Stop as StopException;
-use App\Model\Migration as MigrationModel;
 use App\Exceptions\Fatal as FatalException;
-use App\Exceptions\Terminate as TerminateException;
 use App\Exceptions\FolderSync as FolderSyncException;
 use App\Exceptions\MessagesSync as MessagesSyncException;
-use App\Traits\GarbageCollection as GarbageCollectionTrait;
 use App\Exceptions\MissingIMAPConfig as MissingIMAPConfigException;
+use App\Exceptions\Restart as RestartException;
+use App\Exceptions\Stop as StopException;
+use App\Exceptions\Terminate as TerminateException;
+use App\Message\NoAccountsMessage;
+use App\Message\NotificationMessage;
+use App\Model\Account as AccountModel;
+use App\Model\Folder as FolderModel;
+use App\Model\Migration as MigrationModel;
+use App\Sync\Actions as ActionSync;
+use App\Sync\Folders as FolderSync;
+use App\Sync\Messages as MessageSync;
+use App\Traits\GarbageCollection as GarbageCollectionTrait;
+use DateTime;
+use Evenement\EventEmitter as Emitter;
+use Exception;
+use Fn;
+use League\CLImate\CLImate;
+use Monolog\Logger;
+use Pb\Imap\Mailbox;
+use PDOException;
+use Pimple\Container;
 
 class Sync
 {
+    use GarbageCollectionTrait;
+
     private $cli;
     private $log;
     private $halt;
@@ -71,8 +74,6 @@ class Sync
     const EVENT_CHECK_HALT = 'check_halt';
     const EVENT_GARBAGE_COLLECT = 'garbage_collect';
     const EVENT_CHECK_CLOSED_CONN = 'check_closed_connection';
-
-    use GarbageCollectionTrait;
 
     /**
      * Constructor can either take a dependency container or have
@@ -298,11 +299,9 @@ class Sync
         }
 
         $this->checkForHalt();
-        $this->stats->setActiveAccount($account->email);
+        $this->stats->setActiveAccount($account);
 
         try {
-            $this->disconnect();
-
             // Commit any pending actions to the mail server
             if ($this->getActionCount($account) > 0) {
                 $this->connect($account);
@@ -381,6 +380,11 @@ class Sync
             exit(1);
         } catch (StopException $e) {
             throw $e;
+        } catch (RestartException $e) {
+            $this->log->info($e->getMessage());
+            sleep(1);
+
+            return $this->runAccount($account);
         } catch (TerminateException $e) {
             throw $e;
         } catch (Exception $e) {
@@ -713,6 +717,8 @@ class Sync
         } catch (PDOException $e) {
             throw $e;
         } catch (StopException $e) {
+            throw $e;
+        } catch (RestartException $e) {
             throw $e;
         } catch (TerminateException $e) {
             throw $e;

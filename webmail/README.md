@@ -52,6 +52,9 @@ The Web Client includes the following 3rd party packages:
     1. [Skeleton CSS Boilerplate](https://github.com/dhg/Skeleton),
        _Dave Gamache_
         * [MIT License](https://opensource.org/licenses/MIT)
+    2. [Normalize CSS](https://github.com/necolas/normalize.css),
+       _Nicolas Gallagher_
+        * [MIT License](https://opensource.org/licenses/MIT)
 3. PHP
     1. [Linkify](https://github.com/misd-service-development/php-linkify),
        _MISD Service Development, University of Cambridge_

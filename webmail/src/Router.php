@@ -157,9 +157,9 @@ class Router
         $headers = [];
 
         foreach ($_SERVER as $name => $value) {
-            if (('HTTP_' == substr($name, 0, 5))
-                || ('CONTENT_TYPE' == $name)
-                || ('CONTENT_LENGTH' == $name)
+            if (('HTTP_' === substr($name, 0, 5))
+                || ('CONTENT_TYPE' === $name)
+                || ('CONTENT_LENGTH' === $name)
             ) {
                 $key = str_replace(
                     [' ', 'Http'],

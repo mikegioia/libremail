@@ -7,7 +7,7 @@ use Exception;
 class MessagesSync extends Exception
 {
     public $code = EXC_MESSAGES_SYNC;
-    public $message = "Failed to sync IMAP messages for folder '%s'.";
+    public $message = "Failed to sync IMAP messages for folder '%s'";
 
     public function __construct(string $folder)
     {

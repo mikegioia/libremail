@@ -1,5 +1,5 @@
 html {
-  font-size: 90%;
+  font-size: 80%;
   height: 100%;
   width: 100%;
 }
@@ -127,6 +127,14 @@ aside a {
 
 .blocked {
   display: block;
+}
+
+.float-left {
+  float: left;
+}
+
+.float-right {
+  float: right;
 }
 
 .inline-blocked {

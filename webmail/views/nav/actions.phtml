@@ -8,24 +8,24 @@
             </a>
             <ul>
                 <li>
-                    <input type="submit" name="select" value="All" />
+                    <input type="submit" name="select" value="All">
                 </li>
                 <li>
-                    <input type="submit" name="select" value="None" />
+                    <input type="submit" name="select" value="None">
                 </li>
                 <?php
                 if (OUTBOX !== ($folderLabel ?? null)): ?>
                 <li>
-                    <input type="submit" name="select" value="Read" />
+                    <input type="submit" name="select" value="Read">
                 </li>
                 <li>
-                    <input type="submit" name="select" value="Unread" />
+                    <input type="submit" name="select" value="Unread">
                 </li>
                 <li>
-                    <input type="submit" name="select" value="Starred" />
+                    <input type="submit" name="select" value="Starred">
                 </li>
                 <li>
-                    <input type="submit" name="select" value="Unstarred" />
+                    <input type="submit" name="select" value="Unstarred">
                 </li>
                 <?php
                 endif; ?>
@@ -43,10 +43,10 @@
                 <?php
                 if (! isset($folderLabel) || OUTBOX !== $folderLabel): ?>
                 <li>
-                    <input type="submit" name="action" value="Mark all as read" />
+                    <input type="submit" name="action" value="Mark all as read">
                 </li>
                 <li>
-                    <input type="submit" name="action" value="Mark all as unread" />
+                    <input type="submit" name="action" value="Mark all as unread">
                 </li>
                 <?php
                 endif; ?>

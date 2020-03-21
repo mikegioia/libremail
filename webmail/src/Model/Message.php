@@ -159,9 +159,10 @@ class Message extends Model implements MessageInterface
         array $allowedFields = [],
         bool $allowEmpty = false
     ) {
-        $addresses = [$this->from];
-        $fields = array_intersect(['from', 'to', 'cc'], $allowedFields);
-        $fields = $fields ?: ['from', 'to', 'cc'];
+        $addresses = [];
+        $allowedKeys = ['from', 'to', 'cc', 'reply_to'];
+        $fields = array_intersect($allowedKeys, $allowedFields);
+        $fields = $fields ?: ['reply_to', 'to', 'cc'];
 
         foreach ($fields as $field) {
             if ($this->$field) {
@@ -200,7 +201,29 @@ class Message extends Model implements MessageInterface
 
     public function getReplyAddress(bool $stringify = true)
     {
-        return $this->getReplyAllAddresses($stringify, '', ['from']);
+        $replyTo = $this->getReplyAllAddresses($stringify, '', ['reply_to']);
+
+        return $replyTo ?: $this->getReplyAllAddresses($stringify, '', ['from']);
+    }
+
+    public function getReplyToAddresses(string $accountEmail = '', bool $stringify = false)
+    {
+        return $this->getReplyAllAddresses(
+            $stringify,
+            $accountEmail,
+            ['reply_to', 'from', 'to'],
+            false
+        );
+    }
+
+    public function getReplyCcAddresses(string $accountEmail = '', bool $stringify = false)
+    {
+        return $this->getReplyAllAddresses(
+            $stringify,
+            $accountEmail,
+            ['cc'],
+            true
+        );
     }
 
     public function loadById()
@@ -661,10 +684,6 @@ class Message extends Model implements MessageInterface
         array $skipFolderIds,
         array $onlyFolderIds
     ) {
-        if (! count($threadIds)) {
-            return [];
-        }
-
         // Load all of the threads and sort by date
         $allThreadIds = $this->getThreadDates($threadIds, $accountId);
 
@@ -672,28 +691,39 @@ class Message extends Model implements MessageInterface
         // for the large payload of data below
         $sliceIds = array_slice($allThreadIds, $offset, $limit);
 
+        if (! count($sliceIds)) {
+            return [];
+        }
+
+        // Store additional query fields
+        $ignoreFolders = array_diff($skipFolderIds, $onlyFolderIds);
+
         // Load all of the unique messages along with some
         // meta data. This is used to then locate the most
         // recent messages.
-        $messages = $this->db()
+        $qry = $this->db()
             ->select([
                 'id', 'thread_id', 'seen', 'folder_id', '`date`'
             ])
             ->from('messages')
             ->whereIn('thread_id', $sliceIds)
-            ->whereNotIn('folder_id', array_diff($skipFolderIds, $onlyFolderIds))
             ->where('deleted', '=', 0)
             ->groupBy('message_id')
             ->orderBy('thread_id', Model::ASC)
-            ->orderBy('date', Model::DESC)
-            ->execute()
-            ->fetchAll();
+            ->orderBy('date', Model::DESC);
+
+        if ($ignoreFolders) {
+            $qry->whereNotIn('folder_id', $ignoreFolders);
+        }
+
+        $messages = $qry->execute()->fetchAll();
 
         // Locate the most recent message ID and the oldest
         // unseen message ID. These are used for querying
         // the full message data.
         $recents = [];
         $unseens = [];
+        $textPlains = [];
 
         foreach ($messages as $message) {
             if (! isset($recents[$message['thread_id']])) {
@@ -705,6 +735,10 @@ class Message extends Model implements MessageInterface
             if (0 === (int) $message['seen']) {
                 $unseens[$message['thread_id']] = $message['id'];
             }
+        }
+
+        if (! $recents) {
+            return [];
         }
 
         // Load all of the recent messages
@@ -719,16 +753,19 @@ class Message extends Model implements MessageInterface
             ->whereIn('id', $recents)
             ->execute()
             ->fetchAll(PDO::FETCH_CLASS, get_class());
-        $textPlains = $this->db()
-            ->select(['thread_id', 'text_plain'])
-            ->from('messages')
-            ->whereIn('id', $unseens)
-            ->execute()
-            ->fetchAll();
-        $textPlains = array_combine(
-            array_column($textPlains, 'thread_id'),
-            array_column($textPlains, 'text_plain')
-        );
+
+        if ($unseens) {
+            $textPlains = $this->db()
+                ->select(['thread_id', 'text_plain'])
+                ->from('messages')
+                ->whereIn('id', $unseens)
+                ->execute()
+                ->fetchAll();
+            $textPlains = array_combine(
+                array_column($textPlains, 'thread_id'),
+                array_column($textPlains, 'text_plain')
+            );
+        }
 
         foreach ($threads as $thread) {
             if (isset($textPlains[$thread->thread_id])) {
@@ -748,6 +785,10 @@ class Message extends Model implements MessageInterface
      */
     private function getThreadDates(array $threadIds, int $accountId)
     {
+        if (! $threadIds) {
+            return [];
+        }
+
         $results = $this->db()
             ->select(['thread_id', 'max(date) as max_date'])
             ->from('messages')
@@ -999,7 +1040,7 @@ class Message extends Model implements MessageInterface
 
         // If there are any filters, first check this message
         foreach ($filters as $key => $value) {
-            if ($this->$key != $value) {
+            if ((string) $this->$key !== (string) $value) {
                 $addSelf = false;
                 break;
             }
@@ -1038,11 +1079,7 @@ class Message extends Model implements MessageInterface
         }
 
         foreach ($filters as $key => $value) {
-            if (is_array($value)) {
-                $query->whereIn($key, $value);
-            } else {
-                $query->where($key, '=', $value);
-            }
+            $query->where($key, '=', $value);
         }
 
         return $query->execute()->fetchAll(PDO::FETCH_CLASS, get_class());

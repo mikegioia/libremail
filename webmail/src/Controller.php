@@ -288,11 +288,30 @@ class Controller
 
     public function reply(int $parentId)
     {
-        $parent = (new Message)->getById($parentId, true);
+        $this->replyPage($parentId, false);
+    }
+
+    public function replyAll(int $parentId)
+    {
+        $this->replyPage($parentId, true);
+    }
+
+    private function replyPage(int $parentId, bool $replyAll)
+    {
+        $parentMessage = (new Message)->getById($parentId, true, true);
+        $parent = Thread::constructFromMessage(
+            $parentMessage,
+            new Folders($this->account, [])
+        )->updateMessage($parentMessage);
 
         $this->page('reply', [
+            'ccAddresses' => $parent->getReplyCcAddresses($this->account->email),
+            'contacts' => Contact::getByAccount($this->account->id),
             'parent' => $parent,
-            'contacts' => Contact::getByAccount($this->account->id)
+            'replyAll' => $replyAll,
+            'toAddresses' => $replyAll
+                ? $parent->getReplyToAddresses($this->account->email)
+                : $parent->getReplyAddress(false)
         ]);
     }
 
@@ -370,7 +389,8 @@ class Controller
             );
         } elseif (is_numeric(Url::postParam('reply_all_edit'))) {
             (new Compose($this->account))->replyEdit(
-                Url::postParam('reply_all_edit')
+                Url::postParam('reply_all_edit'),
+                true
             );
         } else {
             (new Actions(

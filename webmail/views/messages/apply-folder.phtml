@@ -6,13 +6,13 @@
             <i class="fa fa-times"></i>
         </a>
     </h4>
-    <input type="search" list="folder-list" value="" name="copy_to[]" placeholder="Search..." />
+    <input type="search" list="folder-list" value="" name="copy_to[]" placeholder="Search...">
     <div class="list">
     <?php
     foreach ($folders as $folder): ?>
-        <input type="checkbox" value="<?php $view->clean($folder->full_name ); ?>" name="copy_to[]"
+        <input type="checkbox" value="<?php $view->clean($folder->full_name); ?>" name="copy_to[]"
             class="move-to-checkbox" id="label-checkbox-<?php echo $folder->id; ?>"
-            <?php echo $folder->selected ? 'checked="checked"' : '' ?> />
+            <?php echo $folder->selected ? 'checked="checked"' : '' ?>>
         <label for="label-checkbox-<?php echo $folder->id; ?>">
             <?php $view->clean($folder->full_name); ?>
         </label>

@@ -15,22 +15,22 @@
             </a>
             <ul>
                 <li>
-                    <input type="submit" name="select" value="All" />
+                    <input type="submit" name="select" value="All">
                 </li>
                 <li>
-                    <input type="submit" name="select" value="None" />
+                    <input type="submit" name="select" value="None">
                 </li>
                 <li>
-                    <input type="submit" name="select" value="Read" />
+                    <input type="submit" name="select" value="Read">
                 </li>
                 <li>
-                    <input type="submit" name="select" value="Unread" />
+                    <input type="submit" name="select" value="Unread">
                 </li>
                 <li>
-                    <input type="submit" name="select" value="Starred" />
+                    <input type="submit" name="select" value="Starred">
                 </li>
                 <li>
-                    <input type="submit" name="select" value="Unstarred" />
+                    <input type="submit" name="select" value="Unstarred">
                 </li>
             </ul>
         </div>
@@ -123,25 +123,25 @@ endif; ?>
             || $folders->getTrashId() === $folderId
             || $folders->getDraftsId() === $folderId): ?>
             <li>
-                <input type="submit" name="action" value="Mark as read" />
+                <input type="submit" name="action" value="Mark as read">
             </li>
         <?php
         endif; ?>
             <li>
-                <input type="submit" name="action" value="Mark as unread" />
+                <input type="submit" name="action" value="Mark as unread">
             </li>
         <?php
         if ($folders->getSpamId() !== $folderId && $folders->getTrashId() !== $folderId): ?>
             <li>
-                <input type="submit" name="action" value="Move to Inbox" />
+                <input type="submit" name="action" value="Move to Inbox">
             </li>
         <?php
         endif; ?>
             <li>
-                <input type="submit" name="action" value="Add star" />
+                <input type="submit" name="action" value="Add star">
             </li>
             <li>
-                <input type="submit" name="action" value="Remove star" />
+                <input type="submit" name="action" value="Remove star">
             </li>
         </ul>
     </div>

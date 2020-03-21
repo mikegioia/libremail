@@ -2,11 +2,13 @@
 
 namespace App;
 
-use Fn;
+use App\Exceptions\Restart as RestartException;
 use App\Message\StatsMessage;
-use App\Model\Meta as MetaModel;
-use App\Model\Folder as FolderModel;
 use App\Model\Account as AccountModel;
+use App\Model\Folder as FolderModel;
+use App\Model\Meta as MetaModel;
+use App\Model\Task as TaskModel;
+use Fn;
 
 /**
  * Reports statistics about the syncing process. This will
@@ -14,22 +16,24 @@ use App\Model\Account as AccountModel;
  */
 class Stats
 {
-    private $pid;
-    private $cli;
-    private $stats;
-    private $daemon;
-    private $asleep;
-    private $running;
-    private $stopTime;
-    private $startTime;
-    private $activeFolder;
     private $activeAccount;
+    private $activeFolder;
+    private $asleep;
+    private $cli;
+    private $daemon;
+    private $pid;
+    private $running;
+    private $startTime;
+    private $stats;
+    private $stopTime;
+    private $taskModel;
 
     public function __construct(Console $console)
     {
         $this->pid = getmypid();
         $this->cli = $console->getCli();
         $this->daemon = $console->daemon;
+        $this->taskModel = new TaskModel;
     }
 
     public function setAsleep(bool $asleep = true)
@@ -49,7 +53,7 @@ class Stats
         $this->log();
     }
 
-    public function setActiveAccount(string $account = null)
+    public function setActiveAccount(AccountModel $account)
     {
         $this->activeAccount = $account;
 
@@ -84,6 +88,29 @@ class Stats
         }
 
         $this->log();
+    }
+
+    /**
+     * This helps prevent messages temporarily re-appearing.
+     * If the user archives a message while the sync is running
+     * then it might show the message again before the sync
+     * has a chance to process the archive action.
+     *
+     * @throws RestartException
+     */
+    public function checkRestart()
+    {
+        if (! $this->activeAccount) {
+            return;
+        }
+
+        $count = $this->taskModel->getTaskCountForSync(
+            $this->activeAccount->id
+        );
+
+        if ($count > 0) {
+            throw new RestartException;
+        }
     }
 
     /**
@@ -174,7 +201,7 @@ class Stats
             new StatsMessage(
                 (string) $this->activeFolder,
                 (bool) $this->asleep,
-                (string) $this->activeAccount,
+                (string) $this->activeAccount->email,
                 (bool) $this->running,
                 time() - $this->startTime,
                 $this->getStats($useCache)
@@ -198,7 +225,7 @@ class Stats
             MetaModel::START_TIME => $this->startTime ?: 0,
             MetaModel::LAST_SYNC_TIME => $this->stopTime ?: 0,
             MetaModel::ACTIVE_FOLDER => $this->activeFolder ?: '',
-            MetaModel::ACTIVE_ACCOUNT => $this->activeAccount ?: ''
+            MetaModel::ACTIVE_ACCOUNT => $this->activeAccount->email ?? ''
         ]);
     }
 }

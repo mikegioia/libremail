@@ -189,7 +189,11 @@ class Compose
 
         Session::formData($data);
 
-        Url::redirectRaw(Url::reply($parentId));
+        if ($replyAll) {
+            Url::redirectRaw(Url::replyAll($parentId));
+        } else {
+            Url::redirectRaw(Url::reply($parentId));
+        }
     }
 
     private function getReplyData(Message $parent, array $data, bool $replyAll = true)
@@ -197,8 +201,8 @@ class Compose
         $email = $this->account->email;
 
         if (true === $replyAll) {
-            $to = $parent->getReplyAllAddresses(false, $email, ['to', 'from'], true);
-            $cc = $parent->getReplyAllAddresses(false, $email, ['cc'], true);
+            $to = $parent->getReplyToAddresses($email);
+            $cc = $parent->getReplyCcAddresses($email);
         } else {
             $to = $parent->getReplyAddress(false);
             $cc = [];

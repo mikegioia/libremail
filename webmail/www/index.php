@@ -68,7 +68,8 @@ Model::initDb(
         $config['DB_HOST'],
         $config['DB_PORT'],
         $config['DB_DATABASE'],
-        $config['DB_CHARSET']),
+        $config['DB_CHARSET']
+    ),
     $config['DB_USERNAME'],
     $config['DB_PASSWORD'],
     $config['TIMEZONE']
@@ -150,6 +151,8 @@ if (! $account->exists()) {
     $router->post('/compose', [$controller, 'draft']);
     // Reply to a message
     $router->get('/reply/(\d+)', [$controller, 'reply']);
+    // Reply-all to a message
+    $router->get('/replyall/(\d+)', [$controller, 'replyAll']);
     // View the outbox messages
     $router->get('/outbox', [$controller, 'outbox']);
     // Delete draft

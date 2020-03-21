@@ -2,11 +2,11 @@
     <input id="thread-msg-checkbox-<?php echo $message->id; ?>" type="checkbox"
         class="thread-msg-checkbox"
         <?php echo $open === true ? ' checked' : '' ?>
-        <?php echo $locked === true ? ' disabled' : ''?> />
+        <?php echo $locked === true ? ' disabled' : ''?>>
     <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-label">
         <span class="snippet">
             <span class="avatar">
-                <img src="<?php echo $message->avatar_url; ?>" />
+                <img src="<?php echo $message->avatar_url; ?>">
             </span><!--
             --><strong class="from"><?php $view->clean($message->from_name); ?></strong><!--
             --><span><?php $view->clean($message->snippet); ?></span>
@@ -18,7 +18,7 @@
         <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-header u-cf">
             <span class="snippet">
                 <span class="avatar">
-                    <img src="<?php echo $message->avatar_url; ?>" />
+                    <img src="<?php echo $message->avatar_url; ?>">
                 </span>
                 <span class="details blocked">
                     <span class="from blocked">
@@ -123,10 +123,7 @@
             'outbox' => $outbox,
             'account' => $account,
             'message' => $message,
-            'visible' => true === ($showReplyAll ?? false),
-            'addresses' => $outbox->exists() && $outbox->getAddresses()
-                ? $outbox->getAddresses()
-                : $message->getReplyAllAddresses(false, $account->email)
+            'visible' => true === ($showReplyAll ?? false)
         ]);
     endif; ?>
 </div>
