@@ -53,7 +53,7 @@ class Stats
         $this->log();
     }
 
-    public function setActiveAccount(AccountModel $account)
+    public function setActiveAccount(AccountModel $account = null)
     {
         $this->activeAccount = $account;
 

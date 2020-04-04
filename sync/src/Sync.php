@@ -57,6 +57,7 @@ class Sync
     private $threader;
     private $threading;
     private $interactive;
+    private $lastRunTime;
     private $activeAccount;
     private $maxRetries = 5;
     private $retriesFolders;
