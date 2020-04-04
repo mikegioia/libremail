@@ -82,6 +82,12 @@ your SQL config file:
 You don't have to use 512MB as your packet size, but anything 16MB or higher is
 advised.
 
+#### 1.2 Configuring `max_allowed_packet` for non-SUPER SQL databases (Amazon RDS)
+
+If your SQL user account does not have SUPER privileges, you will have to set the
+`max_allowed_packet` config setting manually. In Amazon RDS, these parameters can
+be changed by creating a "customized parameter group" in the RDS admin panel.
+
 ### 2. Configure the Application
 
 Configuration options are saved in `config/default.ini`. Do not modify this file
