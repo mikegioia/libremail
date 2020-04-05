@@ -22,7 +22,7 @@
         "ext-pdo": "*",
         "ext-iconv": "*",
         "ext-mbstring": "*",
-        "particlebits/imap": "@dev",
+        "particlebits/imap": "^2.1",
         "particlebits/pdo": "@dev",
         "laminas/laminas-mail": "@dev",
         "laminas/laminas-mime": "@dev",

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "47901fd43f59d7e143f53946eba91817",
+    "content-hash": "83d63117643c190dd9b919b2f4e60714",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -1028,16 +1028,16 @@
         },
         {
             "name": "particlebits/imap",
-            "version": "dev-master",
+            "version": "2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "b97927c2149b6c0bf88c02af9ddf154edbb7b6cd"
+                "reference": "535f0c0dfa8777f6105a0b5dad8f4e3012b099c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/b97927c2149b6c0bf88c02af9ddf154edbb7b6cd",
-                "reference": "b97927c2149b6c0bf88c02af9ddf154edbb7b6cd",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/535f0c0dfa8777f6105a0b5dad8f4e3012b099c5",
+                "reference": "535f0c0dfa8777f6105a0b5dad8f4e3012b099c5",
                 "shasum": ""
             },
             "require": {
@@ -1063,7 +1063,7 @@
                     "homepage": "https://particlebits.com"
                 }
             ],
-            "description": "PHP class to access an IMAP mailbox. Specifically uses the Zend library and not the IMAP extension.",
+            "description": "PHP class to access an IMAP mailbox. Specifically uses the Laminas library and not the IMAP extension.",
             "homepage": "https://github.com/particlebits/imap",
             "keywords": [
                 "fetch",
@@ -1071,7 +1071,7 @@
                 "mail",
                 "php"
             ],
-            "time": "2020-04-05T22:34:16+00:00"
+            "time": "2020-04-05T22:42:55+00:00"
         },
         {
             "name": "particlebits/pdo",
@@ -2384,7 +2384,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "particlebits/imap": 20,
         "particlebits/pdo": 20,
         "laminas/laminas-mail": 20,
         "laminas/laminas-mime": 20,
