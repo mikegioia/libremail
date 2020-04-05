@@ -7,15 +7,25 @@
             "src/Functions.php"
         ]
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/particlebits/laminas-mail"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/particlebits/laminas-mime"
+        }
+    ],
     "require": {
         "php": ">=7.0",
         "ext-pdo": "*",
         "ext-iconv": "*",
         "ext-mbstring": "*",
-        "particlebits/imap": "^2.0",
+        "particlebits/imap": "^2.1",
         "particlebits/pdo": "@dev",
-        "particlebits/zend-mail": "@dev",
-        "particlebits/zend-mime": "@dev",
+        "laminas/laminas-mail": "@dev",
+        "laminas/laminas-mime": "@dev",
         "laminas/laminas-servicemanager": "^3.4",
         "pimple/pimple": "^3.3",
         "monolog/monolog": "^1.25",
