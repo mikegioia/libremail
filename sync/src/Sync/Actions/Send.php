@@ -6,20 +6,20 @@ namespace App\Sync\Actions;
 use DateTime;
 use Exception;
 // Application
-use App\Sync\Actions;
-use App\Model\Task as TaskModel;
-use App\Model\Message as MessageModel;
 use App\Exceptions\NotFound as NotFoundException;
+use App\Model\Message as MessageModel;
+use App\Model\Task as TaskModel;
+use App\Sync\Actions;
 // Vendor
+use Laminas\Mail\Exception\InvalidArgumentException;
+use Laminas\Mail\Message as MailMessage;
+use Laminas\Mail\Transport\Exception\RuntimeException as TransportRuntimeException;
+use Laminas\Mail\Transport\Smtp as SmtpTransport;
+use Laminas\Mail\Transport\SmtpOptions;
+use Laminas\Mime\Message as MimeMessage;
+use Laminas\Mime\Mime;
+use Laminas\Mime\Part as MimePart;
 use Pb\Imap\Mailbox;
-use Zend\Mime\Mime;
-use Zend\Mime\Part as MimePart;
-use Zend\Mail\Message as MailMessage;
-use Zend\Mime\Message as MimeMessage;
-use Zend\Mail\Transport\SmtpOptions;
-use Zend\Mail\Transport\Smtp as SmtpTransport;
-use Zend\Mail\Exception\InvalidArgumentException;
-use Zend\Mail\Transport\Exception\RuntimeException as TransportRuntimeException;
 
 class Send extends Base
 {

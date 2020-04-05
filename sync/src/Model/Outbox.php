@@ -2,11 +2,11 @@
 
 namespace App\Model;
 
-use PDO;
-use App\Model;
-use Zend\Mail\AddressList;
-use App\Traits\Model as ModelTrait;
 use App\Exceptions\NotFound as NotFoundException;
+use App\Model;
+use App\Traits\Model as ModelTrait;
+use Laminas\Mail\AddressList;
+use PDO;
 
 class Outbox extends Model
 {

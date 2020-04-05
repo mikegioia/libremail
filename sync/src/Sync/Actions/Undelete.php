@@ -2,9 +2,9 @@
 
 namespace App\Sync\Actions;
 
-use Pb\Imap\Mailbox;
-use Zend\Mail\Storage;
 use App\Model\Task as TaskModel;
+use Laminas\Mail\Storage;
+use Pb\Imap\Mailbox;
 
 class Undelete extends Base
 {
