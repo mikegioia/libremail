@@ -34,7 +34,18 @@ define('BASEPATH', __DIR__);
 date_default_timezone_set('UTC');
 
 // Load the vendor libraries
-require BASEPATH.'/vendor/autoload.php';
+if (file_exists($a = getcwd() . '/vendor/autoload.php')) {
+    require $a;
+} elseif (file_exists($a = __DIR__ . '/../../../autoload.php')) {
+    require $a;
+} elseif (file_exists($a = __DIR__ . '/../vendor/autoload.php')) {
+    require $a;
+} elseif (file_exists($a = BASEPATH.'/vendor/autoload.php')) {
+    require $a;
+} else {
+    fwrite(STDERR, 'Cannot locate autoloader; please run "composer install"' . PHP_EOL);
+    exit(1);
+}
 
 // Load configuration files and parse the CLI arguments
 $constants = parse_ini_file(BASEPATH.'/config/constants.ini', false);
