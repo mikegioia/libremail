@@ -2,26 +2,26 @@
 
 namespace App;
 
-use Fn;
+use App\Exceptions\AttachmentsPathNotWriteable as AttachmentsPathNotWriteableException;
+use App\Exceptions\Fatal as FatalException;
+use App\Exceptions\LogPathNotWriteable as LogPathNotWriteableException;
+use App\Exceptions\MaxAllowedPacket as MaxAllowedPacketException;
+use App\Exceptions\Terminate as TerminateException;
+use App\Message\DiagnosticsMessage;
+use App\Message\ErrorMessage;
+use App\Model\Account as AccountModel;
+use App\Model\Migration as MigrationModel;
+use App\Util;
 use Exception;
 use PDOException;
 use Pimple\Container;
-use App\Message\ErrorMessage;
-use App\Message\DiagnosticsMessage;
-use App\Model\Account as AccountModel;
-use App\Model\Migration as MigrationModel;
-use App\Exceptions\Fatal as FatalException;
-use App\Exceptions\Terminate as TerminateException;
-use App\Exceptions\MaxAllowedPacket as MaxAllowedPacketException;
-use App\Exceptions\LogPathNotWriteable as LogPathNotWriteableException;
-use App\Exceptions\AttachmentsPathNotWriteable as AttachmentsPathNotWriteableException;
 
 class Diagnostics
 {
-    private $di;
     private $cli;
-    private $log;
     private $console;
+    private $di;
+    private $log;
 
     /**
      * Statically set config used in static methods.
@@ -234,8 +234,8 @@ class Diagnostics
 
             if (! $size || $size < $safeSize) {
                 $e = new MaxAllowedPacketException(
-                    Fn\formatBytes($size, 0),
-                    Fn\formatBytes($safeSize, 0)
+                    Util::formatBytes($size, 0),
+                    Util::formatBytes($safeSize, 0)
                 );
 
                 $this->endTest(STATUS_WARNING, self::TEST_MAX_PACKET, $e);
@@ -503,7 +503,7 @@ class Diagnostics
             'SSL connection has been closed unexpectedly'
         ];
 
-        if (! Fn\contains($e->getMessage(), $messages)) {
+        if (! Util::contains($e->getMessage(), $messages)) {
             if ($di['console']->daemon) {
                 Message::send(
                     new ErrorMessage(

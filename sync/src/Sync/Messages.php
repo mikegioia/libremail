@@ -1,9 +1,5 @@
 <?php
 
-/**
- * Syncs IMAP messages to SQL.
- */
-
 namespace App\Sync;
 
 use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
@@ -13,15 +9,18 @@ use App\Model\Folder as FolderModel;
 use App\Model\Message as MessageModel;
 use App\Stats;
 use App\Sync;
+use App\Util;
 use Evenement\EventEmitter as Emitter;
 use Exception;
-use Fn;
 use League\CLImate\CLImate;
 use Monolog\Logger;
 use Pb\Imap\Exceptions\MessageSizeLimit as MessageSizeLimitException;
 use Pb\Imap\Mailbox;
 use PDOException;
 
+/**
+ * Syncs IMAP messages to SQL.
+ */
 class Messages
 {
     private $log;
@@ -144,7 +143,7 @@ class Messages
         $start = time();
         $count = count($toDownload);
         $syncedCount = $total - $count;
-        $noun = Fn\plural('message', $total);
+        $noun = Util::plural('message', $total);
         $this->log->debug("Downloading messages in {$folder->name}");
 
         if ($count) {
@@ -156,7 +155,7 @@ class Messages
         // Update folder stats with count
         $folder->saveStats($total, $syncedCount);
 
-        if (true === Fn\get($options, Sync::OPT_SKIP_DOWNLOAD)) {
+        if (true === Util::get($options, Sync::OPT_SKIP_DOWNLOAD)) {
             return;
         }
 
@@ -167,7 +166,7 @@ class Messages
         }
 
         if ($this->interactive) {
-            $noun = Fn\plural('message', $count);
+            $noun = Util::plural('message', $count);
             $this->cli->whisper("Syncing $count new $noun in {$folder->name}:");
             $progress = $this->cli->progress()->total(100);
         }

@@ -2,16 +2,16 @@
 
 namespace App\Model;
 
-use Fn;
-use PDO;
-use DateTime;
-use App\Model;
-use Particle\Validator\Validator;
-use App\Traits\Model as ModelTrait;
+use App\Exceptions\DatabaseInsert as DatabaseInsertException;
+use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 use App\Exceptions\NotFound as NotFoundException;
 use App\Exceptions\Validation as ValidationException;
-use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
-use App\Exceptions\DatabaseInsert as DatabaseInsertException;
+use App\Model;
+use App\Traits\Model as ModelTrait;
+use App\Util;
+use DateTime;
+use Particle\Validator\Validator;
+use PDO;
 
 class Folder extends Model
 {
@@ -81,7 +81,7 @@ class Folder extends Model
 
     public function isIgnored()
     {
-        return Fn\intEq($this->ignored, 1);
+        return Util::intEq($this->ignored, 1);
     }
 
     public function isDrafts()

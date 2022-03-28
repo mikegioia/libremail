@@ -1,31 +1,27 @@
 <?php
 
-/**
- * Syncs actions to the IMAP server.
- */
-
 namespace App\Sync;
 
-// Core
-use Fn;
+use App\Exceptions\NotFound as NotFoundException;
+use App\Model;
+use App\Model\Account as AccountModel;
+use App\Model\Folder as FolderModel;
+use App\Model\Message as MessageModel;
+use App\Model\Outbox as OutboxModel;
+use App\Model\Task as TaskModel;
+use App\Sync;
+use App\Util;
+use Evenement\EventEmitter as Emitter;
 use Exception;
-use RuntimeException;
-// Vendor
+use League\CLImate\CLImate;
 use Monolog\Logger;
 use Pb\Imap\Mailbox;
 use Pb\Imap\Message;
-use League\CLImate\CLImate;
-use Evenement\EventEmitter as Emitter;
-// Application
-use App\Sync;
-use App\Model;
-use App\Model\Task as TaskModel;
-use App\Model\Folder as FolderModel;
-use App\Model\Outbox as OutboxModel;
-use App\Model\Account as AccountModel;
-use App\Model\Message as MessageModel;
-use App\Exceptions\NotFound as NotFoundException;
+use RuntimeException;
 
+/**
+ * Syncs actions to the IMAP server.
+ */
 class Actions
 {
     private $log;
@@ -99,7 +95,7 @@ class Actions
             return 0;
         }
 
-        $noun = Fn\plural('task', $count);
+        $noun = Util::plural('task', $count);
         $this->log->info("Syncing $count $noun for {$account->email}");
 
         // Compress them by removing any redundant tasks
@@ -195,7 +191,7 @@ class Actions
         }
 
         if ($ignoreCount && true === $enableLog) {
-            $noun = Fn\plural('task', $ignoreCount);
+            $noun = Util::plural('task', $ignoreCount);
             $this->log->info("Ignored $ignoreCount $noun");
         }
 
@@ -379,7 +375,7 @@ class Actions
     private function startProgress(int $total)
     {
         if ($this->interactive) {
-            $noun = Fn\plural('task', $total);
+            $noun = Util::plural('task', $total);
             $this->progress = $this->cli->progress()->total($total);
             $this->cli->whisper("Syncing $total $noun");
         }

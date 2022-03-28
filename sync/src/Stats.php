@@ -8,7 +8,7 @@ use App\Model\Account as AccountModel;
 use App\Model\Folder as FolderModel;
 use App\Model\Meta as MetaModel;
 use App\Model\Task as TaskModel;
-use Fn;
+use App\Util;
 
 /**
  * Reports statistics about the syncing process. This will
@@ -151,7 +151,7 @@ class Stats
                     'count' => $folder->getCount(),
                     'synced' => $folder->getSynced(),
                     'percent' => ($folder->getSynced() > 0)
-                        ? Fn\percent($folder->getSynced() / $folder->getCount())
+                        ? Util::percent($folder->getSynced() / $folder->getCount())
                         : (($folder->getCount() > 0)
                             ? '0%'
                             : '100%')
@@ -201,7 +201,7 @@ class Stats
             new StatsMessage(
                 (string) $this->activeFolder,
                 (bool) $this->asleep,
-                (string) $this->activeAccount->email,
+                (string) Util::get($this->activeAccount, 'email', ''),
                 (bool) $this->running,
                 time() - $this->startTime,
                 $this->getStats($useCache)

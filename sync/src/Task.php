@@ -2,11 +2,11 @@
 
 namespace App;
 
-use Fn;
-use Exception;
 use App\Task\SaveAccountTask;
 use App\Task\AccountInfoTask;
 use App\Task\RemoveAccountTask;
+use App\Util;
+use Exception;
 
 class Task
 {
@@ -28,19 +28,19 @@ class Task
     {
         switch ($type) {
             case self::SAVE_ACCOUNT:
-                Fn\expects($data)->toHave([
+                Util::expects($data)->toHave([
                     'name', 'email', 'password'
                 ]);
 
                 return new SaveAccountTask($data);
 
             case self::ACCOUNT_INFO:
-                Fn\expects($data)->toHave(['email']);
+                Util::expects($data)->toHave(['email']);
 
                 return new AccountInfoTask($data);
 
             case self::REMOVE_ACCOUNT:
-                Fn\expects($data)->toHave(['email']);
+                Util::expects($data)->toHave(['email']);
 
                 return new RemoveAccountTask($data);
         }
