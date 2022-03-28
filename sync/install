@@ -160,13 +160,13 @@ function saveCredentialsWebmail {
   fi
 
   ## Update the credential lines
-  sed -i -e "/DB_USERNAME=/ s/=.*/=${username}/" $webmailLocalEnv
-  sed -i -e "/DB_PASSWORD=/ s/=.*/=${password}/" $webmailLocalEnv
+  sed -i '' -e "/DB_USERNAME=/ s/=.*/=${username}/" $webmailLocalEnv
+  sed -i '' -e "/DB_PASSWORD=/ s/=.*/=${password}/" $webmailLocalEnv
 }
 
 ## Runs the sync script's diagnostic checks
 function runDiagnostics {
-  ${basepath}/sync -d
+  ${basepath}/sync -D
   result=$?
 
   if [ $result -ne 0 ]; then
