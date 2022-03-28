@@ -201,7 +201,7 @@ class Stats
             new StatsMessage(
                 (string) $this->activeFolder,
                 (bool) $this->asleep,
-                (string) $this->activeAccount->email,
+                (string) get($this->activeAccount, 'email', ''),
                 (bool) $this->running,
                 time() - $this->startTime,
                 $this->getStats($useCache)
