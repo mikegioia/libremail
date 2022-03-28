@@ -20,7 +20,7 @@ class Folders
     private $emitter;
     private $interactive;
 
-    const IGNORED_LIST = [
+    public const IGNORED_LIST = [
         '[Gmail]'
     ];
 
@@ -39,9 +39,7 @@ class Folders
     /**
      * Syncs a set of IMAP folders with what we have in SQL.
      *
-     * @param iterable $folderList
      * @param array FolderModel $savedFolders
-     * @param AccountModel $account
      */
     public function run(iterable $folderList, array $savedFolders, AccountModel $account)
     {
@@ -56,9 +54,7 @@ class Folders
     /**
      * Adds new folders from IMAP to the database.
      *
-     * @param iterable $folderList
      * @param array FolderModel $savedFolders
-     * @param AccountModel $account
      */
     private function addNewFolders(
         iterable $folderList,
@@ -112,9 +108,7 @@ class Folders
     /**
      * Removes purged folders no longer in the mailbox from the database.
      *
-     * @param iterable $folderList
      * @param array FolderModel $savedFolders
-     * @param AccountModel $account
      */
     private function removeOldFolders(
         iterable $folderList,

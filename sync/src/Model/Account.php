@@ -2,15 +2,15 @@
 
 namespace App\Model;
 
-use PDO;
-use DateTime;
-use App\Model;
-use Particle\Validator\Validator;
-use App\Traits\Model as ModelTrait;
-use App\Exceptions\Validation as ValidationException;
 use App\Exceptions\AccountExists as AccountExistsException;
 use App\Exceptions\DatabaseInsert as DatabaseInsertException;
 use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
+use App\Exceptions\Validation as ValidationException;
+use App\Model;
+use App\Traits\Model as ModelTrait;
+use DateTime;
+use Particle\Validator\Validator;
+use PDO;
 
 class Account extends Model
 {
@@ -54,9 +54,6 @@ class Account extends Model
 
     /**
      * Create a new account record.
-     *
-     * @param array $data
-     * @param bool $updateIfExists
      *
      * @throws AccountExistsException
      * @throws DatabaseInsertException

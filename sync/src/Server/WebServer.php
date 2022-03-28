@@ -4,9 +4,9 @@ namespace App\Server;
 
 use App\Log;
 use Exception;
+use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Http\HttpServerInterface;
-use Psr\Http\Message\RequestInterface;
 
 class WebServer implements HttpServerInterface
 {
@@ -23,7 +23,6 @@ class WebServer implements HttpServerInterface
      * we want to do is check if the requested path exists as a file in
      * the web folder. If so, serve it, otherwise return a 404.
      *
-     * @param ConnectionInterface $conn
      * @param RequestInterface $request
      */
     public function onOpen(ConnectionInterface $conn, RequestInterface $request = null)
@@ -72,7 +71,6 @@ class WebServer implements HttpServerInterface
     /**
      * Serves a static file to the client.
      *
-     * @param ConnectionInterface $conn
      * @param string $path
      */
     private function serveFile(ConnectionInterface $conn, $path)
@@ -91,8 +89,6 @@ class WebServer implements HttpServerInterface
 
     /**
      * Display a 404 page.
-     *
-     * @param ConnectionInterface $conn
      */
     private function show404(ConnectionInterface $conn)
     {
@@ -115,8 +111,6 @@ class WebServer implements HttpServerInterface
 
     /**
      * Try to get the content type by file extension.
-     *
-     * @param string $path
      *
      * @return string
      */

@@ -8,23 +8,22 @@
  * Call this script to run "forever" and manage the possibly-memory
  * abusive sync and server scripts.
  */
-use App\Log;
-use App\Model;
-use App\Daemon;
 use App\Command;
-use App\Message;
-use App\Startup;
+use App\Console\DaemonConsole;
 use App\Constants;
+use App\Daemon;
 use App\Diagnostics;
+use App\Exceptions\Terminate as TerminateException;
+use App\Log;
+use App\Message;
+use App\Model;
+use App\Startup;
+use MKraemer\ReactPCNTL\PCNTL;
 use Pb\PDO\Database;
 use Pimple\Container;
-use Exception as Exception;
-use React\EventLoop\Factory;
-use App\Console\DaemonConsole;
-use MKraemer\ReactPCNTL\PCNTL;
 use React\ChildProcess\Process;
+use React\EventLoop\Factory;
 use Symfony\Component\EventDispatcher\Event;
-use App\Exceptions\Terminate as TerminateException;
 use Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 
 // Set up paths and constants

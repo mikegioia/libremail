@@ -27,12 +27,12 @@ class Folder extends Model
     public $created_at;
     public $uid_validity;
 
-    const DRAFTS = [
+    public const DRAFTS = [
         '[Gmail]/Drafts',
         '[Gmail]/Bozze'
     ];
 
-    const SENT = [
+    public const SENT = [
         '[Gmail]/Sent Mail',
         '[Gmail]/Posta inviata'
     ];
@@ -131,8 +131,6 @@ class Folder extends Model
     /**
      * Create a new folder record. Updates a folder to be active
      * if it exists in the system already.
-     *
-     * @param array $data
      *
      * @throws ValidationException
      * @throws DatabaseUpdateException
@@ -235,9 +233,6 @@ class Folder extends Model
      * the total count of messages on the IMAP server, and the
      * count of messages confirmed to be synced in our database.
      *
-     * @param int $count
-     * @param int $synced
-     *
      * @return bool
      */
     public function saveStats(int $count, int $synced)
@@ -251,8 +246,6 @@ class Folder extends Model
     /**
      * Updates a new UID validity flag on the folder.
      *
-     * @param int $uidValidity
-     *
      * @return bool
      */
     public function saveUidValidity(int $uidValidity)
@@ -265,12 +258,10 @@ class Folder extends Model
     /**
      * Finds a folder by account and name.
      *
-     * @param int $accountId
-     * @param string $name
      * @param bool $failOnNotFound If set, throw an Exception when
      *   the folder isn't found
      *
-     * @return bool | FolderModel
+     * @return bool|FolderModel
      */
     public function getByName(
         int $accountId,
@@ -297,7 +288,6 @@ class Folder extends Model
      * Returns a list of folders by an account ID. This is useful for
      * comparing the new folders against the already saved ones.
      *
-     * @param int $accountId
      * @param bool $indexByName Return array indexed by folder name
      *
      * @return FolderModel array

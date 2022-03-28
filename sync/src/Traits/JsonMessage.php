@@ -13,7 +13,6 @@ trait JsonMessage
      * Reads in a message chunk from a stream. This is to be
      * implemented in the class and should call parseMessage.
      *
-     * @param string $message
      * @param string $key
      */
     abstract protected function processMessage(string $message, string $key = null);
@@ -21,7 +20,6 @@ trait JsonMessage
     /**
      * Reads in a JSON message for handling.
      *
-     * @param string $json
      * @param string $key
      */
     abstract protected function handleMessage(string $json, string $key = null);
@@ -31,7 +29,6 @@ trait JsonMessage
      * This expects JSON messages to be formatted in a certain
      * way:.
      *
-     * @param string $message
      * @param string $key
      */
     private function parseMessage(string $message, string $key = null)

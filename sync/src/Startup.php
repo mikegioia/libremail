@@ -2,9 +2,9 @@
 
 namespace App;
 
-use Pimple\Container;
 use App\Message\PidMessage;
 use App\Model\Account as AccountModel;
+use Pimple\Container;
 
 /**
  * Runs at the start of the application and performs various

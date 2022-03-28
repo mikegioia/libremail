@@ -2,23 +2,25 @@
 
 namespace App\Server;
 
-use App\Log;
-use App\Task;
-use Exception;
 use App\Command;
+use App\Exceptions\Terminate as TerminateException;
+use App\Log;
 use App\Message;
+use App\Task;
+use App\Traits\JsonMessage as JsonMessageTrait;
+use Exception;
 use PDOException;
-use SplObjectStorage;
 use Ratchet\ConnectionInterface;
-use React\EventLoop\LoopInterface;
 use Ratchet\MessageComponentInterface;
+use React\EventLoop\LoopInterface;
 use React\Stream\ReadableResourceStream;
 use React\Stream\WritableResourceStream;
-use App\Traits\JsonMessage as JsonMessageTrait;
-use App\Exceptions\Terminate as TerminateException;
+use SplObjectStorage;
 
 class StatsServer implements MessageComponentInterface
 {
+    // For JSON message handling
+    use JsonMessageTrait;
     private $log;
     private $loop;
     private $clients;
@@ -26,9 +28,6 @@ class StatsServer implements MessageComponentInterface
     // Streams
     private $read;
     private $write;
-
-    // For JSON message handling
-    use JsonMessageTrait;
 
     public function __construct(Log $log, LoopInterface $loop)
     {

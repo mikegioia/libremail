@@ -2,10 +2,10 @@
 
 namespace App\Model;
 
-use App\Model;
-use Belt\Belt;
-use App\Traits\Model as ModelTrait;
 use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
+use App\Model;
+use App\Traits\Model as ModelTrait;
+use Belt\Belt;
 
 class Meta extends Model
 {
@@ -15,15 +15,15 @@ class Meta extends Model
     public $value;
     public $updated_at;
 
-    const ASLEEP = 'asleep';
-    const RUNNING = 'running';
-    const SYNC_PID = 'sync_pid';
-    const HEARTBEAT = 'heartbeat';
-    const START_TIME = 'start_time';
-    const FOLDER_STATS = 'folder_stats';
-    const ACTIVE_FOLDER = 'active_folder';
-    const ACTIVE_ACCOUNT = 'active_account';
-    const LAST_SYNC_TIME = 'last_sync_time';
+    public const ASLEEP = 'asleep';
+    public const RUNNING = 'running';
+    public const SYNC_PID = 'sync_pid';
+    public const HEARTBEAT = 'heartbeat';
+    public const START_TIME = 'start_time';
+    public const FOLDER_STATS = 'folder_stats';
+    public const ACTIVE_FOLDER = 'active_folder';
+    public const ACTIVE_ACCOUNT = 'active_account';
+    public const LAST_SYNC_TIME = 'last_sync_time';
 
     public function getData()
     {
@@ -36,8 +36,6 @@ class Meta extends Model
 
     /**
      * Updates a set of keys with new values.
-     *
-     * @param array $data
      *
      * @throws DatabaseUpdateException
      */

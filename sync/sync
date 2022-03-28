@@ -8,22 +8,20 @@
  * from the CLI or managed via a supervisor. It works by checking
  * a list of saved IMAP credentials and runs through a flow of tasks.
  */
-use App\Log;
-use App\Sync;
-use App\Model;
-use App\Stats;
-use App\Message;
-use App\Startup;
+use App\Console\SyncConsole;
 use App\Constants;
 use App\Diagnostics;
-use Pb\PDO\Database;
-use Pimple\Container;
-use Exception as Exception;
-use App\Console\SyncConsole;
-use PDOException as PDOException;
-use App\Sync\Threads as ThreadSync;
 use App\Exceptions\Stop as StopException;
 use App\Exceptions\Terminate as TerminateException;
+use App\Log;
+use App\Message;
+use App\Model;
+use App\Startup;
+use App\Stats;
+use App\Sync;
+use App\Sync\Threads as ThreadSync;
+use Pb\PDO\Database;
+use Pimple\Container;
 
 // Set up paths and constants
 set_time_limit(0);

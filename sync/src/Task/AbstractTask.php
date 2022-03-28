@@ -14,8 +14,6 @@ abstract class AbstractTask
     /**
      * Constructor takes in a data array and sets the class variables
      * based on the data keys.
-     *
-     * @param array $data
      */
     public function __construct(array $data)
     {

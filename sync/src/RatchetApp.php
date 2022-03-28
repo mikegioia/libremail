@@ -2,15 +2,15 @@
 
 namespace App;
 
-use Ratchet\Wamp\WampServer;
-use Ratchet\Http\OriginCheck;
-use Ratchet\ComponentInterface;
-use Ratchet\WebSocket\WsServer;
 use Ratchet\App as BaseRatchetApp;
-use Symfony\Component\Routing\Route;
+use Ratchet\ComponentInterface;
 use Ratchet\Http\HttpServerInterface;
-use Ratchet\Wamp\WampServerInterface;
+use Ratchet\Http\OriginCheck;
 use Ratchet\MessageComponentInterface;
+use Ratchet\Wamp\WampServer;
+use Ratchet\Wamp\WampServerInterface;
+use Ratchet\WebSocket\WsServer;
+use Symfony\Component\Routing\Route;
 
 class RatchetApp extends BaseRatchetApp
 {

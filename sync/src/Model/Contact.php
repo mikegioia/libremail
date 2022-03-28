@@ -2,10 +2,10 @@
 
 namespace App\Model;
 
-use App\Model;
-use Belt\Belt;
-use App\Traits\Model as ModelTrait;
 use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
+use App\Model;
+use App\Traits\Model as ModelTrait;
+use Belt\Belt;
 
 class Contact extends Model
 {
@@ -47,10 +47,7 @@ class Contact extends Model
             ->execute();
 
         if (! Belt::isNumber($updated)) {
-            throw new DatabaseUpdateException(
-                META,
-                $this->db()->getError()
-            );
+            throw new DatabaseUpdateException(META, $this->db()->getError());
         }
     }
 }

@@ -3,13 +3,13 @@
 namespace App\Sync\Actions;
 
 // Core
-use DateTime;
-use Exception;
-// Application
 use App\Exceptions\NotFound as NotFoundException;
 use App\Model\Message as MessageModel;
+// Application
 use App\Model\Task as TaskModel;
 use App\Sync\Actions;
+use DateTime;
+use Exception;
 // Vendor
 use Laminas\Mail\Exception\InvalidArgumentException;
 use Laminas\Mail\Message as MailMessage;
@@ -23,10 +23,10 @@ use Pb\Imap\Mailbox;
 
 class Send extends Base
 {
-    const TLS = 'tls';
-    const UTF8 = 'UTF-8';
-    const LOCALHOST = 'localhost';
-    const MULTIPART_ALTERNATIVE = 'multipart/alternative';
+    public const TLS = 'tls';
+    public const UTF8 = 'UTF-8';
+    public const LOCALHOST = 'localhost';
+    public const MULTIPART_ALTERNATIVE = 'multipart/alternative';
 
     /**
      * Tasks are ready if the outbox message is set to be delivered.

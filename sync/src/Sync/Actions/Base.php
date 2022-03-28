@@ -2,13 +2,13 @@
 
 namespace App\Sync\Actions;
 
+use App\Model\Account as AccountModel;
+use App\Model\Folder as FolderModel;
+use App\Model\Message as MessageModel;
+use App\Model\Outbox as OutboxModel;
+use App\Model\Task as TaskModel;
 use Pb\Imap\Mailbox;
 use Pb\Imap\Message;
-use App\Model\Task as TaskModel;
-use App\Model\Folder as FolderModel;
-use App\Model\Outbox as OutboxModel;
-use App\Model\Account as AccountModel;
-use App\Model\Message as MessageModel;
 
 abstract class Base
 {

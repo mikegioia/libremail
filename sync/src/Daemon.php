@@ -2,19 +2,21 @@
 
 namespace App;
 
-use Exception;
-use App\Events\MessageEvent;
 use App\Console\DaemonConsole;
-use App\Message\HealthMessage;
-use React\ChildProcess\Process;
-use App\Message\AbstractMessage;
-use React\EventLoop\LoopInterface;
-use App\Traits\JsonMessage as JsonMessageTrait;
+use App\Events\MessageEvent;
 use App\Exceptions\BadCommand as BadCommandException;
+use App\Message\AbstractMessage;
+use App\Message\HealthMessage;
+use App\Traits\JsonMessage as JsonMessageTrait;
+use Exception;
+use React\ChildProcess\Process;
+use React\EventLoop\LoopInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 
 class Daemon
 {
+    // For JSON message handling
+    use JsonMessageTrait;
     private $log;
     // Flag to not attempt to restart process
     private $halt;
@@ -37,11 +39,8 @@ class Daemon
     private $processRestartInterval = [];
     private $processLastRestartTime = [];
 
-    // For JSON message handling
-    use JsonMessageTrait;
-
-    const PROC_SYNC = 'sync';
-    const PROC_SERVER = 'server';
+    public const PROC_SYNC = 'sync';
+    public const PROC_SERVER = 'server';
 
     public function __construct(
         Log $log,
@@ -105,7 +104,7 @@ class Daemon
 
         // Every 10 seconds signal the sync process to get statistics.
         // Only do this if the webserver is running.
-        $this->loop->addPeriodicTimer(10, function ($timer) use ($syncProcess) {
+        $this->loop->addPeriodicTimer(10, function ($timer) {
             if (isset($this->processPids[PROC_SYNC])
                 && $this->webServerProcess
             ) {
@@ -157,9 +156,6 @@ class Daemon
      * of time has passed, plus some decay value. The decay is
      * used to not thrash a reconnect if we have networking
      * problems.
-     *
-     * @param string $process
-     * @param string $event
      */
     public function restartWithDecay(string $process, string $event)
     {
@@ -223,8 +219,6 @@ class Daemon
 
     /**
      * Sends a message to the server process to forward to any clients.
-     *
-     * @param AbstractMessage $message
      */
     public function broadcast(AbstractMessage $message)
     {
@@ -290,9 +284,6 @@ class Daemon
      * Reads in a JSON message from one of the child processes.
      * The message expects certain fields to be set depending on
      * the type.
-     *
-     * @param string $json
-     * @param string $process
      */
     private function handleMessage(string $json, string $process)
     {
@@ -337,8 +328,6 @@ class Daemon
      * Reads in a message to determine if the message is a
      * command from a subprocess. If it is, pass this command
      * off to our handler library and return true.
-     *
-     * @param string $message
      *
      * @return bool
      */

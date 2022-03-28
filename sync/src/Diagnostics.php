@@ -11,7 +11,6 @@ use App\Message\DiagnosticsMessage;
 use App\Message\ErrorMessage;
 use App\Model\Account as AccountModel;
 use App\Model\Migration as MigrationModel;
-use App\Util;
 use Exception;
 use PDOException;
 use Pimple\Container;
@@ -40,11 +39,11 @@ class Diagnostics
     /**
      * Test name constants.
      */
-    const TEST_DB_CONN = 'db_conn';
-    const TEST_LOG_PATH = 'log_path';
-    const TEST_DB_EXISTS = 'db_exists';
-    const TEST_MAX_PACKET = 'max_packet';
-    const TEST_ATTACH_PATH = 'attach_path';
+    public const TEST_DB_CONN = 'db_conn';
+    public const TEST_LOG_PATH = 'log_path';
+    public const TEST_DB_EXISTS = 'db_exists';
+    public const TEST_MAX_PACKET = 'max_packet';
+    public const TEST_ATTACH_PATH = 'attach_path';
 
     public function __construct(Container $di)
     {
@@ -335,7 +334,6 @@ class Diagnostics
     /**
      * Mark test as finished and write to log and/or console.
      *
-     * @param string $status
      * @param const $test
      * @param Exception $e Optional exception for errors
      *
@@ -356,9 +354,7 @@ class Diagnostics
                 && ! $this->console->daemon
                 && ! $this->console->databaseExists
             ) {
-                throw new FatalException(
-                    "Failed diagnostic test #$code, $message"
-                );
+                throw new FatalException("Failed diagnostic test #$code, $message");
             }
 
             if (! $this->console->interactive) {
@@ -438,9 +434,6 @@ class Diagnostics
 
     /**
      * Checks if the attachments path is writeable by the user.
-     *
-     * @param string $email
-     * @param bool $createEmailDir
      *
      * @throws AttachmentsPathNotWriteableException
      *

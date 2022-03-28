@@ -2,23 +2,19 @@
 
 namespace App;
 
-use App\Task\SaveAccountTask;
 use App\Task\AccountInfoTask;
 use App\Task\RemoveAccountTask;
-use App\Util;
+use App\Task\SaveAccountTask;
 use Exception;
 
 class Task
 {
-    const SAVE_ACCOUNT = 'save_account';
-    const ACCOUNT_INFO = 'account_info';
-    const REMOVE_ACCOUNT = 'remove_account';
+    public const SAVE_ACCOUNT = 'save_account';
+    public const ACCOUNT_INFO = 'account_info';
+    public const REMOVE_ACCOUNT = 'remove_account';
 
     /**
      * Takes in a type and a data array and makes a new Task.
-     *
-     * @param string $type
-     * @param array $data
      *
      * @throws Exception
      *
@@ -45,8 +41,6 @@ class Task
                 return new RemoveAccountTask($data);
         }
 
-        throw new Exception(
-            'Invalid task type passed to Task::make'
-        );
+        throw new Exception('Invalid task type passed to Task::make');
     }
 }

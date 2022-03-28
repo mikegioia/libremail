@@ -33,10 +33,10 @@ class Outbox extends Model
     public $updated_at;
     public $update_history;
 
-    const SENT = 'sent';
-    const FAILED = 'failed';
-    const DELETED = 'deleted';
-    const RESTORED = 'restored';
+    public const SENT = 'sent';
+    public const FAILED = 'failed';
+    public const DELETED = 'deleted';
+    public const RESTORED = 'restored';
 
     public function getData()
     {

@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Expects;
 use DateInterval;
 use DateTime;
 
@@ -14,7 +13,6 @@ class Util
      * default.
      *
      * @param mixed $object
-     * @param string $key
      * @param mixed $default
      *
      * @return mixed
@@ -65,9 +63,6 @@ class Util
     /**
      * Formats a count of bytes into a readable size.
      *
-     * @param int $bytes
-     * @param int $precision
-     *
      * @return string
      */
     public static function formatBytes(int $bytes, int $precision = 2)
@@ -86,8 +81,6 @@ class Util
     /**
      * Converts a decimal to a formatted percent.
      *
-     * @param float $value
-     *
      * @return string
      */
     public static function percent(float $value, int $precision = 2)
@@ -97,9 +90,6 @@ class Util
 
     /**
      * Pluralizes a word given the count of items.
-     *
-     * @param string $word
-     * @param int $count
      *
      * @return string
      */
@@ -120,9 +110,6 @@ class Util
      * Takes in an array and reindexes the array but the value
      * stored in $key.
      *
-     * @param array $array
-     * @param string $key
-     *
      * @return array
      */
     public static function reindex(array $array, string $key)
@@ -140,9 +127,6 @@ class Util
      * Returns a string like 1:30 PM corresponding to the
      * number of minutes from now.
      *
-     * @param int $minutes
-     * @param string $format
-     *
      * @return string
      */
     public static function timeFromNow(int $minutes, string $format = 'g:i a')
@@ -154,8 +138,6 @@ class Util
     }
 
     /**
-     * @param int $minutes
-     *
      * @return int
      */
     public static function unixFromNow(int $minutes)
@@ -181,9 +163,6 @@ class Util
     /**
      * Look for a string in an array of possibilities.
      *
-     * @param string $subject
-     * @param array $list
-     *
      * @return bool
      */
     public static function contains(string $subject, array $list)
@@ -199,8 +178,6 @@ class Util
 
     /**
      * Cleans a subject line of extra characters.
-     *
-     * @param string $subject
      *
      * @return string
      */

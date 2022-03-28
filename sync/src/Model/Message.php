@@ -19,6 +19,7 @@ use PDOException;
 
 class Message extends Model
 {
+    use ModelTrait;
     public $id;
     public $to;
     public $cc;
@@ -59,15 +60,13 @@ class Message extends Model
     private $unserializedAttachments;
 
     // Options
-    const OPT_SKIP_CONTENT = 'skip_content';
-    const OPT_TRUNCATE_FIELDS = 'truncate_fields';
+    public const OPT_SKIP_CONTENT = 'skip_content';
+    public const OPT_TRUNCATE_FIELDS = 'truncate_fields';
 
     // Flags
-    const FLAG_SEEN = 'seen';
-    const FLAG_FLAGGED = 'flagged';
-    const FLAG_DELETED = 'deleted';
-
-    use ModelTrait;
+    public const FLAG_SEEN = 'seen';
+    public const FLAG_FLAGGED = 'flagged';
+    public const FLAG_DELETED = 'deleted';
 
     public function getData()
     {
@@ -228,11 +227,6 @@ class Message extends Model
      * Fetches a range of messages for an account. Used during the
      * threading computation.
      *
-     * @param int $accountId
-     * @param int $minId
-     * @param int $maxId
-     * @param int $limit
-     *
      * @return array Messages
      */
     public function getRangeForThreading(
@@ -260,8 +254,6 @@ class Message extends Model
     /**
      * Finds the highest ID for an account.
      *
-     * @param int $accountId
-     *
      * @return int
      */
     public function getMaxMessageId(int $accountId)
@@ -279,8 +271,6 @@ class Message extends Model
 
     /**
      * Finds the lowest ID for an account.
-     *
-     * @param int $accountId
      *
      * @return int
      */
@@ -301,9 +291,6 @@ class Message extends Model
      * Returns a list of integer unique IDs given an account ID
      * and a folder ID to search. This fetches IDs in pages to
      * not exceed any memory limits on the query response.
-     *
-     * @param int $accountId
-     * @param int $folderId
      *
      * @return array of ints The index is the message_no and
      *   the value is the unique_id
@@ -329,8 +316,6 @@ class Message extends Model
     /**
      * Returns a count of unique IDs for an account.
      *
-     * @param int $accountId
-     *
      * @return int
      */
     public function countByAccount(int $accountId)
@@ -352,9 +337,6 @@ class Message extends Model
 
     /**
      * Returns a count of unique IDs for a folder.
-     *
-     * @param int $accountId
-     * @param int $folderId
      *
      * @return int
      */
@@ -381,11 +363,6 @@ class Message extends Model
     /**
      * This method is called by getSyncedIdsByFolder to return a
      * page of results.
-     *
-     * @param int $accountId
-     * @param int $folderId
-     * @param int $offset
-     * @param int $limit
      *
      * @return array of ints
      */
@@ -424,7 +401,6 @@ class Message extends Model
     /**
      * Create or updates a message record.
      *
-     * @param array $data
      * @param array $skipFields Set of fields to not update
      *
      * @throws ValidationException
@@ -553,10 +529,7 @@ class Message extends Model
         }
 
         if (! $newMessageId) {
-            throw new DatabaseInsertException(
-                MESSAGE,
-                $this->getError()
-            );
+            throw new DatabaseInsertException(MESSAGE, $this->getError());
         }
 
         $this->id = $newMessageId;
@@ -567,7 +540,6 @@ class Message extends Model
      * on the class object.
      *
      * @param array $meta
-     * @param array $options
      */
     public function setMessageData(ImapMessage $message, array $options = [])
     {
@@ -619,7 +591,6 @@ class Message extends Model
      * Creates or modifies a draft message based on an outbox message.
      * Only creates a new message if the outbox is a draft.
      *
-     * @param Outbox $outbox
      * @param int $draftsId Drafts mailbox (folder) ID
      */
     public function createOrUpdateSent(Outbox $outbox, int $sentId)
@@ -708,10 +679,6 @@ class Message extends Model
      * Takes in an array of message unique IDs and marks them all as
      * deleted in the database.
      *
-     * @param array $uniqueIds
-     * @param int $accountId
-     * @param int $folderId
-     *
      * @throws DatabaseUpdateException
      */
     public function markDeleted(array $uniqueIds, int $accountId, int $folderId)
@@ -734,8 +701,6 @@ class Message extends Model
     /**
      * Marks an entire folder as deleted, and optionally for purge too.
      *
-     * @param int $accountId
-     * @param int $folderId
      * @param bool $purge If true, will also set purge=1
      *
      * @throws DatabaseUpdateException
@@ -761,10 +726,6 @@ class Message extends Model
     /**
      * Takes in an array of message unique IDs and sets a flag to on.
      *
-     * @param array $uniqueIds
-     * @param int $accountId
-     * @param int $folderId
-     * @param string $flag
      * @param bool $state On or off
      * @param bool $inverse If set, do where not in $uniqueIds query
      *
@@ -827,9 +788,7 @@ class Message extends Model
         ]);
 
         if (! $this->isValidFlag($value)) {
-            throw new ValidationException(
-                "Invalid flag value '$value' for $flag"
-            );
+            throw new ValidationException("Invalid flag value '$value' for $flag");
         }
 
         $updated = $this->db()
@@ -889,9 +848,6 @@ class Message extends Model
     /**
      * Removes messages from a folder/account that are marked
      * for purge (removal).
-     *
-     * @param int $accountId
-     * @param int $folderId
      *
      * @return int Count of deleted rows
      */
@@ -962,9 +918,6 @@ class Message extends Model
     /**
      * Saves a thread ID for the given messages.
      *
-     * @param array $ids
-     * @param int $threadId
-     *
      * @throws DatabaseUpdateException
      *
      * @return int
@@ -984,10 +937,6 @@ class Message extends Model
 
     /**
      * Saves a message number for the given message ID.
-     *
-     * @param int $uniqueId
-     * @param int $folderId
-     * @param int $messageNo
      *
      * @throws DatabaseUpdateException
      *
@@ -1055,17 +1004,14 @@ class Message extends Model
     }
 
     /**
-     * @param bool | int $updated Response from update operation
+     * @param bool|int $updated Response from update operation
      *
      * @throws DatabaseUpdateException
      */
     private function errorHandle($updated)
     {
         if (! Belt::isNumber($updated)) {
-            throw new DatabaseUpdateException(
-                MESSAGE,
-                $this->getError()
-            );
+            throw new DatabaseUpdateException(MESSAGE, $this->getError());
         }
     }
 }

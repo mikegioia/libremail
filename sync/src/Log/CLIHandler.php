@@ -2,9 +2,9 @@
 
 namespace App\Log;
 
-use Monolog\Logger;
 use League\CLImate\CLImate;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Logger;
 
 class CLIHandler extends AbstractProcessingHandler
 {

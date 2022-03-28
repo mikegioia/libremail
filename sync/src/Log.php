@@ -2,14 +2,14 @@
 
 namespace App;
 
+use App\Exceptions\LogPathNotWriteable as LogPathNotWriteableException;
+use App\Log\CLIHandler;
 use Error;
 use Exception;
-use Monolog\Logger;
-use App\Log\CLIHandler;
 use League\CLImate\CLImate;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\RotatingFileHandler;
-use App\Exceptions\LogPathNotWriteable as LogPathNotWriteableException;
+use Monolog\Logger;
 
 class Log
 {
@@ -52,7 +52,7 @@ class Log
     }
 
     /**
-     * @param Exception | Error $exception
+     * @param Exception|Error $exception
      */
     public function exceptionHandler($exception)
     {
@@ -110,8 +110,6 @@ class Log
     /**
      * Write an error exception to the console or log depending
      * on the environment.
-     *
-     * @param Exception $e
      */
     public function displayError(Exception $e)
     {
@@ -143,7 +141,7 @@ class Log
             4 => Logger::WARNING, // warning conditions
             5 => Logger::NOTICE, // normal but significant condition
             6 => Logger::INFO, // informational messages
-            7 => Logger::DEBUG //debug-level messages
+            7 => Logger::DEBUG // debug-level messages
         ];
 
         $this->path = (true === $interactive)
@@ -160,9 +158,6 @@ class Log
 
     /**
      * Checks if the log path is writeable by the user.
-     *
-     * @param bool $interactive
-     * @param string $path
      *
      * @throws LogPathNotWriteableException
      *
@@ -185,8 +180,6 @@ class Log
 
     /**
      * Returns an absolute URL from a possible relative one.
-     *
-     * @param string $path
      *
      * @return string
      */

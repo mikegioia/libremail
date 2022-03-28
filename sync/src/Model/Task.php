@@ -2,12 +2,12 @@
 
 namespace App\Model;
 
-use PDO;
-use Exception;
-use App\Model;
-use Belt\Belt;
-use App\Traits\Model as ModelTrait;
 use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
+use App\Model;
+use App\Traits\Model as ModelTrait;
+use Belt\Belt;
+use Exception;
+use PDO;
 
 class Task extends Model
 {
@@ -25,24 +25,24 @@ class Task extends Model
     public $message_id;
     public $created_at;
 
-    const STATUS_NEW = 0;
-    const STATUS_DONE = 1;
-    const STATUS_ERROR = 2;
-    const STATUS_REVERTED = 3;
-    const STATUS_IGNORED = 4;
+    public const STATUS_NEW = 0;
+    public const STATUS_DONE = 1;
+    public const STATUS_ERROR = 2;
+    public const STATUS_REVERTED = 3;
+    public const STATUS_IGNORED = 4;
 
-    const TYPE_COPY = 'copy';
-    const TYPE_FLAG = 'flag';
-    const TYPE_READ = 'read';
-    const TYPE_SEND = 'send';
-    const TYPE_CREATE = 'create';
-    const TYPE_DELETE = 'delete';
-    const TYPE_UNFLAG = 'unflag';
-    const TYPE_UNREAD = 'unread';
-    const TYPE_UNDELETE = 'undelete';
-    const TYPE_DELETE_OUTBOX = 'delete_outbox';
+    public const TYPE_COPY = 'copy';
+    public const TYPE_FLAG = 'flag';
+    public const TYPE_READ = 'read';
+    public const TYPE_SEND = 'send';
+    public const TYPE_CREATE = 'create';
+    public const TYPE_DELETE = 'delete';
+    public const TYPE_UNFLAG = 'unflag';
+    public const TYPE_UNREAD = 'unread';
+    public const TYPE_UNDELETE = 'undelete';
+    public const TYPE_DELETE_OUTBOX = 'delete_outbox';
 
-    const MAX_ATTEMPTS = 3;
+    public const MAX_ATTEMPTS = 3;
 
     public function getData()
     {
@@ -100,8 +100,6 @@ class Task extends Model
     /**
      * Marks a message as failed.
      *
-     * @param string $message
-     * @param int $status
      * @param mixed $returnValue value returned from this function;
      *   Useful for the caller to respond with this function
      *
@@ -158,10 +156,7 @@ class Task extends Model
             ->execute();
 
         if (! Belt::isNumber($updated)) {
-            throw new DatabaseUpdateException(
-                TASK,
-                $this->db()->getError()
-            );
+            throw new DatabaseUpdateException(TASK, $this->db()->getError());
         }
     }
 
@@ -173,7 +168,6 @@ class Task extends Model
     /**
      * Updates the status of the message.
      *
-     * @param string $status
      * @param string $reason Optional reason string
      * @param bool $force If set, forces all fields to update
      *
@@ -203,19 +197,14 @@ class Task extends Model
             ->execute();
 
         if (! Belt::isNumber($updated)) {
-            throw new DatabaseUpdateException(
-                TASK,
-                $this->db()->getError()
-            );
+            throw new DatabaseUpdateException(TASK, $this->db()->getError());
         }
     }
 
     /**
      * Returns the un-synced tasks. Returns false if none.
      *
-     * @param int $accountId
-     *
-     * @return array | bool
+     * @return array|bool
      */
     public function getTasksForSync(int $accountId)
     {
@@ -231,8 +220,6 @@ class Task extends Model
 
     /**
      * Returns count of un-synced tasks, 0 if none.
-     *
-     * @param int $accountId
      *
      * @return int
      */
@@ -255,7 +242,7 @@ class Task extends Model
      * Returns ALL of the un-synced tasks for a rollback.
      * If there are none, this returns false.
      *
-     * @return array | bool
+     * @return array|bool
      */
     public function getTasksForRollback()
     {

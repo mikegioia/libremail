@@ -67,8 +67,6 @@ class Message
      * Updates the internal set of references with any new
      * ones that are passed in. Returns stored set.
      *
-     * @param array $references
-     *
      * @return array
      */
     public function addReferences(array $references)
@@ -107,8 +105,6 @@ class Message
 
     /**
      * Save the thread ID for any internal IDs.
-     *
-     * @param MessageModel $model
      */
     public function save(MessageModel $model)
     {
@@ -125,8 +121,6 @@ class Message
 
     /**
      * Merge another Message object into this one.
-     *
-     * @param Message $message
      */
     public function merge(Message $message)
     {
@@ -148,8 +142,6 @@ class Message
 
     /**
      * Updates the initial set of references from the message object.
-     *
-     * @param MessageModel $message
      */
     private function storeReferences(MessageModel $message)
     {

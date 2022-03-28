@@ -3,7 +3,6 @@
 namespace App;
 
 use App\Exceptions\Validation as ValidationException;
-use Exception;
 
 /**
  * Assertion library for checking if an object contains
@@ -33,8 +32,6 @@ class Expects
 
     /**
      * Checks if the array contains the given keys.
-     *
-     * @param array $keys
      *
      * @throws InvalidArgumentException
      */

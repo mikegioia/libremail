@@ -2,9 +2,9 @@
 
 namespace App\Traits;
 
-use Belt\Belt;
 use App\Exceptions\NotFound as NotFoundException;
 use App\Exceptions\Validation as ValidationException;
+use Belt\Belt;
 
 trait Model
 {
@@ -48,7 +48,6 @@ trait Model
     /**
      * Turns stdClass SQL objects into model objects.
      *
-     * @param array $objects
      * @param string $modelClass
      *
      * @return array
@@ -117,9 +116,6 @@ trait Model
     /**
      * Updates any values referenced in keys to be valid flags
      * for the database. A flag is 1 or 0.
-     *
-     * @param array $data
-     * @param array $keys
      */
     private function updateFlagValues(array &$data, array $keys)
     {
@@ -135,9 +131,6 @@ trait Model
     /**
      * Updates any values referenced in keys to be valid UTF8
      * strings.
-     *
-     * @param array $data
-     * @param array $keys
      */
     private function updateUtf8Values(array &$data, array $keys)
     {
