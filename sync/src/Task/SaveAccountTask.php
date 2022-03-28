@@ -2,15 +2,15 @@
 
 namespace App\Task;
 
-use App\Task;
-use Exception;
-use App\Message;
 use App\Diagnostics;
-use App\Server\StatsServer;
+use App\Exceptions\Validation as ValidationException;
+use App\Message;
 use App\Message\AccountMessage;
 use App\Message\NotificationMessage;
 use App\Model\Account as AccountModel;
-use App\Exceptions\Validation as ValidationException;
+use App\Server\StatsServer;
+use App\Task;
+use Exception;
 
 class SaveAccountTask extends AbstractTask
 {

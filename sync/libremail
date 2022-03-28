@@ -8,23 +8,22 @@
  * Call this script to run "forever" and manage the possibly-memory
  * abusive sync and server scripts.
  */
-use App\Log;
-use App\Model;
-use App\Daemon;
 use App\Command;
-use App\Message;
-use App\Startup;
+use App\Console\DaemonConsole;
 use App\Constants;
+use App\Daemon;
 use App\Diagnostics;
+use App\Exceptions\Terminate as TerminateException;
+use App\Log;
+use App\Message;
+use App\Model;
+use App\Startup;
+use MKraemer\ReactPCNTL\PCNTL;
 use Pb\PDO\Database;
 use Pimple\Container;
-use Exception as Exception;
-use React\EventLoop\Factory;
-use App\Console\DaemonConsole;
-use MKraemer\ReactPCNTL\PCNTL;
 use React\ChildProcess\Process;
+use React\EventLoop\Factory;
 use Symfony\Component\EventDispatcher\Event;
-use App\Exceptions\Terminate as TerminateException;
 use Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 
 // Set up paths and constants
@@ -88,7 +87,7 @@ Message::setLog($di['log']->getLogger());
 
 // Set up the signal handler to shutdown
 $TERMINATE = function () {
-    throw new TerminateException;
+    throw new TerminateException();
 };
 
 // Graceful shutdown
@@ -207,17 +206,20 @@ $di['db_factory'] = $di->factory(function ($container, $config = null) {
         $db = new Database(
             $dsn,
             $dbConfig['username'],
-            $dbConfig['password']);
+            $dbConfig['password']
+        );
         $db->query('SET SESSION wait_timeout = 28800;');
         $db->query('SET NAMES '.$dbConfig['charset'].';');
 
         return $db;
     } catch (PDOException $e) {
-        throw new TerminateException(
-            'There was a problem connecting to the database. '.
-            'Are you sure it exists? Here are the details: '.
+        $message = sprintf('%s. %s: %s',
+            'There was a problem connecting to the database',
+            'Are you sure it exists? Here are the details',
             $e->getMessage()
         );
+
+        throw new TerminateException($message);
     }
 });
 

@@ -2,9 +2,9 @@
 
 namespace App;
 
-use League\CLImate\CLImate as CLI;
 use League\CLImate\Argument\Parser;
 use League\CLImate\Argument\Summary;
+use League\CLImate\CLImate as CLI;
 
 abstract class Console
 {
@@ -20,7 +20,7 @@ abstract class Console
     private $summary;
     private $arguments;
 
-    const DESCRIPTION = 'LibreMail IMAP to SQL sync engine';
+    public const DESCRIPTION = 'LibreMail IMAP to SQL sync engine';
 
     public function __construct()
     {

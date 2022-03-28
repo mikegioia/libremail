@@ -31,19 +31,11 @@ class Messages
     private $interactive;
     private $skipContent = false;
 
-    const FLAG_UNSEEN = 'UNSEEN';
-    const FLAG_FLAGGED = 'FLAGGED';
+    public const FLAG_UNSEEN = 'UNSEEN';
+    public const FLAG_FLAGGED = 'FLAGGED';
 
-    const OPT_SKIP_CONTENT = 'skip_content';
+    public const OPT_SKIP_CONTENT = 'skip_content';
 
-    /**
-     * @param Logger $log
-     * @param CLImate $cli
-     * @param Stats $stats
-     * @param Emitter $emitter
-     * @param Mailbox $mailbox
-     * @param bool $interactive
-     */
     public function __construct(
         Logger $log,
         CLImate $cli,
@@ -68,8 +60,6 @@ class Messages
     /**
      * Syncs the content, threads, and flags for all messages in a folder.
      *
-     * @param AccountModel $account
-     * @param FolderModel $folder
      * @param array $selectStats Response from selecting IMAP folder
      * @param array $options (see syncMessages)
      */
@@ -116,9 +106,6 @@ class Messages
      * database, copy all the new messages down and mark the removed
      * ones as such in the database.
      *
-     * @param array $newIds
-     * @param array $savedIds
-     * @param FolderModel $folder
      * @param array $options (see syncMessages)
      */
     private function downloadMessages(
@@ -207,10 +194,6 @@ class Messages
 
     /**
      * Download a specified message by message ID.
-     *
-     * @param int $messageId
-     * @param int $uniqueId
-     * @param FolderModel $folder
      */
     private function downloadMessage(int $messageId, int $uniqueId, FolderModel $folder)
     {
@@ -265,10 +248,6 @@ class Messages
     /**
      * For any messages we have saved that didn't come back from the
      * mailbox, mark them as deleted in the database.
-     *
-     * @param array $newIds
-     * @param array $savedIds
-     * @param FolderModel $folder
      */
     private function markDeleted(array $newIds, array $savedIds, FolderModel $folder)
     {
@@ -312,8 +291,6 @@ class Messages
      * When the UID validity flag changes for a folder, we need
      * to resync all of the messages in that folder. This deletes
      * everything for the resync to work.
-     *
-     * @param FolderModel $folder
      */
     private function markDeletedAndPurged(FolderModel $folder)
     {
@@ -343,10 +320,6 @@ class Messages
     /**
      * Updates the messages with any new message numbers. These numbers
      * can change and will need their references updated on sync.
-     *
-     * @param array $newIds
-     * @param array $savedIds
-     * @param FolderModel $folder
      */
     private function updateMessageNumbers(array $newIds, array $savedIds, FolderModel $folder)
     {
@@ -390,9 +363,6 @@ class Messages
 
     /**
      * Syncs the seen flag between the IMAP mailbox and SQL.
-     *
-     * @param AccountModel $account
-     * @param FolderModel $model
      */
     private function updateSeenFlags(AccountModel $account, FolderModel $folder)
     {
@@ -454,9 +424,6 @@ class Messages
 
     /**
      * Syncs the flagged (starred) flag between the IMAP mailbox and SQL.
-     *
-     * @param AccountModel $account
-     * @param FolderModel $model
      */
     private function updateFlaggedFlags(AccountModel $account, FolderModel $folder)
     {
@@ -522,9 +489,6 @@ class Messages
      * they're synced to the mailbox are left as duplicates in SQL. They
      * have no message number or unique ID and can't be updated during
      * the sync process.
-     *
-     * @param AccountModel $account
-     * @param FolderModel $model
      */
     private function flushPurged(AccountModel $account, FolderModel $folder)
     {

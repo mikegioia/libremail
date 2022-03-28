@@ -8,25 +8,23 @@
  * connect to. This process can be run standalone, manually
  * or (more commonly) it's invoked via the daemon script.
  */
-use App\Log;
-use App\Model;
-use App\Daemon;
-use App\Message;
-use App\Startup;
+use App\Console\ServerConsole;
 use App\Constants;
-use App\RatchetApp;
+use App\Daemon;
 use App\Diagnostics;
+use App\Exceptions\Terminate as TerminateException;
+use App\Log;
+use App\Message;
+use App\Model;
+use App\RatchetApp;
+use App\Server\StatsServer;
+use App\Server\WebServer;
+use App\Startup;
+use MKraemer\ReactPCNTL\PCNTL;
 use Pb\PDO\Database;
 use Pimple\Container;
-use App\Server\WebServer;
-use App\Server\StatsServer;
-use Exception as Exception;
 use React\EventLoop\Factory;
-use App\Console\ServerConsole;
-use MKraemer\ReactPCNTL\PCNTL;
-use PDOException as PDOException;
 use Symfony\Component\Routing\Route;
-use App\Exceptions\Terminate as TerminateException;
 
 // Set up paths and constants
 set_time_limit(0);
@@ -99,7 +97,7 @@ $HALT = function () use ($di) {
         $di['loop']->stop();
     }
 
-    throw new TerminateException;
+    throw new TerminateException();
 };
 
 // Set up process handler bindings for React
@@ -126,11 +124,13 @@ $di['db_factory'] = $di->factory(function ($container, $config = null) {
             $dbConfig['password']
         );
     } catch (PDOException $e) {
-        throw new PDOException(
-            'There was a problem connecting to the database. '.
-            'Are you sure it exists? Here are the details: '.
+        $message = sprintf('%s. %s: %s',
+            'There was a problem connecting to the database',
+            'Are you sure it exists? Here are the details',
             $e->getMessage()
         );
+
+        throw new PDOException($message);
     }
 });
 

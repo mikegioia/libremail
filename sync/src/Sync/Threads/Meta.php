@@ -10,8 +10,8 @@ class Meta
     public $subjectHash;
     public $familyThreadIds = [];
 
-    const FIVE_DAYS = 432000;
-    const THREE_DAYS = 259200;
+    public const FIVE_DAYS = 432000;
+    public const THREE_DAYS = 259200;
 
     public function __construct($threadId)
     {

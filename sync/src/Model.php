@@ -4,11 +4,11 @@ namespace App;
 
 use DateTime;
 use DateTimeZone;
+use League\CLImate\CLImate;
 use Monolog\Logger;
+use Particle\Validator\Validator;
 use Pb\PDO\Database;
 use Pimple\Container;
-use League\CLImate\CLImate;
-use Particle\Validator\Validator;
 
 class Model
 {
@@ -18,10 +18,10 @@ class Model
     protected static $log;
     protected static $config;
 
-    const ASC = 'asc';
-    const DESC = 'desc';
+    public const ASC = 'asc';
+    public const DESC = 'desc';
 
-    const UTC = 'UTC';
+    public const UTC = 'UTC';
 
     /**
      * @var bool Mode for returning new DB instance
@@ -38,7 +38,7 @@ class Model
      * it will set the ID to that value. For arrays, it will
      * update the internal properties from the array.
      *
-     * @param array | int $data
+     * @param array|int $data
      */
     public function __construct($data = null)
     {
@@ -58,7 +58,7 @@ class Model
     }
 
     /**
-     * @param array | int $data
+     * @param array|int $data
      */
     public function setData($data)
     {
@@ -142,7 +142,7 @@ class Model
      *
      * @param string $key Optional key to lookup
      *
-     * @return mixed | array
+     * @return mixed|array
      */
     public function config(string $key = '')
     {

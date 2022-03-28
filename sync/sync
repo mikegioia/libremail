@@ -8,22 +8,20 @@
  * from the CLI or managed via a supervisor. It works by checking
  * a list of saved IMAP credentials and runs through a flow of tasks.
  */
-use App\Log;
-use App\Sync;
-use App\Model;
-use App\Stats;
-use App\Message;
-use App\Startup;
+use App\Console\SyncConsole;
 use App\Constants;
 use App\Diagnostics;
-use Pb\PDO\Database;
-use Pimple\Container;
-use Exception as Exception;
-use App\Console\SyncConsole;
-use PDOException as PDOException;
-use App\Sync\Threads as ThreadSync;
 use App\Exceptions\Stop as StopException;
 use App\Exceptions\Terminate as TerminateException;
+use App\Log;
+use App\Message;
+use App\Model;
+use App\Startup;
+use App\Stats;
+use App\Sync;
+use App\Sync\Threads as ThreadSync;
+use Pb\PDO\Database;
+use Pimple\Container;
 
 // Set up paths and constants
 set_time_limit(0);
@@ -101,7 +99,7 @@ $HALT = function ($signo) use ($di) {
     if (isset($di['sync']) && $di['sync']) {
         $di['sync']->halt();
     } else {
-        throw new TerminateException;
+        throw new TerminateException();
     }
 };
 
@@ -168,17 +166,20 @@ $di['db_factory'] = $di->factory(function ($container, $config = null) {
         $db = new Database(
             $dsn,
             $dbConfig['username'],
-            $dbConfig['password']);
+            $dbConfig['password']
+        );
         $db->query('SET SESSION wait_timeout = 28800;');
         $db->query('SET NAMES '.$dbConfig['charset'].';');
 
         return $db;
     } catch (PDOException $e) {
-        throw new TerminateException(
-            'There was a problem connecting to the database. '.
-            'Are you sure it exists? Here are the details: '.
+        $message = sprintf('%s. %s: %s',
+            'There was a problem connecting to the database',
+            'Are you sure it exists? Here are the details',
             $e->getMessage()
         );
+
+        throw new TerminateException($message);
     }
 });
 

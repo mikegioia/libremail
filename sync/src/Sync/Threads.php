@@ -37,9 +37,9 @@ class Threads
     private $progress;
     private $interactive;
 
-    const EVENT_MESSAGE_DIRTY = 'message_dirty';
+    public const EVENT_MESSAGE_DIRTY = 'message_dirty';
 
-    const SUBJECT_SIMILARITY = 80;
+    public const SUBJECT_SIMILARITY = 80;
 
     // Index of the most recent message known
     private $maxId;
@@ -65,13 +65,8 @@ class Threads
     private $prevAddressCount = 0;
 
     // How many messages to fetch at once
-    const BATCH_SIZE = 1000;
+    public const BATCH_SIZE = 1000;
 
-    /**
-     * @param Logger $log
-     * @param CLImate $cli
-     * @param bool $interactive
-     */
     public function __construct(Logger $log, CLImate $cli, bool $interactive)
     {
         $this->log = $log;
@@ -84,9 +79,6 @@ class Threads
      * than the one we have in the cache, then start over. This should
      * either be set up to handle multiple accounts, or the sync script
      * should not run for multiple accounts on the same process.
-     *
-     * @param AccountModel $account
-     * @param Emitter $emitter
      */
     public function run(AccountModel $account, Emitter $emitter)
     {
@@ -195,8 +187,6 @@ class Threads
 
     /**
      * Stores a new message into the internal array.
-     *
-     * @param MessageModel $message
      */
     private function storeMessage(MessageModel $message)
     {
@@ -284,7 +274,6 @@ class Threads
      * Recurses through the message's references and builds an array
      * of all references across all known messages.
      *
-     * @param ThreadMessage $message
      * @param array $refs Master list of common message IDs
      * @param array $processed List of processed message IDs
      * @param int $threadId Final thread ID to set

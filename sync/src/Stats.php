@@ -8,7 +8,6 @@ use App\Model\Account as AccountModel;
 use App\Model\Folder as FolderModel;
 use App\Model\Meta as MetaModel;
 use App\Model\Task as TaskModel;
-use App\Util;
 
 /**
  * Reports statistics about the syncing process. This will

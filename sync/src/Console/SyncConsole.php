@@ -2,12 +2,12 @@
 
 namespace App\Console;
 
-use Exception;
 use App\Console;
 use App\Diagnostics;
-use App\Sync\Rollback;
 use App\Model\Account as AccountModel;
 use App\Model\Migration as MigrationModel;
+use App\Sync\Rollback;
+use Exception;
 
 class SyncConsole extends Console
 {

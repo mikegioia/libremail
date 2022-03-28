@@ -2,12 +2,12 @@
 
 namespace App\Task;
 
-use App\Task;
 use App\Message;
-use App\Server\StatsServer;
 use App\Message\AccountInfoMessage;
 use App\Message\NotificationMessage;
 use App\Model\Account as AccountModel;
+use App\Server\StatsServer;
+use App\Task;
 
 class AccountInfoTask extends AbstractTask
 {

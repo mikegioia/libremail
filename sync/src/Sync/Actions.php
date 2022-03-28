@@ -54,18 +54,18 @@ class Actions
         TaskModel::TYPE_UNREAD => 'App\Sync\Actions\Unread'
     ];
 
-    const ERR_DELETE_NOT_FOUND = 'Failed get message num for delete';
-    const ERR_FAIL_IMAP_SYNC = 'Failed IMAP sync';
-    const ERR_NO_IMAP_MESSAGE = 'No message found in IMAP mailbox';
-    const ERR_NO_SQL_FOLDER = 'No folder found in SQL';
-    const ERR_NO_SQL_MESSAGE = 'No message found in SQL';
-    const ERR_NO_SQL_OUTBOX = 'No outbox message found in SQL';
-    const ERR_NO_SQL_SENT = 'No sent folder found in SQL';
-    const ERR_TRANSPORT_FAIL = 'Message failed before transport';
-    const ERR_TRANSPORT_GENERAL = 'Message failed from an unknown exception';
+    public const ERR_DELETE_NOT_FOUND = 'Failed get message num for delete';
+    public const ERR_FAIL_IMAP_SYNC = 'Failed IMAP sync';
+    public const ERR_NO_IMAP_MESSAGE = 'No message found in IMAP mailbox';
+    public const ERR_NO_SQL_FOLDER = 'No folder found in SQL';
+    public const ERR_NO_SQL_MESSAGE = 'No message found in SQL';
+    public const ERR_NO_SQL_OUTBOX = 'No outbox message found in SQL';
+    public const ERR_NO_SQL_SENT = 'No sent folder found in SQL';
+    public const ERR_TRANSPORT_FAIL = 'Message failed before transport';
+    public const ERR_TRANSPORT_GENERAL = 'Message failed from an unknown exception';
 
-    const IGNORE_OUTBOX_DELETED = 'Outbox message previously deleted';
-    const IGNORE_OUTBOX_SENT = 'Outbox message previously sent';
+    public const IGNORE_OUTBOX_DELETED = 'Outbox message previously deleted';
+    public const IGNORE_OUTBOX_SENT = 'Outbox message previously sent';
 
     public function __construct(
         Logger $log,
@@ -144,8 +144,6 @@ class Actions
      * Iterates through the task list and removes any duplicates
      * or redundant tasks.
      *
-     * @param array $allTasks
-     *
      * @return array
      */
     private function processDuplicates(array $allTasks, bool $enableLog = true)
@@ -202,9 +200,6 @@ class Actions
      * Syncs a task with the IMAP server. The first fetches the
      * message from the mail server to see if the UID matches.
      * If not an error is logged and the task is skipped.
-     *
-     * @param TaskModel $task
-     * @param AccountModel $account
      */
     private function processTask(TaskModel $task, AccountModel $account)
     {
@@ -238,9 +233,7 @@ class Actions
         $actionClass = self::$actionLookup[$task->type] ?? null;
 
         if (! $actionClass) {
-            throw new RuntimeException(
-                "Task type {$task->type} not found in action classes lookup"
-            );
+            throw new RuntimeException("Task type {$task->type} not found in action classes lookup");
         }
 
         $action = new $actionClass(

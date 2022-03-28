@@ -14,23 +14,22 @@ use App\Message\PidMessage;
 use App\Message\StatsMessage;
 use App\Message\TaskMessage;
 use App\Server\StatsServer;
-use App\Util;
 use Exception;
 use Monolog\Logger;
 
 class Message
 {
     // Valid messages
-    const PID = 'pid';
-    const TASK = 'task';
-    const STATS = 'stats';
-    const ERROR = 'error';
-    const HEALTH = 'health';
-    const ACCOUNT = 'account';
-    const NO_ACCOUNTS = 'no_accounts';
-    const DIAGNOSTICS = 'diagnostics';
-    const ACCOUNT_INFO = 'account_info';
-    const NOTIFICATION = 'notification';
+    public const PID = 'pid';
+    public const TASK = 'task';
+    public const STATS = 'stats';
+    public const ERROR = 'error';
+    public const HEALTH = 'health';
+    public const ACCOUNT = 'account';
+    public const NO_ACCOUNTS = 'no_accounts';
+    public const DIAGNOSTICS = 'diagnostics';
+    public const ACCOUNT_INFO = 'account_info';
+    public const NOTIFICATION = 'notification';
 
     // Injected during service registration
     protected static $log;
@@ -57,8 +56,6 @@ class Message
      * Determines if a message is valid. This just means it's a JSON
      * string, that it has a "type" property, and that the type is one
      * of the internal message constants.
-     *
-     * @param string $json
      *
      * @return bool
      */
@@ -114,8 +111,6 @@ class Message
     /**
      * Takes in a JSON object (should be validated first!) and
      * creates a new Message based off the type.
-     *
-     * @param string $json
      *
      * @throws Exception
      *
@@ -213,8 +208,6 @@ class Message
 
     /**
      * Generic helper for writing to the server log file.
-     *
-     * @param string $message
      */
     public static function debug(string $message)
     {

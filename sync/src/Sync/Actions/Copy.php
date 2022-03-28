@@ -2,10 +2,10 @@
 
 namespace App\Sync\Actions;
 
-use Pb\Imap\Mailbox;
-use App\Model\Task as TaskModel;
-use App\Model\Folder as FolderModel;
 use App\Exceptions\NotFound as NotFoundException;
+use App\Model\Folder as FolderModel;
+use App\Model\Task as TaskModel;
+use Pb\Imap\Mailbox;
 
 class Copy extends Base
 {

@@ -2,15 +2,15 @@
 
 namespace App\Model;
 
-use PDO;
-use DateTime;
-use App\Model;
-use Particle\Validator\Validator;
-use App\Traits\Model as ModelTrait;
-use App\Exceptions\Validation as ValidationException;
 use App\Exceptions\AccountExists as AccountExistsException;
 use App\Exceptions\DatabaseInsert as DatabaseInsertException;
 use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
+use App\Exceptions\Validation as ValidationException;
+use App\Model;
+use App\Traits\Model as ModelTrait;
+use DateTime;
+use Particle\Validator\Validator;
+use PDO;
 
 class Account extends Model
 {
@@ -54,9 +54,6 @@ class Account extends Model
 
     /**
      * Create a new account record.
-     *
-     * @param array $data
-     * @param bool $updateIfExists
      *
      * @throws AccountExistsException
      * @throws DatabaseInsertException
@@ -128,7 +125,7 @@ class Account extends Model
      */
     public function validate()
     {
-        $val = new Validator;
+        $val = new Validator();
 
         $val->required('name', 'Name')->lengthBetween(0, 100);
         $val->required('email', 'Email')->lengthBetween(0, 100);
@@ -145,11 +142,12 @@ class Account extends Model
         $val->optional('imap_flags', 'IMAP flags')->lengthBetween(0, 50);
 
         if (! $val->validate($this->getData())) {
-            throw new ValidationException(
-                $this->getErrorString(
-                    $val,
-                    'There was a problem creating this account.'
-                ));
+            $message = $this->getErrorString(
+                $val,
+                'There was a problem creating this account.'
+            );
+
+            throw new ValidationException($message);
         }
     }
 

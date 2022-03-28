@@ -2,8 +2,8 @@
 
 namespace App;
 
-use App\Exceptions\Error as ErrorException;
 use App\Exceptions\BadCommand as BadCommandException;
+use App\Exceptions\Error as ErrorException;
 use Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 
 class Command
@@ -13,11 +13,11 @@ class Command
     private $regexMatch = '/^(!{1}[A-Z]+\n{1})$/';
     private $regexExtract = '/^(?:!{1})([A-Z]+)(?:\n{1})$/';
     // Valid commands
-    const STOP = 'STOP';
-    const STATS = 'STATS';
-    const START = 'START';
-    const HEALTH = 'HEALTH';
-    const RESTART = 'RESTART';
+    public const STOP = 'STOP';
+    public const STATS = 'STATS';
+    public const START = 'START';
+    public const HEALTH = 'HEALTH';
+    public const RESTART = 'RESTART';
 
     public function __construct(Emitter $emitter = null)
     {
@@ -64,10 +64,7 @@ class Command
     public function run($message)
     {
         if (! $this->emitter) {
-            throw new ErrorException(
-                'A command was attempted to be run in a context '.
-                'without an Event Emitter.'
-            );
+            throw new ErrorException('Event emitter required for commands');
         }
 
         $matched = preg_match_all($this->regexExtract, $message, $results);

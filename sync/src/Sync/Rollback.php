@@ -3,10 +3,10 @@
 namespace App\Sync;
 
 use App\Model;
-use League\CLImate\CLImate;
-use App\Model\Task as TaskModel;
-use App\Model\Outbox as OutboxModel;
 use App\Model\Message as MessageModel;
+use App\Model\Outbox as OutboxModel;
+use App\Model\Task as TaskModel;
+use League\CLImate\CLImate;
 
 class Rollback
 {

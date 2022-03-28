@@ -15,27 +15,27 @@
         }
     ],
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.2",
         "ext-pdo": "*",
         "ext-iconv": "*",
         "ext-mbstring": "*",
-        "particlebits/imap": "^2.1",
-        "particlebits/pdo": "@dev",
+        "cboden/ratchet": "^0.4.2",
+        "evenement/evenement": "^3.0",
+        "ilya/belt": "^2.1",
         "laminas/laminas-mail": "@dev",
         "laminas/laminas-mime": "@dev",
         "laminas/laminas-servicemanager": "^3.4",
-        "pimple/pimple": "^3.3",
-        "monolog/monolog": "^1.25",
         "league/climate": "^3.5",
-        "particle/validator": "^2.3",
-        "ilya/belt": "^2.1",
+        "mkraemer/react-pcntl": "^3.0",
+        "monolog/monolog": "^1.25",
         "neitanod/forceutf8": "^2.0",
-        "react/event-loop": "@dev",
-        "cboden/ratchet": "^0.4.2",
-        "evenement/evenement": "^3.0",
-        "symfony/event-dispatcher": "^3.4",
+        "particle/validator": "^2.3",
+        "particlebits/imap": "^2.1",
+        "particlebits/pdo": "@dev",
+        "pimple/pimple": "^3.3",
         "react/child-process": "^0.5.2",
-        "mkraemer/react-pcntl": "^3.0"
+        "react/event-loop": "@dev",
+        "symfony/event-dispatcher": "^3.4"
     },
     "suggest": {
         "ext-mysqlnd": "MySQL Native Driver",
@@ -47,8 +47,8 @@
         "libremail"
     ],
     "scripts": {
-        "fix": "php-cs-fixer fix",
+        "fix": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix",
         "test": "./vendor/bin/phpunit",
-        "lint": "php-cs-fixer fix --dry-run --diff"
+        "lint": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --dry-run --diff"
     }
 }

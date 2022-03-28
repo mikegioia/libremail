@@ -10,8 +10,7 @@ class DatabaseUpdate extends Exception
     public $message = 'There was a problem updating this %s.';
 
     /**
-     * @param string $type
-     * @param string | array $errors
+     * @param string|array $errors
      */
     public function __construct(string $type, $errors = [])
     {

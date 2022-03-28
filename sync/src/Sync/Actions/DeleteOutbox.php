@@ -2,8 +2,8 @@
 
 namespace App\Sync\Actions;
 
-use Pb\Imap\Mailbox;
 use App\Model\Task as TaskModel;
+use Pb\Imap\Mailbox;
 
 class DeleteOutbox extends Base
 {

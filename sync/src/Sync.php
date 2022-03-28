@@ -22,7 +22,6 @@ use App\Sync\Actions as ActionSync;
 use App\Sync\Folders as FolderSync;
 use App\Sync\Messages as MessageSync;
 use App\Traits\GarbageCollection as GarbageCollectionTrait;
-use App\Util;
 use DateTime;
 use Evenement\EventEmitter as Emitter;
 use Exception;
@@ -64,17 +63,17 @@ class Sync
     private $retriesMessages;
 
     // Config
-    const READY_THRESHOLD = 60;
+    public const READY_THRESHOLD = 60;
 
     // Options
-    const OPT_SKIP_DOWNLOAD = 'skip_download';
-    const OPT_ONLY_SYNC_ACTIONS = 'only_sync_actions';
-    const OPT_ONLY_UPDATE_STATS = 'only_update_stats';
+    public const OPT_SKIP_DOWNLOAD = 'skip_download';
+    public const OPT_ONLY_SYNC_ACTIONS = 'only_sync_actions';
+    public const OPT_ONLY_UPDATE_STATS = 'only_update_stats';
 
     // Events
-    const EVENT_CHECK_HALT = 'check_halt';
-    const EVENT_GARBAGE_COLLECT = 'garbage_collect';
-    const EVENT_CHECK_CLOSED_CONN = 'check_closed_connection';
+    public const EVENT_CHECK_HALT = 'check_halt';
+    public const EVENT_GARBAGE_COLLECT = 'garbage_collect';
+    public const EVENT_CHECK_CLOSED_CONN = 'check_closed_connection';
 
     /**
      * Constructor can either take a dependency container or have
@@ -112,25 +111,16 @@ class Sync
         $this->initGc();
     }
 
-    /**
-     * @param CLImate $cli
-     */
     public function setCLI(CLImate $cli)
     {
         $this->cli = $cli;
     }
 
-    /**
-     * @param Logger $log
-     */
     public function setLog(Logger $log)
     {
         $this->log = $log;
     }
 
-    /**
-     * @param array $config
-     */
     public function setConfig(array $config)
     {
         $this->config = $config;
@@ -267,7 +257,6 @@ class Sync
      * allowed to fail a certain number of times before the account is
      * considered offline.
      *
-     * @param AccountModel $account
      * @param array $options Valid options include:
      *   only_update_stats (false) If true, only stats about the
      *     folders will be logged. Messages won't be downloaded.
@@ -345,9 +334,7 @@ class Sync
                 } catch (PDOException $e) {
                     throw $e;
                 } catch (Exception $e) {
-                    throw new FatalException(
-                        'Syncing that folder failed: '.$e->getMessage()
-                    );
+                    throw new FatalException('Syncing that folder failed: '.$e->getMessage());
                 }
 
                 $this->syncMessages($account, [$folder]);
@@ -607,7 +594,6 @@ class Sync
      * to try each folder some amount of times before moving on
      * to the next folder.
      *
-     * @param AccountModel $account
      * @param array FolderModel $folders
      * @param array $options Valid options include:
      *   skip_download (false) If true, only stats about the
@@ -644,8 +630,6 @@ class Sync
      * This will run for a long time for the first iteration,
      * and all subsequent runs will only update threads for
      * new messages.
-     *
-     * @param AccountModel $account
      */
     private function updateThreads(AccountModel $account)
     {
@@ -655,8 +639,6 @@ class Sync
     /**
      * Syncs all of the messages for a given IMAP folder.
      *
-     * @param AccountModel $account
-     * @param FolderModel $folder
      * @param array $options (see syncMessages)
      *
      * @throws MessagesSyncException
@@ -821,8 +803,6 @@ class Sync
      * This can happen when the IMAP socket is closed or fails. When
      * this happens we want to terminate the sync and let the whole
      * thing pick back up.
-     *
-     * @param Exception $e
      *
      * @throws StopException
      */

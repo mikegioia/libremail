@@ -14,6 +14,8 @@ class Expects
 
     /**
      * @param array|object $data
+     *
+     * @throws ValidationException
      */
     public function __construct($data)
     {
@@ -22,7 +24,7 @@ class Expects
         }
 
         if (! is_array($data)) {
-            throw new \Exception('Invalid expects: '.print_r($data, true));
+            throw new ValidationException('Invalid expects: '.print_r($data, true));
         }
 
         $this->data = $data;
@@ -30,8 +32,6 @@ class Expects
 
     /**
      * Checks if the array contains the given keys.
-     *
-     * @param array $keys
      *
      * @throws InvalidArgumentException
      */
@@ -44,13 +44,14 @@ class Expects
 
         if (count($intersection) < count($keys)) {
             $missing = array_diff($keys, array_flip($this->data));
-            $keys = implode(', ', $keys);
-            $missing = implode(', ', $missing);
-
-            throw new ValidationException(
-                "toHave() expects argument to contain keys '$keys' but ".
-                "was missing '$missing'"
+            $message = sprintf("%s '%s' %s '%s'",
+                'toHave() expects argument to contain keys',
+                implode(', ', $keys),
+                'but was missing',
+                implode(', ', $missing)
             );
+
+            throw new ValidationException($message);
         }
 
         return $this;
