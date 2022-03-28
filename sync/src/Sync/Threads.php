@@ -1,5 +1,18 @@
 <?php
 
+namespace App\Sync;
+
+use App\Model\Account as AccountModel;
+use App\Model\Contact as ContactModel;
+use App\Model\Message as MessageModel;
+use App\Sync;
+use App\Sync\Threads\Message as ThreadMessage;
+use App\Sync\Threads\Meta as ThreadMeta;
+use App\Util;
+use Evenement\EventEmitter as Emitter;
+use League\CLImate\CLImate;
+use Monolog\Logger;
+
 /**
  * Groups messages into threads. This process runs in O(n).
  *
@@ -15,20 +28,6 @@
  * Pass 4: Iterate over each thread and save it to the
  *   database if anything has changed.
  */
-
-namespace App\Sync;
-
-use Fn;
-use App\Sync;
-use Monolog\Logger;
-use League\CLImate\CLImate;
-use App\Model\Account as AccountModel;
-use App\Model\Contact as ContactModel;
-use App\Model\Message as MessageModel;
-use Evenement\EventEmitter as Emitter;
-use App\Sync\Threads\Meta as ThreadMeta;
-use App\Sync\Threads\Message as ThreadMessage;
-
 class Threads
 {
     private $log;
@@ -221,7 +220,7 @@ class Threads
     {
         $count = 0;
         $total = count($this->messages);
-        $noun = Fn\plural('message', $total);
+        $noun = Util::plural('message', $total);
 
         $this->log->debug(
             "Threading Pass 2: updating {$total} {$noun} for ".
@@ -503,10 +502,11 @@ class Threads
     private function startProgress(int $pass, int $total)
     {
         if ($this->interactive) {
-            $noun = Fn\plural('message', $total);
+            $noun = Util::plural('message', $total);
             $this->log->debug(
                 "Threading Pass {$pass}: processing {$total} {$noun} ".
-                "for {$this->account->getEmail()}:");
+                "for {$this->account->getEmail()}:"
+            );
             $this->progress = $this->cli->progress()->total(100);
         }
     }
@@ -521,9 +521,9 @@ class Threads
     private function printMemory()
     {
         $this->log->debug(
-            'Memory usage: '.Fn\formatBytes(memory_get_usage()).
-            ', real usage: '.Fn\formatBytes(memory_get_usage(true)).
-            ', peak usage: '.Fn\formatBytes(memory_get_peak_usage())
+            'Memory usage: '.Util::formatBytes(memory_get_usage()).
+            ', real usage: '.Util::formatBytes(memory_get_usage(true)).
+            ', peak usage: '.Util::formatBytes(memory_get_peak_usage())
         );
     }
 

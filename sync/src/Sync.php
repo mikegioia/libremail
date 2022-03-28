@@ -22,10 +22,10 @@ use App\Sync\Actions as ActionSync;
 use App\Sync\Folders as FolderSync;
 use App\Sync\Messages as MessageSync;
 use App\Traits\GarbageCollection as GarbageCollectionTrait;
+use App\Util;
 use DateTime;
 use Evenement\EventEmitter as Emitter;
 use Exception;
-use Fn;
 use League\CLImate\CLImate;
 use Monolog\Logger;
 use Pb\Imap\Mailbox;
@@ -177,8 +177,8 @@ class Sync
                 throw new TerminateException('Sync self-terminating after one run');
             }
 
-            $wakeTime = Fn\timeFromNow($sleepMinutes);
-            $wakeUnix = Fn\unixFromNow($sleepMinutes);
+            $wakeTime = Util::timeFromNow($sleepMinutes);
+            $wakeUnix = Util::unixFromNow($sleepMinutes);
 
             $this->setAsleep(true);
 
@@ -322,7 +322,7 @@ class Sync
                 }
             }
 
-            if (true === Fn\get($options, self::OPT_ONLY_SYNC_ACTIONS)
+            if (true === Util::get($options, self::OPT_ONLY_SYNC_ACTIONS)
                 || true === $this->actions
             ) {
                 $this->disconnect();
@@ -364,7 +364,7 @@ class Sync
 
                 // If the all that's requested is to update the folder stats,
                 // then we can exit here.
-                if (true === Fn\get($options, self::OPT_ONLY_UPDATE_STATS)) {
+                if (true === Util::get($options, self::OPT_ONLY_UPDATE_STATS)) {
                     return;
                 }
 
@@ -615,7 +615,7 @@ class Sync
      */
     private function syncMessages(AccountModel $account, array $folders, array $options = [])
     {
-        if (true === Fn\get($options, self::OPT_SKIP_DOWNLOAD)) {
+        if (true === Util::get($options, self::OPT_SKIP_DOWNLOAD)) {
             $this->log->debug('Updating folder counts');
         } else {
             $this->log->debug('Syncing messages in each folder');
@@ -688,9 +688,9 @@ class Sync
         $this->log->debug(
             "Syncing messages in {$folder->name} for {$account->email}");
         $this->log->debug(
-            'Memory usage: '.Fn\formatBytes(memory_get_usage()).
-            ', real usage: '.Fn\formatBytes(memory_get_usage(true)).
-            ', peak usage: '.Fn\formatBytes(memory_get_peak_usage())
+            'Memory usage: '.Util::formatBytes(memory_get_usage()).
+            ', real usage: '.Util::formatBytes(memory_get_usage(true)).
+            ', peak usage: '.Util::formatBytes(memory_get_peak_usage())
         );
 
         // Syncing a folder of messages is done using the following

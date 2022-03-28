@@ -2,20 +2,20 @@
 
 namespace App\Model;
 
-use Fn;
-use PDO;
-use DateTime;
+use App\Exceptions\DatabaseInsert as DatabaseInsertException;
+use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
+use App\Exceptions\NotFound as NotFoundException;
+use App\Exceptions\Validation as ValidationException;
 use App\Model;
+use App\Traits\Model as ModelTrait;
+use App\Util;
 use Belt\Belt;
-use PDOException;
+use DateTime;
 use ForceUTF8\Encoding;
 use Particle\Validator\Validator;
 use Pb\Imap\Message as ImapMessage;
-use App\Traits\Model as ModelTrait;
-use App\Exceptions\NotFound as NotFoundException;
-use App\Exceptions\Validation as ValidationException;
-use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
-use App\Exceptions\DatabaseInsert as DatabaseInsertException;
+use PDO;
+use PDOException;
 
 class Message extends Model
 {
@@ -128,12 +128,12 @@ class Message extends Model
 
     public function isSynced()
     {
-        return Fn\intEq($this->synced, 1);
+        return Util::intEq($this->synced, 1);
     }
 
     public function isDeleted()
     {
-        return Fn\intEq($this->deleted, 1);
+        return Util::intEq($this->deleted, 1);
     }
 
     public function getAttachments()
@@ -211,7 +211,7 @@ class Message extends Model
      */
     public function getSubjectHash()
     {
-        return md5(Fn\cleanSubject($this->subject ?: ''));
+        return md5(Util::cleanSubject($this->subject ?: ''));
     }
 
     /**
@@ -221,7 +221,7 @@ class Message extends Model
      */
     public function getCleanSubject()
     {
-        return Fn\cleanSubject($this->subject ?: '');
+        return Util::cleanSubject($this->subject ?: '');
     }
 
     /**
@@ -569,11 +569,11 @@ class Message extends Model
      */
     public function setMessageData(ImapMessage $message, array $options = [])
     {
-        if (true === Fn\get($options, self::OPT_TRUNCATE_FIELDS)) {
+        if (true === Util::get($options, self::OPT_TRUNCATE_FIELDS)) {
             $message->subject = substr($message->subject, 0, 270);
         }
 
-        if (true === Fn\get($options, self::OPT_SKIP_CONTENT)) {
+        if (true === Util::get($options, self::OPT_SKIP_CONTENT)) {
             $message->textHtml = null;
             $message->textPlain = null;
         }

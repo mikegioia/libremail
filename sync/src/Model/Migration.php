@@ -1,5 +1,13 @@
 <?php
 
+namespace App\Model;
+
+use App\Model;
+use App\Traits\Model as ModelTrait;
+use App\Util;
+use DateTime;
+use Pb\PDO\Database;
+
 /**
  * Handles all SQL migration scripts. This file is designed
  * to read in the SQL scripts from the /db directory and run
@@ -7,15 +15,6 @@
  * table (unless it's script 0 to create this table) then skip
  * that script.
  */
-
-namespace App\Model;
-
-use Fn;
-use DateTime;
-use App\Model;
-use Pb\PDO\Database;
-use App\Traits\Model as ModelTrait;
-
 class Migration extends Model
 {
     use ModelTrait;
@@ -100,7 +99,7 @@ class Migration extends Model
         $db = $db ?: $this->db();
         $size = $db->query("SHOW VARIABLES LIKE 'max_allowed_packet';")->fetch();
 
-        return Fn\get($size, 'Value');
+        return Util::get($size, 'Value');
     }
 
     /**

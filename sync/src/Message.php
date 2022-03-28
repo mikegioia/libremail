@@ -2,21 +2,21 @@
 
 namespace App;
 
-use Fn;
+use App\Exceptions\Validation as ValidationException;
+use App\Message\AbstractMessage;
+use App\Message\AccountMessage;
+use App\Message\DiagnosticsMessage;
+use App\Message\ErrorMessage;
+use App\Message\HealthMessage;
+use App\Message\NoAccountsMessage;
+use App\Message\NotificationMessage;
+use App\Message\PidMessage;
+use App\Message\StatsMessage;
+use App\Message\TaskMessage;
+use App\Server\StatsServer;
+use App\Util;
 use Exception;
 use Monolog\Logger;
-use App\Server\StatsServer;
-use App\Message\PidMessage;
-use App\Message\TaskMessage;
-use App\Message\ErrorMessage;
-use App\Message\StatsMessage;
-use App\Message\HealthMessage;
-use App\Message\AccountMessage;
-use App\Message\AbstractMessage;
-use App\Message\NoAccountsMessage;
-use App\Message\DiagnosticsMessage;
-use App\Message\NotificationMessage;
-use App\Exceptions\Validation as ValidationException;
 
 class Message
 {
@@ -134,19 +134,19 @@ class Message
 
         // Check that message contains the required fields.
         try {
-            Fn\expects($m)->toHave(['type']);
+            Util::expects($m)->toHave(['type']);
 
             switch ($m->type) {
                 case self::PID:
-                    Fn\expects($m)->toHave(['pid']);
+                    Util::expects($m)->toHave(['pid']);
 
                     return new PidMessage((int) $m->pid);
                 case self::TASK:
-                    Fn\expects($m)->toHave(['task', 'data']);
+                    Util::expects($m)->toHave(['task', 'data']);
 
                     return new TaskMessage($m->task, (array) $m->data);
                 case self::STATS:
-                    Fn\expects($m)->toHave([
+                    Util::expects($m)->toHave([
                         'active', 'asleep', 'account', 'running',
                         'uptime', 'accounts'
                     ]);
@@ -160,7 +160,7 @@ class Message
                         (array) $m->accounts
                     );
                 case self::ERROR:
-                    Fn\expects($m)->toHave([
+                    Util::expects($m)->toHave([
                         'error_type', 'message', 'suggestion'
                     ]);
 
@@ -170,7 +170,7 @@ class Message
                         $m->suggestion
                     );
                 case self::HEALTH:
-                    Fn\expects($m)->toHave([
+                    Util::expects($m)->toHave([
                         'tests', 'procs', 'no_accounts'
                     ]);
 
@@ -180,21 +180,21 @@ class Message
                         (bool) $m->no_accounts
                     );
                 case self::ACCOUNT:
-                    Fn\expects($m)->toHave(['updated', 'email']);
+                    Util::expects($m)->toHave(['updated', 'email']);
 
                     return new AccountMessage((bool) $m->updated, $m->email);
                 case self::NO_ACCOUNTS:
                     return new NoAccountsMessage;
                 case self::ACCOUNT_INFO:
-                    Fn\expects($m)->toHave(['account']);
+                    Util::expects($m)->toHave(['account']);
 
                     return new AccountInfoMessage($m->account);
                 case self::NOTIFICATION:
-                    Fn\expects($m)->toHave(['status', 'message']);
+                    Util::expects($m)->toHave(['status', 'message']);
 
                     return new NotificationMessage($m->status, $m->message);
                 case self::DIAGNOSTICS:
-                    Fn\expects($m)->toHave(['tests']);
+                    Util::expects($m)->toHave(['tests']);
 
                     return new DiagnosticsMessage((array) $m->tests);
             }

@@ -13,7 +13,7 @@ class Expects
     private $data;
 
     /**
-     * @param array | object $data
+     * @param array|object $data
      */
     public function __construct($data)
     {

@@ -1,19 +1,18 @@
 <?php
 
+namespace App\Sync;
+
+use App\Model\Account as AccountModel;
+use App\Model\Folder as FolderModel;
+use App\Sync;
+use App\Util;
+use Evenement\EventEmitter as Emitter;
+use League\CLImate\CLImate;
+use Monolog\Logger;
+
 /**
  * Syncs IMAP folders to SQL.
  */
-
-namespace App\Sync;
-
-use Fn;
-use App\Sync;
-use Monolog\Logger;
-use League\CLImate\CLImate;
-use App\Model\Folder as FolderModel;
-use App\Model\Account as AccountModel;
-use Evenement\EventEmitter as Emitter;
-
 class Folders
 {
     private $log;
@@ -48,7 +47,7 @@ class Folders
     {
         $count = iterator_count($folderList);
 
-        $this->log->debug("Found $count ".Fn\plural('folder', $count));
+        $this->log->debug("Found $count ".Util::plural('folder', $count));
 
         $this->addNewFolders($folderList, $savedFolders, $account);
         $this->removeOldFolders($folderList, $savedFolders, $account);
@@ -83,12 +82,12 @@ class Folders
 
         if ($this->interactive) {
             $this->cli->whisper(
-                "Adding $count new ".Fn\plural('folder', $count).':'
+                "Adding $count new ".Util::plural('folder', $count).':'
             );
             $progress = $this->cli->progress()->total($count);
         } else {
             $this->log->info(
-                "Adding $count new ".Fn\plural('folder', $count)
+                "Adding $count new ".Util::plural('folder', $count)
             );
         }
 
@@ -141,7 +140,7 @@ class Folders
             return;
         }
 
-        $this->log->info("Removing $count ".Fn\plural('folder', $count));
+        $this->log->info("Removing $count ".Util::plural('folder', $count));
 
         foreach ($toRemove as $folder) {
             $folder->delete();
