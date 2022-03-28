@@ -64,10 +64,7 @@ class Command
     public function run($message)
     {
         if (! $this->emitter) {
-            throw new ErrorException(
-                'A command was attempted to be run in a context '.
-                'without an Event Emitter.'
-            );
+            throw new ErrorException('Event emitter required for commands');
         }
 
         $matched = preg_match_all($this->regexExtract, $message, $results);

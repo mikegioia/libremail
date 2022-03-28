@@ -516,9 +516,12 @@ class Diagnostics
                 $di['log']->getLogger()->addNotice($e->getMessage());
             }
 
-            throw new TerminateException(
-                'System encountered an un-recoverable database error. '.
-                'Going to halt now, please see the log file for info.');
+            $message = sprintf('%s. %s.',
+                'System encountered an un-recoverable database error',
+                'Going to halt now, please see the log file for info'
+            );
+
+            throw new TerminateException($message);
         } else {
             $di['log']->getLogger()->addDebug(
                 'Database connection lost: '.$e->getMessage()

@@ -128,7 +128,7 @@ class Account extends Model
      */
     public function validate()
     {
-        $val = new Validator;
+        $val = new Validator();
 
         $val->required('name', 'Name')->lengthBetween(0, 100);
         $val->required('email', 'Email')->lengthBetween(0, 100);
@@ -145,11 +145,12 @@ class Account extends Model
         $val->optional('imap_flags', 'IMAP flags')->lengthBetween(0, 50);
 
         if (! $val->validate($this->getData())) {
-            throw new ValidationException(
-                $this->getErrorString(
-                    $val,
-                    'There was a problem creating this account.'
-                ));
+            $message = $this->getErrorString(
+                $val,
+                'There was a problem creating this account.'
+            );
+
+            throw new ValidationException($message);
         }
     }
 

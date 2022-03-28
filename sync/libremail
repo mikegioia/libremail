@@ -88,7 +88,7 @@ Message::setLog($di['log']->getLogger());
 
 // Set up the signal handler to shutdown
 $TERMINATE = function () {
-    throw new TerminateException;
+    throw new TerminateException();
 };
 
 // Graceful shutdown
@@ -207,17 +207,20 @@ $di['db_factory'] = $di->factory(function ($container, $config = null) {
         $db = new Database(
             $dsn,
             $dbConfig['username'],
-            $dbConfig['password']);
+            $dbConfig['password']
+        );
         $db->query('SET SESSION wait_timeout = 28800;');
         $db->query('SET NAMES '.$dbConfig['charset'].';');
 
         return $db;
     } catch (PDOException $e) {
-        throw new TerminateException(
-            'There was a problem connecting to the database. '.
-            'Are you sure it exists? Here are the details: '.
+        $message = sprintf('%s. %s: %s',
+            'There was a problem connecting to the database',
+            'Are you sure it exists? Here are the details',
             $e->getMessage()
         );
+
+        throw new TerminateException($message);
     }
 });
 

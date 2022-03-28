@@ -433,7 +433,7 @@ class Message extends Model
      */
     public function save(array $data = [], array $skipFields = [])
     {
-        $val = new Validator;
+        $val = new Validator();
 
         $val->required('folder_id', 'Folder ID')->integer();
         $val->required('unique_id', 'Unique ID')->integer();
@@ -464,11 +464,12 @@ class Message extends Model
         }
 
         if (! $val->validate($data)) {
-            throw new ValidationException(
-                $this->getErrorString(
-                    $val,
-                    'This message is missing required data.'
-                ));
+            $message = $this->getErrorString(
+                $val,
+                'This message is missing required data.'
+            );
+
+            throw new ValidationException($message);
         }
 
         // Update flags to have the right data type
@@ -507,6 +508,7 @@ class Message extends Model
 
         if ($exists) {
             $this->id = $exists->id;
+
             unset($data['id']);
             unset($data['created_at']);
 

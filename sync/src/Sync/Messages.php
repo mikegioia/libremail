@@ -392,7 +392,7 @@ class Messages
      * Syncs the seen flag between the IMAP mailbox and SQL.
      *
      * @param AccountModel $account
-     * @param FolderModel $model
+     * @param FolderModel $folder
      */
     private function updateSeenFlags(AccountModel $account, FolderModel $folder)
     {
@@ -456,7 +456,7 @@ class Messages
      * Syncs the flagged (starred) flag between the IMAP mailbox and SQL.
      *
      * @param AccountModel $account
-     * @param FolderModel $model
+     * @param FolderModel $folder
      */
     private function updateFlaggedFlags(AccountModel $account, FolderModel $folder)
     {
@@ -524,7 +524,7 @@ class Messages
      * the sync process.
      *
      * @param AccountModel $account
-     * @param FolderModel $model
+     * @param FolderModel $folder
      */
     private function flushPurged(AccountModel $account, FolderModel $folder)
     {

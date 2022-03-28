@@ -91,18 +91,19 @@ trait Model
     public function requireArray($values, string $name)
     {
         if (! is_array($values) || ! Belt::size($values)) {
-            throw new ValidationException(
-                "$name needs to be an array with values."
-            );
+            throw new ValidationException("$name needs to be an array with values.");
         }
     }
 
     public function requireValue($value, array $collection)
     {
         if (! Belt::contains($collection, $value)) {
-            throw new ValidationException(
-                "$value must be one of ".implode(', ', $collection).'.'
+            $message = sprintf('%s must be one of %s.',
+                $value,
+                implode(', ', $collection)
             );
+
+            throw new ValidationException($message);
         }
     }
 

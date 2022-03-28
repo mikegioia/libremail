@@ -140,7 +140,7 @@ class Folder extends Model
      */
     public function save(array $data = [])
     {
-        $val = new Validator;
+        $val = new Validator();
 
         $val->optional('count', 'Count')->integer();
         $val->optional('ignored', 'Ignored')->numeric();
@@ -154,11 +154,12 @@ class Folder extends Model
         $data = $this->getData();
 
         if (! $val->validate($data)) {
-            throw new ValidationException(
-                $this->getErrorString(
-                    $val,
-                    'This folder is missing required data.'
-                ));
+            $message = $this->getErrorString(
+                $val,
+                'This folder is missing required data.'
+            );
+
+            throw new ValidationException($message);
         }
 
         // Check if this folder exists
