@@ -21,10 +21,12 @@ class StatsServer implements MessageComponentInterface
 {
     // For JSON message handling
     use JsonMessageTrait;
+
     private $log;
     private $loop;
     private $clients;
     private $lastMessage;
+
     // Streams
     private $read;
     private $write;

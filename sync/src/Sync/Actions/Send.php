@@ -2,15 +2,12 @@
 
 namespace App\Sync\Actions;
 
-// Core
 use App\Exceptions\NotFound as NotFoundException;
 use App\Model\Message as MessageModel;
-// Application
 use App\Model\Task as TaskModel;
 use App\Sync\Actions;
 use DateTime;
 use Exception;
-// Vendor
 use Laminas\Mail\Exception\InvalidArgumentException;
 use Laminas\Mail\Message as MailMessage;
 use Laminas\Mail\Transport\Exception\RuntimeException as TransportRuntimeException;

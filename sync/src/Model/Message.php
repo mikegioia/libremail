@@ -20,6 +20,7 @@ use PDOException;
 class Message extends Model
 {
     use ModelTrait;
+
     public $id;
     public $to;
     public $cc;

@@ -17,6 +17,7 @@ class Daemon
 {
     // For JSON message handling
     use JsonMessageTrait;
+
     private $log;
     // Flag to not attempt to restart process
     private $halt;
