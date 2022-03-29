@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "83d63117643c190dd9b919b2f4e60714",
+    "content-hash": "b357d9efca2b19174a6a9d14f1f70e48",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -204,54 +204,6 @@
                 "url"
             ],
             "time": "2019-07-01T23:21:34+00:00"
-        },
-        {
-            "name": "ilya/belt",
-            "version": "2.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ilya-dev/belt.git",
-                "reference": "e6229b855eaa9291c667f804975f29e563dc777c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ilya-dev/belt/zipball/e6229b855eaa9291c667f804975f29e563dc777c",
-                "reference": "e6229b855eaa9291c667f804975f29e563dc777c",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "phpspec/phpspec": "~2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Belt\\": "src/Belt/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ilya S",
-                    "email": "public.ilya.s@gmail.com"
-                }
-            ],
-            "description": "A handful of tools for PHP devs",
-            "keywords": [
-                "arrays",
-                "collections",
-                "functions",
-                "objects",
-                "php",
-                "tools",
-                "utilities"
-            ],
-            "time": "2014-05-21T08:48:47+00:00"
         },
         {
             "name": "laminas/laminas-loader",
@@ -2384,19 +2336,19 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "particlebits/pdo": 20,
         "laminas/laminas-mail": 20,
         "laminas/laminas-mime": 20,
+        "particlebits/pdo": 20,
         "react/event-loop": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.0",
+        "php": ">=7.2",
         "ext-pdo": "*",
         "ext-iconv": "*",
         "ext-mbstring": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.1.0"
 }

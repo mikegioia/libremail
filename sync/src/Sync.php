@@ -44,6 +44,7 @@ class Sync
     private $email;
     private $sleep;
     private $quick;
+    private $stats;
     private $config;
     private $folder;
     private $daemon;
@@ -540,10 +541,8 @@ class Sync
      * @param AccountModel $account Account to sync
      *
      * @throws FolderSyncException
-     *
-     * @return array $folders List of IMAP folders
      */
-    private function syncFolders(AccountModel $account)
+    private function syncFolders(AccountModel $account): void
     {
         if ($this->retriesFolders[$account->email] > $this->maxRetries) {
             $this->log->notice(
@@ -642,14 +641,12 @@ class Sync
      * @param array $options (see syncMessages)
      *
      * @throws MessagesSyncException
-     *
-     * @return bool
      */
     private function syncFolderMessages(
         AccountModel $account,
         FolderModel $folder,
         array $options
-    ) {
+    ): void {
         if ($folder->isIgnored()) {
             $this->log->debug('Skipping ignored folder');
 
@@ -717,8 +714,7 @@ class Sync
             sleep($waitSeconds);
             ++$this->retriesMessages[$account->email];
             $this->checkForHalt();
-
-            return $this->syncFolderMessages($account, $folder, $options);
+            $this->syncFolderMessages($account, $folder, $options);
         }
     }
 

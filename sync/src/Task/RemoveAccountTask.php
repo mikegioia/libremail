@@ -9,6 +9,7 @@ use App\Message\NotificationMessage;
 use App\Model\Account as AccountModel;
 use App\Server\StatsServer;
 use App\Task;
+use Exception;
 
 class RemoveAccountTask extends AbstractTask
 {

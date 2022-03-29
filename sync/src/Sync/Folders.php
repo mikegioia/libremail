@@ -97,7 +97,7 @@ class Folders
             $folder->save();
             $folders[$folder->getId()] = $folder;
 
-            if ($this->interactive) {
+            if ($this->interactive && isset($progress)) {
                 $progress->current($i++);
             }
 

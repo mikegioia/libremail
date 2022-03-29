@@ -1,0 +1,8 @@
+parameters:
+    level: 1
+    paths:
+        - src
+    bootstrapFiles:
+        - config/constants.php
+    inferPrivatePropertyTypeFromConstructor: true
+    checkMissingIterableValueType: false

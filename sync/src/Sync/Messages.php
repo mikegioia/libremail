@@ -93,7 +93,7 @@ class Messages
 
         $this->updateMessageNumbers($newIds, $savedIds, $folder);
         $this->downloadMessages($newIds, $savedIds, $folder, $options);
-        $this->markDeleted($newIds, $savedIds, $folder, $options);
+        $this->markDeleted($newIds, $savedIds, $folder);
         $this->updateSeenFlags($account, $folder);
         $this->updateFlaggedFlags($account, $folder);
         $this->flushPurged($account, $folder);

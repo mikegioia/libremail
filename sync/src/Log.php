@@ -173,9 +173,11 @@ class Log
             ? dirname($path)
             : BASEPATH;
 
-        if (! is_writeable($logPath)) {
-            throw new LogPathNotWriteableException($logPath);
+        if (is_writeable($logPath)) {
+            return true;
         }
+
+        throw new LogPathNotWriteableException($logPath);
     }
 
     /**

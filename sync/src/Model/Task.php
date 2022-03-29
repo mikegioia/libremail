@@ -5,7 +5,7 @@ namespace App\Model;
 use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 use App\Model;
 use App\Traits\Model as ModelTrait;
-use Belt\Belt;
+use App\Util;
 use Exception;
 use PDO;
 
@@ -155,7 +155,7 @@ class Task extends Model
             ->where('id', '=', $this->id)
             ->execute();
 
-        if (! Belt::isNumber($updated)) {
+        if (! Util::isNumber($updated)) {
             throw new DatabaseUpdateException(TASK, $this->db()->getError());
         }
     }
@@ -196,7 +196,7 @@ class Task extends Model
             ->where('id', '=', $this->id)
             ->execute();
 
-        if (! Belt::isNumber($updated)) {
+        if (! Util::isNumber($updated)) {
             throw new DatabaseUpdateException(TASK, $this->db()->getError());
         }
     }

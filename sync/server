@@ -9,7 +9,6 @@
  * or (more commonly) it's invoked via the daemon script.
  */
 use App\Console\ServerConsole;
-use App\Constants;
 use App\Daemon;
 use App\Diagnostics;
 use App\Exceptions\Terminate as TerminateException;
@@ -34,19 +33,19 @@ date_default_timezone_set('UTC');
 // Load the vendor libraries
 require BASEPATH.'/vendor/autoload.php';
 
+// Load application constants
+require BASEPATH.'/config/constants.php';
+
 // Load configuration files and parse the CLI arguments
-$constants = parse_ini_file(BASEPATH.'/config/constants.ini', false);
 $default = parse_ini_file(BASEPATH.'/config/default.ini', true);
 $local = parse_ini_file(BASEPATH.'/config/local.ini', true);
 $config = array_replace_recursive($default, $local);
-Constants::process($constants);
-unset($constants);
 
 // Set the memory limit from the config
 ini_set('memory_limit', $config['app']['memory']);
 
 // Set up dependency container and register all services
-$di = new Container;
+$di = new Container();
 
 // Store the configuration as a service
 $di['config'] = $config;

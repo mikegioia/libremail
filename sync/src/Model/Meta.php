@@ -5,7 +5,7 @@ namespace App\Model;
 use App\Exceptions\DatabaseUpdate as DatabaseUpdateException;
 use App\Model;
 use App\Traits\Model as ModelTrait;
-use Belt\Belt;
+use App\Util;
 
 class Meta extends Model
 {
@@ -50,7 +50,7 @@ class Meta extends Model
                 ->where('key', '=', $key)
                 ->execute();
 
-            if (! Belt::isNumber($updated)) {
+            if (! Util::isNumber($updated)) {
                 throw new DatabaseUpdateException(META, $this->db()->getError());
             }
         }

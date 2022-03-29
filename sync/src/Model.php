@@ -63,7 +63,9 @@ class Model
     public function setData($data)
     {
         if (is_scalar($data)) {
-            $this->id = $data;
+            if (isset($this->id)) {
+                $this->id = $data;
+            }
         } else {
             foreach ($data as $key => $value) {
                 $this->$key = $value;

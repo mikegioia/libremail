@@ -9,7 +9,6 @@
  * a list of saved IMAP credentials and runs through a flow of tasks.
  */
 use App\Console\SyncConsole;
-use App\Constants;
 use App\Diagnostics;
 use App\Exceptions\Stop as StopException;
 use App\Exceptions\Terminate as TerminateException;
@@ -23,16 +22,18 @@ use App\Sync\Threads as ThreadSync;
 use Pb\PDO\Database;
 use Pimple\Container;
 
-// Set up paths and constants
+// Update internals
 set_time_limit(0);
-define('BASEPATH', __DIR__);
-// User UTF-8
 mb_internal_encoding('UTF-8');
 date_default_timezone_set('UTC');
-define('DBSCRIPTS', BASEPATH.'/db/*.sql');
+
+// Load the vendor libraries
+require __DIR__.'/vendor/autoload.php';
+
+// Load application constants
+require __DIR__.'/config/constants.php';
 
 // Load configuration files and parse the CLI arguments
-$constants = parse_ini_file(BASEPATH.'/config/constants.ini', false);
 $default = parse_ini_file(BASEPATH.'/config/default.ini', true);
 $local = parse_ini_file(BASEPATH.'/config/local.ini', true);
 $config = array_replace_recursive($default, $local);
@@ -42,15 +43,8 @@ ini_set('memory_limit', $config['app']['memory']);
 ini_set('mysql.connect_timeout', $config['sql']['timeout']);
 ini_set('default_socket_timeout', $config['sql']['timeout']);
 
-// Load the vendor libraries
-require BASEPATH.'/vendor/autoload.php';
-
-// Process constants
-Constants::process($constants);
-unset($constants);
-
 // Set up dependency container and register all services
-$di = new Container;
+$di = new Container();
 
 // Store the configuration as a service
 $di['config'] = $config;

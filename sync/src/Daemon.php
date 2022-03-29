@@ -83,7 +83,7 @@ class Daemon
             $this->processPids[PROC_SYNC] = null;
         }
 
-        $syncProcess = new Process(BASEPATH.EXEC_SYNC);
+        $syncProcess = new Process(__DIR__.EXEC_SYNC);
 
         // When the sync process exits, we want to alert the
         // daemon. This is to restart the sync upon crash or

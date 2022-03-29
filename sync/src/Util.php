@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Countable;
 use DateInterval;
 use DateTime;
 
@@ -58,6 +59,26 @@ class Util
     public static function strEq(string $str1, string $str2)
     {
         return $str1 === $str2;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    public static function isNumber($value)
+    {
+        return is_integer($value) || is_float($value);
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    public static function isString($value)
+    {
+        return is_string($value);
     }
 
     /**
@@ -124,6 +145,30 @@ class Util
     }
 
     /**
+     * Look for a string in an array of possibilities.
+     *
+     * @return bool
+     */
+    public static function contains(string $subject, array $list)
+    {
+        return in_array($subject, $list, true);
+    }
+
+    /**
+     * @param array|Countable $value
+     *
+     * @return int|null
+     */
+    public static function size($value)
+    {
+        if (is_array($value) || ($value instanceof Countable)) {
+            return count($value);
+        }
+
+        return null;
+    }
+
+    /**
      * Returns a string like 1:30 PM corresponding to the
      * number of minutes from now.
      *
@@ -158,22 +203,6 @@ class Util
     public static function expects($data)
     {
         return new Expects($data);
-    }
-
-    /**
-     * Look for a string in an array of possibilities.
-     *
-     * @return bool
-     */
-    public static function contains(string $subject, array $list)
-    {
-        foreach ($list as $item) {
-            if (false !== strpos($subject, $item)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

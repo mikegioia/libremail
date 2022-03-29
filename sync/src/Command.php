@@ -9,9 +9,11 @@ use Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 class Command
 {
     private $emitter;
+
     // Command format: !COMMAND\n
     private $regexMatch = '/^(!{1}[A-Z]+\n{1})$/';
     private $regexExtract = '/^(?:!{1})([A-Z]+)(?:\n{1})$/';
+
     // Valid commands
     public const STOP = 'STOP';
     public const STATS = 'STATS';
@@ -38,18 +40,6 @@ class Command
     public function isValid($message)
     {
         return preg_match($this->regexMatch, $message);
-    }
-
-    /**
-     * Makes a new command string from a constant.
-     *
-     * @param string $command One of the command constants
-     *
-     * @return string
-     */
-    public function make($command)
-    {
-        return "!$command\n";
     }
 
     /**
@@ -96,6 +86,18 @@ class Command
             default:
                 throw new BadCommandException($message);
         }
+    }
+
+    /**
+     * Makes a new command string from a constant.
+     *
+     * @param string $command One of the command constants
+     *
+     * @return string
+     */
+    public static function make(string $command)
+    {
+        return "!$command\n";
     }
 
     public static function getMessage($command)

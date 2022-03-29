@@ -9,7 +9,6 @@ use App\Exceptions\Validation as ValidationException;
 use App\Model;
 use App\Traits\Model as ModelTrait;
 use App\Util;
-use Belt\Belt;
 use DateTime;
 use ForceUTF8\Encoding;
 use Particle\Validator\Validator;
@@ -46,6 +45,7 @@ class Message extends Model
     public $thread_id;
     public $text_html;
     public $date_recv;
+    public $outbox_id;
     public $account_id;
     public $message_id;
     public $message_no;
@@ -499,7 +499,7 @@ class Message extends Model
                     $data['text_plain'] = Encoding::fixUTF8($data['text_plain']);
                     $data['raw_headers'] = Encoding::fixUTF8($data['raw_headers']);
                     $data['raw_content'] = Encoding::fixUTF8($data['raw_content']);
-                    $newMessageId = $updateMessage($this->db(), $data);
+                    $updated = $updateMessage($this->db(), $data);
                 } else {
                     throw $e;
                 }
@@ -746,9 +746,9 @@ class Message extends Model
             return;
         }
 
-        $this->isValidFlag($state, 'State');
         $this->requireInt($folderId, 'Folder ID');
         $this->requireInt($accountId, 'Account ID');
+        $this->requireValidFlag($state, 'State');
         $this->requireValue($flag, [
             self::FLAG_SEEN, self::FLAG_FLAGGED
         ]);
@@ -783,14 +783,11 @@ class Message extends Model
     public function setFlag(string $flag, string $value)
     {
         $this->requireInt($this->id, 'Message ID');
+        $this->requireValidFlag($value, ucfirst($flag));
         $this->requireValue($flag, [
             self::FLAG_SEEN, self::FLAG_FLAGGED,
             self::FLAG_DELETED
         ]);
-
-        if (! $this->isValidFlag($value)) {
-            throw new ValidationException("Invalid flag value '$value' for $flag");
-        }
 
         $updated = $this->db()
             ->update([
@@ -1011,7 +1008,7 @@ class Message extends Model
      */
     private function errorHandle($updated)
     {
-        if (! Belt::isNumber($updated)) {
+        if (! Util::isNumber($updated)) {
             throw new DatabaseUpdateException(MESSAGE, $this->getError());
         }
     }

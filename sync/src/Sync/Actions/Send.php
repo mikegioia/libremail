@@ -71,7 +71,7 @@ class Send extends Base
 
             // Create a new temporary message in the sent mail mailbox
             // with purge=1 to ensure it's removed upon re-sync
-            $sentMessage = (new MessageModel)->createOrUpdateSent(
+            $sentMessage = (new MessageModel())->createOrUpdateSent(
                 $this->outbox, $sentFolder->id
             );
 
@@ -176,8 +176,8 @@ class Send extends Base
      */
     private function addReplyHeaders(MessageModel $parent)
     {
-        $referencesHeader = $message->getHeaders()->get('References');
-        $inReplyToHeader = $message->getHeaders()->get('In-Reply-To');
+        $referencesHeader = $parent->getHeaders()->get('References');
+        $inReplyToHeader = $parent->getHeaders()->get('In-Reply-To');
 
         // @todo
     }

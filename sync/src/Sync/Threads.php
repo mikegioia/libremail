@@ -55,6 +55,8 @@ class Threads
     private $unthreaded = [];
     // Index of all threads for subject matching
     private $threadMeta = [];
+    // List of all processed messages by message ID
+    private $allProcessed = [];
     // Index of subject hashes => thread IDs
     private $subjectHashes = [];
     // Index of thread IDs and their new thread ID
