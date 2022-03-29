@@ -5,8 +5,8 @@ namespace App;
 use App\Messages\Names;
 use App\Model\Account;
 use App\Model\Message;
+use Laminas\Escaper\Escaper;
 use stdClass;
-use Zend\Escaper\Escaper;
 
 class Messages
 {

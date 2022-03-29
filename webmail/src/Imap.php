@@ -4,7 +4,7 @@ namespace App;
 
 use App\Exceptions\ServerException;
 use Exception;
-use Zend\Mail\Storage\Imap as ZendImap;
+use Laminas\Mail\Storage\Imap as LaminasImap;
 
 class Imap
 {
@@ -18,7 +18,7 @@ class Imap
     public function connect(string $email, string $password, string $host, int $port)
     {
         try {
-            $imapStream = new ZendImap([
+            $imapStream = new LaminasImap([
                 'ssl' => 'SSL',
                 'host' => $host,
                 'user' => $email,

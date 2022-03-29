@@ -4,8 +4,8 @@ namespace App;
 
 use App\Exceptions\NotFoundException;
 use App\Model\Message;
+use Laminas\Escaper\Escaper;
 use Misd\Linkify\Linkify;
-use Zend\Escaper\Escaper;
 
 class Thread
 {

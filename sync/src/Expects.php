@@ -33,7 +33,7 @@ class Expects
     /**
      * Checks if the array contains the given keys.
      *
-     * @throws InvalidArgumentException
+     * @throws ValidationException
      */
     public function toHave(array $keys)
     {

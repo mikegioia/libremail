@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use App\Exceptions\NotFound as NotFoundException;
+use App\Exceptions\Validation as ValidationException;
 use App\Model;
 use App\Traits\Model as ModelTrait;
 use Laminas\Mail\AddressList;

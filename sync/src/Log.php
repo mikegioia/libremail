@@ -114,7 +114,7 @@ class Log
     public function displayError(Exception $e)
     {
         if (true === $this->interactive) {
-            $this->cli->boldRedBackgroundBlack($e->getMessage());
+            $this->cli->bold()->red()->backgroundBlack()->out($e->getMessage());
             $this->cli->dim('[Err#'.$e->getCode().']');
 
             if ($this->config['stacktrace']) {

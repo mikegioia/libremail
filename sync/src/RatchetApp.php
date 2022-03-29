@@ -57,13 +57,6 @@ class RatchetApp extends BaseRatchetApp
             $decorated = new OriginCheck($decorated, $allowedOrigins);
         }
 
-        // Allow origins in flash policy server
-        if (false === empty($this->flashServer)) {
-            foreach ($allowedOrigins as $allowedOrgin) {
-                $this->flashServer->app->addAllowedAccess($allowedOrgin, $this->port);
-            }
-        }
-
         // Allow $path to also be a Route
         $route = null;
 

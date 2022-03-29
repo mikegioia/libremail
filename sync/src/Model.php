@@ -6,7 +6,7 @@ use DateTime;
 use DateTimeZone;
 use League\CLImate\CLImate;
 use Monolog\Logger;
-use Particle\Validator\Validator;
+use Particle\Validator\ValidationResult;
 use Pb\PDO\Database;
 use Pimple\Container;
 
@@ -170,10 +170,10 @@ class Model
         return $this->db()->getError();
     }
 
-    public function getErrorString(Validator $validator, string $message)
+    public function getErrorString(ValidationResult $result, string $message)
     {
         $return = [];
-        $messages = $validator->getMessages();
+        $messages = $result->getMessages();
 
         foreach ($messages as $key => $messages) {
             $return = array_merge($return, array_values($messages));

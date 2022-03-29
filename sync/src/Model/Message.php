@@ -415,9 +415,9 @@ class Message extends Model
         $val->required('folder_id', 'Folder ID')->integer();
         $val->required('unique_id', 'Unique ID')->integer();
         $val->required('account_id', 'Account ID')->integer();
-        // Optional fields
         $val->required('size', 'Size')->integer();
         $val->required('message_no', 'Message Number')->integer();
+
         $val->optional('date', 'Date')->datetime(DATE_DATABASE);
         $val->optional('subject', 'Subject')->lengthBetween(0, 270);
         $val->optional('charset', 'Charset')->lengthBetween(0, 100);
@@ -440,9 +440,11 @@ class Message extends Model
             $data = array_diff_key($data, array_flip($skipFields));
         }
 
-        if (! $val->validate($data)) {
+        $result = $val->validate($data);
+
+        if (! $result->isValid()) {
             $message = $this->getErrorString(
-                $val,
+                $result,
                 'This message is missing required data.'
             );
 
