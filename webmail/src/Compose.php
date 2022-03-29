@@ -2,12 +2,12 @@
 
 namespace App;
 
-use Exception;
-use App\Model\Outbox;
-use App\Model\Account;
-use App\Model\Message;
 use App\Actions\Queue as QueueAction;
 use App\Exceptions\ValidationException;
+use App\Model\Account;
+use App\Model\Message;
+use App\Model\Outbox;
+use Exception;
 
 class Compose
 {

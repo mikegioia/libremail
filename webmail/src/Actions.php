@@ -21,42 +21,42 @@ class Actions
     private $params;
 
     // Actions
-    const COPY = 'copy';
-    const FLAG = 'flag';
-    const MOVE = 'move';
-    const SPAM = 'spam';
-    const TRASH = 'trash';
-    const UNCOPY = 'uncopy';
-    const UNFLAG = 'unflag';
-    const UNSPAM = 'unspam';
-    const DELETE = 'delete';
-    const RESTORE = 'restore';
-    const ARCHIVE = 'archive';
-    const UNTRASH = 'untrash';
-    const MARK_READ = 'mark_read';
-    const MARK_UNREAD = 'mark_unread';
-    const CONVERT_DRAFT = 'convert_draft';
-    const RESTORE_DRAFT = 'restore_draft';
-    const MARK_ALL_READ = 'mark_all_read';
-    const MARK_ALL_UNREAD = 'mark_all_unread';
-    const MARK_UNREAD_FROM_HERE = 'mark_unread_from_here';
+    public const COPY = 'copy';
+    public const FLAG = 'flag';
+    public const MOVE = 'move';
+    public const SPAM = 'spam';
+    public const TRASH = 'trash';
+    public const UNCOPY = 'uncopy';
+    public const UNFLAG = 'unflag';
+    public const UNSPAM = 'unspam';
+    public const DELETE = 'delete';
+    public const RESTORE = 'restore';
+    public const ARCHIVE = 'archive';
+    public const UNTRASH = 'untrash';
+    public const MARK_READ = 'mark_read';
+    public const MARK_UNREAD = 'mark_unread';
+    public const CONVERT_DRAFT = 'convert_draft';
+    public const RESTORE_DRAFT = 'restore_draft';
+    public const MARK_ALL_READ = 'mark_all_read';
+    public const MARK_ALL_UNREAD = 'mark_all_unread';
+    public const MARK_UNREAD_FROM_HERE = 'mark_unread_from_here';
     // Selections
-    const SELECT_ALL = 'all';
-    const SELECT_NONE = 'none';
-    const SELECT_READ = 'read';
-    const SELECT_UNREAD = 'unread';
-    const SELECT_FLAGGED = 'starred';
-    const SELECT_UNFLAGGED = 'unstarred';
+    public const SELECT_ALL = 'all';
+    public const SELECT_NONE = 'none';
+    public const SELECT_READ = 'read';
+    public const SELECT_UNREAD = 'unread';
+    public const SELECT_FLAGGED = 'starred';
+    public const SELECT_UNFLAGGED = 'unstarred';
     // Options
-    const OUTBOX_ID = 'outbox_id';
-    const SEND_AFTER = 'send_after';
-    const ALL_MESSAGES = 'all_messages';
-    const TO_FOLDER_ID = 'to_folder_id';
-    const FROM_FOLDER_ID = 'from_folder_id';
-    const SINGLE_MESSAGE = 'single_message';
-    const OUTBOX_MESSAGE = 'outbox_message';
+    public const OUTBOX_ID = 'outbox_id';
+    public const SEND_AFTER = 'send_after';
+    public const ALL_MESSAGES = 'all_messages';
+    public const TO_FOLDER_ID = 'to_folder_id';
+    public const FROM_FOLDER_ID = 'from_folder_id';
+    public const SINGLE_MESSAGE = 'single_message';
+    public const OUTBOX_MESSAGE = 'outbox_message';
     // Convert these action names
-    const ACTION_CONVERSIONS = [
+    public const ACTION_CONVERSIONS = [
         'Add star' => 'flag',
         'Remove star' => 'unflag',
         'Move to Inbox' => 'restore',
@@ -66,7 +66,7 @@ class Actions
         'Mark all as unread' => 'mark_all_unread'
     ];
     // Lookup of actions to action classes
-    const ACTION_CLASSES = [
+    public const ACTION_CLASSES = [
         'flag' => 'App\Actions\Flag',
         'spam' => 'App\Actions\Spam',
         'trash' => 'App\Actions\Trash',

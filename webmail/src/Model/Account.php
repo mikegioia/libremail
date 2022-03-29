@@ -2,12 +2,12 @@
 
 namespace App\Model;
 
-use PDO;
-use Exception;
-use App\Model;
 use App\Config;
-use App\Exceptions\ServerException;
 use App\Exceptions\DatabaseInsertException;
+use App\Exceptions\ServerException;
+use App\Model;
+use Exception;
+use PDO;
 
 class Account extends Model
 {
@@ -175,9 +175,7 @@ class Account extends Model
         } catch (Exception $e) {
             $this->db()->rollback();
 
-            throw new ServerException(
-                'Failed creating new account. '.$e->getMessage()
-            );
+            throw new ServerException('Failed creating new account. '.$e->getMessage());
         }
 
         $this->id = $newAccountId;

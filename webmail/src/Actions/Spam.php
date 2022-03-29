@@ -2,12 +2,12 @@
 
 namespace App\Actions;
 
-use App\Thread;
 use App\Actions;
+use App\Actions\Copy as CopyAction;
+use App\Exceptions\ServerException;
 use App\Folders;
 use App\Messages\MessageInterface;
-use App\Exceptions\ServerException;
-use App\Actions\Copy as CopyAction;
+use App\Thread;
 
 class Spam extends Delete
 {

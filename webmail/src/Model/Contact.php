@@ -2,8 +2,8 @@
 
 namespace App\Model;
 
-use PDO;
 use App\Model;
+use PDO;
 
 class Contact extends Model
 {

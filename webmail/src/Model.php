@@ -16,8 +16,8 @@ class Model
     private static $_password;
     private static $_timezone;
 
-    const ASC = 'asc';
-    const DESC = 'desc';
+    public const ASC = 'asc';
+    public const DESC = 'desc';
 
     /**
      * @param array|Model|null $data

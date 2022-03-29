@@ -5,8 +5,8 @@ namespace App\Actions;
 use App\Actions;
 use App\Folders;
 use App\Messages\MessageInterface;
-use App\Model\Task as TaskModel;
 use App\Model\Message as MessageModel;
+use App\Model\Task as TaskModel;
 use App\Traits\ConfigTrait;
 
 abstract class Base
@@ -41,7 +41,7 @@ abstract class Base
     abstract public function getType();
 
     /**
-     * @param MessageModel | OutboxModel $message SQL object to update
+     * @param MessageModel|OutboxModel $message SQL object to update
      * @param Folders $folders Meta info about mailboxes
      * @param array $options Any of the following:
      *     int `outbox_id`

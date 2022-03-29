@@ -2,11 +2,11 @@
 
 namespace App\Model;
 
-use PDO;
+use App\Exceptions\ValidationException;
+use App\Model;
 use DateTime;
 use Exception;
-use App\Model;
-use App\Exceptions\ValidationException;
+use PDO;
 
 class Task extends Model
 {
@@ -27,22 +27,22 @@ class Task extends Model
      */
     private static $batchId;
 
-    const STATUS_NEW = 0;
-    const STATUS_DONE = 1;
-    const STATUS_ERROR = 2;
-    const STATUS_REVERTED = 3;
-    const STATUS_IGNORED = 4;
+    public const STATUS_NEW = 0;
+    public const STATUS_DONE = 1;
+    public const STATUS_ERROR = 2;
+    public const STATUS_REVERTED = 3;
+    public const STATUS_IGNORED = 4;
 
-    const TYPE_COPY = 'copy';
-    const TYPE_FLAG = 'flag';
-    const TYPE_READ = 'read';
-    const TYPE_SEND = 'send';
-    const TYPE_CREATE = 'create';
-    const TYPE_DELETE = 'delete';
-    const TYPE_UNFLAG = 'unflag';
-    const TYPE_UNREAD = 'unread';
-    const TYPE_UNDELETE = 'undelete';
-    const TYPE_DELETE_OUTBOX = 'delete_outbox';
+    public const TYPE_COPY = 'copy';
+    public const TYPE_FLAG = 'flag';
+    public const TYPE_READ = 'read';
+    public const TYPE_SEND = 'send';
+    public const TYPE_CREATE = 'create';
+    public const TYPE_DELETE = 'delete';
+    public const TYPE_UNFLAG = 'unflag';
+    public const TYPE_UNREAD = 'unread';
+    public const TYPE_UNDELETE = 'undelete';
+    public const TYPE_DELETE_OUTBOX = 'delete_outbox';
 
     /**
      * Create a new task.

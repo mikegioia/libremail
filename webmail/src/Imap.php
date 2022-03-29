@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Exception;
 use App\Exceptions\ServerException;
+use Exception;
 use Zend\Mail\Storage\Imap as ZendImap;
 
 class Imap

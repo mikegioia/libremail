@@ -6,15 +6,15 @@ use App\Exceptions\ClientException;
 
 class Session
 {
-    const ERROR = 'error';
-    const SUCCESS = 'success';
+    public const ERROR = 'error';
+    public const SUCCESS = 'success';
 
-    const ALERT = 'alert';
-    const FORM_DATA = 'form_data';
-    const FORM_ERRORS = 'form_errors';
-    const NOTIFICATIONS = 'notifications';
+    public const ALERT = 'alert';
+    public const FORM_DATA = 'form_data';
+    public const FORM_ERRORS = 'form_errors';
+    public const NOTIFICATIONS = 'notifications';
 
-    const FLAG_HIDE_JS_ALERT = 'hide_js_alert';
+    public const FLAG_HIDE_JS_ALERT = 'hide_js_alert';
 
     /**
      * Retrieve and optionally remove a session value.
@@ -138,15 +138,11 @@ class Session
         $token = $_GET['token'] ?? null;
 
         if (! $token || ! isset($_SESSION['token'])) {
-            throw new ClientException(
-                'Missing token! Did you click the right link?'
-            );
+            throw new ClientException('Missing token! Did you click the right link?');
         }
 
         if ($token !== $_SESSION['token']) {
-            throw new ClientException(
-                'Invalid token! Did your session expire?'
-            );
+            throw new ClientException('Invalid token! Did your session expire?');
         }
     }
 }

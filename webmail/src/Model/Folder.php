@@ -2,8 +2,8 @@
 
 namespace App\Model;
 
-use PDO;
 use App\Model;
+use PDO;
 
 class Folder extends Model
 {

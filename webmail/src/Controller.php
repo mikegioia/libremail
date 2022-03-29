@@ -2,16 +2,15 @@
 
 namespace App;
 
-use App\Model\Meta;
-use App\Model\Outbox;
+use App\Actions\MarkRead as MarkReadAction;
+use App\Exceptions\ClientException;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\ServerException;
 use App\Model\Account;
 use App\Model\Contact;
 use App\Model\Message;
-use App\Model\Settings;
-use App\Exceptions\ClientException;
-use App\Exceptions\ServerException;
-use App\Exceptions\NotFoundException;
-use App\Actions\MarkRead as MarkReadAction;
+use App\Model\Meta;
+use App\Model\Outbox;
 
 class Controller
 {
