@@ -6,6 +6,7 @@ use App\Actions;
 use App\Folders;
 use App\Messages\MessageInterface;
 use App\Model\Message as MessageModel;
+use App\Model\Outbox as OutboxModel;
 use App\Model\Task as TaskModel;
 use App\Traits\ConfigTrait;
 

@@ -26,7 +26,7 @@ class Messages
      * Load the threads for a folder. Returns two arrays, a starred
      * (or flagged) collection, and non-starred.
      *
-     * @return [Message array, Message array, object, object]
+     * @return array [array<Message>, array<Message>, object, object]
      */
     public function getThreadsByFolder(
         int $folderId,
@@ -65,7 +65,7 @@ class Messages
      * Load the threads for a folder. Returns two arrays, a starred
      * (or flagged) collection, and non-starred.
      *
-     * @return [Message array, Message array, object, object]
+     * @return array [array<Message>, array<Message>, object, object]
      */
     public function getThreadsBySearch(
         string $query,
@@ -106,6 +106,9 @@ class Messages
         );
     }
 
+    /**
+     * @return array [array<Message>, array<Message>, object, object]
+     */
     private function loadThreads(
         array $messages,
         stdClass $messageCounts,
@@ -145,7 +148,7 @@ class Messages
             $limit,
             $splitFlagged
         );
-        $totals = (new Message)->getSizeCounts($this->accountId);
+        $totals = (new Message())->getSizeCounts($this->accountId);
 
         return [$flagged, $unflagged, $paging, $totals];
     }

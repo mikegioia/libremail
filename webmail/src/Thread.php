@@ -387,7 +387,7 @@ class Thread
      * Takes a string like "John D. <john@abc.org>" and returns
      * the name and email broken out.
      *
-     * @return [string $name, string $email]
+     * @return array<string, string> [string $name, string $email]
      */
     private function getNameParts(string $nameString)
     {

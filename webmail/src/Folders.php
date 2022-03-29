@@ -263,6 +263,8 @@ class Folders
                 return $folder;
             }
         }
+
+        return null;
     }
 
     /**

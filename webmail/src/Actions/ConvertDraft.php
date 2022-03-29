@@ -8,6 +8,7 @@ use App\Model\Message as MessageModel;
 use App\Model\Outbox as OutboxModel;
 use App\Model\Task as TaskModel;
 use App\Url;
+use Exception;
 
 class ConvertDraft extends Delete
 {

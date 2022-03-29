@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Actions\Queue as QueueAction;
+use App\Exceptions\NotFoundException;
 use App\Exceptions\ValidationException;
 use App\Model\Account;
 use App\Model\Message;

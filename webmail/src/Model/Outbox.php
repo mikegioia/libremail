@@ -17,28 +17,28 @@ use PDO;
 
 class Outbox extends Model implements MessageInterface
 {
-    public $id;
-    public $to;
-    public $cc;
+    public $account_id;
+    public $attempts;
     public $bcc;
-    public $from;
-    public $sent;
+    public $cc;
+    public $created_at;
+    public $deleted;
     public $draft;
     public $failed;
+    public $from;
+    public $id;
     public $locked;
-    public $deleted;
-    public $subject;
-    public $reply_to;
-    public $attempts;
-    public $thread_id;
     public $parent_id;
+    public $reply_to;
+    public $send_after;
+    public $sent;
+    public $subject;
     public $text_html;
     public $text_plain;
-    public $account_id;
-    public $send_after;
-    public $created_at;
-    public $updated_at;
+    public $thread_id;
+    public $to;
     public $update_history;
+    public $updated_at;
 
     private $parent;
     private $account;

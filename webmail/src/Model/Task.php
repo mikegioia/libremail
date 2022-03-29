@@ -23,7 +23,7 @@ class Task extends Model
     public $created_at;
 
     /**
-     * @var Shared batch ID across batch inserted tasks
+     * @var int Shared batch ID across batch inserted tasks
      */
     private static $batchId;
 

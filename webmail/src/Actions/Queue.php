@@ -21,8 +21,8 @@ class Queue extends Delete
      *
      * @see Base for params
      *
-     * @param $options Options used:
-     *   Outbox `outbox_message` Required
+     * @param array $options Options used:
+     *   OutboxModel `outbox_message` Required
      *   string `send_after` Optional local date string
      *
      * @throws ServerException

@@ -16,7 +16,7 @@ class RestoreDraft extends Base
     /**
      * Copies a message to the Spam folder.
      *
-     * @param MessageInterface $message OutboxModel object
+     * @param OutboxModel $outbox OutboxModel object
      *
      * @see Base for params
      */

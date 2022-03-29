@@ -17,13 +17,20 @@ class Folder extends Model
     public $created_at;
     public $uid_validity;
 
+    // Computed fields added during thread computation
+    public $color = '';
+    public $full_name = '';
+    public $is_mailbox = false;
+    public $label = '';
+    public $unread_count = 0;
+
     /**
      * Returns a list of folders by an account ID. This is useful for
      * comparing the new folders against the already saved ones.
      *
      * @param bool $indexByName Return array indexed by folder name
      *
-     * @return FolderModel array
+     * @return array<Folder>
      */
     public function getByAccount(int $accountId, bool $indexByName = true)
     {
