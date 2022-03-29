@@ -1007,7 +1007,7 @@ class Message extends Model implements MessageInterface
      */
     private function setThreadCache(int $accountId, int $folderId, stdClass $counts)
     {
-        $this->threadsCache[$accountId.':'.$folderId] = $counts;
+        $this->threadCache[$accountId.':'.$folderId] = $counts;
     }
 
     /**

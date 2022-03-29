@@ -11,6 +11,7 @@ class Thread
 {
     private $thread;
     private $folders;
+    private $message;
     private $messages;
     private $threadId;
     private $folderId;
@@ -52,7 +53,7 @@ class Thread
 
     public static function constructFromMessage(Message $message, Folders $folders)
     {
-        return new static(
+        return new self(
             $folders,
             $message->thread_id,
             $message->folder_id,

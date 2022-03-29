@@ -63,7 +63,7 @@ class Model
     public function setData($data)
     {
         if (is_scalar($data)) {
-            if (isset($this->id)) {
+            if (property_exists($this, 'id')) {
                 $this->id = $data;
             }
         } else {

@@ -15,9 +15,11 @@ use App\Actions\MarkRead as MarkReadAction;
 use App\Actions\MarkUnread as MarkUnreadAction;
 use App\Exceptions\NotFoundException;
 use App\Model\Task as TaskModel;
+use Exception;
 
 class Actions
 {
+    private $folders;
     private $params;
 
     // Actions
@@ -73,7 +75,6 @@ class Actions
         'unflag' => 'App\Actions\Unflag',
         'unspam' => 'App\Actions\Unspam',
         'delete' => 'App\Actions\Delete',
-        'unspam' => 'App\Actions\Unspam',
         'restore' => 'App\Actions\Restore',
         'archive' => 'App\Actions\Archive',
         'untrash' => 'App\Actions\Untrash',

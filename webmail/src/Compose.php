@@ -68,7 +68,7 @@ class Compose
         }
     }
 
-    public function send(int $id, bool $edit)
+    public function send(int $id, bool $edit, bool $queue)
     {
         $outboxMessage = (new Outbox($this->account))->getById($id);
 
@@ -104,7 +104,7 @@ class Compose
             Model::getDb()->beginTransaction();
 
             try {
-                (new QueueAction)->run(
+                (new QueueAction())->run(
                     [$draftMessage->id],
                     $this->folders,
                     [Actions::OUTBOX_MESSAGE => $outboxMessage]

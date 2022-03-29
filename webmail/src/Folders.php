@@ -26,6 +26,7 @@ class Folders
     private $colorCount;
     private $nameLookup;
     private $listFolders;
+    private $folderCounts;
     // Storage of folder/depth
     private $index = [];
     // Flag if the folders are fully loaded
@@ -365,7 +366,7 @@ class Folders
     private function loadMetaTree()
     {
         $this->loadFolders();
-        $this->folderCounts = (new Message)->getUnreadCounts(
+        $this->folderCounts = (new Message())->getUnreadCounts(
             $this->accountId,
             $this->getSkipIds(),
             $this->getDraftsId()
@@ -414,15 +415,13 @@ class Folders
 
     /**
      * Recursive function to build the folder tree.
-     *
-     * @return array
      */
     private function treeify(
         array &$tree,
         array $parts,
         Folder $folder,
         int $depth
-    ) {
+    ): void {
         $part = array_shift($parts);
 
         if (! isset($tree[$part])) {
@@ -432,17 +431,17 @@ class Folders
             ];
         }
 
-        // No more parts left
-        if (! $parts) {
-            $this->fixName($folder, $part);
-            $tree[$part]['folder'] = $folder;
-        } else { // Recurse again
+        // Recurse again
+        if ($parts) {
             $this->treeify(
                 $tree[$part]['children'],
                 $parts,
                 $folder,
                 $depth + 1
             );
+        } else { // No more parts left
+            $this->fixName($folder, $part);
+            $tree[$part]['folder'] = $folder;
         }
     }
 
@@ -455,7 +454,7 @@ class Folders
         int &$index,
         int $offset,
         int $parentOffset
-    ) {
+    ): void {
         if (isset($branch['folder'])) {
             if ($branch['folder']->is_mailbox) {
                 return;
@@ -486,7 +485,7 @@ class Folders
     /**
      * Convert certain folder names for better readability.
      */
-    private function fixName(Folder &$folder, string $finalPart)
+    private function fixName(Folder &$folder, string $finalPart): void
     {
         $folder->full_name = $folder->name;
         $folder->name = $finalPart;
@@ -513,7 +512,7 @@ class Folders
      * Determines if the folder is a mailbox or a regular folder.
      * Adds a property to the folder 'is_mailbox'.
      */
-    private function setMailboxType(Folder &$folder)
+    private function setMailboxType(Folder &$folder): void
     {
         $name = $folder->name;
 
@@ -546,7 +545,7 @@ class Folders
         }
     }
 
-    private function addUnreadCount(Folder &$folder)
+    private function addUnreadCount(Folder &$folder): void
     {
         if (isset($this->folderCounts[$folder->id])) {
             $folder->unread_count = $this->folderCounts[$folder->id];
@@ -558,7 +557,7 @@ class Folders
     /**
      * Ignores certain folders that shouldn't display.
      */
-    private function setIgnore(Folder &$folder)
+    private function setIgnore(Folder &$folder): void
     {
         if (self::GMAIL === strtolower($folder->name)) {
             $folder->ignored = 1;
@@ -568,7 +567,7 @@ class Folders
     /**
      * Adds a default color for the folder.
      */
-    private function setColor(Folder &$folder)
+    private function setColor(Folder &$folder): void
     {
         if (! isset($this->index[$folder->id])) {
             $folder->color = (object) self::COLOR_GREY;
@@ -591,6 +590,8 @@ class Folders
     /**
      * Adds the boolean property "selected" based on the IDs
      * passed in. Sorts the entire by selected items first.
+     *
+     * @return array
      */
     private function applySelected(array $folderList, array $selectedIds)
     {

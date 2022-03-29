@@ -20,7 +20,7 @@ class Model
     public const DESC = 'desc';
 
     /**
-     * @param array|Model|null $data
+     * @param array|Model|int|string|null $data
      */
     public function __construct($data = null)
     {
@@ -29,7 +29,9 @@ class Model
         }
 
         if (is_scalar($data)) {
-            $this->id = $data;
+            if (property_exists($this, 'id')) {
+                $this->id = $data;
+            }
         } else {
             $this->setData($data);
         }
@@ -134,7 +136,8 @@ class Model
      */
     public function exists()
     {
-        return is_numeric($this->id)
+        return property_exists($this, 'id')
+            && is_numeric($this->id)
             && 0 !== (int) $this->id;
     }
 }

@@ -30,6 +30,7 @@ class Outbox extends Model implements MessageInterface
     public $subject;
     public $reply_to;
     public $attempts;
+    public $thread_id;
     public $parent_id;
     public $text_html;
     public $text_plain;

@@ -4,8 +4,7 @@ $finder = PhpCsFixer\Finder::create()
     ->exclude([
         'config',
         'tools',
-        'vendor',
-        'views'
+        'vendor'
     ])
     ->name('libremail')
     ->name('server')

@@ -23,38 +23,8 @@ mb_http_output('UTF-8');
 // of the script
 mb_internal_encoding('UTF-8');
 
-// Set up constants
-define('GET', 'GET');
-define('POST', 'POST');
-define('INBOX', 'inbox');
-define('SEARCH', 'search');
-define('OUTBOX', 'outbox');
-define('THREAD', 'thread');
-define('VIEWEXT', '.phtml');
-define('STARRED', 'starred');
-define('MAILBOX', 'mailbox');
-define('LIBREMAIL', 'LibreMail');
-define('BASEDIR', __DIR__.'/..');
-define('DIR', DIRECTORY_SEPARATOR);
-define('VIEWDIR', BASEDIR.'/views');
-define('DATE_DATETIME', 'j F Y H:i');
-define('DATE_DATABASE', 'Y-m-d H:i:s');
-define('DATE_CALENDAR_SHORT', 'j M');
-define('DATE_CALENDAR', 'j/m/Y');
-define('DATE_TIME_SHORT', 'H:i');
-// Error constants
-define('ERR_NO_TRASH_FOLDER', 1010);
-define('ERR_NO_STARRED_FOLDER', 1011);
-define('ERR_NO_SPAM_FOLDER', 1012);
-define('ERR_TASK_ROLLBACK', 1020);
-// Application preferences
-define('PREF_THEME', 'wm.theme');
-
-// Helper to load external config files
-function getConfig(string $file)
-{
-    return include BASEDIR.'/config/'.$file.'.php';
-}
+// Load up constants
+require __DIR__.'/../config/constants.php';
 
 // Load environment config
 $config = parse_ini_file(BASEDIR.'/.env');
@@ -88,11 +58,11 @@ Actions\Base::setConfig($config);
 // account in the database.
 $email = $_COOKIE['email'] ?? null;
 $account = $email
-    ? (new Account)->getByEmail($email)
-    : (new Account)->getFirstActive();
+    ? (new Account())->getByEmail($email)
+    : (new Account())->getFirstActive();
 $account = $account ?: new Account;
 
-$router = new Router;
+$router = new Router();
 $controller = new Controller($account);
 
 // If there's no account, the only allowed pages are the

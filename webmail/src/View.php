@@ -122,7 +122,7 @@ class View
      */
     public function date(string $dateString, string $format)
     {
-        echo self::getDate($date, $format);
+        echo self::getDate($dateString, $format);
     }
 
     /**

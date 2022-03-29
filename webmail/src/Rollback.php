@@ -6,21 +6,21 @@ use App\Exceptions\ServerException;
 use App\Model\Message as MessageModel;
 use App\Model\Outbox as OutboxModel;
 use App\Model\Task as TaskModel;
+use Exception;
 
 class Rollback
 {
     /**
      * Rolls all current logged tasks in the tasks table. Start
-     * from the end and revert each one.
+     * from the end and revert each one. This function sets an
+     * HTTP 301 redirect header and exits.
      *
      * @throws ServerException
-     *
-     * @return HTTP 303 redirect
      */
     public function run(int $batchId)
     {
         $count = 0;
-        $taskModel = new TaskModel;
+        $taskModel = new TaskModel();
         $tasks = $taskModel->getByBatchId($batchId);
 
         if (! $tasks) {
@@ -88,13 +88,13 @@ class Rollback
 
             case TaskModel::TYPE_DELETE_OUTBOX:
                 // Remove the deleted flag on the outbox message
-                return (new OutboxModel)
+                return (new OutboxModel())
                     ->loadById($task->outbox_id, true)
                     ->restore();
 
             case TaskModel::TYPE_SEND:
                 // Restore the outbox message
-                return (new OutboxModel)
+                return (new OutboxModel())
                     ->loadById($task->outbox_id)
                     ->restore(true);
         }

@@ -65,7 +65,7 @@ class Task extends Model
             'message_id' => $messageId,
             'account_id' => $accountId,
             'status' => self::STATUS_NEW,
-            'batch_id' => static::getBatchId(),
+            'batch_id' => self::getBatchId(),
             'created_at' => (new DateTime)->format(DATE_DATABASE)
         ];
 
@@ -81,7 +81,7 @@ class Task extends Model
 
         $data['id'] = $newTaskId;
 
-        return new static($data);
+        return new self($data);
     }
 
     public function getByBatchId(int $batchId)

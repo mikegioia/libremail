@@ -18,7 +18,7 @@ trait Model
      */
     public function getId()
     {
-        return isset($this->id)
+        return property_exists($this, 'id')
             ? (int) $this->id
             : null;
     }
@@ -28,7 +28,7 @@ trait Model
      */
     public function getCreatedAt()
     {
-        return isset($this->created_at)
+        return property_exists($this, 'created_at')
             ? (string) $this->created_at
             : null;
     }
