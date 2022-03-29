@@ -105,8 +105,10 @@ class Send extends Base
 
             return false;
         } catch (Exception $e) {
-            print_r($e->getMessage());
-            exit('General exception hit!');
+            // UNCOMMENT WHEN TESTING
+            // @TODO
+            // print_r($e->getMessage());
+            // exit('General exception hit!');
 
             $this->task->log()->addError('Message failed to send');
             $this->task->log()->addError($e->getMessage());

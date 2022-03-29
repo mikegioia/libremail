@@ -111,11 +111,27 @@ class Threads
     }
 
     /**
+     * @return int
+     */
+    public function getTotalIds()
+    {
+        return $this->totalIds ?: 0;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDirtyMessageIds()
+    {
+        return $this->dirtyMessageIds ?: [];
+    }
+
+    /**
      * Finds the last message ID to store and update.
      */
     private function storeMessageIdBounds()
     {
-        $model = new MessageModel;
+        $model = new MessageModel();
 
         $this->maxId = $model->getMaxMessageId($this->account->id);
 
@@ -126,7 +142,7 @@ class Threads
 
     private function storeTotalMessageIds()
     {
-        $this->totalIds = (new MessageModel)->countByAccount($this->account->id);
+        $this->totalIds = (new MessageModel())->countByAccount($this->account->id);
     }
 
     private function updateEmitter()

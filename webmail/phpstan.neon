@@ -1,11 +1,8 @@
 parameters:
-    level: 2
+    level: 5
     paths:
         - src
-        - views
-    fileExtensions:
-        - php
-        - phtml
+        - www/index.php
     bootstrapFiles:
         - config/constants.php
     inferPrivatePropertyTypeFromConstructor: true

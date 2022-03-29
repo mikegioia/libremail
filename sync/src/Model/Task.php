@@ -174,7 +174,7 @@ class Task extends Model
      * @throws DatabaseUpdateException
      */
     private function updateStatus(
-        string $status,
+        int $status,
         string $reason = null,
         bool $force = false
     ) {
@@ -183,10 +183,12 @@ class Task extends Model
         }
 
         $this->status = $status;
+
         $updates = ['status' => $status];
 
         if ($reason || $force) {
             $this->reason = $reason;
+
             $updates['reason'] = $reason;
         }
 

@@ -12,6 +12,7 @@ use App\Command;
 use App\Console\DaemonConsole;
 use App\Daemon;
 use App\Diagnostics;
+use App\Events\MessageEvent;
 use App\Exceptions\Terminate as TerminateException;
 use App\Log;
 use App\Message;
@@ -78,7 +79,7 @@ $di['emitter'] = new Emitter();
 $di['loop'] = Factory::create();
 
 // Set up the command handler
-$di['command'] = new Command($di['emitter'], $di['log']);
+$di['command'] = new Command($di['emitter']);
 
 // Statically set Message logging service
 Message::setLog($di['log']->getLogger());
@@ -161,7 +162,7 @@ $di['emitter']->addListener(
 // Triggered to update the stats to all websocket connections
 $di['emitter']->addListener(
     EV_BROADCAST_MSG,
-    function (Event $event) use ($di) {
+    function (MessageEvent $event) use ($di) {
         $di['daemon']->broadcast($event->getMessage());
     });
 

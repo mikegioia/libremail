@@ -55,7 +55,7 @@ $di['diagnostics'] = function ($container) {
 };
 
 // Console/CLI service
-$di['console'] = new ServerConsole($config);
+$di['console'] = new ServerConsole();
 $di['cli'] = function ($container) {
     return $container['console']->getCLI();
 };

@@ -69,6 +69,9 @@ class Migration extends Model
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public function setMaxAllowedPacket(int $mb = 16)
     {
         $value = $this->getMaxAllowedPacket();

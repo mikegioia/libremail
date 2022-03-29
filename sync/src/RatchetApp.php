@@ -33,12 +33,14 @@ class RatchetApp extends BaseRatchetApp
      */
     public function route($path, ComponentInterface $controller, array $allowedOrigins = [], $httpHost = null)
     {
-        if ($controller instanceof HttpServerInterface || $controller instanceof WsServer) {
+        if ($controller instanceof HttpServerInterface) {
             $decorated = $controller;
         } elseif ($controller instanceof WampServerInterface) {
             $decorated = new WsServer(new WampServer($controller));
+            $decorated->enableKeepAlive($this->_server->loop);
         } elseif ($controller instanceof MessageComponentInterface) {
             $decorated = new WsServer($controller);
+            $decorated->enableKeepAlive($this->_server->loop);
         } else {
             $decorated = $controller;
         }
@@ -53,7 +55,9 @@ class RatchetApp extends BaseRatchetApp
             $allowedOrigins[] = $httpHost;
         }
 
-        if ('*' !== $allowedOrigins[0]) {
+        if ('*' !== $allowedOrigins[0]
+            && $decorated instanceof MessageComponentInterface
+        ) {
             $decorated = new OriginCheck($decorated, $allowedOrigins);
         }
 

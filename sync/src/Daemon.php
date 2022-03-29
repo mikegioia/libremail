@@ -44,8 +44,14 @@ class Daemon
     private $webServerProcess;
     // References to true PIDs
     private $processPids = [];
-    private $processRestartInterval = [];
-    private $processLastRestartTime = [];
+    private $processRestartInterval = [
+        PROC_SYNC => null,
+        PROC_SERVER => null
+    ];
+    private $processLastRestartTime = [
+        PROC_SYNC => 0,
+        PROC_SERVER => 0
+    ];
 
     public const PROC_SYNC = 'sync';
     public const PROC_SERVER = 'server';

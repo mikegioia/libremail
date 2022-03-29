@@ -10,6 +10,7 @@ use League\CLImate\CLImate;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
+use Throwable;
 
 class Log
 {
@@ -51,10 +52,7 @@ class Log
         return $this->logger;
     }
 
-    /**
-     * @param Exception|Error $exception
-     */
-    public function exceptionHandler($exception)
+    public function exceptionHandler(Throwable $exception): void
     {
         if ($this->stackTrace) {
             $this->getLogger()->critical(

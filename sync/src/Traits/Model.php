@@ -8,6 +8,9 @@ use App\Util;
 
 trait Model
 {
+    /**
+     * @return string
+     */
     public function getClass()
     {
         return get_class();
@@ -60,7 +63,7 @@ trait Model
      *
      * @param string $modelClass
      *
-     * @return array
+     * @return object|array
      */
     public function populate(array $objects, string $modelClass = null)
     {

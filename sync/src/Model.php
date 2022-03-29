@@ -29,7 +29,7 @@ class Model
     protected static $factoryMode = false;
 
     /**
-     * @var Database Local reference if in factory mode
+     * @var Database|null Local reference if in factory mode
      */
     protected static $localDb;
 

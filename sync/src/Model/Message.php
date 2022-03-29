@@ -684,7 +684,7 @@ class Message extends Model
      */
     public function markDeleted(array $uniqueIds, int $accountId, int $folderId)
     {
-        if (! $uniqueIds || ! count($uniqueIds)) {
+        if (! count($uniqueIds)) {
             return;
         }
 
@@ -962,7 +962,7 @@ class Message extends Model
     private function formatAddress(array $addresses)
     {
         if (! is_array($addresses)) {
-            return null;
+            return '';
         }
 
         $formatted = [];
@@ -987,7 +987,7 @@ class Message extends Model
     private function formatAttachments(array $attachments)
     {
         if (! is_array($attachments)) {
-            return null;
+            return '';
         }
 
         $formatted = [];
