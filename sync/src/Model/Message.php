@@ -365,7 +365,7 @@ class Message extends Model
      * This method is called by getSyncedIdsByFolder to return a
      * page of results.
      *
-     * @return array of ints
+     * @return array<int>
      */
     private function getPagedSyncedIdsByFolder(
         int $accountId,
@@ -408,7 +408,7 @@ class Message extends Model
      * @throws DatabaseUpdateException
      * @throws DatabaseInsertException
      */
-    public function save(array $data = [], array $skipFields = [])
+    public function save(array $data = [], array $skipFields = []): void
     {
         $val = new Validator();
 
@@ -501,7 +501,7 @@ class Message extends Model
                     $data['text_plain'] = Encoding::fixUTF8($data['text_plain']);
                     $data['raw_headers'] = Encoding::fixUTF8($data['raw_headers']);
                     $data['raw_content'] = Encoding::fixUTF8($data['raw_content']);
-                    $updated = $updateMessage($this->db(), $data);
+                    $updated = $updateMessage($this->db(), $this->id, $data);
                 } else {
                     throw $e;
                 }
@@ -541,10 +541,8 @@ class Message extends Model
     /**
      * Saves the meta information and content for a message as data
      * on the class object.
-     *
-     * @param array $meta
      */
-    public function setMessageData(ImapMessage $message, array $options = [])
+    public function setMessageData(ImapMessage $message, array $options = []): void
     {
         if (true === Util::get($options, self::OPT_TRUNCATE_FIELDS)) {
             $message->subject = substr($message->subject, 0, 270);
@@ -594,7 +592,7 @@ class Message extends Model
      * Creates or modifies a draft message based on an outbox message.
      * Only creates a new message if the outbox is a draft.
      *
-     * @param int $draftsId Drafts mailbox (folder) ID
+     * @param int $sentId Drafts mailbox (folder) ID
      */
     public function createOrUpdateSent(Outbox $outbox, int $sentId)
     {
@@ -750,7 +748,7 @@ class Message extends Model
 
         $this->requireInt($folderId, 'Folder ID');
         $this->requireInt($accountId, 'Account ID');
-        $this->requireValidFlag($state, 'State');
+        $this->requireValidFlag($state ? 1 : 0, 'State');
         $this->requireValue($flag, [
             self::FLAG_SEEN, self::FLAG_FLAGGED
         ]);
@@ -984,8 +982,6 @@ class Message extends Model
      * Attachments need to be serialized. They come in as an array
      * of objects with name, path, and id fields.
      *
-     * @param Attachment array $attachments
-     *
      * @return string
      */
     private function formatAttachments(array $attachments)
@@ -1008,7 +1004,7 @@ class Message extends Model
      *
      * @throws DatabaseUpdateException
      */
-    private function errorHandle($updated)
+    private function errorHandle($updated): void
     {
         if (! Util::isNumber($updated)) {
             throw new DatabaseUpdateException(MESSAGE, $this->getError());

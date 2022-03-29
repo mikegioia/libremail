@@ -317,8 +317,6 @@ class Diagnostics
 
     /**
      * Mark test as started and possibly write to console.
-     *
-     * @param const $test
      */
     private function startTest(string $test)
     {
@@ -334,7 +332,6 @@ class Diagnostics
     /**
      * Mark test as finished and write to log and/or console.
      *
-     * @param const $test
      * @param Exception $e Optional exception for errors
      *
      * @throws FatalException
@@ -484,7 +481,7 @@ class Diagnostics
         Container &$di,
         PDOException $e,
         bool $forwardException = false,
-        bool $sleepSeconds = null
+        int $sleepSeconds = null
     ) {
         $messages = [
             'Lost connection',

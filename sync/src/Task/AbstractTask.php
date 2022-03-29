@@ -2,6 +2,7 @@
 
 namespace App\Task;
 
+use App\Server\StatsServer;
 use ReflectionClass;
 
 abstract class AbstractTask
@@ -36,5 +37,5 @@ abstract class AbstractTask
     /**
      * Each task implements this function to perform it's action.
      */
-    abstract public function run();
+    abstract public function run(StatsServer $server = null);
 }

@@ -9,6 +9,7 @@ use App\Sync\Actions;
 use DateTime;
 use Exception;
 use Laminas\Mail\Exception\InvalidArgumentException;
+use Laminas\Mail\Header\ContentType;
 use Laminas\Mail\Message as MailMessage;
 use Laminas\Mail\Transport\Exception\RuntimeException as TransportRuntimeException;
 use Laminas\Mail\Transport\Smtp as SmtpTransport;
@@ -126,7 +127,7 @@ class Send extends Base
     public function sendSmtp()
     {
         // Setup SMTP transport using PLAIN authentication
-        $transport = (new SmtpTransport)->setOptions(
+        $transport = (new SmtpTransport())->setOptions(
             new SmtpOptions([
                 'name' => gethostname() ?: self::LOCALHOST,
                 'host' => $this->account->smtp_host,
@@ -139,7 +140,7 @@ class Send extends Base
                 ]
             ]));
         // Set the transport to disconnect on destruct
-        $transport->setAutoDisconnect();
+        $transport->setAutoDisconnect(true);
 
         $message = new MailMessage;
 
@@ -174,10 +175,10 @@ class Send extends Base
      * Adds the References and In-Reply-To headers for responding to
      * another message within a thread.
      */
-    private function addReplyHeaders(MessageModel $parent)
+    private function addReplyHeaders(MailMessage $message)
     {
-        $referencesHeader = $parent->getHeaders()->get('References');
-        $inReplyToHeader = $parent->getHeaders()->get('In-Reply-To');
+        $referencesHeader = $message->getHeaders()->get('References');
+        $inReplyToHeader = $message->getHeaders()->get('In-Reply-To');
 
         // @todo
     }
@@ -201,7 +202,7 @@ class Send extends Base
         $html->encoding = Mime::ENCODING_QUOTEDPRINTABLE;
 
         // Build and set the body parts
-        $body = new MimeMessage;
+        $body = new MimeMessage();
         $body->setParts([$text, $html]);
 
         // Add this to the message
@@ -209,6 +210,9 @@ class Send extends Base
 
         // Update the content type header accordingly
         $contentTypeHeader = $message->getHeaders()->get('Content-Type');
-        $contentTypeHeader->setType(self::MULTIPART_ALTERNATIVE);
+
+        if ($contentTypeHeader instanceof ContentType) {
+            $contentTypeHeader->setType(self::MULTIPART_ALTERNATIVE);
+        }
     }
 }

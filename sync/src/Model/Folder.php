@@ -263,7 +263,7 @@ class Folder extends Model
      * @param bool $failOnNotFound If set, throw an Exception when
      *   the folder isn't found
      *
-     * @return bool|FolderModel
+     * @return bool|Folder
      */
     public function getByName(
         int $accountId,
@@ -292,7 +292,7 @@ class Folder extends Model
      *
      * @param bool $indexByName Return array indexed by folder name
      *
-     * @return FolderModel array
+     * @return array<Folder>
      */
     public function getByAccount(int $accountId, bool $indexByName = true)
     {

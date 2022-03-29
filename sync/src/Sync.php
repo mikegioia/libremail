@@ -9,7 +9,6 @@ namespace App;
 use App\Exceptions\Fatal as FatalException;
 use App\Exceptions\FolderSync as FolderSyncException;
 use App\Exceptions\MessagesSync as MessagesSyncException;
-use App\Exceptions\MissingIMAPConfig as MissingIMAPConfigException;
 use App\Exceptions\Restart as RestartException;
 use App\Exceptions\Stop as StopException;
 use App\Exceptions\Terminate as TerminateException;
@@ -83,7 +82,7 @@ class Sync
      * ad hoc method is when this class is used separately within
      * other classes like Console.
      *
-     * @param array $di Service container
+     * @param Container $di Service container
      */
     public function __construct(Container $di = null)
     {
@@ -398,10 +397,7 @@ class Sync
     /**
      * Connects to an IMAP mailbox using the supplied credentials.
      *
-     * @param AccountModel Account to connect to
-     * @param bool $setRunning Optional
-     *
-     * @throws MissingIMAPConfigException
+     * @param AccountModel $account Account to connect to
      */
     public function connect(AccountModel $account, bool $setRunning = true)
     {
@@ -593,10 +589,10 @@ class Sync
      * to try each folder some amount of times before moving on
      * to the next folder.
      *
-     * @param array FolderModel $folders
      * @param array $options Valid options include:
-     *   skip_download (false) If true, only stats about the
-     *     folder will be logged. The messages won't be downloaded.
+     *   * `skip_download` (false)
+     *       If true, only stats about the folder will be logged.
+     *       The messages won't be downloaded.
      */
     private function syncMessages(AccountModel $account, array $folders, array $options = [])
     {

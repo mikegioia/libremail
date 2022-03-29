@@ -3,6 +3,7 @@
 namespace App\Server;
 
 use App\Log;
+use App\Util;
 use Exception;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
@@ -28,7 +29,7 @@ class WebServer implements HttpServerInterface
     public function onOpen(ConnectionInterface $conn, RequestInterface $request = null)
     {
         $this->log->debug(
-            'New web connection opened from #'.$conn->resourceId
+            'New web connection opened from #'.Util::get($conn, 'resourceId', '?')
         );
 
         $uri = $request->getUri();
@@ -50,7 +51,7 @@ class WebServer implements HttpServerInterface
     public function onClose(ConnectionInterface $conn)
     {
         $this->log->debug(
-            'Closing web connection to #'.$conn->resourceId
+            'Closing web connection to #'.Util::get($conn, 'resourceId', '?')
         );
     }
 

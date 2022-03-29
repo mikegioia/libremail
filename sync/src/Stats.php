@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Console\SyncConsole;
 use App\Exceptions\Restart as RestartException;
 use App\Message\StatsMessage;
 use App\Model\Account as AccountModel;
@@ -27,12 +28,12 @@ class Stats
     private $stopTime;
     private $taskModel;
 
-    public function __construct(Console $console)
+    public function __construct(SyncConsole $console)
     {
         $this->pid = getmypid();
         $this->cli = $console->getCli();
         $this->daemon = $console->daemon;
-        $this->taskModel = new TaskModel;
+        $this->taskModel = new TaskModel();
     }
 
     public function setAsleep(bool $asleep = true)
@@ -116,7 +117,7 @@ class Stats
      * Returns all of the statistics and sync status info on
      * all of the folders for all of the accounts.
      *
-     * @param array $useCache If true, use it instead of fetching.
+     * @param bool $useCache If true, use it instead of fetching.
      *   This is useful when sending the message to the client
      *   like 'update the active folder' but without needing to
      *   query for all folder statistics.

@@ -39,7 +39,7 @@ class Folders
     /**
      * Syncs a set of IMAP folders with what we have in SQL.
      *
-     * @param array FolderModel $savedFolders
+     * @param array<FolderModel> $savedFolders
      */
     public function run(iterable $folderList, array $savedFolders, AccountModel $account)
     {
@@ -54,7 +54,7 @@ class Folders
     /**
      * Adds new folders from IMAP to the database.
      *
-     * @param array FolderModel $savedFolders
+     * @param array<FolderModel> $savedFolders
      */
     private function addNewFolders(
         iterable $folderList,
@@ -108,7 +108,7 @@ class Folders
     /**
      * Removes purged folders no longer in the mailbox from the database.
      *
-     * @param array FolderModel $savedFolders
+     * @param array<FolderModel> $savedFolders
      */
     private function removeOldFolders(
         iterable $folderList,

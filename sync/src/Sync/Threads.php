@@ -140,10 +140,8 @@ class Threads
      * Load all messages, or any new messages, from the database into
      * the internal storage array. This will instantiate a new message
      * object and store the references for that message.
-     *
-     * @param AccountModel $account
      */
-    private function storeMessages()
+    private function storeMessages(): void
     {
         $count = 0;
         $minId = $this->currentId;

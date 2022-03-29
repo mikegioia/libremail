@@ -38,9 +38,6 @@ class Util
     /**
      * Safe integer equality test.
      *
-     * @param mixed $int1
-     * @param mixed $int2
-     *
      * @return bool
      */
     public static function intEq(int $int1, int $int2)
@@ -50,9 +47,6 @@ class Util
 
     /**
      * Safe string equality test.
-     *
-     * @param mixed $str1
-     * @param mixed $str2
      *
      * @return bool
      */
@@ -147,9 +141,11 @@ class Util
     /**
      * Look for a string in an array of possibilities.
      *
+     * @param mixed $subject
+     *
      * @return bool
      */
-    public static function contains(string $subject, array $list)
+    public static function contains($subject, array $list)
     {
         return in_array($subject, $list, true);
     }

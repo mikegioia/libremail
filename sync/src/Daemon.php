@@ -90,7 +90,7 @@ class Daemon
             $this->processPids[PROC_SYNC] = null;
         }
 
-        $syncProcess = new Process(__DIR__.EXEC_SYNC);
+        $syncProcess = new Process(BASEPATH.EXEC_SYNC);
 
         // When the sync process exits, we want to alert the
         // daemon. This is to restart the sync upon crash or
@@ -237,9 +237,8 @@ class Daemon
         // Resume the stdin stream, send the message and then pause
         // it again.
         $this->webServerProcess->stdin->write(
-            Message::packJson(
-                $message->toArray()
-            ));
+            Message::packJson($message->toArray())
+        );
     }
 
     /**
@@ -249,13 +248,14 @@ class Daemon
     {
         $this->broadcast(
             new HealthMessage(
-                $this->diagnostics,
+                $this->diagnostics ?: [],
                 [
                     PROC_SYNC => isset($this->processPids[PROC_SYNC]),
                     PROC_SERVER => isset($this->processPids[PROC_SERVER])
                 ],
                 $this->noAccounts
-            ));
+            )
+        );
     }
 
     public function halt()
