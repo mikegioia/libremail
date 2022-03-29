@@ -2,10 +2,10 @@
 
 namespace App;
 
-use App\Model\Task as TaskModel;
 use App\Exceptions\ServerException;
-use App\Model\Outbox as OutboxModel;
 use App\Model\Message as MessageModel;
+use App\Model\Outbox as OutboxModel;
+use App\Model\Task as TaskModel;
 
 class Rollback
 {
@@ -39,10 +39,7 @@ class Rollback
         } catch (Exception $e) {
             Model::getDb()->rollBack();
 
-            throw new ServerException(
-                'There was a problem undoing those tasks.',
-                ERR_TASK_ROLLBACK
-            );
+            throw new ServerException('There was a problem undoing those tasks.', ERR_TASK_ROLLBACK);
         }
 
         Model::getDb()->commit();

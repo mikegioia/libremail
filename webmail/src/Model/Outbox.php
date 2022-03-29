@@ -2,18 +2,18 @@
 
 namespace App\Model;
 
-use PDO;
-use Parsedown;
-use App\View;
-use App\Model;
-use App\Session;
-use App\Messages\MessageInterface;
-use App\Exceptions\NotFoundException;
-use App\Exceptions\ValidationException;
 use App\Exceptions\DatabaseInsertException;
 use App\Exceptions\DatabaseUpdateException;
-use Zend\Mail\Exception\InvalidArgumentException;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\ValidationException;
+use App\Messages\MessageInterface;
+use App\Model;
+use App\Session;
+use App\View;
+use Parsedown;
+use PDO;
 use Zend\Mail\Address;
+use Zend\Mail\Exception\InvalidArgumentException;
 
 class Outbox extends Model implements MessageInterface
 {
@@ -45,10 +45,10 @@ class Outbox extends Model implements MessageInterface
     // Lazy-loaded and cached
     private $unreadCount;
 
-    const CREATED = 'created';
-    const UPDATED = 'updated';
-    const DELETED = 'deleted';
-    const RESTORED = 'restored';
+    public const CREATED = 'created';
+    public const UPDATED = 'updated';
+    public const DELETED = 'deleted';
+    public const RESTORED = 'restored';
 
     /**
      * Designed to take in POST data and save defaults.
@@ -191,9 +191,7 @@ class Outbox extends Model implements MessageInterface
                 ->execute();
 
             if (! is_numeric($updated)) {
-                throw new DatabaseUpdateException(
-                    "Failed updating outbox message {$this->id}"
-                );
+                throw new DatabaseUpdateException("Failed updating outbox message {$this->id}");
             }
         } elseif (! $this->isEmpty()) {
             $newOutboxId = $this->db()
@@ -203,9 +201,7 @@ class Outbox extends Model implements MessageInterface
                 ->execute();
 
             if (! $newOutboxId) {
-                throw new DatabaseInsertException(
-                    'Failed adding message to outbox'
-                );
+                throw new DatabaseInsertException('Failed adding message to outbox');
             }
 
             $this->id = $newOutboxId;
@@ -394,9 +390,7 @@ class Outbox extends Model implements MessageInterface
         }
 
         if (! $this->account_id) {
-            throw new ValidationException(
-                'Account ID required when querying outbox unread'
-            );
+            throw new ValidationException('Account ID required when querying outbox unread');
         }
 
         $result = $this->db()
@@ -417,9 +411,7 @@ class Outbox extends Model implements MessageInterface
     public function getActive()
     {
         if (! $this->account_id) {
-            throw new ValidationException(
-                'Account ID required when querying outbox unread'
-            );
+            throw new ValidationException('Account ID required when querying outbox unread');
         }
 
         return $this->db()
@@ -537,7 +529,7 @@ class Outbox extends Model implements MessageInterface
     }
 
     /**
-     * @param array | string $addresses this should always come in
+     * @param array|string $addresses this should always come in
      *   as an array from the client, but since it's POST data we
      *   we can't type hint it
      */

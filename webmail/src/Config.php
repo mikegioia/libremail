@@ -4,19 +4,19 @@ namespace App;
 
 class Config
 {
-    const IMAP_SETTINGS = [
+    public const IMAP_SETTINGS = [
         'gmail' => ['imap.gmail.com', 993],
         'yahoo' => ['imap.mail.yahoo.com', 993]
     ];
 
-    const SMTP_SETTINGS = [
+    public const SMTP_SETTINGS = [
         'gmail' => ['smtp.gmail.com', 587],
         'yahoo' => ['smtp.mail.yahoo.com', 587]
     ];
 
-    const SERVICE_GMAIL = 'gmail';
-    const SERVICE_YAHOO = 'yahoo';
-    const SERVICE_OTHER = 'other';
+    public const SERVICE_GMAIL = 'gmail';
+    public const SERVICE_YAHOO = 'yahoo';
+    public const SERVICE_OTHER = 'other';
 
     /**
      * Loads SMTP settings based on an imap host.
@@ -93,9 +93,9 @@ class Config
             // 4 hex characters
             bin2hex(openssl_random_pseudo_bytes(2)),
             // "4" for the UUID version + 3 hex characters
-            mt_rand(0, 0x0fff) | 0x4000,
+            mt_rand(0, 0x0FFF) | 0x4000,
             // (8, 9, a, or b) for the UUID variant + 3 hex characters
-            mt_rand(0, 0x3fff) | 0x8000,
+            mt_rand(0, 0x3FFF) | 0x8000,
             // 12 hex characters
             bin2hex(openssl_random_pseudo_bytes(6))
         );

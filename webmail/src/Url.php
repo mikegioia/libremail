@@ -108,7 +108,7 @@ class Url
     {
         header('Location: '.self::get($path, $params), $code);
 
-        die();
+        exit();
     }
 
     public static function redirectRaw(string $url, array $params = [], int $code = 303)
@@ -117,7 +117,7 @@ class Url
 
         header('Location: '.$url, $code);
 
-        die();
+        exit();
     }
 
     public static function redirectBack($default = '/', int $code = 303)

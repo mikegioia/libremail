@@ -2,14 +2,14 @@
 
 namespace App\Actions;
 
-use DateTime;
-use App\Folders;
-use DateTimeZone;
-use DateInterval;
-use App\Model\Task as TaskModel;
-use App\Messages\MessageInterface;
 use App\Exceptions\ServerException;
+use App\Folders;
+use App\Messages\MessageInterface;
 use App\Model\Outbox as OutboxModel;
+use App\Model\Task as TaskModel;
+use DateInterval;
+use DateTime;
+use DateTimeZone;
 
 class Queue extends Delete
 {
@@ -32,9 +32,7 @@ class Queue extends Delete
         $outboxMessage = $options['outbox_message'] ?? null;
 
         if (! $outboxMessage) {
-            throw new ServerException(
-                'Outbox message missing in queue mail task'
-            );
+            throw new ServerException('Outbox message missing in queue mail task');
         }
 
         $outboxMessage->draft = 0; // no longer a draft
@@ -65,7 +63,6 @@ class Queue extends Delete
      * this time will be converted to a UTC time. Otherwise, a default
      * of 60 seconds from now is used.
      *
-     * @param OutboxModel $message
      * @param string $sendAfter Must be in user's local time
      *
      * @return string

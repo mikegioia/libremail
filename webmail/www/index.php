@@ -2,12 +2,12 @@
 
 namespace App;
 
-use Exception;
+use App\Exceptions\ClientException;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\ServerException;
 use App\Model\Account;
 use App\Model\Message;
-use App\Exceptions\ClientException;
-use App\Exceptions\ServerException;
-use App\Exceptions\NotFoundException;
+use Exception;
 
 // Autoload application and vendor libraries
 require __DIR__.'/../vendor/autoload.php';
@@ -51,7 +51,8 @@ define('ERR_TASK_ROLLBACK', 1020);
 define('PREF_THEME', 'wm.theme');
 
 // Helper to load external config files
-function getConfig(string $file) {
+function getConfig(string $file)
+{
     return include BASEDIR.'/config/'.$file.'.php';
 }
 

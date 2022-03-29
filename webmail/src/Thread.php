@@ -2,10 +2,10 @@
 
 namespace App;
 
+use App\Exceptions\NotFoundException;
 use App\Model\Message;
 use Misd\Linkify\Linkify;
 use Zend\Escaper\Escaper;
-use App\Exceptions\NotFoundException;
 
 class Thread
 {
@@ -23,11 +23,11 @@ class Thread
     private $threadFolders = [];
     private $threadFolderIds = [];
 
-    const UTF8 = 'utf-8';
-    const SNIPPET_LENGTH = 160;
-    const INDEX_GROUP = 'group';
-    const INDEX_MESSAGE = 'message';
-    const EMAIL_REGEX = '@(http)?(s)?(://)?(([a-zA-Z])([-\w]+\.)+([^\s\.]+[^\s]*)+[^,.\s])@';
+    public const UTF8 = 'utf-8';
+    public const SNIPPET_LENGTH = 160;
+    public const INDEX_GROUP = 'group';
+    public const INDEX_MESSAGE = 'message';
+    public const EMAIL_REGEX = '@(http)?(s)?(://)?(([a-zA-Z])([-\w]+\.)+([^\s\.]+[^\s]*)+[^,.\s])@';
 
     /**
      * @param bool $load If true, loads the thread data from SQL. This

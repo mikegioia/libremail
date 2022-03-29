@@ -2,10 +2,10 @@
 
 namespace App;
 
-use stdClass;
+use App\Messages\Names;
 use App\Model\Account;
 use App\Model\Message;
-use App\Messages\Names;
+use stdClass;
 use Zend\Escaper\Escaper;
 
 class Messages
@@ -13,8 +13,8 @@ class Messages
     private $folders;
     private $accountId;
 
-    const UTF8 = 'utf-8';
-    const SNIPPET_LENGTH = 160;
+    public const UTF8 = 'utf-8';
+    public const SNIPPET_LENGTH = 160;
 
     public function __construct(Account $account, Folders $folders)
     {

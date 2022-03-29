@@ -2,17 +2,16 @@
 
 namespace App\Model;
 
-use Fn;
-use PDO;
-use stdClass;
-use Exception;
-use App\Model;
 use App\Config;
-use App\Messages\MessageInterface;
-use App\Exceptions\NotFoundException;
-use App\Exceptions\ValidationException;
 use App\Exceptions\DatabaseInsertException;
 use App\Exceptions\DatabaseUpdateException;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\ValidationException;
+use App\Messages\MessageInterface;
+use App\Model;
+use Exception;
+use PDO;
+use stdClass;
 
 class Message extends Model implements MessageInterface
 {
@@ -65,19 +64,19 @@ class Message extends Model implements MessageInterface
     private $unserializedAttachments;
 
     // Flags
-    const FLAG_SEEN = 'seen';
-    const FLAG_FLAGGED = 'flagged';
-    const FLAG_DELETED = 'deleted';
+    public const FLAG_SEEN = 'seen';
+    public const FLAG_FLAGGED = 'flagged';
+    public const FLAG_DELETED = 'deleted';
     // Options
-    const IS_DRAFTS = 'is_drafts';
-    const ALL_SIBLINGS = 'all_siblings';
-    const ONLY_FLAGGED = 'only_flagged';
-    const ONLY_DELETED = 'only_deleted';
-    const SPLIT_FLAGGED = 'split_flagged';
-    const INCLUDE_DELETED = 'include_deleted';
-    const ONLY_FUTURE_SIBLINGS = 'only_future';
+    public const IS_DRAFTS = 'is_drafts';
+    public const ALL_SIBLINGS = 'all_siblings';
+    public const ONLY_FLAGGED = 'only_flagged';
+    public const ONLY_DELETED = 'only_deleted';
+    public const SPLIT_FLAGGED = 'split_flagged';
+    public const INCLUDE_DELETED = 'include_deleted';
+    public const ONLY_FUTURE_SIBLINGS = 'only_future';
     // Default options
-    const DEFAULTS = [
+    public const DEFAULTS = [
         'is_drafts' => false,
         'only_future' => false,
         'all_siblings' => false,
@@ -731,7 +730,7 @@ class Message extends Model implements MessageInterface
             }
 
             // We want the snippet to contain the oldest
-            // unread message unless 
+            // unread message unless
             if (0 === (int) $message['seen']) {
                 $unseens[$message['thread_id']] = $message['id'];
             }
@@ -1014,7 +1013,7 @@ class Message extends Model implements MessageInterface
     /**
      * Checks the cache and returns (if set) the counts object.
      *
-     * @return bool | object
+     * @return bool|object
      */
     private function threadCache(int $accountId, int $folderId)
     {
@@ -1038,7 +1037,7 @@ class Message extends Model implements MessageInterface
         $addSelf = true;
         $options = array_merge(self::DEFAULTS, $options);
 
-        // If even one filter value is different from the 
+        // If even one filter value is different from the
         // corresponding value on this message, then don't
         // include this message in the query
         foreach ($filters as $key => $value) {
@@ -1100,7 +1099,6 @@ class Message extends Model implements MessageInterface
      * Creates or modifies a draft message based on an outbox message.
      * Only creates a new message if the outbox is a draft.
      *
-     * @param Outbox $outbox
      * @param int $draftsId Drafts mailbox (folder) ID
      * @param Message $parent Message being replied to
      */
@@ -1176,9 +1174,7 @@ class Message extends Model implements MessageInterface
                 ->execute();
 
             if (! is_numeric($updated)) {
-                throw new DatabaseUpdateException(
-                    "Failed updating message {$message->id}"
-                );
+                throw new DatabaseUpdateException("Failed updating message {$message->id}");
             }
         } else {
             $newMessageId = $this->db()
@@ -1204,8 +1200,6 @@ class Message extends Model implements MessageInterface
 
     /**
      * Stores the thread ID on a message.
-     *
-     * @param int $threadId
      *
      * @return bool
      */
@@ -1285,9 +1279,7 @@ class Message extends Model implements MessageInterface
             ->execute();
 
         if (! $newMessageId) {
-            throw new DatabaseInsertException(
-                "Failed copying message {$this->id} to Folder #{$folderId}"
-            );
+            throw new DatabaseInsertException("Failed copying message {$this->id} to Folder #{$folderId}");
         }
 
         $data['id'] = $newMessageId;
@@ -1351,9 +1343,7 @@ class Message extends Model implements MessageInterface
     public function deleteCopiesFrom(int $folderId)
     {
         if (! $this->exists() || ! $this->message_id) {
-            throw new ValidationException(
-                'Message needs to be loaded before copies are deleted'
-            );
+            throw new ValidationException('Message needs to be loaded before copies are deleted');
         }
 
         $deleted = $this->db()
@@ -1381,9 +1371,7 @@ class Message extends Model implements MessageInterface
     public function deleteCreatedMessage()
     {
         if (! $this->exists()) {
-            throw new ValidationException(
-                'Message needs to be loaded before it can be deleted'
-            );
+            throw new ValidationException('Message needs to be loaded before it can be deleted');
         }
 
         if ($this->outbox_id) {

@@ -7,11 +7,11 @@
 
 namespace App;
 
-use DateTime;
-use Exception;
-use DateTimeZone;
 use App\Model\Meta;
 use App\Traits\ConfigTrait;
+use DateTime;
+use DateTimeZone;
+use Exception;
 
 class View
 {
@@ -21,17 +21,17 @@ class View
 
     private static $nonce;
 
-    const UTC = 'UTC';
-    const TIME = 'g:i a';
-    const DATE_SHORT = 'M j';
-    const DATE_FULL = 'Y-m-d';
-    const DEFAULT_TZ = 'America/New_York';
-    const DATE_DISPLAY_TIME = 'F jS \a\t g:i a';
+    public const UTC = 'UTC';
+    public const TIME = 'g:i a';
+    public const DATE_SHORT = 'M j';
+    public const DATE_FULL = 'Y-m-d';
+    public const DEFAULT_TZ = 'America/New_York';
+    public const DATE_DISPLAY_TIME = 'F jS \a\t g:i a';
 
-    const HTTP_200 = 'HTTP/1.1 200 OK';
-    const HTTP_400 = 'HTTP/1.1 400 Bad Request';
-    const HTTP_404 = 'HTTP/1.1 404 Not Found';
-    const HTTP_500 = 'HTTP/1.1 500 Server Error';
+    public const HTTP_200 = 'HTTP/1.1 200 OK';
+    public const HTTP_400 = 'HTTP/1.1 400 Bad Request';
+    public const HTTP_404 = 'HTTP/1.1 404 Not Found';
+    public const HTTP_500 = 'HTTP/1.1 500 Server Error';
 
     /**
      * Returns the system-wide nonce for the current request.
@@ -49,8 +49,6 @@ class View
     /**
      * Add data to the internal variables. This is chainable,
      * and it will permanently store this data across renders.
-     *
-     * @param array $data
      *
      * @return self
      */
@@ -168,8 +166,6 @@ class View
     /**
      * Returns a readable version of a file size.
      *
-     * @param int $size
-     *
      * @return string
      */
     public function humanFileSize(int $size)
@@ -189,8 +185,6 @@ class View
 
     /**
      * Returns a readable version of a positive integer.
-     *
-     * @param int $number
      *
      * @return string
      */
@@ -212,8 +206,6 @@ class View
     /**
      * Returns the best string representation of a time span.
      * i.e. "20 minutes ago", "1 day ago", or the date time.
-     *
-     * @param int $timestamp
      *
      * @return string
      */

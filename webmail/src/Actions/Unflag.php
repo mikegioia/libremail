@@ -3,11 +3,11 @@
 namespace App\Actions;
 
 use App\Actions;
+use App\Actions\Delete as DeleteAction;
 use App\Folders;
 use App\Messages\MessageInterface;
-use App\Model\Task as TaskModel;
 use App\Model\Message as MessageModel;
-use App\Actions\Delete as DeleteAction;
+use App\Model\Task as TaskModel;
 
 class Unflag extends DeleteAction
 {

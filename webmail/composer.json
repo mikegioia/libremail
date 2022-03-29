@@ -5,20 +5,20 @@
         }
     },
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.2",
         "ext-pdo": "*",
         "ext-mbstring": "*",
-        "misd/linkify": "^1.1",
         "erusev/parsedown": "^1.7",
-        "particlebits/pdo": "^2.0",
         "ezyang/htmlpurifier": "^4.10",
+        "laminas/laminas-escaper": "^2.6",
         "laminas/laminas-mail": "^2.10",
-        "laminas/laminas-escaper": "^2.6"
+        "misd/linkify": "^1.1",
+        "particlebits/pdo": "^2.0"
     },
     "scripts": {
-        "fix": "php-cs-fixer fix",
+        "fix": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix",
         "test": "./vendor/bin/phpunit",
-        "lint": "php-cs-fixer fix --dry-run --diff",
+        "lint": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --dry-run --diff",
         "compile": "php compile.php"
     }
 }

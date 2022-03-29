@@ -4,8 +4,8 @@ namespace App;
 
 class Decode
 {
-    const UTF8 = 'UTF-8';
-    const REPLACEMENTS = [
+    public const UTF8 = 'UTF-8';
+    public const REPLACEMENTS = [
         'utf8' => 'UTF-8',
         'utf-8' => 'UTF-8',
         'us-ascii' => 'ASCII',

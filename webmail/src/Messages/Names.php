@@ -6,8 +6,8 @@ use stdClass;
 
 class Names
 {
-    const MAX_LEN = 18;
-    const UTF8 = 'utf-8';
+    public const MAX_LEN = 18;
+    public const UTF8 = 'utf-8';
 
     /**
      * Parses a list of names in the "from" header and their

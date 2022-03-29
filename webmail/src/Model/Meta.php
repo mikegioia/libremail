@@ -2,9 +2,9 @@
 
 namespace App\Model;
 
+use App\Model;
 use PDO;
 use stdClass;
-use App\Model;
 
 class Meta extends Model
 {
@@ -14,7 +14,7 @@ class Meta extends Model
 
     private static $cache;
 
-    const ALLOWED = [
+    public const ALLOWED = [
         PREF_THEME
     ];
 
@@ -22,7 +22,6 @@ class Meta extends Model
      * Get the value for a specific key. If none exists,
      * fallback to the default param.
      *
-     * @param string $key
      * @param mixed $default
      * @param stdClass $source
      *

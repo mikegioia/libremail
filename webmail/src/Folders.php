@@ -2,10 +2,10 @@
 
 namespace App;
 
-use App\Model\Folder;
-use App\Model\Outbox;
 use App\Model\Account;
+use App\Model\Folder;
 use App\Model\Message;
+use App\Model\Outbox;
 
 class Folders
 {
@@ -41,33 +41,33 @@ class Folders
         '[Gmail]/Trash' => 'Trash'
     ];
     // Mailbox constants
-    const INBOX = 'inbox';
-    const GMAIL = '[gmail]';
-    const DRAFTS = [
+    public const INBOX = 'inbox';
+    public const GMAIL = '[gmail]';
+    public const DRAFTS = [
         '[Gmail]/Drafts',
         '[Gmail]/Bozze'
     ];
-    const SPAM = [
+    public const SPAM = [
         '[Gmail]/Spam'
     ];
-    const TRASH = [
+    public const TRASH = [
         '[Gmail]/Trash',
         '[Gmail]/Cestino'
     ];
-    const STARRED = [
+    public const STARRED = [
         '[Gmail]/Starred',
         '[Gmail]/Speciali'
     ];
-    const ALL = [
+    public const ALL = [
         '[Gmail]/All Mail',
         '[Gmail]/Tutti i messaggi'
     ];
-    const SENT = [
+    public const SENT = [
         '[Gmail]/Sent Mail',
         '[Gmail]/Posta inviata'
     ];
     // Color constants
-    const COLOR_GREY = [
+    public const COLOR_GREY = [
         'name' => 'light-grey',
         'bg' => '#cdcfd4',
         'fg' => '#303138'
@@ -250,7 +250,7 @@ class Folders
     /**
      * Returns a folder by ID.
      *
-     * @return Folder | null
+     * @return Folder|null
      */
     public function getById(int $id)
     {
@@ -297,7 +297,7 @@ class Folders
      *
      * @param bool $returnString If true, returns a formatted string
      *
-     * @return int | string
+     * @return int|string
      */
     public function getUnreadCount(int $folderId, bool $returnString = false)
     {

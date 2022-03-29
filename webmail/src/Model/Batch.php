@@ -2,8 +2,8 @@
 
 namespace App\Model;
 
-use DateTime;
 use App\Model;
+use DateTime;
 
 class Batch extends Model
 {

@@ -3,9 +3,9 @@
 namespace App\Actions;
 
 use App\Actions;
+use App\Exceptions\ServerException;
 use App\Folders;
 use App\Messages\MessageInterface;
-use App\Exceptions\ServerException;
 
 class Unspam extends Delete
 {
