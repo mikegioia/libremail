@@ -6,8 +6,10 @@ use App\Command;
 use App\Exceptions\Terminate as TerminateException;
 use App\Log;
 use App\Message;
+use App\Message\TaskMessage;
 use App\Task;
 use App\Traits\JsonMessage as JsonMessageTrait;
+use App\Util;
 use Exception;
 use PDOException;
 use Ratchet\ConnectionInterface;
@@ -35,7 +37,7 @@ class StatsServer implements MessageComponentInterface
     {
         $this->loop = $loop;
         $this->log = $log->getLogger();
-        $this->clients = new SplObjectStorage;
+        $this->clients = new SplObjectStorage();
 
         // Set up the STDIN and STDOUT streams
         $this->setupInputStreams();
@@ -63,7 +65,9 @@ class StatsServer implements MessageComponentInterface
 
     public function onOpen(ConnectionInterface $conn)
     {
-        $this->log->debug('New socket connection opened from #'.$conn->resourceId);
+        $this->log->debug(
+            'New socket connection opened from #'.Util::get($conn, 'resourceId', '?')
+        );
         $this->clients->attach($conn);
 
         if ($this->lastMessage) {
@@ -78,7 +82,9 @@ class StatsServer implements MessageComponentInterface
 
     public function onClose(ConnectionInterface $conn)
     {
-        $this->log->debug('Closing socket connection to #'.$conn->resourceId);
+        $this->log->debug(
+            'Closing socket connection to #'.Util::get($conn, 'resourceId', '?')
+        );
         $this->clients->detach($conn);
     }
 
@@ -96,7 +102,12 @@ class StatsServer implements MessageComponentInterface
 
     public function onMessage(ConnectionInterface $from, $message)
     {
-        $this->log->debug("New socket message from #{$from->resourceId}: $message");
+        $logMessage = sprintf('New socket message from #%s: %s',
+            Util::get($from, 'resourceId', '?'),
+            $message
+        );
+
+        $this->log->debug($logMessage);
         $this->processMessage($message, null);
     }
 
@@ -135,13 +146,13 @@ class StatsServer implements MessageComponentInterface
             try {
                 $message = Message::make($parsed);
 
-                if (Message::TASK === $message->getType()) {
+                if ($message instanceof TaskMessage) {
                     $task = Task::make($message->task, (array) $message->data);
                     $response = $task->run($this);
 
                     // The response itself can be a command. If it
                     // is, send it to the Daemon.
-                    if ((new Command)->isValid($response)) {
+                    if ((new Command())->isValid($response)) {
                         $this->write->write($response);
                     }
                 }

@@ -15,28 +15,29 @@ use App\Model\Outbox;
 class Controller
 {
     private $account;
+    private $config = [];
 
     public function __construct(Account $account)
     {
         $this->account = $account;
     }
 
-    public function inbox()
+    public function inbox(): void
     {
         $this->mailbox(INBOX);
     }
 
-    public function folder(int $id)
+    public function folder(int $id): void
     {
-        $this->mailbox($id);
+        $this->mailbox((string) $id);
     }
 
-    public function folderPage(int $id, int $page)
+    public function folderPage(int $id, int $page): void
     {
-        $this->mailbox($id, $page);
+        $this->mailbox((string) $id, $page);
     }
 
-    public function outbox()
+    public function outbox(): void
     {
         $select = Url::getParam('select');
 
@@ -47,23 +48,24 @@ class Controller
         ]);
     }
 
-    public function starred(string $page)
+    public function starred(int $page): void
     {
         $this->mailbox(STARRED, $page);
     }
 
-    public function undo(int $batchId)
+    public function undo(int $batchId): void
     {
         session_start();
-        (new Rollback)->run($batchId);
+
+        (new Rollback())->run($batchId);
     }
 
-    public function getStar(string $type, string $theme, int $id, string $state)
+    public function getStar(string $type, string $theme, int $id, string $state): void
     {
         header('Content-Type: text/html');
         header('Cache-Control: max-age=86400'); // one day
 
-        (new View)->render('/star', [
+        (new View())->render('/star', [
             'id' => $id,
             'type' => $type,
             'theme' => $theme,
@@ -71,7 +73,7 @@ class Controller
         ]);
     }
 
-    public function setStar()
+    public function setStar(): void
     {
         $type = Url::postParam('type', MAILBOX);
         $folders = new Folders($this->account, []);
@@ -90,7 +92,7 @@ class Controller
             ]
         );
 
-        (new View)->render('/star', [
+        (new View())->render('/star', [
             'id' => Url::postParam('id', 0),
             'type' => Url::postParam('type'),
             'theme' => Url::postParam('theme'),
@@ -98,18 +100,18 @@ class Controller
         ]);
     }
 
-    public function closeJsAlert()
+    public function closeJsAlert(): void
     {
         session_start();
         Session::flag(Session::FLAG_HIDE_JS_ALERT, true);
         Url::redirectBack();
     }
 
-    public function thread(int $folderId, int $threadId)
+    public function thread(int $folderId, int $threadId): void
     {
         // Set up libraries
-        $view = new View;
-        $colors = getConfig('colors');
+        $view = new View();
+        $colors = $this->getConfig('colors');
         $select = Url::getParam('select');
         $folders = new Folders($this->account, $colors);
         // Load the thread object, this will throw an exception if
@@ -118,7 +120,7 @@ class Controller
         $thread = new Thread($folders, $threadId, $folderId, $this->account->id);
 
         // Mark this thread as read
-        (new MarkReadAction)->run([$threadId], $folders);
+        (new MarkReadAction())->run([$threadId], $folders);
 
         // Re-compute the un-read totals, as this may be changed now
         // Render the message thread
@@ -126,28 +128,28 @@ class Controller
             'thread' => $thread,
             'folders' => $folders,
             'folderId' => $folderId,
-            'totals' => (new Message)->getSizeCounts($this->account->id)
+            'totals' => (new Message())->getSizeCounts($this->account->id)
         ]);
     }
 
-    public function original(int $messageId)
+    public function original(int $messageId): void
     {
         header('Content-Type: text/plain');
 
         // Load the message, this will throw an exception if not found
-        $message = (new Message)->getById($messageId, true);
+        $message = (new Message())->getById($messageId, true);
 
-        (new View)->raw($message->getOriginal());
+        (new View())->raw($message->getOriginal());
     }
 
-    public function account()
+    public function account(): void
     {
         $this->page('account');
     }
 
-    public function setup()
+    public function setup(): void
     {
-        $view = new View;
+        $view = new View();
 
         $view->htmlHeaders();
         $view->render('setup', [
@@ -157,7 +159,7 @@ class Controller
         ]);
     }
 
-    public function createAccount()
+    public function createAccount(): void
     {
         session_start();
 
@@ -180,14 +182,15 @@ class Controller
         ]);
 
         try {
-            (new Imap)->connect($email, $password, $host, (int) $port);
+            (new Imap())->connect($email, $password, $host, (int) $port);
 
             $this->account->create();
 
             Session::notify(
                 'Your account configuration has been saved! You can '.
                 'now start the sync process.',
-                Session::SUCCESS);
+                Session::SUCCESS
+            );
 
             Url::redirect('/account');
             // User sent to the account page now, script halted
@@ -203,7 +206,7 @@ class Controller
         Url::redirectBack('/setup');
     }
 
-    public function updateAccount()
+    public function updateAccount(): void
     {
         session_start();
 
@@ -216,7 +219,7 @@ class Controller
         list($smtpHost, $smtpPort) = Config::getSmtpSettings($host);
 
         try {
-            (new Imap)->connect($email, $password, $host, $port);
+            (new Imap())->connect($email, $password, $host, $port);
 
             // Save the new account info
             $this->account->update(
@@ -240,12 +243,12 @@ class Controller
         Url::redirectBack('/account');
     }
 
-    public function settings()
+    public function settings(): void
     {
         $this->page('settings');
     }
 
-    public function updateSettings()
+    public function updateSettings(): void
     {
         session_start();
         Meta::update($_POST);
@@ -253,7 +256,7 @@ class Controller
         Url::redirectBack('/settings');
     }
 
-    public function compose(int $outboxId = null)
+    public function compose(int $outboxId = null): void
     {
         $message = new Outbox($this->account);
 
@@ -272,7 +275,7 @@ class Controller
         ]);
     }
 
-    public function preview(int $outboxId)
+    public function preview(int $outboxId): void
     {
         $outboxMessage = (new Outbox($this->account))->getById($outboxId);
 
@@ -285,19 +288,19 @@ class Controller
         ]);
     }
 
-    public function reply(int $parentId)
+    public function reply(int $parentId): void
     {
         $this->replyPage($parentId, false);
     }
 
-    public function replyAll(int $parentId)
+    public function replyAll(int $parentId): void
     {
         $this->replyPage($parentId, true);
     }
 
-    private function replyPage(int $parentId, bool $replyAll)
+    private function replyPage(int $parentId, bool $replyAll): void
     {
-        $parentMessage = (new Message)->getById($parentId, true, true);
+        $parentMessage = (new Message())->getById($parentId, true, true);
         $parent = Thread::constructFromMessage(
             $parentMessage,
             new Folders($this->account, [])
@@ -314,7 +317,7 @@ class Controller
         ]);
     }
 
-    public function deleteDraft()
+    public function deleteDraft(): void
     {
         session_start();
 
@@ -324,7 +327,7 @@ class Controller
 
         // First try to delete the draft, then delete the outbox message
         if ($outboxMessage->exists()) {
-            $draftMessage = (new Message)->getByOutboxId(
+            $draftMessage = (new Message())->getByOutboxId(
                 $id,
                 $folders->getDraftsId()
             );
@@ -345,7 +348,7 @@ class Controller
         Url::redirect('/');
     }
 
-    public function draft()
+    public function draft(): void
     {
         session_start();
 
@@ -354,7 +357,7 @@ class Controller
         $compose->draft($sendPreview);
     }
 
-    public function send()
+    public function send(): void
     {
         session_start();
 
@@ -366,7 +369,7 @@ class Controller
         $compose->send($id, $edit, $queue);
     }
 
-    public function update()
+    public function update(): void
     {
         session_start();
 
@@ -393,19 +396,19 @@ class Controller
             );
         } else {
             (new Actions(
-                new Folders($this->account, getConfig('colors')),
+                new Folders($this->account, $this->getConfig('colors')),
                 $_POST + $_GET
             ))->run();
         }
     }
 
-    public function action()
+    public function action(): void
     {
         session_start();
         Session::validateToken();
 
         (new Actions(
-            new Folders($this->account, getConfig('colors')),
+            new Folders($this->account, $this->getConfig('colors')),
             $_GET + ['url_id' => THREAD]
         ))->run();
     }
@@ -414,7 +417,7 @@ class Controller
      * Search all messages for a collection of thread IDs, and then
      * render those threads in a mailbox view (with paging, etc).
      */
-    public function search()
+    public function search(): void
     {
         // Load params
         $query = Url::getParam('q', '');
@@ -422,7 +425,7 @@ class Controller
         $page = (int) Url::getParam('p', 1);
         $folderId = (int) Url::getParam('f', 0);
         // Set up libraries
-        $colors = getConfig('colors');
+        $colors = $this->getConfig('colors');
         $select = Url::getParam('select');
         $folders = new Folders($this->account, $colors);
         $messages = new Messages($this->account, $folders);
@@ -433,11 +436,13 @@ class Controller
             $folderId,
             max($page, 1), // disallow negatives
             25, // page limit
-            $sortBy, [
+            $sortBy,
+            [
                 Message::ONLY_FLAGGED => false,
                 Message::SPLIT_FLAGGED => false,
                 Message::INCLUDE_DELETED => false
-            ]);
+            ]
+        );
 
         // Render the search page
         $this->page('mailbox', [
@@ -458,11 +463,13 @@ class Controller
 
     /**
      * Helper function to render a mailbox page.
+     *
+     * @throws ClientException
      */
-    private function mailbox(string $id, int $page = 1, int $limit = 25)
+    private function mailbox(string $id, int $page = 1, int $limit = 25): void
     {
         // Set up libraries
-        $colors = getConfig('colors');
+        $colors = $this->getConfig('colors');
         $select = Url::getParam('select');
         $folders = new Folders($this->account, $colors);
         $messages = new Messages($this->account, $folders);
@@ -504,12 +511,12 @@ class Controller
         ]);
     }
 
-    private function page(string $viewPath, array $data = [])
+    private function page(string $viewPath, array $data = []): void
     {
-        $view = new View;
+        $view = new View();
 
         if (! isset($data['folders'])) {
-            $data['folders'] = new Folders($this->account, getConfig('colors'));
+            $data['folders'] = new Folders($this->account, $this->getConfig('colors'));
         }
 
         $view->htmlHeaders();
@@ -528,12 +535,28 @@ class Controller
         );
     }
 
-    public function error404()
+    /**
+     * Helper to load external config files.
+     *
+     * @return array
+     */
+    public function getConfig(string $file)
     {
-        throw new NotFoundException;
+        if (isset($this->config[$file])) {
+            return $this->config[$file];
+        }
+
+        $this->config[$file] = include BASEDIR.'/config/'.$file.'.php';
+
+        return $this->config[$file];
     }
 
-    public function errorNoFolders()
+    public function error404()
+    {
+        throw new NotFoundException();
+    }
+
+    public function errorNoFolders(): void
     {
         View::showError(
             View::HTTP_200,

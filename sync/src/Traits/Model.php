@@ -4,23 +4,36 @@ namespace App\Traits;
 
 use App\Exceptions\NotFound as NotFoundException;
 use App\Exceptions\Validation as ValidationException;
-use Belt\Belt;
+use App\Util;
 
 trait Model
 {
+    /**
+     * @return string
+     */
     public function getClass()
     {
         return get_class();
     }
 
+    /**
+     * @return int|null
+     */
     public function getId()
     {
-        return (int) $this->id;
+        return property_exists($this, 'id')
+            ? (int) $this->id
+            : null;
     }
 
+    /**
+     * @return string|null
+     */
     public function getCreatedAt()
     {
-        return $this->created_at;
+        return property_exists($this, 'created_at')
+            ? (string) $this->created_at
+            : null;
     }
 
     /**
@@ -50,7 +63,7 @@ trait Model
      *
      * @param string $modelClass
      *
-     * @return array
+     * @return object|array
      */
     public function populate(array $objects, string $modelClass = null)
     {
@@ -68,35 +81,60 @@ trait Model
         return $modelObjects;
     }
 
-    public function isValidFlag(int $flag)
+    /**
+     * @param mixed $flag
+     */
+    public function isValidFlag($flag)
     {
-        return in_array($flag, [0, 1]);
+        return Util::contains((int) $flag, [0, 1]);
     }
 
-    public function requireInt($number, string $name)
+    /**
+     * @param mixed $flag
+     */
+    public function requireValidFlag($flag, string $name): void
     {
-        if (! Belt::isNumber($number)) {
+        if (! $this->isValidFlag($flag)) {
+            throw new ValidationException("$name needs to be 0 or 1.");
+        }
+    }
+
+    /**
+     * @param mixed $number
+     */
+    public function requireInt($number, string $name): void
+    {
+        if (! Util::isNumber($number)) {
             throw new ValidationException("$name needs to be an integer.");
         }
     }
 
-    public function requireString($string, string $name)
+    /**
+     * @param mixed $string
+     */
+    public function requireString($string, string $name): void
     {
-        if (! Belt::isString($string)) {
+        if (! Util::isString($string)) {
             throw new ValidationException("$name needs to be a string.");
         }
     }
 
+    /**
+     * @param mixed $values
+     */
     public function requireArray($values, string $name)
     {
-        if (! is_array($values) || ! Belt::size($values)) {
+        if (! is_array($values) || ! Util::size($values)) {
             throw new ValidationException("$name needs to be an array with values.");
         }
     }
 
+    /**
+     * @param mixed $value
+     */
     public function requireValue($value, array $collection)
     {
-        if (! Belt::contains($collection, $value)) {
+        if (! Util::contains($value, $collection)) {
             $message = sprintf('%s must be one of %s.',
                 $value,
                 implode(', ', $collection)
@@ -106,6 +144,9 @@ trait Model
         }
     }
 
+    /**
+     * @param mixed $result
+     */
     public function handleNotFound($result, string $type, bool $fail)
     {
         if (! $result && true === $fail) {

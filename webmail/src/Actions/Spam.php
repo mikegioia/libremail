@@ -30,7 +30,7 @@ class Spam extends Delete
         // For this operation, we're going to perform the actions
         // on every message in the thread unless the option to only
         // remove this one message is set.
-        if (true === $options[Actions::SINGLE_MESSAGE] ?? false) {
+        if (true === ($options[Actions::SINGLE_MESSAGE] ?? false)) {
             $messages = [$message];
         } else {
             $messages = $thread->getMessages();

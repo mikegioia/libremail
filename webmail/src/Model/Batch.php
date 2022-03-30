@@ -4,6 +4,7 @@ namespace App\Model;
 
 use App\Model;
 use DateTime;
+use Exception;
 
 class Batch extends Model
 {
@@ -24,7 +25,7 @@ class Batch extends Model
             throw new Exception('Failed adding batch');
         }
 
-        return new static([
+        return new self([
             'id' => $newBatchId,
             'created_at' => $createdAt
         ]);

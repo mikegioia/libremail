@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Task\AbstractTask;
 use App\Task\AccountInfoTask;
 use App\Task\RemoveAccountTask;
 use App\Task\SaveAccountTask;

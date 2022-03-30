@@ -10,6 +10,7 @@ use League\CLImate\CLImate;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
+use Throwable;
 
 class Log
 {
@@ -51,10 +52,7 @@ class Log
         return $this->logger;
     }
 
-    /**
-     * @param Exception|Error $exception
-     */
-    public function exceptionHandler($exception)
+    public function exceptionHandler(Throwable $exception): void
     {
         if ($this->stackTrace) {
             $this->getLogger()->critical(
@@ -114,7 +112,7 @@ class Log
     public function displayError(Exception $e)
     {
         if (true === $this->interactive) {
-            $this->cli->boldRedBackgroundBlack($e->getMessage());
+            $this->cli->bold()->red()->backgroundBlack()->out($e->getMessage());
             $this->cli->dim('[Err#'.$e->getCode().']');
 
             if ($this->config['stacktrace']) {
@@ -173,9 +171,11 @@ class Log
             ? dirname($path)
             : BASEPATH;
 
-        if (! is_writeable($logPath)) {
-            throw new LogPathNotWriteableException($logPath);
+        if (is_writeable($logPath)) {
+            return true;
         }
+
+        throw new LogPathNotWriteableException($logPath);
     }
 
     /**

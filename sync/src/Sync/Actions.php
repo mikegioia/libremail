@@ -334,7 +334,7 @@ class Actions
 
             $this->emitter->emit(Sync::EVENT_CHECK_CLOSED_CONN, [$e]);
 
-            return;
+            return false;
         }
 
         return true;

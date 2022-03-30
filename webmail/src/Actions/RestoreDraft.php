@@ -16,7 +16,7 @@ class RestoreDraft extends Base
     /**
      * Copies a message to the Spam folder.
      *
-     * @param MessageInterface $message OutboxModel object
+     * @param OutboxModel $outbox OutboxModel object
      *
      * @see Base for params
      */
@@ -30,7 +30,7 @@ class RestoreDraft extends Base
             0,
             $outbox->account_id,
             TaskModel::TYPE_DELETE_OUTBOX,
-            (int) $outbox->deleted,
+            (string) $outbox->deleted,
             null,
             $outbox->id
         );

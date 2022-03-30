@@ -21,7 +21,6 @@
         "ext-mbstring": "*",
         "cboden/ratchet": "^0.4.2",
         "evenement/evenement": "^3.0",
-        "ilya/belt": "^2.1",
         "laminas/laminas-mail": "@dev",
         "laminas/laminas-mime": "@dev",
         "laminas/laminas-servicemanager": "^3.4",
@@ -48,7 +47,8 @@
     ],
     "scripts": {
         "fix": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix",
-        "test": "./vendor/bin/phpunit",
-        "lint": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --dry-run --diff"
+        "lint": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --dry-run --diff",
+        "phpstan": "tools/phpstan/vendor/bin/phpstan --memory-limit=1G analyse",
+        "phpstan-strict": "tools/phpstan/vendor/bin/phpstan --memory-limit=1G --level=6 analyse"
     }
 }

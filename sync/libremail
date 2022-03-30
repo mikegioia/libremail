@@ -10,9 +10,9 @@
  */
 use App\Command;
 use App\Console\DaemonConsole;
-use App\Constants;
 use App\Daemon;
 use App\Diagnostics;
+use App\Events\MessageEvent;
 use App\Exceptions\Terminate as TerminateException;
 use App\Log;
 use App\Message;
@@ -26,33 +26,32 @@ use React\EventLoop\Factory;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher as Emitter;
 
-// Set up paths and constants
+// Update internals
 set_time_limit(0);
-define('BASEPATH', __DIR__);
 date_default_timezone_set('UTC');
 
 // Load the vendor libraries
-require BASEPATH.'/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
+
+// Load application constants
+require __DIR__.'/config/constants.php';
 
 // Load configuration files and parse the CLI arguments
-$constants = parse_ini_file(BASEPATH.'/config/constants.ini', false);
 $default = parse_ini_file(BASEPATH.'/config/default.ini', true);
 $local = parse_ini_file(BASEPATH.'/config/local.ini', true);
 $config = array_replace_recursive($default, $local);
-Constants::process($constants);
-unset($constants);
 
 // Set the memory limit from the config
 ini_set('memory_limit', $config['app']['memory']);
 
 // Set up dependency container and register all services
-$di = new Container;
+$di = new Container();
 
 // Store the configuration as a service
 $di['config'] = $config;
 
 // Console/CLI service
-$di['console'] = new DaemonConsole;
+$di['console'] = new DaemonConsole();
 $di['cli'] = function ($c) {
     return $c['console']->getCLI();
 };
@@ -73,14 +72,14 @@ $di['log']->init();
 $di['console']->init();
 
 // Set up the event dispatcher
-$di['emitter'] = new Emitter;
+$di['emitter'] = new Emitter();
 
 // React event loop, used for child-process and web socket
 // server (Ratchet).
 $di['loop'] = Factory::create();
 
 // Set up the command handler
-$di['command'] = new Command($di['emitter'], $di['log']);
+$di['command'] = new Command($di['emitter']);
 
 // Statically set Message logging service
 Message::setLog($di['log']->getLogger());
@@ -163,7 +162,7 @@ $di['emitter']->addListener(
 // Triggered to update the stats to all websocket connections
 $di['emitter']->addListener(
     EV_BROADCAST_MSG,
-    function (Event $event) use ($di) {
+    function (MessageEvent $event) use ($di) {
         $di['daemon']->broadcast($event->getMessage());
     });
 

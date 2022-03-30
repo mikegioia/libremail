@@ -16,9 +16,10 @@
         "particlebits/pdo": "^2.0"
     },
     "scripts": {
+        "compile": "php compile.php",
         "fix": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix",
-        "test": "./vendor/bin/phpunit",
         "lint": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --dry-run --diff",
-        "compile": "php compile.php"
+        "phpstan": "tools/phpstan/vendor/bin/phpstan --memory-limit=1G analyse",
+        "phpstan-strict": "tools/phpstan/vendor/bin/phpstan --memory-limit=1G --level=6 analyse"
     }
 }

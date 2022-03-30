@@ -241,54 +241,6 @@
             "time": "2022-03-20T21:51:18+00:00"
         },
         {
-            "name": "ilya/belt",
-            "version": "2.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ilya-dev/belt.git",
-                "reference": "e6229b855eaa9291c667f804975f29e563dc777c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ilya-dev/belt/zipball/e6229b855eaa9291c667f804975f29e563dc777c",
-                "reference": "e6229b855eaa9291c667f804975f29e563dc777c",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "phpspec/phpspec": "~2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Belt\\": "src/Belt/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ilya S",
-                    "email": "public.ilya.s@gmail.com"
-                }
-            ],
-            "description": "A handful of tools for PHP devs",
-            "keywords": [
-                "arrays",
-                "collections",
-                "functions",
-                "objects",
-                "php",
-                "tools",
-                "utilities"
-            ],
-            "time": "2014-05-21T08:48:47+00:00"
-        },
-        {
             "name": "laminas/laminas-loader",
             "version": "2.6.1",
             "source": {
@@ -1063,16 +1015,16 @@
         },
         {
             "name": "particlebits/imap",
-            "version": "2.1.1",
+            "version": "2.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/imap.git",
-                "reference": "535f0c0dfa8777f6105a0b5dad8f4e3012b099c5"
+                "reference": "9c930026872ea8ae7420fa7e4fd6e24a59319047"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/535f0c0dfa8777f6105a0b5dad8f4e3012b099c5",
-                "reference": "535f0c0dfa8777f6105a0b5dad8f4e3012b099c5",
+                "url": "https://api.github.com/repos/ParticleBits/imap/zipball/9c930026872ea8ae7420fa7e4fd6e24a59319047",
+                "reference": "9c930026872ea8ae7420fa7e4fd6e24a59319047",
                 "shasum": ""
             },
             "require": {
@@ -1106,7 +1058,11 @@
                 "mail",
                 "php"
             ],
-            "time": "2020-04-05T22:42:55+00:00"
+            "support": {
+                "issues": "https://github.com/ParticleBits/imap/issues",
+                "source": "https://github.com/ParticleBits/imap/tree/2.1.2"
+            },
+            "time": "2022-03-29T15:27:06+00:00"
         },
         {
             "name": "particlebits/pdo",
@@ -2447,5 +2403,5 @@
         "ext-mbstring": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.1.0"
 }

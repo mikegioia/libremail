@@ -9,7 +9,6 @@ namespace App;
 use App\Exceptions\Fatal as FatalException;
 use App\Exceptions\FolderSync as FolderSyncException;
 use App\Exceptions\MessagesSync as MessagesSyncException;
-use App\Exceptions\MissingIMAPConfig as MissingIMAPConfigException;
 use App\Exceptions\Restart as RestartException;
 use App\Exceptions\Stop as StopException;
 use App\Exceptions\Terminate as TerminateException;
@@ -44,6 +43,7 @@ class Sync
     private $email;
     private $sleep;
     private $quick;
+    private $stats;
     private $config;
     private $folder;
     private $daemon;
@@ -57,7 +57,6 @@ class Sync
     private $threading;
     private $interactive;
     private $lastRunTime;
-    private $activeAccount;
     private $maxRetries = 5;
     private $retriesFolders;
     private $retriesMessages;
@@ -82,7 +81,7 @@ class Sync
      * ad hoc method is when this class is used separately within
      * other classes like Console.
      *
-     * @param array $di Service container
+     * @param Container $di Service container
      */
     public function __construct(Container $di = null)
     {
@@ -111,17 +110,17 @@ class Sync
         $this->initGc();
     }
 
-    public function setCLI(CLImate $cli)
+    public function setCLI(CLImate $cli): void
     {
         $this->cli = $cli;
     }
 
-    public function setLog(Logger $log)
+    public function setLog(Logger $log): void
     {
         $this->log = $log;
     }
 
-    public function setConfig(array $config)
+    public function setConfig(array $config): void
     {
         $this->config = $config;
     }
@@ -131,7 +130,7 @@ class Sync
      * for all accounts, then sleeps for a designated period of
      * time.
      */
-    public function loop()
+    public function loop(): void
     {
         $wakeUnix = 0;
         $sleepMinutes = $this->config['app']['sync']['sleep_minutes'];
@@ -145,7 +144,7 @@ class Sync
                 $this->wake = false;
             }
 
-            if ((new DateTime)->getTimestamp() < $wakeUnix) {
+            if ((new DateTime())->getTimestamp() < $wakeUnix) {
                 // Run action sync every minute
                 if ($this->isReadyToRun()) {
                     $this->setAsleep(false);
@@ -189,6 +188,8 @@ class Sync
      * @param AccountModel $account Optional account to run
      * @param array $options See valid options below
      *
+     * @throws Exception
+     *
      * @return bool
      */
     public function run(AccountModel $account = null, array $options = [])
@@ -202,10 +203,10 @@ class Sync
         if ($account) {
             $accounts = [$account];
         } elseif ($this->email) {
-            $account = (new AccountModel)->getByEmail($this->email);
+            $account = (new AccountModel())->getByEmail($this->email);
             $accounts = $account ? [$account] : [];
         } else {
-            $accounts = (new AccountModel)->getActive();
+            $accounts = (new AccountModel())->getActive();
         }
 
         if (! $accounts) {
@@ -215,7 +216,7 @@ class Sync
             // will pick up once the user creates an account and a
             // SIGCONT is sent to this process.
             if ($this->daemon) {
-                Message::send(new NoAccountsMessage);
+                Message::send(new NoAccountsMessage());
 
                 return true;
             }
@@ -226,7 +227,7 @@ class Sync
         }
 
         // Try to set max allowed packet size in SQL
-        $migration = new MigrationModel;
+        $migration = new MigrationModel();
 
         if (! $migration->setMaxAllowedPacket(16)) {
             $this->log->notice(
@@ -352,7 +353,7 @@ class Sync
                 // If the all that's requested is to update the folder stats,
                 // then we can exit here.
                 if (true === Util::get($options, self::OPT_ONLY_UPDATE_STATS)) {
-                    return;
+                    return true;
                 }
 
                 // Second pass, download the messages. Yes, we could have stored
@@ -397,12 +398,9 @@ class Sync
     /**
      * Connects to an IMAP mailbox using the supplied credentials.
      *
-     * @param AccountModel Account to connect to
-     * @param bool $setRunning Optional
-     *
-     * @throws MissingIMAPConfigException
+     * @param AccountModel $account Account to connect to
      */
-    public function connect(AccountModel $account, bool $setRunning = true)
+    public function connect(AccountModel $account, bool $setRunning = true): void
     {
         // Skip out if the connection is already active
         if ($this->mailbox) {
@@ -418,9 +416,11 @@ class Sync
             $account->email,
             $account->password,
             '',
-            $attachmentsPath, [
+            $attachmentsPath,
+            [
                 Mailbox::OPT_SKIP_ATTACHMENTS => $this->quick
-            ]);
+            ]
+        );
         $this->mailbox->getImapStream();
 
         if (true === $setRunning) {
@@ -428,7 +428,7 @@ class Sync
         }
     }
 
-    public function disconnect(bool $running = false)
+    public function disconnect(bool $running = false): void
     {
         if ($this->mailbox) {
             try {
@@ -446,19 +446,39 @@ class Sync
         }
     }
 
-    public function setAsleep(bool $asleep = true)
+    /**
+     * @return bool
+     */
+    public function getAsleep()
+    {
+        return isset($this->asleep)
+            ? $this->asleep
+            : false;
+    }
+
+    public function setAsleep(bool $asleep = true): void
     {
         $this->asleep = $asleep;
         $this->stats->setAsleep($asleep);
     }
 
-    public function setRunning(bool $running = true)
+    /**
+     * @return bool
+     */
+    public function getRunning()
+    {
+        return isset($this->running)
+            ? $this->running
+            : false;
+    }
+
+    public function setRunning(bool $running = true): void
     {
         $this->running = $running;
         $this->stats->setRunning($running);
     }
 
-    public function setLastRunTime()
+    public function setLastRunTime(): void
     {
         $this->lastRunTime = microtime(true);
     }
@@ -477,6 +497,9 @@ class Sync
             || microtime(true) - $this->lastRunTime > self::READY_THRESHOLD;
     }
 
+    /**
+     * @return int
+     */
     public function getTimeBeforeReady()
     {
         return is_null($this->lastRunTime)
@@ -488,7 +511,7 @@ class Sync
      * Turns the halt flag on. Message sync operations check for this
      * and throw a TerminateException if true.
      */
-    public function halt()
+    public function halt(): void
     {
         $this->halt = true;
 
@@ -498,13 +521,13 @@ class Sync
         }
     }
 
-    public function stop()
+    public function stop(): void
     {
         $this->halt = true;
         $this->stop = true;
     }
 
-    public function wake()
+    public function wake(): void
     {
         $this->wake = true;
         $this->halt = false;
@@ -513,7 +536,7 @@ class Sync
     /**
      * Attaches events to emitter for sub-classes.
      */
-    private function setupEmitter()
+    private function setupEmitter(): void
     {
         if ($this->emitter) {
             return;
@@ -540,10 +563,8 @@ class Sync
      * @param AccountModel $account Account to sync
      *
      * @throws FolderSyncException
-     *
-     * @return array $folders List of IMAP folders
      */
-    private function syncFolders(AccountModel $account)
+    private function syncFolders(AccountModel $account): void
     {
         if ($this->retriesFolders[$account->email] > $this->maxRetries) {
             $this->log->notice(
@@ -594,13 +615,16 @@ class Sync
      * to try each folder some amount of times before moving on
      * to the next folder.
      *
-     * @param array FolderModel $folders
      * @param array $options Valid options include:
-     *   skip_download (false) If true, only stats about the
-     *     folder will be logged. The messages won't be downloaded.
+     *   * `skip_download` (false)
+     *       If true, only stats about the folder will be logged.
+     *       The messages won't be downloaded.
      */
-    private function syncMessages(AccountModel $account, array $folders, array $options = [])
-    {
+    private function syncMessages(
+        AccountModel $account,
+        array $folders,
+        array $options = []
+    ): void {
         if (true === Util::get($options, self::OPT_SKIP_DOWNLOAD)) {
             $this->log->debug('Updating folder counts');
         } else {
@@ -631,7 +655,7 @@ class Sync
      * and all subsequent runs will only update threads for
      * new messages.
      */
-    private function updateThreads(AccountModel $account)
+    private function updateThreads(AccountModel $account): void
     {
         $this->threader->run($account, $this->emitter);
     }
@@ -642,14 +666,12 @@ class Sync
      * @param array $options (see syncMessages)
      *
      * @throws MessagesSyncException
-     *
-     * @return bool
      */
     private function syncFolderMessages(
         AccountModel $account,
         FolderModel $folder,
         array $options
-    ) {
+    ): void {
         if ($folder->isIgnored()) {
             $this->log->debug('Skipping ignored folder');
 
@@ -717,8 +739,7 @@ class Sync
             sleep($waitSeconds);
             ++$this->retriesMessages[$account->email];
             $this->checkForHalt();
-
-            return $this->syncFolderMessages($account, $folder, $options);
+            $this->syncFolderMessages($account, $folder, $options);
         }
     }
 
@@ -763,7 +784,7 @@ class Sync
         return $count;
     }
 
-    private function sendMessage(string $message, string $status = STATUS_ERROR)
+    private function sendMessage(string $message, string $status = STATUS_ERROR): void
     {
         if ($this->daemon) {
             Message::send(new NotificationMessage($status, $message));
@@ -778,7 +799,7 @@ class Sync
      * @throws StopException
      * @throws TerminateException
      */
-    private function checkForHalt()
+    private function checkForHalt(): void
     {
         pcntl_signal_dispatch();
 
@@ -788,12 +809,12 @@ class Sync
 
             // If there was a stop command issued, then don't terminate
             if (true === $this->stop) {
-                throw new StopException;
+                throw new StopException();
             }
 
             // If we just want to sleep, then don't terminate
             if (true !== $this->sleep) {
-                throw new TerminateException;
+                throw new TerminateException();
             }
         }
     }
@@ -806,7 +827,7 @@ class Sync
      *
      * @throws StopException
      */
-    private function checkForClosedConnection(Exception $e)
+    private function checkForClosedConnection(Exception $e): void
     {
         if (false !== strpos($e->getMessage(), 'connection closed?')) {
             $this->sendMessage(
@@ -816,7 +837,7 @@ class Sync
                 STATUS_ERROR
             );
 
-            throw new StopException;
+            throw new StopException();
         }
     }
 }

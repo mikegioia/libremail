@@ -209,7 +209,7 @@ class Diagnostics
         try {
             $db = $this->di['db_factory'];
             $this->endTest(STATUS_SUCCESS, self::TEST_DB_EXISTS);
-        } catch (TerminateException $e) {
+        } catch (Exception $e) {
             $this->endTest(STATUS_ERROR, self::TEST_DB_EXISTS, $e);
         }
 
@@ -227,15 +227,12 @@ class Diagnostics
         try {
             $safeMb = 16;
             $db = $this->di['db_factory'];
-            $migrationModel = new MigrationModel;
+            $migrationModel = new MigrationModel();
             $safeSize = (int) ($safeMb * 1024 * 1024);
             $size = $migrationModel->getMaxAllowedPacket($db);
 
             if (! $size || $size < $safeSize) {
-                $e = new MaxAllowedPacketException(
-                    Util::formatBytes($size, 0),
-                    Util::formatBytes($safeSize, 0)
-                );
+                $e = new MaxAllowedPacketException($size, $safeSize);
 
                 $this->endTest(STATUS_WARNING, self::TEST_MAX_PACKET, $e);
             } else {
@@ -317,8 +314,6 @@ class Diagnostics
 
     /**
      * Mark test as started and possibly write to console.
-     *
-     * @param const $test
      */
     private function startTest(string $test)
     {
@@ -334,7 +329,6 @@ class Diagnostics
     /**
      * Mark test as finished and write to log and/or console.
      *
-     * @param const $test
      * @param Exception $e Optional exception for errors
      *
      * @throws FatalException
@@ -437,7 +431,7 @@ class Diagnostics
      *
      * @throws AttachmentsPathNotWriteableException
      *
-     * @return bool
+     * @return string
      */
     public static function checkAttachmentsPath(string $email, bool $createEmailDir = true)
     {
@@ -451,16 +445,14 @@ class Diagnostics
             throw new AttachmentsPathNotWriteableException($attachmentsDir);
         }
 
-        if (! $createEmailDir) {
-            return true;
-        }
-
         $attachmentsPath = substr($configPath, 0, 1) !== $slash
             ? BASEPATH."$slash$configPath"
             : $configPath;
         $attachmentsPath .= "$slash$email";
 
-        @mkdir($attachmentsPath, 0755, true);
+        if ($createEmailDir) {
+            @mkdir($attachmentsPath, 0755, true);
+        }
 
         return $attachmentsPath;
     }
@@ -484,7 +476,7 @@ class Diagnostics
         Container &$di,
         PDOException $e,
         bool $forwardException = false,
-        bool $sleepSeconds = null
+        int $sleepSeconds = null
     ) {
         $messages = [
             'Lost connection',

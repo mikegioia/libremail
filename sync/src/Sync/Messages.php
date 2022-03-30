@@ -93,7 +93,7 @@ class Messages
 
         $this->updateMessageNumbers($newIds, $savedIds, $folder);
         $this->downloadMessages($newIds, $savedIds, $folder, $options);
-        $this->markDeleted($newIds, $savedIds, $folder, $options);
+        $this->markDeleted($newIds, $savedIds, $folder);
         $this->updateSeenFlags($account, $folder);
         $this->updateFlaggedFlags($account, $folder);
         $this->flushPurged($account, $folder);
@@ -269,7 +269,7 @@ class Messages
         );
 
         try {
-            (new MessageModel)->markDeleted(
+            (new MessageModel())->markDeleted(
                 array_values($toDelete),
                 $folder->getAccountId(),
                 $folder->getId()
@@ -400,7 +400,7 @@ class Messages
 
         // Mark as seen anything unseen that's not in this collection
         try {
-            $updated = (new MessageModel)->markFlag(
+            $updated = (new MessageModel())->markFlag(
                 $unseenIds,
                 $folder->getAccountId(),
                 $folder->getId(),
@@ -438,7 +438,7 @@ class Messages
             $count = count($flaggedIds);
 
             try {
-                $updated = (new MessageModel)->markFlag(
+                $updated = (new MessageModel())->markFlag(
                     $flaggedIds,
                     $folder->getAccountId(),
                     $folder->getId(),

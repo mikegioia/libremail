@@ -4,6 +4,7 @@ namespace App;
 
 use App\Exceptions\Validation as ValidationException;
 use App\Message\AbstractMessage;
+use App\Message\AccountInfoMessage;
 use App\Message\AccountMessage;
 use App\Message\DiagnosticsMessage;
 use App\Message\ErrorMessage;

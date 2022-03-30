@@ -12,11 +12,6 @@ class ServerConsole extends Console
     public $background;
     public $interactive;
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Initializes the accepted arguments and saves them as class
      * properties accessible publicly.

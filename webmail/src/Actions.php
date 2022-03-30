@@ -15,9 +15,11 @@ use App\Actions\MarkRead as MarkReadAction;
 use App\Actions\MarkUnread as MarkUnreadAction;
 use App\Exceptions\NotFoundException;
 use App\Model\Task as TaskModel;
+use Exception;
 
 class Actions
 {
+    private $folders;
     private $params;
 
     // Actions
@@ -73,7 +75,6 @@ class Actions
         'unflag' => 'App\Actions\Unflag',
         'unspam' => 'App\Actions\Unspam',
         'delete' => 'App\Actions\Delete',
-        'unspam' => 'App\Actions\Unspam',
         'restore' => 'App\Actions\Restore',
         'archive' => 'App\Actions\Archive',
         'untrash' => 'App\Actions\Untrash',
@@ -105,8 +106,10 @@ class Actions
     /**
      * Parses the POST data and runs the requested actions.
      * This will also route the user to the next page.
+     *
+     * @throws Exception
      */
-    public function run()
+    public function run(): void
     {
         // Strings
         $action = $this->param('action');
@@ -161,7 +164,7 @@ class Actions
         $count = true === $options[self::ALL_MESSAGES]
             ? count($allMessageIds)
             : count($messageIds);
-        $this->setResponseMessage($action, $count, $copyTo + $moveTo);
+        $this->setResponseMessage($action, $count, array_merge($copyTo, $moveTo));
 
         // If we got here, redirect
         Url::actionRedirect($urlId, $folderId, $page, $action);
@@ -177,13 +180,13 @@ class Actions
         array $messageIds,
         array $allMessageIds,
         array $options = []
-    ) {
+    ): void {
         if (self::MARK_ALL_READ === $action) {
-            (new MarkReadAction)->run($allMessageIds, $this->folders);
+            (new MarkReadAction())->run($allMessageIds, $this->folders);
         } elseif (self::MARK_ALL_UNREAD === $action) {
-            (new MarkUnreadAction)->run($allMessageIds, $this->folders);
+            (new MarkUnreadAction())->run($allMessageIds, $this->folders);
         } elseif (self::FLAG === $action) {
-            (new FlagAction)->run(
+            (new FlagAction())->run(
                 [end($allMessageIds)],
                 $this->folders,
                 $options
@@ -198,7 +201,7 @@ class Actions
         }
     }
 
-    private function convertAction($action)
+    private function convertAction($action): string
     {
         return str_replace(
             array_keys(self::ACTION_CONVERSIONS),
@@ -212,7 +215,7 @@ class Actions
      * (by message-id) that are already in the folders. If remove folders
      * was selected, then remove the folders from the selected messages.
      */
-    private function copyMessages(array $messageIds, array $copyTo, string $action)
+    private function copyMessages(array $messageIds, array $copyTo, string $action): void
     {
         if (! $copyTo) {
             return;
@@ -240,7 +243,7 @@ class Actions
      * (by message-id) that are already in the folders. Moving messages
      * is a copy followed by a delete of the original message.
      */
-    private function moveMessages(array $messageIds, array $moveTo, int $fromFolderId)
+    private function moveMessages(array $messageIds, array $moveTo, int $fromFolderId): void
     {
         if (! $moveTo) {
             return;
@@ -250,15 +253,12 @@ class Actions
         $this->copyMessages($messageIds, $moveTo, self::COPY);
 
         // Then delete all of the messages
-        $deleteAction = new DeleteAction;
-        $deleteAction->run($messageIds, $this->folders, [
-            self::FROM_FOLDER_ID => $fromFolderId
-        ]);
+        $this->deleteMessages($messageIds, $fromFolderId);
     }
 
-    private function deleteMessages(array $messageIds, int $fromFolderId)
+    private function deleteMessages(array $messageIds, int $fromFolderId): void
     {
-        $deleteAction = new DeleteAction;
+        $deleteAction = new DeleteAction();
         $deleteAction->run($messageIds, $this->folders, [
             self::FROM_FOLDER_ID => $fromFolderId
         ]);
@@ -272,7 +272,7 @@ class Actions
         string $action,
         int $count,
         array $folders
-    ) {
+    ): void {
         $message = null;
         $nounUpper = 'Conversation';
         $nounPlural = 'conversations';

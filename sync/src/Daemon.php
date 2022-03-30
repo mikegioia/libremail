@@ -6,7 +6,14 @@ use App\Console\DaemonConsole;
 use App\Events\MessageEvent;
 use App\Exceptions\BadCommand as BadCommandException;
 use App\Message\AbstractMessage;
+use App\Message\AccountMessage;
+use App\Message\DiagnosticsMessage;
+use App\Message\ErrorMessage;
 use App\Message\HealthMessage;
+use App\Message\NoAccountsMessage;
+use App\Message\NotificationMessage;
+use App\Message\PidMessage;
+use App\Message\StatsMessage;
 use App\Traits\JsonMessage as JsonMessageTrait;
 use Exception;
 use React\ChildProcess\Process;
@@ -37,8 +44,14 @@ class Daemon
     private $webServerProcess;
     // References to true PIDs
     private $processPids = [];
-    private $processRestartInterval = [];
-    private $processLastRestartTime = [];
+    private $processRestartInterval = [
+        PROC_SYNC => null,
+        PROC_SERVER => null
+    ];
+    private $processLastRestartTime = [
+        PROC_SYNC => 0,
+        PROC_SERVER => 0
+    ];
 
     public const PROC_SYNC = 'sync';
     public const PROC_SERVER = 'server';
@@ -230,9 +243,8 @@ class Daemon
         // Resume the stdin stream, send the message and then pause
         // it again.
         $this->webServerProcess->stdin->write(
-            Message::packJson(
-                $message->toArray()
-            ));
+            Message::packJson($message->toArray())
+        );
     }
 
     /**
@@ -242,13 +254,14 @@ class Daemon
     {
         $this->broadcast(
             new HealthMessage(
-                $this->diagnostics,
+                $this->diagnostics ?: [],
                 [
                     PROC_SYNC => isset($this->processPids[PROC_SYNC]),
                     PROC_SERVER => isset($this->processPids[PROC_SERVER])
                 ],
                 $this->noAccounts
-            ));
+            )
+        );
     }
 
     public function halt()
@@ -300,26 +313,27 @@ class Daemon
             return false;
         }
 
-        switch ($message->getType()) {
-            case Message::PID:
+        switch (get_class($message)) {
+            case PidMessage::class:
                 $this->processPids[$process] = $message->pid;
                 break;
-            case Message::STATS:
+            case StatsMessage::class:
                 if ($message->accounts) {
                     $this->noAccounts = false;
                 }
                 // no break, broadcast
-            case Message::ERROR:
-            case Message::ACCOUNT:
-            case Message::NOTIFICATION:
+            case AccountMessage::class:
+            case ErrorMessage::class:
+            case NotificationMessage::class:
                 $this->emitter->dispatch(
                     EV_BROADCAST_MSG,
-                    new MessageEvent($message));
+                    new MessageEvent($message)
+                );
                 break;
-            case Message::NO_ACCOUNTS:
+            case NoAccountsMessage::class:
                 $this->noAccounts = true;
                 break;
-            case Message::DIAGNOSTICS:
+            case DiagnosticsMessage::class:
                 $this->diagnostics = $message->tests;
                 break;
         }

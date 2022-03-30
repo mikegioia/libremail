@@ -10,34 +10,35 @@ use App\Messages\MessageInterface;
 use App\Model;
 use App\Session;
 use App\View;
+use Laminas\Mail\Address;
+use Laminas\Mail\Exception\InvalidArgumentException;
 use Parsedown;
 use PDO;
-use Zend\Mail\Address;
-use Zend\Mail\Exception\InvalidArgumentException;
 
 class Outbox extends Model implements MessageInterface
 {
-    public $id;
-    public $to;
-    public $cc;
+    public $account_id;
+    public $attempts;
     public $bcc;
-    public $from;
-    public $sent;
+    public $cc;
+    public $created_at;
+    public $deleted;
     public $draft;
     public $failed;
+    public $from;
+    public $id;
     public $locked;
-    public $deleted;
-    public $subject;
-    public $reply_to;
-    public $attempts;
     public $parent_id;
+    public $reply_to;
+    public $send_after;
+    public $sent;
+    public $subject;
     public $text_html;
     public $text_plain;
-    public $account_id;
-    public $send_after;
-    public $created_at;
-    public $updated_at;
+    public $thread_id;
+    public $to;
     public $update_history;
+    public $updated_at;
 
     private $parent;
     private $account;
@@ -217,7 +218,7 @@ class Outbox extends Model implements MessageInterface
      */
     public function validate(bool $notifyOnError = false)
     {
-        $e = new ValidationException;
+        $e = new ValidationException();
 
         foreach (['to', 'cc', 'bcc'] as $field) {
             $this->validateAddresses($field, $e);

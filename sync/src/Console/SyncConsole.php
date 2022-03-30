@@ -311,7 +311,7 @@ class SyncConsole extends Console
      * Prompts the user to select an account type. Returns the service
      * on success or an empty string on error.
      *
-     * @return string
+     * @return array [string, string, int, string, int]
      */
     private function promptAccountType()
     {

@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use App\View;
+
 trait ConfigTrait
 {
     private static $config;
@@ -10,7 +12,7 @@ trait ConfigTrait
     public static function setConfig(array $config)
     {
         self::$config = $config;
-        self::setTimezone($config['TIMEZONE'] ?? self::DEFAULT_TZ);
+        self::setTimezone($config['TIMEZONE'] ?? View::DEFAULT_TZ);
     }
 
     public static function setTimezone(string $timezone)

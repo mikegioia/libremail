@@ -3,7 +3,6 @@
 namespace App;
 
 use League\CLImate\Argument\Parser;
-use League\CLImate\Argument\Summary;
 use League\CLImate\CLImate as CLI;
 
 abstract class Console
@@ -17,16 +16,14 @@ abstract class Console
     // Internal state
     private $parser;
     private $command;
-    private $summary;
     private $arguments;
 
     public const DESCRIPTION = 'LibreMail IMAP to SQL sync engine';
 
     public function __construct()
     {
-        $this->cli = new CLI;
-        $this->parser = new Parser;
-        $this->summary = new Summary;
+        $this->cli = new CLI();
+        $this->parser = new Parser();
         $this->command = $this->parser->command();
         $this->cli->description(self::DESCRIPTION);
 

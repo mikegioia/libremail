@@ -140,20 +140,22 @@ class Folder extends Model
     {
         $val = new Validator();
 
+        $val->required('account_id', 'Account ID')->numeric();
+        $val->required('name', 'Name')->lengthBetween(0, 255);
+
         $val->optional('count', 'Count')->integer();
         $val->optional('ignored', 'Ignored')->numeric();
         $val->optional('synced', 'Synced count')->numeric();
-        $val->required('account_id', 'Account ID')->numeric();
-        $val->required('name', 'Name')->lengthBetween(0, 255);
         $val->optional('uid_validity', 'UID validity')->numeric();
 
         $this->setData($data);
 
         $data = $this->getData();
+        $result = $val->validate($data);
 
-        if (! $val->validate($data)) {
+        if (! $result->isValid()) {
             $message = $this->getErrorString(
-                $val,
+                $result,
                 'This folder is missing required data.'
             );
 
@@ -261,7 +263,7 @@ class Folder extends Model
      * @param bool $failOnNotFound If set, throw an Exception when
      *   the folder isn't found
      *
-     * @return bool|FolderModel
+     * @return bool|Folder
      */
     public function getByName(
         int $accountId,
@@ -290,7 +292,7 @@ class Folder extends Model
      *
      * @param bool $indexByName Return array indexed by folder name
      *
-     * @return FolderModel array
+     * @return array<Folder>
      */
     public function getByAccount(int $accountId, bool $indexByName = true)
     {

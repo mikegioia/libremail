@@ -15,46 +15,61 @@ use stdClass;
 
 class Message extends Model implements MessageInterface
 {
-    public $id;
-    public $to;
-    public $cc;
-    public $bcc;
-    public $from;
-    public $date;
-    public $size;
-    public $seen;
-    public $draft;
-    public $purge;
-    public $synced;
-    public $recent;
-    public $flagged;
-    public $deleted;
-    public $subject;
-    public $charset;
-    public $answered;
-    public $reply_to;
-    public $date_str;
-    public $recv_str;
-    public $date_recv;
-    public $unique_id;
-    public $folder_id;
-    public $thread_id;
-    public $outbox_id;
-    public $text_html;
     public $account_id;
+    public $answered;
+    public $attachments;
+    public $bcc;
+    public $cc;
+    public $charset;
+    public $created_at;
+    public $date;
+    public $date_recv;
+    public $date_str;
+    public $deleted;
+    public $draft;
+    public $flagged;
+    public $folder_id;
+    public $from;
+    public $id;
+    public $in_reply_to;
     public $message_id;
     public $message_no;
-    public $text_plain;
-    public $references;
-    public $created_at;
-    public $in_reply_to;
-    public $attachments;
-    public $raw_headers;
+    public $outbox_id;
+    public $purge;
     public $raw_content;
+    public $raw_headers;
+    public $recent;
+    public $recv_str;
+    public $references;
+    public $reply_to;
+    public $seen;
+    public $size;
+    public $subject;
+    public $synced;
+    public $text_html;
+    public $text_plain;
+    public $thread_id;
+    public $to;
     public $uid_validity;
+    public $unique_id;
 
-    // Computed properties
-    public $thread_count;
+    // Added during thread computation
+    public $avatar_url = '';
+    public $body = '';
+    public $date_string = '';
+    public $datetime_string = '';
+    public $display_date = '';
+    public $folder_ids = [];
+    public $folders = [];
+    public $from_email = '';
+    public $from_name = '';
+    public $has_draft = false;
+    public $names = [];
+    public $seens = [];
+    public $snippet = '';
+    public $thread_count = 0;
+    public $timestamp = 0;
+    public $to_names = [];
 
     // Lazy-loaded outbox message
     private $outboxMessage;
@@ -1007,7 +1022,7 @@ class Message extends Model implements MessageInterface
      */
     private function setThreadCache(int $accountId, int $folderId, stdClass $counts)
     {
-        $this->threadsCache[$accountId.':'.$folderId] = $counts;
+        $this->threadCache[$accountId.':'.$folderId] = $counts;
     }
 
     /**
@@ -1239,7 +1254,7 @@ class Message extends Model implements MessageInterface
     /**
      * Create a new message in the specified folder.
      *
-     * @return Message
+     * @return Message|bool
      *
      * @throws Exception
      */
@@ -1263,7 +1278,9 @@ class Message extends Model implements MessageInterface
         }
 
         $data = $this->getData();
+
         unset($data['id']);
+
         $data['synced'] = 0;
         $data['deleted'] = 0;
         $data['unique_id'] = null;
@@ -1279,7 +1296,14 @@ class Message extends Model implements MessageInterface
             ->execute();
 
         if (! $newMessageId) {
-            throw new DatabaseInsertException("Failed copying message {$this->id} to Folder #{$folderId}");
+            $errorMessage = sprintf('%s %s %s %s',
+                'Failed copying message',
+                $this->id,
+                'to Folder #',
+                $folderId
+            );
+
+            throw new DatabaseInsertException($errorMessage);
         }
 
         $data['id'] = $newMessageId;

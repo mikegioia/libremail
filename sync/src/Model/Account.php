@@ -135,15 +135,18 @@ class Account extends Model
                 $this->config('email.services')
             ));
         $val->required('password', 'Password')->lengthBetween(0, 100);
+
         $val->optional('imap_host', 'IMAP host')->lengthBetween(0, 50);
         $val->optional('imap_port', 'IMAP port')->lengthBetween(0, 5);
         $val->optional('smtp_host', 'SMTP host')->lengthBetween(0, 50);
         $val->optional('smtp_port', 'SMTP port')->lengthBetween(0, 5);
         $val->optional('imap_flags', 'IMAP flags')->lengthBetween(0, 50);
 
-        if (! $val->validate($this->getData())) {
+        $result = $val->validate($this->getData());
+
+        if (! $result->isValid()) {
             $message = $this->getErrorString(
-                $val,
+                $result,
                 'There was a problem creating this account.'
             );
 

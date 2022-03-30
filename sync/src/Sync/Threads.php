@@ -55,6 +55,8 @@ class Threads
     private $unthreaded = [];
     // Index of all threads for subject matching
     private $threadMeta = [];
+    // List of all processed messages by message ID
+    private $allProcessed = [];
     // Index of subject hashes => thread IDs
     private $subjectHashes = [];
     // Index of thread IDs and their new thread ID
@@ -109,11 +111,27 @@ class Threads
     }
 
     /**
+     * @return int
+     */
+    public function getTotalIds()
+    {
+        return $this->totalIds ?: 0;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDirtyMessageIds()
+    {
+        return $this->dirtyMessageIds ?: [];
+    }
+
+    /**
      * Finds the last message ID to store and update.
      */
     private function storeMessageIdBounds()
     {
-        $model = new MessageModel;
+        $model = new MessageModel();
 
         $this->maxId = $model->getMaxMessageId($this->account->id);
 
@@ -124,7 +142,7 @@ class Threads
 
     private function storeTotalMessageIds()
     {
-        $this->totalIds = (new MessageModel)->countByAccount($this->account->id);
+        $this->totalIds = (new MessageModel())->countByAccount($this->account->id);
     }
 
     private function updateEmitter()
@@ -138,10 +156,8 @@ class Threads
      * Load all messages, or any new messages, from the database into
      * the internal storage array. This will instantiate a new message
      * object and store the references for that message.
-     *
-     * @param AccountModel $account
      */
-    private function storeMessages()
+    private function storeMessages(): void
     {
         $count = 0;
         $minId = $this->currentId;

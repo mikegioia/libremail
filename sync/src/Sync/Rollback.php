@@ -6,7 +6,9 @@ use App\Model;
 use App\Model\Message as MessageModel;
 use App\Model\Outbox as OutboxModel;
 use App\Model\Task as TaskModel;
+use Exception;
 use League\CLImate\CLImate;
+use PDOException;
 
 class Rollback
 {
