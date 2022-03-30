@@ -551,6 +551,44 @@ class Controller
         return $this->config[$file];
     }
 
+    /**
+     * Writes local asset files like a web server.
+     *
+     * @throws NotFoundException
+     */
+    public function stylesheet(string $file): void
+    {
+        $path = sprintf('%s/%s.css', BUILDDIR, $file);
+
+        if (! file_exists($path)) {
+            throw new NotFoundException();
+        }
+
+        header('Content-Type: text/css');
+        header('Cache-Control: max-age=86400'); // one day
+
+        (new View())->raw(file_get_contents($path));
+    }
+
+    /**
+     * Writes local asset files like a web server.
+     *
+     * @throws NotFoundException
+     */
+    public function font(string $file, string $ext): void
+    {
+        $path = sprintf('%s/%s.%s', FONTSDIR, $file, $ext);
+
+        if (! file_exists($path)) {
+            throw new NotFoundException();
+        }
+
+        header('Content-Type: font/'.$ext);
+        header('Cache-Control: max-age=86400'); // one day
+
+        (new View())->raw(file_get_contents($path));
+    }
+
     public function error404()
     {
         throw new NotFoundException();
