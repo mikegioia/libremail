@@ -58,7 +58,7 @@ class Message extends Model
     public $raw_content;
     public $uid_validity;
 
-    private $unserializedAttachments;
+    private $decodedAttachments;
 
     // Options
     public const OPT_SKIP_CONTENT = 'skip_content';
@@ -136,19 +136,28 @@ class Message extends Model
         return Util::intEq($this->deleted, 1);
     }
 
+    /**
+     * @return array
+     */
     public function getAttachments()
     {
-        if (! is_null($this->unserializedAttachments)) {
-            return $this->unserializedAttachments;
+        if (! is_null($this->decodedAttachments)) {
+            return $this->decodedAttachments;
         }
 
-        $this->unserializedAttachments = @unserialize($this->attachments);
+        $decoded = @json_decode($this->attachments);
 
-        return $this->unserializedAttachments;
+        $this->decodedAttachments = is_array($decoded)
+            ? $decoded
+            : [];
+
+        return $this->decodedAttachments;
     }
 
     /**
      * @throws NotFoundException
+     *
+     * @return Message
      */
     public function loadById()
     {
@@ -159,7 +168,7 @@ class Message extends Model
         $message = $this->getById($this->id);
 
         if ($message) {
-            $this->setData($message);
+            $this->setData((array) $message);
         } else {
             throw new NotFoundException(MESSAGE);
         }
@@ -167,10 +176,13 @@ class Message extends Model
         return $this;
     }
 
+    /**
+     * @return object|null
+     */
     public function getById(int $id)
     {
         if ($id <= 0) {
-            return;
+            return null;
         }
 
         return $this->db()
@@ -181,6 +193,9 @@ class Message extends Model
             ->fetch(PDO::FETCH_OBJ);
     }
 
+    /**
+     * @return array<Message>
+     */
     public function getByIds(array $ids)
     {
         return $this->db()
@@ -979,7 +994,7 @@ class Message extends Model
     }
 
     /**
-     * Attachments need to be serialized. They come in as an array
+     * Attachments need to be JSON encoded. They come in as an array
      * of objects with name, path, and id fields.
      *
      * @return string
