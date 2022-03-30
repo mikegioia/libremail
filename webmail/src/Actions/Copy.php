@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Actions;
 use App\Folders;
 use App\Messages\MessageInterface;
+use App\Model\Message as MessageModel;
 use App\Model\Task as TaskModel;
 use Exception;
 
@@ -31,7 +32,7 @@ class Copy extends Base
 
         $copied = $message->copyTo($options[Actions::TO_FOLDER_ID]);
 
-        if (is_a($copied, 'App\Model\Message')) {
+        if (is_a($copied, MessageModel::class)) {
             TaskModel::create(
                 $message->id,
                 $message->account_id,

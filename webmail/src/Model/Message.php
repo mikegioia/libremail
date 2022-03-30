@@ -1254,7 +1254,7 @@ class Message extends Model implements MessageInterface
     /**
      * Create a new message in the specified folder.
      *
-     * @return Message
+     * @return Message|bool
      *
      * @throws Exception
      */
@@ -1278,7 +1278,9 @@ class Message extends Model implements MessageInterface
         }
 
         $data = $this->getData();
+
         unset($data['id']);
+
         $data['synced'] = 0;
         $data['deleted'] = 0;
         $data['unique_id'] = null;
@@ -1294,7 +1296,14 @@ class Message extends Model implements MessageInterface
             ->execute();
 
         if (! $newMessageId) {
-            throw new DatabaseInsertException("Failed copying message {$this->id} to Folder #{$folderId}");
+            $errorMessage = sprintf('%s %s %s %s',
+                'Failed copying message',
+                $this->id,
+                'to Folder #',
+                $folderId
+            );
+
+            throw new DatabaseInsertException($errorMessage);
         }
 
         $data['id'] = $newMessageId;

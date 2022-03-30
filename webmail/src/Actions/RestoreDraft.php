@@ -30,7 +30,7 @@ class RestoreDraft extends Base
             0,
             $outbox->account_id,
             TaskModel::TYPE_DELETE_OUTBOX,
-            (int) $outbox->deleted,
+            (string) $outbox->deleted,
             null,
             $outbox->id
         );

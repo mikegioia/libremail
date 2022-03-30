@@ -138,9 +138,9 @@ class Names
                 : (($list[2]->index ?? 0) ? 2 : 1);
             $list[$lastIndex] = $this->getRow(
                 'Draft',
-                true,
+                1,
                 $list[$lastIndex]->index,
-                true
+                1
             );
         }
 

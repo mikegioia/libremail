@@ -109,9 +109,9 @@ class Account extends Model
                 'email' => trim($email),
                 'password' => trim($password),
                 'imap_host' => trim($imapHost),
-                'imap_port' => trim($imapPort),
+                'imap_port' => $imapPort,
                 'smtp_host' => trim($smtpHost),
-                'smtp_port' => trim($smtpPort)
+                'smtp_port' => $smtpPort
             ])
             ->table('accounts')
             ->where('id', '=', $this->id)
@@ -126,7 +126,7 @@ class Account extends Model
      *
      * @throws ServerException
      *
-     * @return Account
+     * @return Account|bool
      */
     public function create()
     {

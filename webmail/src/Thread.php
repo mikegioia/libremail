@@ -9,15 +9,13 @@ use Misd\Linkify\Linkify;
 
 class Thread
 {
-    private $thread;
     private $folders;
     private $message;
-    private $messages;
     private $threadId;
     private $folderId;
-    private $folderIds;
     private $accountId;
     private $messageCount;
+    private $messages = [];
     private $unreadIds = [];
     private $messageIds = [];
     private $threadIndex = [];
@@ -45,12 +43,16 @@ class Thread
         $this->threadId = $threadId;
         $this->folderId = $folderId;
         $this->accountId = $accountId;
+        $this->messageCount = 0;
 
         if ($load) {
             $this->load();
         }
     }
 
+    /**
+     * @return Thread
+     */
     public static function constructFromMessage(Message $message, Folders $folders)
     {
         return new self(
@@ -66,13 +68,13 @@ class Thread
      *
      * @throws NotFoundException
      */
-    public function load()
+    public function load(): void
     {
         $this->messages = [];
         $this->unreadIds = [];
         $this->threadFolderIds = [];
 
-        $allMessages = (new Message)->getThread(
+        $allMessages = (new Message())->getThread(
             $this->accountId,
             $this->threadId,
             $this->folders->getSkipIds($this->folderId),
@@ -80,7 +82,7 @@ class Thread
         );
 
         if (! $allMessages) {
-            throw new NotFoundException;
+            throw new NotFoundException();
         }
 
         $this->updateMessages($allMessages);
@@ -97,56 +99,89 @@ class Thread
         }
     }
 
+    /**
+     * @return Message
+     */
     public function get()
     {
-        return $this->message;
+        return $this->message ?: new Message();
     }
 
+    /**
+     * @return string
+     */
     public function getSubject()
     {
-        return $this->message->subject;
+        return $this->get()->subject;
     }
 
+    /**
+     * @return array
+     */
     public function getMessages()
     {
         return $this->messages;
     }
 
+    /**
+     * @return array
+     */
     public function getFolders()
     {
         return $this->threadFolders;
     }
 
+    /**
+     * @return array
+     */
     public function getFolderIds()
     {
         return $this->threadFolderIds;
     }
 
+    /**
+     * @return int
+     */
     public function getMessageCount()
     {
         return $this->messageCount;
     }
 
+    /**
+     * @return array
+     */
     public function getThreadIndex()
     {
         return $this->threadIndex;
     }
 
+    /**
+     * @return int
+     */
     public function getThreadId()
     {
         return $this->threadId;
     }
 
+    /**
+     * @return array
+     */
     public function getMessageIds()
     {
         return $this->messageIds;
     }
 
+    /**
+     * @return bool
+     */
     public function isUnread(int $id)
     {
         return in_array($id, $this->unreadIds);
     }
 
+    /**
+     * @return bool
+     */
     public function isOutboxMessage()
     {
         foreach ($this->messages as $message) {
@@ -180,7 +215,7 @@ class Thread
     /**
      * Adds additional fields to each message.
      */
-    private function updateMessages(array $allMessages)
+    private function updateMessages(array $allMessages): void
     {
         $messageIds = [];
         $escaper = new Escaper(self::UTF8);
@@ -215,19 +250,19 @@ class Thread
     /**
      * Adds two new properties, from_name and from_email.
      */
-    private function setFrom(Message &$message)
+    private function setFrom(Message &$message): void
     {
-        list(
-            $message->from_name,
-            $message->from_email
-        ) = $this->getNameParts($message->from);
+        list($name, $email) = $this->getNameParts($message->from);
+
+        $message->from_name = $name;
+        $message->from_email = $email;
     }
 
     /**
      * Prepares a shortened version of the to addresses and
      * names. This is added as a new property, to_names.
      */
-    private function setTo(Message &$message)
+    private function setTo(Message &$message): void
     {
         $to = [];
         $names = explode(',', $message->to);
@@ -245,7 +280,7 @@ class Thread
      * date for the message, and a timestamp property for use
      * in calls to date().
      */
-    private function setDate(Message &$message)
+    private function setDate(Message &$message): void
     {
         $now = time();
         $dateString = $message->date_recv ?: $message->date;
@@ -272,7 +307,7 @@ class Thread
         }
     }
 
-    private function setAvatar(Message &$message)
+    private function setAvatar(Message &$message): void
     {
         $message->avatar_url = sprintf(
             'https://www.gravatar.com/avatar/%s?d=identicon',
@@ -283,7 +318,7 @@ class Thread
     /**
      * Prepares an HTML-safe snippet to display in the message line.
      */
-    private function setSnippet(Message &$message, Escaper $escaper)
+    private function setSnippet(Message &$message, Escaper $escaper): void
     {
         $snippet = '';
         $separator = "\r\n";
@@ -309,7 +344,7 @@ class Thread
     /**
      * Parses the text/plain content into escaped HTML.
      */
-    private function setContent(Message &$message)
+    private function setContent(Message &$message): void
     {
         // Cleanse it
         $body = htmlspecialchars($message->text_plain, ENT_QUOTES, 'UTF-8');
@@ -331,7 +366,7 @@ class Thread
      * to collapse when rendering the thread. This also builds
      * the messageIds array.
      */
-    private function buildThreadIndex()
+    private function buildThreadIndex(): void
     {
         $group = [];
         $this->threadIndex = [];
@@ -387,7 +422,7 @@ class Thread
      * Takes a string like "John D. <john@abc.org>" and returns
      * the name and email broken out.
      *
-     * @return array<string, string> [string $name, string $email]
+     * @return array [string, string]
      */
     private function getNameParts(string $nameString)
     {

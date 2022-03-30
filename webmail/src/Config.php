@@ -21,7 +21,7 @@ class Config
     /**
      * Loads SMTP settings based on an imap host.
      *
-     * @return array<int, int> [$host, $port]
+     * @return array [$host, $port]
      */
     public static function getSmtpSettings(string $imapHost)
     {
@@ -41,7 +41,7 @@ class Config
     /**
      * Loads IMAP settings based on an email address.
      *
-     * @return array<int, int> [$host, $port]
+     * @return array [$host, $port]
      */
     public static function getImapSettings(string $address)
     {

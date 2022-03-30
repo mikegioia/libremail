@@ -23,7 +23,7 @@ class Task extends Model
     public $created_at;
 
     /**
-     * @var int Shared batch ID across batch inserted tasks
+     * @var int|null Shared batch ID across batch inserted tasks
      */
     private static $batchId;
 
@@ -84,6 +84,9 @@ class Task extends Model
         return new self($data);
     }
 
+    /**
+     * @return array
+     */
     public function getByBatchId(int $batchId)
     {
         return $this->db()
@@ -102,6 +105,8 @@ class Task extends Model
      * performed.
      *
      * @throws ValidationException
+     *
+     * @return int
      */
     public static function getBatchId()
     {
@@ -111,7 +116,7 @@ class Task extends Model
 
         $batch = Batch::create();
 
-        self::$batchId = $batch->id;
+        self::$batchId = (int) $batch->id;
 
         return self::$batchId;
     }
@@ -119,13 +124,15 @@ class Task extends Model
     /**
      * Updates the status of the task to done.
      */
-    public function revert()
+    public function revert(): void
     {
-        $this->updateStatus(self::STATUS_REVERTED);
+        $this->updateStatus((string) self::STATUS_REVERTED);
     }
 
     /**
      * Updates the status of the message.
+     *
+     * @return int|bool
      */
     private function updateStatus(string $status)
     {

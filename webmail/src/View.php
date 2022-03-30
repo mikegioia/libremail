@@ -76,7 +76,10 @@ class View
         }
 
         ob_start();
-        extract(array_merge($this->data, $data));
+
+        $combined = array_merge($this->data, $data);
+
+        extract($combined);
 
         include $viewPath;
 
@@ -193,7 +196,7 @@ class View
         $length = strlen((string) $number);
 
         if ($number < 1000) {
-            return $number;
+            return (string) $number;
         } elseif ($number < 1000000) {
             return round($number / pow(10, $length - 1), 1).'k';
         } elseif ($number < 1000000000) {

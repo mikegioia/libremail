@@ -28,9 +28,5 @@ class Imap
         } catch (Exception $e) {
             throw new ServerException(rtrim(ucfirst($e->getMessage()), '.').'.');
         }
-
-        if (! $imapStream) {
-            throw new ServerException('Failed to connect to IMAP mailbox.');
-        }
     }
 }

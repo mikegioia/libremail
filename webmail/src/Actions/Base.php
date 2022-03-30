@@ -95,8 +95,7 @@ abstract class Base
                 $sibling->id,
                 $sibling->account_id,
                 $type ?: $this->getType(),
-                $oldValue,
-                null
+                (string) $oldValue
             );
         }
     }
