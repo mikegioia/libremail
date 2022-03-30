@@ -22,6 +22,8 @@ define('LIBREMAIL', 'LibreMail');
 define('BASEDIR', __DIR__.'/..');
 define('DIR', DIRECTORY_SEPARATOR);
 define('VIEWDIR', BASEDIR.'/views');
+define('BUILDDIR', BASEDIR.'/www/build');
+define('FONTSDIR', BASEDIR.'/www/fonts');
 
 // Dates
 define('DATE_DATETIME', 'j F Y H:i');
@@ -35,6 +37,9 @@ define('ERR_NO_TRASH_FOLDER', 1010);
 define('ERR_NO_STARRED_FOLDER', 1011);
 define('ERR_NO_SPAM_FOLDER', 1012);
 define('ERR_TASK_ROLLBACK', 1020);
+
+// Server optionns
+define('SERVER_PHP', 'php');
 
 // Application preferences
 define('PREF_THEME', 'wm.theme');

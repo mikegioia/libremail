@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Actions\Base as BaseAction;
 use App\Exceptions\ClientException;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\ServerException;
@@ -51,7 +52,8 @@ Url::setBase($config['WEB_URL']);
 
 // Some classes utilize the config
 View::setConfig($config);
-Actions\Base::setConfig($config);
+Router::setConfig($config);
+BaseAction::setConfig($config);
 
 // Get the email address from the cookie (if set) and
 // fetch the account. Otherwise, load the first active
@@ -60,7 +62,7 @@ $email = $_COOKIE['email'] ?? null;
 $account = $email
     ? (new Account())->getByEmail($email)
     : (new Account())->getFirstActive();
-$account = $account ?: new Account;
+$account = $account ?: new Account();
 
 $router = new Router();
 $controller = new Controller($account);
@@ -137,6 +139,10 @@ if (! $account->exists()) {
     // Search messages
     $router->get('/search', [$controller, 'search']);
 }
+
+// Handle public asset files
+$router->get('/build/(\w+).css', [$controller, 'stylesheet']);
+$router->get('/fonts/([\w\-]+).(\w+)', [$controller, 'font']);
 
 // Handle 404s
 $router->set404([$controller, 'error404']);

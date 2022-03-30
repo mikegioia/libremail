@@ -1,5 +1,9 @@
 <?php
 
+namespace App;
+
+use App\Traits\ConfigTrait;
+
 /**
  * Simple router taking the Request URI and routing the request to
  * the specified callback.
@@ -9,11 +13,10 @@
  * Copied here for formatting and extending. The file isn't big
  * enough to pull from Composer or manage upstream changes.
  */
-
-namespace App;
-
 class Router
 {
+    use ConfigTrait;
+
     // The route patterns and their handling functions
     private $routes = [];
     // The before middleware route patterns and their handling functions
@@ -359,16 +362,22 @@ class Router
      */
     protected function getCurrentUri()
     {
-        // Get the current Request URI and remove rewrite basepath from it
-        // (= allows one to run the router in a subfolder)
-        $basepath = implode(
-            '/',
-            array_slice(
-                explode('/', $_SERVER['SCRIPT_NAME']),
-                0,
-                -1
-            )).'/';
-        $uri = substr($_SERVER['REQUEST_URI'], strlen($basepath));
+        $serverType = $this->env('WEB_SERVER', 'php');
+
+        if (SERVER_PHP === $serverType) {
+            $uri = $_SERVER['REQUEST_URI'];
+        } else {
+            // Get the current Request URI and remove rewrite basepath
+            // from it (allows one to run the router in a subfolder)
+            $basepath = implode(
+                '/',
+                array_slice(
+                    explode('/', $_SERVER['SCRIPT_NAME']),
+                    0,
+                    -1
+                )).'/';
+            $uri = substr($_SERVER['REQUEST_URI'], strlen($basepath));
+        }
 
         // Don't take query params into account on the URL
         if (strstr($uri, '?')) {
