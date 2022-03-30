@@ -26,6 +26,7 @@ use Evenement\EventEmitter as Emitter;
 use Exception;
 use League\CLImate\CLImate;
 use Monolog\Logger;
+use Pb\Imap\Exceptions\FolderAccessException;
 use Pb\Imap\Mailbox;
 use PDOException;
 use Pimple\Container;
@@ -60,6 +61,8 @@ class Sync
     private $maxRetries = 5;
     private $retriesFolders;
     private $retriesMessages;
+    private $retriesAccessFolder;
+    private $maxFolderRetries = 3;
 
     // Config
     public const READY_THRESHOLD = 60;
@@ -89,6 +92,7 @@ class Sync
         $this->retries = [];
         $this->retriesFolders = [];
         $this->retriesMessages = [];
+        $this->retriesAccessFolder = [];
 
         if ($di) {
             $this->cli = $di['cli'];
@@ -326,7 +330,7 @@ class Sync
             // Check if we're only syncing one folder
             if ($this->folder) {
                 try {
-                    $folderModel = new FolderModel;
+                    $folderModel = new FolderModel();
                     $folder = $folderModel->getByName(
                         $account->getId(),
                         $this->folder,
@@ -341,7 +345,7 @@ class Sync
                 $this->syncMessages($account, [$folder]);
             } else {
                 // Fetch folders and sync them to database
-                $folderModel = new FolderModel;
+                $folderModel = new FolderModel();
                 $this->retriesFolders[$account->email] = 1;
                 $this->syncFolders($account);
                 $folders = $folderModel->getByAccount($account->getId());
@@ -382,7 +386,8 @@ class Sync
             $waitSeconds = $this->config['app']['sync']['wait_seconds'];
             $this->log->info(
                 "Re-trying sync ({$this->retries[$account->email]}/".
-                "{$this->maxRetries}) in $waitSeconds seconds...");
+                "{$this->maxRetries}) in $waitSeconds seconds..."
+            );
             sleep($waitSeconds);
             ++$this->retries[$account->email];
 
@@ -517,7 +522,7 @@ class Sync
 
         // If we're sleeping forever, throw the exception now
         if (true === $this->sleep) {
-            throw new TerminateException;
+            throw new TerminateException();
         }
     }
 
@@ -542,7 +547,7 @@ class Sync
             return;
         }
 
-        $this->emitter = new Emitter;
+        $this->emitter = new Emitter();
 
         $this->emitter->on(self::EVENT_CHECK_HALT, function () {
             $this->checkForHalt();
@@ -573,9 +578,7 @@ class Sync
                 "({$this->maxRetries})."
             );
 
-            // @TODO increment a counter on the folder record
-            // if its >=3 then mark folder as inactive
-            throw new FolderSyncException;
+            throw new FolderSyncException();
         }
 
         $this->log->debug("Syncing IMAP folders for {$account->email}");
@@ -588,7 +591,7 @@ class Sync
                 $this->interactive
             );
             $folderList = $this->mailbox->getFolders();
-            $savedFolders = (new FolderModel)->getByAccount($account->getId());
+            $savedFolders = (new FolderModel())->getByAccount($account->getId());
             $folderSync->run($folderList, $savedFolders, $account);
         } catch (PDOException $e) {
             throw $e;
@@ -633,6 +636,7 @@ class Sync
 
         foreach ($folders as $folder) {
             $this->retriesMessages[$account->email] = 1;
+            $this->retriesAccessFolder[$account->email] = 1;
             $this->stats->setActiveFolder($folder->name);
 
             try {
@@ -730,12 +734,14 @@ class Sync
         } catch (Exception $e) {
             $this->stats->unsetActiveFolder();
             $this->log->error(substr($e->getMessage(), 0, 500));
+            $this->checkIgnoreFolder($account, $folder, $e);
             $this->checkForClosedConnection($e);
             $retryCount = $this->retriesMessages[$account->email];
             $waitSeconds = $this->config['app']['sync']['wait_seconds'];
             $this->log->info(
                 "Re-trying message sync ($retryCount/{$this->maxRetries}) ".
-                "for folder '{$folder->name}' in $waitSeconds seconds...");
+                "for folder '{$folder->name}' in $waitSeconds seconds..."
+            );
             sleep($waitSeconds);
             ++$this->retriesMessages[$account->email];
             $this->checkForHalt();
@@ -789,6 +795,41 @@ class Sync
         if ($this->daemon) {
             Message::send(new NotificationMessage($status, $message));
         }
+    }
+
+    /**
+     * Logs and determines if a folder has been inaccessible
+     * for too many times in a row. If so, the folder is set
+     * to be ignored. A message should be logged somewhere
+     * in the app to make this known and possibly reverted.
+     *
+     * @throws MessagesSyncException
+     */
+    private function checkIgnoreFolder(
+        AccountModel $account,
+        FolderModel $folder,
+        Exception $e
+    ): void {
+        if (! $e instanceof FolderAccessException) {
+            return;
+        }
+
+        if ($this->retriesAccessFolder[$account->email] >= $this->maxFolderRetries) {
+            $folder->ignored = 1;
+            $folder->save();
+
+            $this->log->error(
+                "The account '{$account->email}' has exceeded the max ".
+                "amount of retries ({$this->maxFolderRetries}) after trying ".
+                "to access the folder '{$folder->name}'. This folder is ".
+                'being marked as `ignored`! It will not be re-synced again '.
+                'until you remove this flag on the folder.'
+            );
+
+            throw new MessagesSyncException($folder->name);
+        }
+
+        ++$this->retriesAccessFolder[$account->email];
     }
 
     /**

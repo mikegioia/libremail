@@ -14,7 +14,7 @@ use Evenement\EventEmitter as Emitter;
 use Exception;
 use League\CLImate\CLImate;
 use Monolog\Logger;
-use Pb\Imap\Exceptions\MessageSizeLimit as MessageSizeLimitException;
+use Pb\Imap\Exceptions\MessageSizeLimitException;
 use Pb\Imap\Mailbox;
 use PDOException;
 
