@@ -329,18 +329,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/laminas-mail.git",
-                "reference": "12e4e606a1483f16956f27f27057c358901224d6"
+                "reference": "67170cf56300f6cbb7027fcb95620b6e3366da63"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/laminas-mail/zipball/12e4e606a1483f16956f27f27057c358901224d6",
-                "reference": "12e4e606a1483f16956f27f27057c358901224d6",
+                "url": "https://api.github.com/repos/ParticleBits/laminas-mail/zipball/67170cf56300f6cbb7027fcb95620b6e3366da63",
+                "reference": "67170cf56300f6cbb7027fcb95620b6e3366da63",
                 "shasum": ""
             },
             "require": {
                 "ext-iconv": "*",
                 "laminas/laminas-loader": "^2.5",
-                "laminas/laminas-mime": "^2.5",
+                "laminas/laminas-mime": "@dev",
                 "laminas/laminas-stdlib": "^2.7 || ^3.0",
                 "laminas/laminas-validator": "^2.10.2",
                 "laminas/laminas-zendframework-bridge": "^1.0",
@@ -348,7 +348,7 @@
                 "true/punycode": "^2.1"
             },
             "replace": {
-                "zendframework/zend-mail": "self.version"
+                "zendframework/zend-mail": "^2.10.0"
             },
             "require-dev": {
                 "laminas/laminas-coding-standard": "~1.0.0",
@@ -417,7 +417,7 @@
                 "chat": "https://laminas.dev/chat",
                 "forum": "https://discourse.laminas.dev"
             },
-            "time": "2020-03-20T15:10:16+00:00"
+            "time": "2022-03-31T17:54:21+00:00"
         },
         {
             "name": "laminas/laminas-mime",
@@ -425,12 +425,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/laminas-mime.git",
-                "reference": "300ed689509f866461f295f1088170b82c9b8de4"
+                "reference": "2a9eb43602551f34705e0a3c0a1f5dbfbeb6080c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/laminas-mime/zipball/300ed689509f866461f295f1088170b82c9b8de4",
-                "reference": "300ed689509f866461f295f1088170b82c9b8de4",
+                "url": "https://api.github.com/repos/ParticleBits/laminas-mime/zipball/2a9eb43602551f34705e0a3c0a1f5dbfbeb6080c",
+                "reference": "2a9eb43602551f34705e0a3c0a1f5dbfbeb6080c",
                 "shasum": ""
             },
             "require": {
@@ -443,7 +443,7 @@
             },
             "require-dev": {
                 "laminas/laminas-coding-standard": "~1.0.0",
-                "laminas/laminas-mail": "^2.6",
+                "laminas/laminas-mail": "@dev",
                 "phpunit/phpunit": "^5.7.27 || ^6.5.14 || ^7.5.20"
             },
             "suggest": {
@@ -501,7 +501,7 @@
                 "chat": "https://laminas.dev/chat",
                 "forum": "https://discourse.laminas.dev"
             },
-            "time": "2020-03-29T13:14:11+00:00"
+            "time": "2022-03-31T17:51:42+00:00"
         },
         {
             "name": "laminas/laminas-servicemanager",
@@ -1166,12 +1166,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ParticleBits/pdo.git",
-                "reference": "eb777b837911c68adedcf69a6da85b45ac072420"
+                "reference": "4bf8aea654809aa38990cdfa04933b863d6015a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ParticleBits/pdo/zipball/eb777b837911c68adedcf69a6da85b45ac072420",
-                "reference": "eb777b837911c68adedcf69a6da85b45ac072420",
+                "url": "https://api.github.com/repos/ParticleBits/pdo/zipball/4bf8aea654809aa38990cdfa04933b863d6015a4",
+                "reference": "4bf8aea654809aa38990cdfa04933b863d6015a4",
                 "shasum": ""
             },
             "require": {
@@ -1214,9 +1214,9 @@
             "support": {
                 "docs": "https://github.com/particlebits/pdo/blob/master/docs/README.md",
                 "issues": "https://github.com/particlebits/pdo/issues",
-                "source": "https://github.com/ParticleBits/pdo/tree/master"
+                "source": "https://github.com/ParticleBits/pdo/tree/2.1.2"
             },
-            "time": "2018-10-25T18:50:48+00:00"
+            "time": "2022-03-31T17:36:37+00:00"
         },
         {
             "name": "pimple/pimple",
