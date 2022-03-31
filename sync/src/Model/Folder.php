@@ -106,7 +106,7 @@ class Folder extends Model
         $folder = $this->getById($this->id);
 
         if ($folder) {
-            $this->setData($folder);
+            $this->setData((array) $folder);
         } else {
             throw new NotFoundException(FOLDER);
         }
@@ -114,10 +114,13 @@ class Folder extends Model
         return $this;
     }
 
+    /**
+     * @return object|null
+     */
     public function getById(int $id)
     {
         if ($id <= 0) {
-            return;
+            return null;
         }
 
         return $this->db()
@@ -136,7 +139,7 @@ class Folder extends Model
      * @throws DatabaseUpdateException
      * @throws DatabaseInsertException
      */
-    public function save(array $data = [])
+    public function save(array $data = []): void
     {
         $val = new Validator();
 
@@ -174,6 +177,7 @@ class Folder extends Model
 
         // In all cases, unset deleted flag
         $data['deleted'] = 0;
+
         // If it exists, unset deleted
         if ($exists) {
             $this->deleted = 0;
@@ -198,7 +202,7 @@ class Folder extends Model
 
         unset($data['id']);
 
-        $data['created_at'] = (new DateTime)->format(DATE_DATABASE);
+        $data['created_at'] = (new DateTime())->format(DATE_DATABASE);
 
         $newFolderId = $this->db()
             ->insert(array_keys($data))
@@ -213,7 +217,7 @@ class Folder extends Model
         $this->id = $newFolderId;
     }
 
-    public function delete()
+    public function delete(): void
     {
         $this->deleted = 1;
 
@@ -234,27 +238,23 @@ class Folder extends Model
      * Stores the meta information about the folder. This includes
      * the total count of messages on the IMAP server, and the
      * count of messages confirmed to be synced in our database.
-     *
-     * @return bool
      */
-    public function saveStats(int $count, int $synced)
+    public function saveStats(int $count, int $synced): void
     {
         $this->count = $count;
         $this->synced = $synced;
 
-        return $this->save();
+        $this->save();
     }
 
     /**
      * Updates a new UID validity flag on the folder.
-     *
-     * @return bool
      */
-    public function saveUidValidity(int $uidValidity)
+    public function saveUidValidity(int $uidValidity): void
     {
         $this->uid_validity = $uidValidity;
 
-        return $this->save();
+        $this->save();
     }
 
     /**
@@ -320,6 +320,11 @@ class Folder extends Model
         return $indexed;
     }
 
+    /**
+     * @throws NotFoundException
+     *
+     * @return Folder
+     */
     public function getSentByAccount(int $accountId)
     {
         $folders = $this->getByAccount($accountId);

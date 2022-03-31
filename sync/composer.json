@@ -29,7 +29,7 @@
         "monolog/monolog": "^1.25",
         "neitanod/forceutf8": "^2.0",
         "particle/validator": "^2.3",
-        "particlebits/imap": "^2.1",
+        "particlebits/imap": "^2.2",
         "particlebits/pdo": "@dev",
         "pimple/pimple": "^3.3",
         "react/child-process": "^0.5.2",

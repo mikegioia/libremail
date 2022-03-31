@@ -352,7 +352,7 @@ class Folders
             return;
         }
 
-        $this->folders = (new Folder)->getByAccount($this->accountId);
+        $this->folders = (new Folder())->getByAccount($this->accountId);
 
         // Add meta info to the folders
         foreach ($this->folders as $folder) {
@@ -463,6 +463,7 @@ class Folders
             }
 
             ++$index;
+
             $this->index[$branch['folder']->id] = (object) [
                 'pos' => $index,
                 'offset' => $offset,
