@@ -22,7 +22,14 @@
             Preview + Send
         </button>
         <span>or</span>
+    <?php
+    if ($message->outbox_id): ?>
+        <a href="#confirm-delete-<?php echo $message->outbox_id; ?>">Cancel</a>
+    <?php
+    else: ?>
         <a href="#">Cancel</a>
+    <?php
+    endif; ?>
     </div>
 </div>
 <div id="reply-<?php echo $message->id; ?>" class="reply-form compose">
@@ -43,7 +50,14 @@
             Preview + Send
         </button>
         <span>or</span>
+    <?php
+    if ($message->outbox_id): ?>
+        <a href="#confirm-delete-<?php echo $message->outbox_id; ?>">Cancel</a>
+    <?php
+    else: ?>
         <a href="#">Cancel</a>
+    <?php
+    endif; ?>
     </div>
 </div>
 <div class="reply-controls">
@@ -60,3 +74,19 @@
         <span class="normal">Forward</span>
     </a>
 </div>
+
+<?php
+if ($message->outbox_id):
+    $view->render('confirm', [
+        'id' => 'confirm-delete-'.$message->outbox_id,
+        'confirmLabel' => 'Yes, delete it',
+        'confirmName' => 'delete_draft',
+        'confirmValue' => '1',
+        'cancelLabel' => 'No!',
+        'action' => null,
+        'message' => 'Are you sure you want to delete this draft?',
+        'data' => [
+            'outbox_id' => $message->outbox_id
+        ]
+    ]);
+endif;

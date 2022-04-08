@@ -49,7 +49,7 @@
         endif; ?>
             <span class="actions">
                 <span class="button-group">
-                    <a href="#reply-all-<?php echo $message->id; ?>" class="button" title="Reply all">
+                    <a href="<?php echo App\Url::make('/replyall/%s', $message->id); ?>" class="button" title="Reply all">
                         <i class="fa fa-reply-all"></i>
                     </a><!--
                     --><span class="dropdown short inline-blocked">

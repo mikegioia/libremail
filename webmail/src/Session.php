@@ -6,6 +6,8 @@ use App\Exceptions\ClientException;
 
 class Session
 {
+    private static $sessionStarted = false;
+
     public const ERROR = 'error';
     public const SUCCESS = 'success';
 
@@ -15,6 +17,18 @@ class Session
     public const NOTIFICATIONS = 'notifications';
 
     public const FLAG_HIDE_JS_ALERT = 'hide_js_alert';
+
+    /**
+     * Starts the session and ensures this only happens once.
+     */
+    public static function start(): void
+    {
+        if (! self::$sessionStarted) {
+            session_start();
+
+            self::$sessionStarted = true;
+        }
+    }
 
     /**
      * Retrieve and optionally remove a session value.

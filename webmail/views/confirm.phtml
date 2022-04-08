@@ -1,17 +1,24 @@
 <div class="confirm dialog" id="<?php echo $id; ?>">
+<?php
+if ($action): ?>
     <form method="<?php echo $method ?? 'POST'; ?>" action="<?php echo $action ?? ''; ?>">
+<?php
+endif; ?>
         <div class="confirm-message"><?php echo $message; ?></div>
         <div class="dialog-controls">
             <a href="#" class="button button-danger"><?php echo $cancelLabel ?? 'Cancel'; ?></a>
             <button type="submit" class="button button-secondary" name="<?php echo $confirmName ?? 'submit'; ?>"<?php echo isset($confirmValue) ? ' value="'.$confirmValue.'"' : ''; ?>><?php echo $confirmLabel ?? 'Okay'; ?></button>
         </div>
-        <?php
+    <?php
     if (isset($data)):
         foreach ($data as $key => $value): ?>
         <input type="hidden" name="<?php echo $key; ?>" value="<?php echo $value; ?>">
         <?php
         endforeach;
-    endif; ?>
+    endif;
+if ($action): ?>
     </form>
+<?php
+endif; ?>
 </div>
 <div class="dialog-overlay"></div>

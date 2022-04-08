@@ -96,7 +96,7 @@ class View
     public function htmlHeaders(bool $startSession = true)
     {
         if ($startSession) {
-            session_start();
+            Session::start();
         }
 
         header('Content-Type: text/html');

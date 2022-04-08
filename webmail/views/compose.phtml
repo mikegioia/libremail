@@ -160,10 +160,10 @@ $view->render('confirm', [
     'id' => 'confirm-delete',
     'confirmLabel' => 'Yes, delete it',
     'cancelLabel' => 'No!',
-    'action' => App\Url::make('/outbox/delete'),
+    'action' => App\Url::deleteOutbox(),
     'message' => 'Are you sure you want to delete this message?',
     'data' => [
-        'id' => $message->id
+        'outbox_id' => $message->id
     ]
 ]);
 

@@ -55,7 +55,7 @@ class Controller
 
     public function undo(int $batchId): void
     {
-        session_start();
+        Session::start();
 
         (new Rollback())->run($batchId);
     }
@@ -102,7 +102,7 @@ class Controller
 
     public function closeJsAlert(): void
     {
-        session_start();
+        Session::start();
         Session::flag(Session::FLAG_HIDE_JS_ALERT, true);
         Url::redirectBack();
     }
@@ -161,7 +161,7 @@ class Controller
 
     public function createAccount(): void
     {
-        session_start();
+        Session::start();
 
         $name = Url::postParam('name', '');
         $port = Url::postParam('port', 993);
@@ -208,7 +208,7 @@ class Controller
 
     public function updateAccount(): void
     {
-        session_start();
+        Session::start();
 
         $name = Url::postParam('name', '');
         $port = Url::postParam('port', 993);
@@ -250,7 +250,7 @@ class Controller
 
     public function updateSettings(): void
     {
-        session_start();
+        Session::start();
         Meta::update($_POST);
         Session::notify('Your preferences have been saved!', Session::SUCCESS);
         Url::redirectBack('/settings');
@@ -325,9 +325,9 @@ class Controller
 
     public function deleteDraft(): void
     {
-        session_start();
+        Session::start();
 
-        $id = intval(Url::postParam('id'));
+        $id = intval(Url::postParam('outbox_id'));
         $folders = new Folders($this->account, []);
         $outboxMessage = (new Outbox($this->account))->getById($id);
 
@@ -356,7 +356,7 @@ class Controller
 
     public function draft(): void
     {
-        session_start();
+        Session::start();
 
         $sendPreview = array_key_exists('send_preview', $_POST);
         $compose = new Compose($this->account);
@@ -365,7 +365,7 @@ class Controller
 
     public function send(): void
     {
-        session_start();
+        Session::start();
 
         $id = intval(Url::postParam('id'));
         $edit = array_key_exists('edit', $_POST);
@@ -377,7 +377,7 @@ class Controller
 
     public function update(): void
     {
-        session_start();
+        Session::start();
 
         // Quick reply or reply-all can POST here
         // Editing a message will update the session and redirect
@@ -401,6 +401,8 @@ class Controller
                 Url::postParam('reply_all_edit'),
                 true
             );
+        } elseif (is_numeric(Url::postParam('delete_draft'))) {
+            $this->deleteDraft();
         } else {
             (new Actions(
                 new Folders($this->account, $this->getConfig('colors')),
@@ -411,7 +413,7 @@ class Controller
 
     public function action(): void
     {
-        session_start();
+        Session::start();
         Session::validateToken();
 
         (new Actions(

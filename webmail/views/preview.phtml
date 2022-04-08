@@ -173,7 +173,7 @@ $view->render('confirm', [
     'action' => App\Url::deleteOutbox(),
     'message' => 'Are you sure you want to delete this message?',
     'data' => [
-        'id' => $message->id
+        'outbox_id' => $message->id
     ]
 ]);
 
