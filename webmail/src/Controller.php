@@ -264,7 +264,7 @@ class Controller
             $message = $message->getById($outboxId);
 
             if (! $message->exists() || $message->sent) {
-                throw new NotFoundException;
+                throw new NotFoundException();
             }
         }
 
@@ -280,7 +280,7 @@ class Controller
         $outboxMessage = (new Outbox($this->account))->getById($outboxId);
 
         if (! $outboxMessage->exists() || $outboxMessage->sent) {
-            throw new NotFoundException;
+            throw new NotFoundException();
         }
 
         $this->page('preview', [
@@ -301,10 +301,16 @@ class Controller
     private function replyPage(int $parentId, bool $replyAll): void
     {
         $parentMessage = (new Message())->getById($parentId, true, true);
-        $parent = Thread::constructFromMessage(
+        $thread = Thread::constructFromMessage(
             $parentMessage,
             new Folders($this->account, [])
-        )->updateMessage($parentMessage);
+        );
+        $parent = $thread->updateMessage($parentMessage);
+
+        // Only allows one draft per thread
+        if ($thread->hasOutboxMessage()) {
+            Url::redirectRaw(Url::edit($thread->getOutboxMessage()->id));
+        }
 
         $this->page('reply', [
             'ccAddresses' => $parent->getReplyCcAddresses($this->account->email),
@@ -382,7 +388,8 @@ class Controller
             );
         } elseif (is_numeric(Url::postParam('reply_all_preview'))) {
             (new Compose($this->account))->reply(
-                Url::postParam('reply_all_preview')
+                Url::postParam('reply_all_preview'),
+                true
             );
         } elseif (is_numeric(Url::postParam('reply_edit'))) {
             (new Compose($this->account))->replyEdit(
@@ -491,7 +498,8 @@ class Controller
                 Message::ONLY_FLAGGED => STARRED === $id,
                 Message::IS_DRAFTS => $folderId === $folders->getDraftsId(),
                 Message::INCLUDE_DELETED => $folderId === $folders->getTrashId()
-            ]);
+            ]
+        );
 
         // Render the inbox
         $this->page('mailbox', [

@@ -16,7 +16,7 @@ section#main {
   left: 20rem;
   position: fixed;
   right: 0;
-  top: 5rem;
+  top: 5.3125rem;
   z-index: 1;
 }
 
@@ -42,7 +42,8 @@ section#main > h5 + .help-text {
   color: #555;
   font-size: 1.125rem;
   margin: -1rem 2rem 2.5rem 0;
-  max-width: calc(22% + 50rem);
+  max-width: calc(100% - 2rem);
+  width: calc(22% + 50rem);
 }
 
 /* Margin with notifications */

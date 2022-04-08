@@ -53,7 +53,10 @@ class Queue extends Delete
             $outboxMessage->id
         );
 
-        // Mark the external draft message as deleted
+        // Mark the external draft message as deleted.
+        // This will queue a task to delete the message on
+        // the server, even if the message doesn't exist.
+        // In that case, the task will just be ignored.
         parent::update($message, $folders, $options);
     }
 

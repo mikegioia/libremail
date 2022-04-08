@@ -172,6 +172,20 @@ class Thread
     }
 
     /**
+     * @return Message|null
+     */
+    public function getOutboxMessage()
+    {
+        foreach ($this->messages as $message) {
+            if ($message->outbox_id) {
+                return $message->getOutboxMessage();
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @return bool
      */
     public function isUnread(int $id)
@@ -182,7 +196,7 @@ class Thread
     /**
      * @return bool
      */
-    public function isOutboxMessage()
+    public function hasOutboxMessage()
     {
         foreach ($this->messages as $message) {
             if ($message->outbox_id) {

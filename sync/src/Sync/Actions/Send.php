@@ -49,7 +49,7 @@ class Send extends Base
             return false;
         }
 
-        $now = new DateTime;
+        $now = new DateTime();
         $sendAfter = new DateTime($this->outbox->send_after);
 
         if (! $this->outbox->send_after || $now < $sendAfter) {
@@ -60,7 +60,8 @@ class Send extends Base
     }
 
     /**
-     * Copies a message to a new folder.
+     * Copies a message to a new folder and sends a new
+     * SMTP message through the outgoing server.
      *
      * @see Base for params
      */
@@ -105,11 +106,6 @@ class Send extends Base
 
             return false;
         } catch (Exception $e) {
-            // UNCOMMENT WHEN TESTING
-            // @TODO
-            // print_r($e->getMessage());
-            // exit('General exception hit!');
-
             $this->task->log()->addError('Message failed to send');
             $this->task->log()->addError($e->getMessage());
             $this->task->fail(Actions::ERR_TRANSPORT_GENERAL);
@@ -144,7 +140,7 @@ class Send extends Base
         // Set the transport to disconnect on destruct
         $transport->setAutoDisconnect(true);
 
-        $message = new MailMessage;
+        $message = new MailMessage();
 
         $message->setEncoding(self::UTF8);
         $message->addFrom($this->account->email, $this->account->name);

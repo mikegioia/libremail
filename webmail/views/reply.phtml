@@ -61,7 +61,7 @@ $view->render('nav', [
         </div>
     </div>
     <!-- Form column -->
-    <form action="<?php echo App\Url::reply($parent->id); ?>" method="post">
+    <form action="<?php echo App\Url::compose(); ?>" method="post">
         <!-- To -->
         <input type="radio" id="toggle-to">
         <div class="row input-row addresses <?php echo isset($formErrors['to']) ? 'has-error' : 'hidden'; ?>">
@@ -250,6 +250,7 @@ $view->render('nav', [
                 <span>or</span>
                 <a href="/">Go back</a>
                 <input type="hidden" name="parent_id" value="<?php echo $parent->id; ?>">
+                <input type="hidden" name="thread_id" value="<?php echo $parent->thread_id; ?>">
             </div>
         </div>
     </form>

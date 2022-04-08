@@ -216,7 +216,7 @@ class Stats
     {
         $jsonStats = json_encode($this->getStats(true));
 
-        (new MetaModel)->update([
+        (new MetaModel())->update([
             MetaModel::HEARTBEAT => time(),
             MetaModel::SYNC_PID => $this->pid,
             MetaModel::ASLEEP => $this->asleep ? 1 : 0,

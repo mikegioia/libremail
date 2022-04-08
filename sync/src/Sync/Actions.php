@@ -88,7 +88,7 @@ class Actions
      */
     public function run(AccountModel $account)
     {
-        $tasks = (new TaskModel)->getTasksForSync($account->id);
+        $tasks = (new TaskModel())->getTasksForSync($account->id);
         $count = count($tasks);
 
         if (! $count) {
@@ -126,7 +126,7 @@ class Actions
      */
     public function getCountForProcessing(AccountModel $account)
     {
-        $tasks = (new TaskModel)->getTasksForSync($account->id);
+        $tasks = (new TaskModel())->getTasksForSync($account->id);
         $count = count($tasks);
 
         if (! $count) {
@@ -203,8 +203,8 @@ class Actions
      */
     private function processTask(TaskModel $task, AccountModel $account)
     {
-        $imapMessage = new Message;
-        $sqlFolder = new FolderModel;
+        $imapMessage = new Message();
+        $sqlFolder = new FolderModel();
         $sqlOutbox = new OutboxModel($task->outbox_id);
         $sqlMessage = new MessageModel($task->message_id);
 
@@ -243,6 +243,7 @@ class Actions
         );
 
         if (! $action->isReady()) {
+            // Task status is not updated
             return false;
         }
 

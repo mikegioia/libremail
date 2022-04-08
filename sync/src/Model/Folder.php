@@ -154,6 +154,9 @@ class Folder extends Model
         $this->setData($data);
 
         $data = $this->getData();
+
+        unset($data['id']);
+
         $result = $val->validate($data);
 
         if (! $result->isValid()) {
@@ -169,7 +172,6 @@ class Folder extends Model
         $exists = $this->db()
             ->select()
             ->from('folders')
-            ->where('deleted', '=', 0)
             ->where('name', '=', $this->name)
             ->where('account_id', '=', $this->account_id)
             ->execute()
@@ -199,8 +201,6 @@ class Folder extends Model
 
             return;
         }
-
-        unset($data['id']);
 
         $data['created_at'] = (new DateTime())->format(DATE_DATABASE);
 

@@ -303,6 +303,7 @@ CREATE TABLE IF NOT EXISTS `outbox` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `account_id` int(10) unsigned NOT NULL,
   `parent_id` int(10) unsigned NOT NULL,
+  `thread_id` int(10) unsigned NOT NULL,
   `to` text COLLATE utf8mb4_unicode_ci,
   `from` text COLLATE utf8mb4_unicode_ci,
   `cc` text COLLATE utf8mb4_unicode_ci,
@@ -330,6 +331,8 @@ CREATE TABLE IF NOT EXISTS `outbox` (
 - `id` Unique integer identifying the outbox message.
 - `account_id` Foreign key referencing the account from the `accounts` table.
 - `parent_id` Foreign key referencing the message that this message is replying
+  to. Not used if the message is starting a new thread.
+- `thread_id` Foreign key referencing the thread that this message is replying
   to. Not used if the message is starting a new thread.
 - `to` Comma separated list of addresses to send the message to.
 - `from` Address used in the from header.

@@ -12,7 +12,14 @@
             --><span><?php $view->clean($message->snippet); ?></span>
         </span>
         <span class="date" title="<?php echo $message->datetime_string; ?>"><?php echo $message->date_string; ?></span>
-        <iframe src="<?php echo App\Url::make( '/star/thread/%s/%s/%s.html', $view->meta(PREF_THEME, 'default'), $message->id, $message->flagged == 1 ? 'on' : 'off' ); ?>" class="star"></iframe>
+    <?php
+    if ($message->isDraft()): ?>
+        <span class="star"></span>
+    <?php
+    else: ?>
+        <iframe src="<?php echo App\Url::make('/star/thread/%s/%s/%s.html', $view->meta(PREF_THEME, 'default'), $message->id, $message->flagged == 1 ? 'on' : 'off'); ?>" class="star"></iframe>
+    <?php
+    endif; ?>
     </label>
     <article id="message-<?php echo $message->id; ?>" class="thread-msg">
         <label for="thread-msg-checkbox-<?php echo $message->id; ?>" class="thread-msg-header u-cf">
@@ -32,7 +39,14 @@
                 </span>
             </span>
             <span class="date" title="<?php echo $message->datetime_string; ?>"><?php echo $message->date_string; ?></span>
+        <?php
+        if ($message->isDraft()): ?>
+            <span class="star"></span>
+        <?php
+        else: ?>
             <iframe src="<?php echo App\Url::make('/star/thread/%s/%s/%s.html', $view->meta(PREF_THEME, 'default'), $message->id, $message->flagged == 1 ? 'on' : 'off'); ?>" class="star"></iframe>
+        <?php
+        endif; ?>
             <span class="actions">
                 <span class="button-group">
                     <a href="#reply-all-<?php echo $message->id; ?>" class="button" title="Reply all">
@@ -51,6 +65,8 @@
                                 <i class="fa left-icon fa-reply-all"></i>
                                 <a href="<?php echo App\Url::make('/replyall/%s', $message->id); ?>">Reply all</a>
                             </li>
+                        <?php
+                        if (! $message->isDraft()): ?>
                             <li>
                                 <i class="fa left-icon fa-share"></i>
                                 <a href="<?php echo App\Url::make('/forward/%s', $message->id); ?>">Forward</a>
@@ -87,6 +103,8 @@
                                     'folder_id' => $folders->getInboxId()
                                 ]); ?>">Delete this message</a>
                             </li>
+                        <?php
+                        endif; ?>
                         </ul>
                     </span>
                 </span>

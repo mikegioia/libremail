@@ -235,7 +235,8 @@ blank address input between two valid inputs.
 
 .compose.preview .help-text {
   margin-top: 1rem;
-  max-width: calc(22% + 50rem);
+  max-width: calc(100% - 2rem);
+  width: calc(22% + 50rem);
 }
 
 .compose.preview #schedule {
@@ -304,6 +305,7 @@ blank address input between two valid inputs.
 
 .compose.reply .in-reply-to {
   margin: -1rem 2rem 2rem 0;
+  max-width: calc(100% - 2rem - 2px);
   position: relative;
   width: calc(22% + 50rem);
 }

@@ -13,7 +13,7 @@
         "laminas/laminas-escaper": "^2.6",
         "laminas/laminas-mail": "^2.10",
         "misd/linkify": "^1.1",
-        "particlebits/pdo": "^2.0"
+        "particlebits/pdo": "@dev"
     },
     "scripts": {
         "compile": "php compile.php",

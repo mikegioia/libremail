@@ -53,11 +53,13 @@
   border-bottom: none;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
+  z-index: 24;
 }
 
 .dropdown > a:focus + ul,
 .dropdown ul:hover {
   display: block;
+  z-index: 23;
 }
 
 .dropdown > a:focus + ul {

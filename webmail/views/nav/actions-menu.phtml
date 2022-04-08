@@ -56,7 +56,7 @@
         </button>
     <?php
     elseif ($folders->getDraftsId() === $folderId):
-        if (isset($thread) && $thread->isOutboxMessage()): ?>
+        if (isset($thread) && $thread->hasOutboxMessage()): ?>
         <button name="action" value="edit" class="icon button control">
             <span class="normal">Edit draft</span>
         </button><!--

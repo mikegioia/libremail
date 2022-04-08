@@ -36,14 +36,17 @@ class Compose
             Model::getDb()->beginTransaction();
 
             $outbox = new Outbox($this->account);
-            $outbox->setPostData($_POST)->save($isPreview);
+            $outbox->setPostData($_POST)
+                ->disallowMultipleThreadReplies()
+                ->save($isPreview);
 
             // Update the draft if it exists, and optionally create
             // a new one if this message is a draft
-            (new Message)->createOrUpdateDraft($outbox, $draftId);
-            Session::notify('Draft message saved.', Session::SUCCESS);
+            (new Message())->createOrUpdateDraft($outbox, $draftId);
 
             Model::getDb()->commit();
+
+            Session::notify('Draft message saved.', Session::SUCCESS);
 
             if ($isPreview && ! Session::hasErrors()) {
                 Url::redirectRaw(Url::preview($outbox->id));
@@ -57,7 +60,7 @@ class Compose
             Session::formErrors($e->getErrors());
             Session::formData($_POST);
 
-            if (isset($outbox->id) && $outbox->exists()) {
+            if (isset($outbox) && $outbox->exists()) {
                 Url::redirectRaw(Url::edit($outbox->id));
             } else {
                 Url::redirectRaw(Url::compose());
@@ -134,7 +137,7 @@ class Compose
      */
     public function reply(int $parentId, bool $replyAll = true)
     {
-        $parent = (new Message)->getById($parentId);
+        $parent = (new Message())->getById($parentId);
         $draftId = $this->folders->getDraftsId();
         $data = $this->getReplyData($parent, $_POST, $replyAll);
 
@@ -142,15 +145,17 @@ class Compose
             Model::getDb()->beginTransaction();
 
             $outbox = new Outbox($this->account, $parent);
-            $outbox->setPostData($data)->save(true);
+            $outbox->setPostData($data)
+                ->disallowMultipleThreadReplies()
+                ->save(true);
 
             // Update the draft if it exists, and optionally create
             // a new one if this message is a draft
-            (new Message)->createOrUpdateDraft($outbox, $draftId, $parent);
-
-            Session::notify('Draft message saved.', Session::SUCCESS);
+            (new Message())->createOrUpdateDraft($outbox, $draftId, $parent);
 
             Model::getDb()->commit();
+
+            Session::notify('Draft message saved.', Session::SUCCESS);
 
             if (! Session::hasErrors()) {
                 Url::redirectRaw(Url::preview($outbox->id));
@@ -165,7 +170,7 @@ class Compose
             Session::formErrors($e->getErrors());
             Session::formData($data);
 
-            if (isset($outbox->id) && $outbox->exists()) {
+            if (isset($outbox) && $outbox->exists()) {
                 Url::redirectRaw(Url::edit($outbox->id));
             } else {
                 Url::redirectRaw(Url::compose());
@@ -185,12 +190,14 @@ class Compose
      */
     public function replyEdit(int $parentId, bool $replyAll = true)
     {
-        $parent = (new Message)->getById($parentId);
+        $parent = (new Message())->getById($parentId);
         $data = $this->getReplyData($parent, $_POST, $replyAll);
 
         Session::formData($data);
 
-        if ($replyAll) {
+        if ($parent->outbox_id) {
+            Url::redirectRaw(Url::edit($parent->outbox_id));
+        } elseif ($replyAll) {
             Url::redirectRaw(Url::replyAll($parentId));
         } else {
             Url::redirectRaw(Url::reply($parentId));
@@ -213,6 +220,7 @@ class Compose
         $subject = 'Re: '.$this->cleanSubject($parent->subject);
 
         return [
+            'id' => $parent->outbox_id,
             'to' => $to,
             'cc' => $cc,
             'subject' => $subject,

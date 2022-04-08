@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS `outbox` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `account_id` int(10) unsigned NOT NULL,
   `parent_id` int(10) unsigned DEFAULT NULL,
+  `thread_id` int(10) unsigned DEFAULT NULL,
   `to` text COLLATE utf8mb4_unicode_ci,
   `from` text COLLATE utf8mb4_unicode_ci,
   `cc` text COLLATE utf8mb4_unicode_ci,
@@ -22,5 +23,7 @@ CREATE TABLE IF NOT EXISTS `outbox` (
   `update_history` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
   INDEX (`account_id`),
+  INDEX (`parent_id`),
+  INDEX (`thread_id`),
   INDEX (`sent`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

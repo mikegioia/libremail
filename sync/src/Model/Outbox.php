@@ -13,26 +13,27 @@ class Outbox extends Model
 {
     use ModelTrait;
 
-    public $id;
-    public $to;
-    public $cc;
+    public $account_id;
+    public $attempts;
     public $bcc;
-    public $from;
-    public $sent;
+    public $cc;
+    public $created_at;
+    public $deleted;
     public $draft;
     public $failed;
+    public $from;
+    public $id;
     public $locked;
-    public $deleted;
-    public $subject;
-    public $reply_to;
-    public $attempts;
     public $parent_id;
+    public $reply_to;
+    public $sent;
+    public $subject;
     public $text_html;
-    public $account_id;
     public $text_plain;
-    public $created_at;
-    public $updated_at;
+    public $thread_id;
+    public $to;
     public $update_history;
+    public $updated_at;
 
     public const SENT = 'sent';
     public const FAILED = 'failed';
@@ -42,26 +43,27 @@ class Outbox extends Model
     public function getData()
     {
         return [
-            'id' => $this->id,
-            'to' => $this->to,
-            'cc' => $this->cc,
+            'account_id' => $this->account_id,
+            'attempts' => $this->attempts,
             'bcc' => $this->bcc,
-            'from' => $this->from,
-            'sent' => $this->sent,
+            'cc' => $this->cc,
+            'created_at' => $this->created_at,
+            'deleted' => $this->deleted,
             'draft' => $this->draft,
             'failed' => $this->failed,
+            'from' => $this->from,
+            'id' => $this->id,
             'locked' => $this->locked,
-            'deleted' => $this->deleted,
-            'subject' => $this->subject,
-            'reply_to' => $this->reply_to,
-            'attempts' => $this->attempts,
             'parent_id' => $this->parent_id,
+            'reply_to' => $this->reply_to,
+            'sent' => $this->sent,
+            'subject' => $this->subject,
             'text_html' => $this->text_html,
-            'account_id' => $this->account_id,
             'text_plain' => $this->text_plain,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'update_history' => $this->update_history
+            'thread_id' => $this->thread_id,
+            'to' => $this->to,
+            'update_history' => $this->update_history,
+            'updated_at' => $this->updated_at
         ];
     }
 

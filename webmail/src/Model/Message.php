@@ -76,7 +76,7 @@ class Message extends Model implements MessageInterface
     // Cache for threading info
     private $threadCache = [];
     // Cache for attachments
-    private $unserializedAttachments;
+    private $decodedAttachments;
 
     // Flags
     public const FLAG_SEEN = 'seen';
@@ -144,15 +144,22 @@ class Message extends Model implements MessageInterface
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getAttachments()
     {
-        if (! is_null($this->unserializedAttachments)) {
-            return $this->unserializedAttachments;
+        if (! is_null($this->decodedAttachments)) {
+            return $this->decodedAttachments;
         }
 
-        $this->unserializedAttachments = @unserialize($this->attachments);
+        $decoded = @json_decode($this->attachments);
 
-        return $this->unserializedAttachments;
+        $this->decodedAttachments = is_array($decoded)
+            ? $decoded
+            : [];
+
+        return $this->decodedAttachments;
     }
 
     public function getOriginal()
@@ -309,7 +316,7 @@ class Message extends Model implements MessageInterface
             return $this->outboxMessage;
         }
 
-        $this->outboxMessage = (new Outbox)->getById($this->outbox_id ?: 0);
+        $this->outboxMessage = (new Outbox())->getById($this->outbox_id ?: 0);
 
         return $this->outboxMessage;
     }
@@ -1111,6 +1118,15 @@ class Message extends Model implements MessageInterface
     }
 
     /**
+     * @return bool
+     */
+    public function isDraft()
+    {
+        return is_numeric($this->outbox_id)
+            || 1 === (int) $this->draft;
+    }
+
+    /**
      * Creates or modifies a draft message based on an outbox message.
      * Only creates a new message if the outbox is a draft.
      *
@@ -1202,11 +1218,11 @@ class Message extends Model implements MessageInterface
                 throw new DatabaseInsertException('Failed creating new message');
             }
 
-            $message->id = $newMessageId;
+            $message->id = (int) $newMessageId;
 
             // Update the thread ID
             if (true === $setThreadId) {
-                $message->setThreadId($newMessageId);
+                $message->setThreadId($message->id);
             }
         }
 
@@ -1322,7 +1338,7 @@ class Message extends Model implements MessageInterface
 
         $deleted = $this->db()
             ->delete()
-            ->table('messages')
+            ->from('messages')
             ->where('id', '=', $this->id)
             ->execute();
 

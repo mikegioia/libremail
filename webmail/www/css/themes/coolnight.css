@@ -28,15 +28,20 @@
 }
 
 /* Base elements */
-body.theme-coolnight a,
-body.theme-coolnight .button.link-button {
+body.theme-coolnight a {
   color: #1eaedb;
 }
+body.theme-coolnight .button.link-button {
+  background-color: transparent !important;
+  color: #1eaedb !important;
+}
 body.theme-coolnight a:hover,
-body.theme-coolnight a:focus,
+body.theme-coolnight a:focus {
+  color: #36cfff;
+}
 body.theme-coolnight .button.link-button:hover,
 body.theme-coolnight .button.link-button:focus {
-  color: #36cfff;
+  color: #36cfff !important;
 }
 
 body.theme-coolnight aside,
@@ -390,11 +395,13 @@ body.theme-coolnight .notifications .notification {
 }
 
 body.theme-coolnight .notifications .notification.success {
+  background-color: #94cf87;
   border: 1px solid #193114;
   box-shadow: 0 1px 2px #2b2b2b;
 }
 
 body.theme-coolnight .notifications .notification.error {
+  background-color: #d9ab94;
   border: 1px solid #2d1414;
   box-shadow: 0 1px 2px #2b2b2b;
 }

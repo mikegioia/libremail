@@ -2,6 +2,7 @@
 
 namespace App\Model;
 
+use App\Exceptions\ClientException;
 use App\Exceptions\DatabaseInsertException;
 use App\Exceptions\DatabaseUpdateException;
 use App\Exceptions\NotFoundException;
@@ -70,8 +71,9 @@ class Outbox extends Model implements MessageInterface
         }
 
         // If a message came in, set the message as the parent
-        if ($this->parent) {
+        if ($message) {
             $this->parent_id = $message->id;
+            $this->thread_id = $message->thread_id;
         }
 
         if ($data) {
@@ -80,6 +82,9 @@ class Outbox extends Model implements MessageInterface
         }
     }
 
+    /**
+     * @return self
+     */
     public function setPostData(array $data)
     {
         $this->id = $data['id'] ?? 0;
@@ -98,6 +103,10 @@ class Outbox extends Model implements MessageInterface
             $this->draft = 0;
         }
 
+        if (isset($data['parent_id'])) {
+            $this->parent_id = $data['parent_id'];
+        }
+
         if (isset($data['thread_id'])) {
             $this->thread_id = $data['thread_id'];
         }
@@ -107,6 +116,8 @@ class Outbox extends Model implements MessageInterface
 
     /**
      * Copies data from a message into this outbox message.
+     *
+     * @return self
      */
     public function copyMessageData(Message $message, bool $isDraft = true)
     {
@@ -127,10 +138,13 @@ class Outbox extends Model implements MessageInterface
         return $this->getById($id, $includeDeleted);
     }
 
+    /**
+     * @return Outbox
+     */
     public function getById(int $id, bool $includeDeleted = false)
     {
         if (! $id) {
-            return new self;
+            return new self();
         }
 
         $qry = $this->db()
@@ -147,14 +161,48 @@ class Outbox extends Model implements MessageInterface
         return new self($this->account, null, $data ?: null);
     }
 
+    /**
+     * @return array<Outbox>
+     */
     public function getByIds(array $ids)
     {
-        return $this->db()
+        if (! $ids) {
+            return [];
+        }
+
+        $results = $this->db()
             ->select()
             ->from('outbox')
             ->whereIn('id', $ids)
             ->execute()
-            ->fetchAll(PDO::FETCH_CLASS, get_class());
+            ->fetchAll();
+        $items = [];
+
+        foreach ($results as $data) {
+            $items[] = new self($this->account, null, $data ?: null);
+        }
+
+        return $items;
+    }
+
+    /**
+     * @return array<Outbox>
+     */
+    public function getByThreadId(int $threadId)
+    {
+        $results = $this->db()
+            ->select()
+            ->from('outbox')
+            ->where('thread_id', '=', $threadId)
+            ->execute()
+            ->fetchAll();
+        $items = [];
+
+        foreach ($results as $data) {
+            $items[] = new self($this->account, null, $data ?: null);
+        }
+
+        return $items;
     }
 
     /**
@@ -162,6 +210,8 @@ class Outbox extends Model implements MessageInterface
      *
      * @throws DatabaseInsertException
      * @throws DatabaseUpdateException
+     *
+     * @return self
      */
     public function save(bool $notifyOnError = false)
     {
@@ -173,8 +223,9 @@ class Outbox extends Model implements MessageInterface
             'from' => $this->from,
             'subject' => $this->subject,
             'draft' => $this->draft ? 1 : 0,
-            'parent_id' => $this->parent_id,
             'account_id' => $this->account_id,
+            'parent_id' => $this->parent_id,
+            'thread_id' => $this->thread_id,
             'text_html' => $this->text_html,
             'text_plain' => $this->text_plain,
             'to' => $this->addressString($this->to),
@@ -216,7 +267,7 @@ class Outbox extends Model implements MessageInterface
      *
      * @throws ValidationException
      */
-    public function validate(bool $notifyOnError = false)
+    public function validate(bool $notifyOnError = false): void
     {
         $e = new ValidationException();
 
@@ -237,6 +288,41 @@ class Outbox extends Model implements MessageInterface
         }
     }
 
+    /**
+     * Looks for any other outbox messages with this same
+     * thread ID that are not this same message, and throws
+     * an exception if one exists already.
+     *
+     * This prevents two replies existing on the same thread.
+     *
+     * @throws ClientException
+     *
+     * @return self
+     */
+    public function disallowMultipleThreadReplies()
+    {
+        if (! $this->thread_id) {
+            return $this;
+        }
+
+        $outboxMessages = $this->getByThreadId($this->thread_id);
+
+        // Halt if any outbox messages already exist
+        if ($outboxMessages) {
+            $e = new ClientException(
+                'A draft message already exists for this thread! '.
+                'Please go back and edit or remove that message.'
+            );
+
+            throw $e;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return self
+     */
     public function reset()
     {
         $this->id = 0;
@@ -255,6 +341,8 @@ class Outbox extends Model implements MessageInterface
 
     /**
      * Determines if this message is completely empty.
+     *
+     * @return bool
      */
     public function isEmpty()
     {
@@ -265,16 +353,25 @@ class Outbox extends Model implements MessageInterface
             && ! $this->text_plain;
     }
 
+    /**
+     * @return bool
+     */
     public function isSent()
     {
         return 1 === (int) $this->sent;
     }
 
+    /**
+     * @return bool
+     */
     public function isDraft()
     {
         return 1 === (int) $this->draft;
     }
 
+    /**
+     * @return bool
+     */
     public function isPastDue()
     {
         $now = $this->utcDate();
@@ -284,6 +381,9 @@ class Outbox extends Model implements MessageInterface
             && (! $this->send_after || $now >= $sendAfter);
     }
 
+    /**
+     * @return bool
+     */
     public function isScheduled()
     {
         return ! $this->isSent()
@@ -291,11 +391,17 @@ class Outbox extends Model implements MessageInterface
             && $this->send_after;
     }
 
+    /**
+     * @return bool
+     */
     public function isReply()
     {
         return 0 !== (int) $this->parent_id;
     }
 
+    /**
+     * @return bool
+     */
     public function exists()
     {
         return is_numeric($this->id)
@@ -343,6 +449,9 @@ class Outbox extends Model implements MessageInterface
             : '';
     }
 
+    /**
+     * @return string
+     */
     public function getDeliveryDate()
     {
         if (! $this->send_after) {
@@ -367,6 +476,9 @@ class Outbox extends Model implements MessageInterface
         return $sendAfter->format(View::DATE_SHORT);
     }
 
+    /**
+     * @return array
+     */
     public function getAddresses()
     {
         $this->convertAddresses();
@@ -409,6 +521,9 @@ class Outbox extends Model implements MessageInterface
         return $this->unreadCount;
     }
 
+    /**
+     * @return array<Outbox>
+     */
     public function getActive()
     {
         if (! $this->account_id) {
@@ -430,6 +545,8 @@ class Outbox extends Model implements MessageInterface
      * Removes the delete flag.
      *
      * @throws NotFoundException
+     *
+     * @return int|bool
      */
     public function restore(bool $draft = false)
     {
@@ -461,6 +578,8 @@ class Outbox extends Model implements MessageInterface
 
     /**
      * @throws NotFoundException
+     *
+     * @return int|bool
      */
     public function softDelete()
     {
@@ -485,6 +604,8 @@ class Outbox extends Model implements MessageInterface
 
     /**
      * Not used, implemented from MessageInterface.
+     *
+     * @return array
      */
     public function getSiblings(array $filters = [], array $options = [])
     {
@@ -494,7 +615,7 @@ class Outbox extends Model implements MessageInterface
     /**
      * Not used, implemented from MessageInterface.
      */
-    public function copyTo(int $folderId)
+    public function copyTo(int $folderId): void
     {
         return;
     }
@@ -502,7 +623,7 @@ class Outbox extends Model implements MessageInterface
     /**
      * Logs a new item to the history text.
      */
-    private function updateHistory(string $type)
+    private function updateHistory(string $type): void
     {
         $update = date('ymdhis').' '.$type;
 
@@ -514,7 +635,7 @@ class Outbox extends Model implements MessageInterface
     /**
      * Converts addresses to arrays.
      */
-    private function convertAddresses()
+    private function convertAddresses(): void
     {
         if (is_string($this->to)) {
             $this->to = $this->parseAddresses($this->to);
@@ -533,6 +654,8 @@ class Outbox extends Model implements MessageInterface
      * @param array|string $addresses this should always come in
      *   as an array from the client, but since it's POST data we
      *   we can't type hint it
+     *
+     * @return array
      */
     private function parseAddresses($addresses)
     {
@@ -544,6 +667,9 @@ class Outbox extends Model implements MessageInterface
         return array_values(array_filter($addresses));
     }
 
+    /**
+     * @return array
+     */
     private function getNamesFromAddresses(array $addresses)
     {
         return array_map(function ($address) {
@@ -558,6 +684,9 @@ class Outbox extends Model implements MessageInterface
         }, $addresses);
     }
 
+    /**
+     * @return string
+     */
     private function addressString(array $addresses)
     {
         return implode(', ', array_filter($addresses));
@@ -566,7 +695,7 @@ class Outbox extends Model implements MessageInterface
     /**
      * Checks if an address field contains proper addresses.
      */
-    private function validateAddresses(string $field, ValidationException $e)
+    private function validateAddresses(string $field, ValidationException $e): void
     {
         $addresses = [];
 
@@ -594,6 +723,9 @@ class Outbox extends Model implements MessageInterface
         $this->$field = $addresses;
     }
 
+    /**
+     * @return string|bool
+     */
     private function validAddress(string $address)
     {
         try {

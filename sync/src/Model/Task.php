@@ -227,17 +227,11 @@ class Task extends Model
      */
     public function getTaskCountForSync(int $accountId)
     {
-        $result = $this->db()
-            ->select()
-            ->clear()
-            ->count('1', 'count')
-            ->from('tasks')
-            ->where('account_id', '=', $accountId)
-            ->where('status', '=', self::STATUS_NEW)
-            ->execute()
-            ->fetch();
+        $tasks = $this->getTasksForSync($accountId);
 
-        return intval($result['count'] ?? 0);
+        return $tasks
+            ? count($tasks)
+            : 0;
     }
 
     /**
