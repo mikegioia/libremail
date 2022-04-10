@@ -135,7 +135,7 @@ class Compose
      *
      * @throws NotFoundException
      */
-    public function reply(int $parentId, bool $replyAll = true)
+    public function reply(int $parentId, bool $replyAll, bool $isPreview)
     {
         $parent = (new Message())->getById($parentId);
         $draftId = $this->folders->getDraftsId();
@@ -157,7 +157,7 @@ class Compose
 
             Session::notify('Draft message saved.', Session::SUCCESS);
 
-            if (! Session::hasErrors()) {
+            if ($isPreview && ! Session::hasErrors()) {
                 Url::redirectRaw(Url::preview($outbox->id));
             } else {
                 Url::redirectRaw(Url::edit($outbox->id));
@@ -188,7 +188,7 @@ class Compose
      *
      * @throws NotFoundException
      */
-    public function replyEdit(int $parentId, bool $replyAll = true)
+    public function replyEdit(int $parentId, bool $replyAll)
     {
         $parent = (new Message())->getById($parentId);
         $data = $this->getReplyData($parent, $_POST, $replyAll);
@@ -208,6 +208,7 @@ class Compose
     {
         $email = $this->account->email;
 
+        // Default addresses
         if (true === $replyAll) {
             $to = $parent->getReplyToAddresses($email);
             $cc = $parent->getReplyCcAddresses($email);
@@ -216,17 +217,27 @@ class Compose
             $cc = [];
         }
 
+        // Default body text
+        $textPlain = $data['text_plain'] ?? '';
+
         // Add "Re:" to the subject but only if there isn't one
         $subject = 'Re: '.$this->cleanSubject($parent->subject);
 
+        // Drafts can come in via the message thread or from the
+        // dedicated reply page. The location of the body changes
+        // based on the source location.
+        if (isset($data['reply_all'][$parent->id])) {
+            $textPlain = $data['reply_all'][$parent->id];
+        } elseif (isset($data['reply'][$parent->id])) {
+            $textPlain = $data['reply'][$parent->id];
+        }
+
         return [
             'id' => $parent->outbox_id,
-            'to' => $to,
-            'cc' => $cc,
+            'to' => array_filter($data['to'] ?? []) ?: $to,
+            'cc' => array_filter($data['cc'] ?? []) ?: $cc,
             'subject' => $subject,
-            'text_plain' => $replyAll
-                ? ($data['reply_all'][$parent->id] ?? '')
-                : ($data['reply'][$parent->id] ?? '')
+            'text_plain' => $textPlain
         ];
     }
 

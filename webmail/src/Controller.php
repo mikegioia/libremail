@@ -360,7 +360,16 @@ class Controller
 
         $sendPreview = array_key_exists('send_preview', $_POST);
         $compose = new Compose($this->account);
-        $compose->draft($sendPreview);
+
+        if (array_key_exists('parent_id', $_POST)) {
+            $compose->reply(
+                Url::postParam('parent_id'),
+                true,
+                $sendPreview
+            );
+        } else {
+            $compose->draft($sendPreview);
+        }
     }
 
     public function send(): void
@@ -384,11 +393,13 @@ class Controller
         if (is_numeric(Url::postParam('reply_preview'))) {
             (new Compose($this->account))->reply(
                 Url::postParam('reply_preview'),
-                false
+                false,
+                true
             );
         } elseif (is_numeric(Url::postParam('reply_all_preview'))) {
             (new Compose($this->account))->reply(
                 Url::postParam('reply_all_preview'),
+                true,
                 true
             );
         } elseif (is_numeric(Url::postParam('reply_edit'))) {

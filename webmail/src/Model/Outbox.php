@@ -194,6 +194,7 @@ class Outbox extends Model implements MessageInterface
             ->select()
             ->from('outbox')
             ->where('thread_id', '=', $threadId)
+            ->where('deleted', '=', 0)
             ->execute()
             ->fetchAll();
         $items = [];

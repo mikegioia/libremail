@@ -101,46 +101,49 @@ class Message extends Model implements MessageInterface
         'include_deleted' => false
     ];
 
+    /**
+     * @return array
+     */
     public function getData()
     {
         return [
-            'id' => $this->id,
-            'to' => $this->to,
-            'cc' => $this->cc,
-            'bcc' => $this->bcc,
-            'from' => $this->from,
-            'date' => $this->date,
-            'size' => $this->size,
-            'seen' => $this->seen,
-            'draft' => $this->draft,
-            'purge' => $this->purge,
-            'synced' => $this->synced,
-            'recent' => $this->recent,
-            'flagged' => $this->flagged,
-            'deleted' => $this->deleted,
-            'subject' => $this->subject,
-            'charset' => $this->charset,
-            'answered' => $this->answered,
-            'reply_to' => $this->reply_to,
-            'date_str' => $this->date_str,
-            'recv_str' => $this->recv_str,
-            'date_recv' => $this->date_recv,
-            'unique_id' => $this->unique_id,
-            'folder_id' => $this->folder_id,
-            'thread_id' => $this->thread_id,
-            'outbox_id' => $this->outbox_id,
-            'text_html' => $this->text_html,
             'account_id' => $this->account_id,
+            'answered' => $this->answered,
+            'attachments' => $this->attachments,
+            'bcc' => $this->bcc,
+            'cc' => $this->cc,
+            'charset' => $this->charset,
+            'created_at' => $this->created_at,
+            'date' => $this->date,
+            'date_recv' => $this->date_recv,
+            'date_str' => $this->date_str,
+            'deleted' => $this->deleted,
+            'draft' => $this->draft,
+            'flagged' => $this->flagged,
+            'folder_id' => $this->folder_id,
+            'from' => $this->from,
+            'id' => $this->id,
+            'in_reply_to' => $this->in_reply_to,
             'message_id' => $this->message_id,
             'message_no' => $this->message_no,
-            'text_plain' => $this->text_plain,
-            'references' => $this->references,
-            'created_at' => $this->created_at,
-            'in_reply_to' => $this->in_reply_to,
-            'attachments' => $this->attachments,
-            'raw_headers' => $this->raw_headers,
+            'outbox_id' => $this->outbox_id,
+            'purge' => $this->purge,
             'raw_content' => $this->raw_content,
-            'uid_validity' => $this->uid_validity
+            'raw_headers' => $this->raw_headers,
+            'recent' => $this->recent,
+            'recv_str' => $this->recv_str,
+            'references' => $this->references,
+            'reply_to' => $this->reply_to,
+            'seen' => $this->seen,
+            'size' => $this->size,
+            'subject' => $this->subject,
+            'synced' => $this->synced,
+            'text_html' => $this->text_html,
+            'text_plain' => $this->text_plain,
+            'thread_id' => $this->thread_id,
+            'to' => $this->to,
+            'uid_validity' => $this->uid_validity,
+            'unique_id' => $this->unique_id
         ];
     }
 
@@ -162,6 +165,9 @@ class Message extends Model implements MessageInterface
         return $this->decodedAttachments;
     }
 
+    /**
+     * @return string
+     */
     public function getOriginal()
     {
         return $this->raw_headers."\r\n".$this->raw_content;
@@ -1132,6 +1138,8 @@ class Message extends Model implements MessageInterface
      *
      * @param int $draftsId Drafts mailbox (folder) ID
      * @param Message $parent Message being replied to
+     *
+     * @return Message|null
      */
     public function createOrUpdateDraft(
         Outbox $outbox,
@@ -1184,6 +1192,9 @@ class Message extends Model implements MessageInterface
         return $this->createOrUpdate($message);
     }
 
+    /**
+     * @return Message
+     */
     public function createOrUpdate(
         Message $message,
         bool $removeNulls = true,
